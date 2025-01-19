@@ -1,9 +1,11 @@
-interface Location {
+import mapboxgl from 'mapbox-gl';
+
+export interface Location {
   lat: number;
   lng: number;
 }
 
-interface CrewMember {
+export interface CrewMember {
   id: number;
   name: string;
   certification: string;
@@ -11,10 +13,14 @@ interface CrewMember {
   available: boolean;
 }
 
-interface RouteInfo {
+export interface RouteInfo {
   distance: number;
   duration: number;
-  route: any; // Mapbox route response
+  route: any;
+}
+
+export interface CrewWithRoute extends CrewMember {
+  routeInfo: RouteInfo;
 }
 
 export const crewMembers: CrewMember[] = [
@@ -47,10 +53,25 @@ export function calculateDistance(crew: CrewMember, origin: Location): number {
   return R * c;
 }
 
+// Simple recommendation based on distance
+export function recommendCrew(dispatch: { origin: Location, serviceType: string }): CrewMember | null {
+  const availableCrew = crewMembers.filter(crew => crew.available);
+  if (availableCrew.length === 0) return null;
+
+  return availableCrew.reduce((closest, current) => {
+    const closestDistance = calculateDistance(closest, dispatch.origin);
+    const currentDistance = calculateDistance(current, dispatch.origin);
+    return currentDistance < closestDistance ? current : closest;
+  });
+}
+
 // Get route information using Mapbox Directions API
-async function getRouteInfo(start: Location, end: Location): Promise<RouteInfo> {
+export async function getRouteInfo(start: Location, end: Location): Promise<RouteInfo> {
+  // Replace with your Mapbox token
+  const MAPBOX_TOKEN = 'YOUR_MAPBOX_TOKEN';
+  
   const response = await fetch(
-    `https://api.mapbox.com/directions/v5/mapbox/driving/${start.lng},${start.lat};${end.lng},${end.lat}?access_token=${mapboxgl.accessToken}`
+    `https://api.mapbox.com/directions/v5/mapbox/driving/${start.lng},${start.lat};${end.lng},${end.lat}?access_token=${MAPBOX_TOKEN}`
   );
   const data = await response.json();
   
@@ -66,32 +87,23 @@ async function getRouteInfo(start: Location, end: Location): Promise<RouteInfo> 
 }
 
 // Recommend crew based on proximity and route information
-export async function recommendCrewWithRoute(dispatch: { origin: Location, serviceType: string }): Promise<(CrewMember & { routeInfo: RouteInfo }) | null> {
+export async function recommendCrewWithRoute(dispatch: { origin: Location, serviceType: string }): Promise<CrewWithRoute | null> {
   const availableCrew = crewMembers.filter(crew => crew.available);
   if (availableCrew.length === 0) return null;
 
-  // Get route information for all available crews
-  const crewWithRoutes = await Promise.all(
-    availableCrew.map(async (crew) => {
-      try {
+  try {
+    const crewWithRoutes = await Promise.all(
+      availableCrew.map(async (crew) => {
         const routeInfo = await getRouteInfo(crew.location, dispatch.origin);
         return { ...crew, routeInfo };
-      } catch (error) {
-        console.error(`Failed to get route for crew ${crew.id}:`, error);
-        // Fallback to straight-line distance if route calculation fails
-        return {
-          ...crew,
-          routeInfo: {
-            distance: calculateDistance(crew, dispatch.origin),
-            duration: calculateDistance(crew, dispatch.origin) * 2, // Rough estimate
-            route: null
-          }
-        };
-      }
-    })
-  );
+      })
+    );
 
-  // Sort by duration and return the best option
-  crewWithRoutes.sort((a, b) => a.routeInfo.duration - b.routeInfo.duration);
-  return crewWithRoutes[0];
+    // Sort by duration and return the best option
+    crewWithRoutes.sort((a, b) => a.routeInfo.duration - b.routeInfo.duration);
+    return crewWithRoutes[0];
+  } catch (error) {
+    console.error('Failed to get routes:', error);
+    return null;
+  }
 }
