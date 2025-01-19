@@ -26,7 +26,9 @@ import {
   ShieldCheck,
   CreditCard,
   Clock,
-  CalendarClock
+  CalendarClock,
+  Ambulance,
+  Building2
 } from "lucide-react";
 
 const PatientRecord = () => {
@@ -190,7 +192,7 @@ const PatientRecord = () => {
                           <ScrollArea className="h-[200px]">
                             <div className="space-y-3">
                               <div className="flex items-center gap-2 text-sm">
-                                <Hospital className="h-4 w-4 text-gray-500" />
+                                <Building2 className="h-4 w-4 text-gray-500" />
                                 <div>
                                   <p className="font-medium">Emory University Hospital</p>
                                   <p className="text-gray-500">Last transport: 3 days ago</p>
