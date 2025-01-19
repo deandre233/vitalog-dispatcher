@@ -5,6 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { recommendCrew } from "@/utils/crewRecommendation";
 
 interface AIRecommendations {
   route: string;
@@ -39,6 +40,19 @@ export function DispatchItem({
   aiRecommendations,
   eta,
 }: DispatchItemProps) {
+  // Mock coordinates for demonstration
+  const mockDispatch = {
+    id,
+    origin: { lat: 33.7720, lng: -84.3960 },
+    destination: { lat: 33.7890, lng: -84.3920 },
+    serviceType,
+  };
+
+  const recommendedCrew = recommendCrew(mockDispatch);
+  const crewRecommendation = recommendedCrew
+    ? `Recommended: ${recommendedCrew.name} (${recommendedCrew.distance.toFixed(2)}km away)`
+    : "No crew available";
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -110,7 +124,7 @@ export function DispatchItem({
           <div className="space-y-2">
             <p className="font-medium">AI Recommendations:</p>
             <p className="text-sm">Route: {aiRecommendations.route}</p>
-            <p className="text-sm">Crew: {aiRecommendations.crew}</p>
+            <p className="text-sm">Crew: {crewRecommendation}</p>
             <p className="text-sm">Billing: {aiRecommendations.billing}</p>
           </div>
         </TooltipContent>
