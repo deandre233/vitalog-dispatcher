@@ -57,6 +57,25 @@ interface DispatchItemProps {
   efficiency?: number;
 }
 
+const getProgressForStatus = (status: DispatchStatus): number => {
+  switch (status) {
+    case "dispatch":
+      return 0;
+    case "enroute":
+      return 20;
+    case "onscene":
+      return 40;
+    case "transporting":
+      return 60;
+    case "destination":
+      return 80;
+    case "available":
+      return 100;
+    default:
+      return 0;
+  }
+};
+
 export function DispatchItem({
   id,
   activationTime,
@@ -113,6 +132,9 @@ export function DispatchItem({
     setCurrentStatus(newStatus);
     toast.success(`Status updated to ${newStatus}`);
   };
+
+  // Calculate progress based on current status
+  const currentProgress = getProgressForStatus(currentStatus);
 
   return (
     <div
@@ -246,9 +268,9 @@ export function DispatchItem({
                   <div className="space-y-1">
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Transport Progress</span>
-                      <span>{progress}%</span>
+                      <span>{currentProgress}%</span>
                     </div>
-                    <Progress value={progress} className="h-2" />
+                    <Progress value={currentProgress} className="h-2" />
                   </div>
                 </div>
               </div>
