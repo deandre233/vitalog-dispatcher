@@ -1,12 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { MapPin, Clock, Ambulance, User, Building, Brain } from "lucide-react";
+import { Brain } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { DispatchItem } from "./DispatchItem";
+import { DispatchFilters } from "./DispatchFilters";
 
 const dispatches = [
   {
@@ -66,109 +62,23 @@ export function DispatchBoard() {
   return (
     <Card className="p-6 m-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-medical-primary">Active Dispatches</h2>
-        <div className="flex gap-2">
-          <input type="date" className="px-3 py-1 border rounded-md" />
-          <select className="px-3 py-1 border rounded-md">
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="enroute">En Route</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
+        <h2 className="text-xl font-semibold text-medical-primary">
+          Active Dispatches
+        </h2>
+        <DispatchFilters />
       </div>
 
       <Alert className="mb-4">
         <Brain className="h-4 w-4" />
         <AlertDescription>
-          AI Insight: Current dispatch load is optimal. 2 crews available for emergency response.
+          AI Insight: Current dispatch load is optimal. 2 crews available for
+          emergency response.
         </AlertDescription>
       </Alert>
 
       <div className="space-y-4">
         {dispatches.map((dispatch) => (
-          <TooltipProvider key={dispatch.id}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center justify-between p-4 bg-white border rounded-lg hover:bg-medical-accent transition-colors">
-                  <div className="flex items-center gap-6">
-                    <div
-                      className={`p-2 rounded-full ${
-                        dispatch.priority === "high"
-                          ? "bg-red-100"
-                          : dispatch.priority === "medium"
-                          ? "bg-yellow-100"
-                          : "bg-green-100"
-                      }`}
-                    >
-                      <Ambulance
-                        className={`w-5 h-5 ${
-                          dispatch.priority === "high"
-                            ? "text-red-500"
-                            : dispatch.priority === "medium"
-                            ? "text-yellow-500"
-                            : "text-green-500"
-                        }`}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <div className="font-medium text-medical-primary">
-                        {dispatch.id}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Clock className="w-4 h-4" />
-                        <span>{dispatch.activationTime}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <User className="w-4 h-4" />
-                        <span>{dispatch.assignedTo}</span>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="font-medium">{dispatch.patient}</div>
-                      <div className="text-sm text-gray-500">
-                        {dispatch.serviceType}
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Building className="w-4 h-4 text-gray-500" />
-                        <span>{dispatch.origin}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="w-4 h-4 text-gray-500" />
-                        <span>{dispatch.destination}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-sm font-medium">
-                      ETA: {dispatch.eta}
-                    </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        dispatch.status === "En Route"
-                          ? "bg-blue-100 text-blue-700"
-                          : dispatch.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-green-100 text-green-700"
-                      }`}
-                    >
-                      {dispatch.status}
-                    </span>
-                  </div>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="w-64">
-                <div className="space-y-2">
-                  <p className="font-medium">AI Recommendations:</p>
-                  <p className="text-sm">Route: {dispatch.aiRecommendations.route}</p>
-                  <p className="text-sm">Crew: {dispatch.aiRecommendations.crew}</p>
-                  <p className="text-sm">Billing: {dispatch.aiRecommendations.billing}</p>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <DispatchItem key={dispatch.id} {...dispatch} />
         ))}
       </div>
     </Card>
