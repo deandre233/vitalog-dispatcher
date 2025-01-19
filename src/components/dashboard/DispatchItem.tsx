@@ -9,7 +9,8 @@ import {
   Calendar,
   ChevronDown,
   ChevronUp,
-  XCircle
+  XCircle,
+  Brain
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -28,6 +29,7 @@ interface AIRecommendations {
   route: string;
   crew: string;
   billing: string;
+  insights?: string[];
 }
 
 interface DispatchItemProps {
@@ -265,6 +267,12 @@ export function DispatchItem({
               <div className="mt-4 p-3 bg-blue-50 rounded-md">
                 <h4 className="text-sm font-medium text-blue-700 mb-2">AI Insights</h4>
                 <ul className="space-y-1">
+                  {aiRecommendations.insights?.map((insight, index) => (
+                    <li key={index} className="text-sm text-blue-600 flex items-center gap-2">
+                      <Brain className="w-4 h-4" />
+                      {insight}
+                    </li>
+                  ))}
                   <li className="text-sm text-blue-600">{aiRecommendations.route}</li>
                   <li className="text-sm text-blue-600">{aiRecommendations.crew}</li>
                   <li className="text-sm text-blue-600">{aiRecommendations.billing}</li>

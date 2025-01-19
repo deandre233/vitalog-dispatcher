@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { getTrafficInfo } from "@/utils/aiDispatchUtils";
+import { analyzeDispatchEfficiency, monitorDispatchProgress, generateAIInsights } from "@/utils/aiDispatchAnalytics";
 
 interface Patient {
   name: string;
@@ -20,6 +21,7 @@ interface AIRecommendations {
   route: string;
   crew: string;
   billing: string;
+  insights?: string[];
   trafficStatus?: {
     congestionLevel: "low" | "medium" | "high";
     estimatedDelay: number;
@@ -113,23 +115,35 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     progress = Math.min(100, progress + Math.random() * 5);
   }
 
-  // Get traffic updates
-  const trafficInfo = getTrafficInfo(
+  // Get analytics data
+  const analytics = analyzeDispatchEfficiency(
     { lat: 33.7720, lng: -84.3960 }, // Mock origin coordinates
-    { lat: 33.7490, lng: -84.3880 }  // Mock destination coordinates
+    { lat: 33.7490, lng: -84.3880 },  // Mock destination coordinates
+    undefined,
+    `${elapsedMinutes} min`
   );
 
-  // Calculate efficiency score based on progress and traffic
-  const efficiency = calculateEfficiencyScore(progress, trafficInfo.congestionLevel);
+  // Monitor dispatch progress
+  monitorDispatchProgress(dispatch.status.toLowerCase(), `${elapsedMinutes}`, 30);
+
+  // Generate AI insights
+  const aiInsights = generateAIInsights(analytics);
+
+  // Get traffic updates
+  const trafficInfo = getTrafficInfo(
+    { lat: 33.7720, lng: -84.3960 },
+    { lat: 33.7490, lng: -84.3880 }
+  );
 
   return {
     ...dispatch,
     progress,
     elapsedTime: `${elapsedMinutes} min`,
     lastUpdated: now.toISOString(),
-    efficiency,
+    efficiency: analytics.efficiency,
     aiRecommendations: {
       ...dispatch.aiRecommendations,
+      insights: aiInsights,
       trafficStatus: {
         congestionLevel: trafficInfo.congestionLevel,
         estimatedDelay: trafficInfo.delayMinutes,
@@ -137,16 +151,6 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       }
     }
   };
-};
-
-const calculateEfficiencyScore = (progress: number, congestionLevel: "low" | "medium" | "high"): number => {
-  const baseScore = progress;
-  const trafficMultiplier = 
-    congestionLevel === "low" ? 1 :
-    congestionLevel === "medium" ? 0.8 :
-    0.6;
-  
-  return Math.round(baseScore * trafficMultiplier);
 };
 
 export function DispatchBoard() {
