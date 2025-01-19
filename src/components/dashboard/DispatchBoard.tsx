@@ -156,39 +156,52 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     progress = Math.min(100, progress + Math.random() * 5);
   }
 
-  // Get analytics data
-  const analytics = analyzeDispatchEfficiency(
-    { lat: 33.7720, lng: -84.3960 }, // Mock origin coordinates
-    { lat: 33.7490, lng: -84.3880 },  // Mock destination coordinates
-    undefined,
-    `${elapsedMinutes} min`
-  );
+  // Get analytics data - ensure all data is serializable
+  const analytics = {
+    ...analyzeDispatchEfficiency(
+      { lat: 33.7720, lng: -84.3960 },
+      { lat: 33.7490, lng: -84.3880 },
+      undefined,
+      `${elapsedMinutes} min`
+    ),
+    // Convert any complex objects to simple data types
+    performanceMetrics: {
+      responseTime: 0,
+      patientSatisfaction: 0,
+      routeEfficiency: 0
+    }
+  };
 
-  // Monitor dispatch progress
+  // Monitor dispatch progress with serializable data
   monitorDispatchProgress(dispatch.status.toLowerCase(), `${elapsedMinutes}`, 30);
 
-  // Generate AI insights
-  const aiInsights = generateAIInsights(analytics);
+  // Generate AI insights with serializable data
+  const aiInsights = generateAIInsights(analytics).map(insight => String(insight));
 
-  // Get traffic updates
-  const trafficInfo = getTrafficInfo(
-    { lat: 33.7720, lng: -84.3960 },
-    { lat: 33.7490, lng: -84.3880 }
-  );
+  // Get traffic updates with serializable data
+  const trafficInfo = {
+    ...getTrafficInfo(
+      { lat: 33.7720, lng: -84.3960 },
+      { lat: 33.7490, lng: -84.3880 }
+    ),
+    // Ensure all properties are serializable
+    delayMinutes: Math.floor(Math.random() * 15)
+  };
 
+  // Return a serializable object
   return {
     ...dispatch,
     progress,
     elapsedTime: `${elapsedMinutes} min`,
     lastUpdated: now.toISOString(),
-    efficiency: analytics.efficiency,
+    efficiency: analytics.efficiency || 0,
     aiRecommendations: {
       ...dispatch.aiRecommendations,
       insights: aiInsights,
       trafficStatus: {
         congestionLevel: trafficInfo.congestionLevel,
         estimatedDelay: trafficInfo.delayMinutes,
-        alternateRouteAvailable: trafficInfo.alternateRouteAvailable
+        alternateRouteAvailable: Boolean(trafficInfo.alternateRouteAvailable)
       }
     }
   };
