@@ -1,4 +1,4 @@
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger } from "@/components/ui/sidebar";
 import { Users, Map, ClipboardCheck, Brain, Inbox, Calendar, Archive, Bell, ShieldCheck, FolderLock, Building, Network, UserRound, Upload, BookOpen, Tags, History, Link2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
@@ -27,8 +27,12 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar>
+    <Sidebar variant="floating" collapsible="icon">
       <SidebarContent>
+        <div className="flex items-center justify-between px-4 py-2">
+          <span className="text-lg font-semibold text-medical-primary">Dispatch</span>
+          <SidebarTrigger />
+        </div>
         <SidebarGroup>
           <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
           <SidebarGroupContent>
