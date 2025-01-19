@@ -411,13 +411,24 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               value={record?.carrier_type}
               onValueChange={(value) => handleInsuranceChange(type, 'carrier_type', value)}
             >
-              <option value="">Select Carrier Type</option>
-              <option value="Medicare">Medicare</option>
-              <option value="Medicaid">Medicaid</option>
-              <option value="Blue Cross / Blue Shield">Blue Cross / Blue Shield</option>
-              <option value="Commercial">Commercial Insurance</option>
-              <option value="HMO">HMO Medicare Risk</option>
-              <option value="Other">Other</option>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Carrier Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Medicare">Medicare</SelectItem>
+                <SelectItem value="Medicaid">Medicaid [MC]</SelectItem>
+                <SelectItem value="Blue Cross">Blue Cross / Blue Shield [BL]</SelectItem>
+                <SelectItem value="Commercial">Commercial Insurance [CI]</SelectItem>
+                <SelectItem value="HMO">HMO Medicare Risk [16]</SelectItem>
+                <SelectItem value="Disability">Disability [DS]</SelectItem>
+                <SelectItem value="Federal">Federal Employees Program [F1]</SelectItem>
+                <SelectItem value="Liability">Liability Medical [LM]</SelectItem>
+                <SelectItem value="Self">Self-administered Group [SA]</SelectItem>
+                <SelectItem value="Title V">Title V [TV]</SelectItem>
+                <SelectItem value="VA">Veteran Affairs [VA]</SelectItem>
+                <SelectItem value="Workers">Workers Compensation [WC]</SelectItem>
+                <SelectItem value="Other">Other Insurance</SelectItem>
+              </SelectContent>
             </Select>
           </div>
           <div>
@@ -426,14 +437,22 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               value={record?.policy_type}
               onValueChange={(value) => handleInsuranceChange(type, 'policy_type', value)}
             >
-              <option value="">Select Policy Type</option>
-              <option value="Medicare part B [MB]">Medicare part B [MB]</option>
-              <option value="Medicare part A [MA]">Medicare part A [MA]</option>
-              <option value="Medicaid [MC]">Medicaid [MC]</option>
-              <option value="Blue Cross / Blue Shield [BL]">Blue Cross / Blue Shield [BL]</option>
-              <option value="Commercial insurance [CI]">Commercial insurance [CI]</option>
-              <option value="Health Maint Organization [HM]">Health Maint Organization [HM]</option>
-              <option value="Other">Other insurance is primary [47]</option>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Policy Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Medicare part B [MB]">Medicare part B [MB]</SelectItem>
+                <SelectItem value="Medicare part A [MA]">Medicare part A [MA]</SelectItem>
+                <SelectItem value="Medicare part C [ME]">Medicare part C / Advantage [ME]</SelectItem>
+                <SelectItem value="Medicaid [MC]">Medicaid [MC]</SelectItem>
+                <SelectItem value="Blue Cross [BL]">Blue Cross / Blue Shield [BL]</SelectItem>
+                <SelectItem value="Commercial [CI]">Commercial Insurance [CI]</SelectItem>
+                <SelectItem value="HMO [HM]">Health Maint Organization [HM]</SelectItem>
+                <SelectItem value="EPO [14]">Exclusive Prov Organization [14]</SelectItem>
+                <SelectItem value="PPO [12]">Preferred Prov Organization [12]</SelectItem>
+                <SelectItem value="POS [13]">Point Of Service [13]</SelectItem>
+                <SelectItem value="Other [47]">Other Insurance [47]</SelectItem>
+              </SelectContent>
             </Select>
           </div>
         </div>
@@ -515,11 +534,15 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
             value={record?.patient_relation}
             onValueChange={(value) => handlePatientRelationChange(type, value)}
           >
-            <option value="">Select Relation</option>
-            <option value="Self">Self</option>
-            <option value="Spouse">Spouse</option>
-            <option value="Child">Child</option>
-            <option value="Other">Other</option>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Relation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Self">Self</SelectItem>
+              <SelectItem value="Spouse">Spouse</SelectItem>
+              <SelectItem value="Child">Child</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
           </Select>
         </div>
 
@@ -547,11 +570,15 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               onValueChange={(value) => handleInsuranceChange(type, 'policyholder_gender', value)}
               disabled={record?.patient_relation === 'Self'}
             >
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-              <option value="Not recorded">Not recorded</option>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Male">Male</SelectItem>
+                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="Not recorded">Not recorded</SelectItem>
+              </SelectContent>
             </Select>
             <Input
               value={record?.policyholder_phone}
@@ -710,8 +737,13 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               value={billingSettings.pricing_schema}
               onValueChange={(value) => handleBillingSettingsChange('pricing_schema', value)}
             >
-              <option value="retail">Retail</option>
-              <option value="insurance">Insurance</option>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Pricing Schema" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="retail">Retail</SelectItem>
+                <SelectItem value="insurance">Insurance</SelectItem>
+              </SelectContent>
             </Select>
           </div>
 
