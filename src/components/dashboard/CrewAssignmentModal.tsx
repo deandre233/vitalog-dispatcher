@@ -116,7 +116,10 @@ export function CrewAssignmentModal({
           data: {
             type: 'Feature',
             properties: {},
-            geometry: recommendedCrew.routeInfo.route!.geometry
+            geometry: {
+              type: 'LineString',
+              coordinates: recommendedCrew.routeInfo.route!.geometry.coordinates
+            }
           }
         });
 
