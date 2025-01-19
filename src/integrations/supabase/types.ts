@@ -158,11 +158,14 @@ export type Database = {
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
           first_name: string
+          gender: string | null
           id: string
           last_name: string
           medical_conditions: string[] | null
           medications: string[] | null
           phone: string | null
+          primary_insurance: string | null
+          secondary_insurance: string | null
           state: string | null
           updated_at: string | null
           zip: string | null
@@ -177,11 +180,14 @@ export type Database = {
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           first_name: string
+          gender?: string | null
           id?: string
           last_name: string
           medical_conditions?: string[] | null
           medications?: string[] | null
           phone?: string | null
+          primary_insurance?: string | null
+          secondary_insurance?: string | null
           state?: string | null
           updated_at?: string | null
           zip?: string | null
@@ -196,11 +202,14 @@ export type Database = {
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           first_name?: string
+          gender?: string | null
           id?: string
           last_name?: string
           medical_conditions?: string[] | null
           medications?: string[] | null
           phone?: string | null
+          primary_insurance?: string | null
+          secondary_insurance?: string | null
           state?: string | null
           updated_at?: string | null
           zip?: string | null
@@ -211,11 +220,14 @@ export type Database = {
         Row: {
           created_at: string | null
           crew_assigned: string | null
+          destination_address: string | null
           dispatch_id: string
+          dispatch_status: Database["public"]["Enums"]["dispatch_status"] | null
           dropoff_location: string
           dropoff_type: string | null
           id: string
           notes: string | null
+          origin_address: string | null
           patient_id: string | null
           pickup_location: string
           pickup_type: string | null
@@ -223,6 +235,7 @@ export type Database = {
           recurrence_frequency: string | null
           recurrence_type: string | null
           return_trip_id: string | null
+          scheduled_time: string | null
           status: string
           transport_date: string | null
           warnings: string[] | null
@@ -230,11 +243,16 @@ export type Database = {
         Insert: {
           created_at?: string | null
           crew_assigned?: string | null
+          destination_address?: string | null
           dispatch_id: string
+          dispatch_status?:
+            | Database["public"]["Enums"]["dispatch_status"]
+            | null
           dropoff_location: string
           dropoff_type?: string | null
           id?: string
           notes?: string | null
+          origin_address?: string | null
           patient_id?: string | null
           pickup_location: string
           pickup_type?: string | null
@@ -242,6 +260,7 @@ export type Database = {
           recurrence_frequency?: string | null
           recurrence_type?: string | null
           return_trip_id?: string | null
+          scheduled_time?: string | null
           status: string
           transport_date?: string | null
           warnings?: string[] | null
@@ -249,11 +268,16 @@ export type Database = {
         Update: {
           created_at?: string | null
           crew_assigned?: string | null
+          destination_address?: string | null
           dispatch_id?: string
+          dispatch_status?:
+            | Database["public"]["Enums"]["dispatch_status"]
+            | null
           dropoff_location?: string
           dropoff_type?: string | null
           id?: string
           notes?: string | null
+          origin_address?: string | null
           patient_id?: string | null
           pickup_location?: string
           pickup_type?: string | null
@@ -261,6 +285,7 @@ export type Database = {
           recurrence_frequency?: string | null
           recurrence_type?: string | null
           return_trip_id?: string | null
+          scheduled_time?: string | null
           status?: string
           transport_date?: string | null
           warnings?: string[] | null
@@ -290,7 +315,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      dispatch_status: "Pending" | "In Progress" | "Completed"
     }
     CompositeTypes: {
       [_ in never]: never
