@@ -339,7 +339,7 @@ export function DispatchItem({
         dispatchId={id}
         serviceType={serviceType}
         origin={{ lat: 33.7490, lng: -84.3880 }}
-        onAssign={handleAssign}
+        onAssign={closeAssignModal}
       />
     </div>
   );
