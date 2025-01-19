@@ -13,13 +13,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate, useParams } from "react-router-dom";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { toast } from "sonner";
 
 type WarningKeys = "requiresOxygen" | "requiresIsolation" | "bariatric" | "dnrOrder";
 type BarrierKeys = "hearing" | "physical" | "vision" | "cognitive" | "cultural" | "language" | "speech" | "alcohol" | "drug" | "unsupervised";
 
 const formSchema = z.object({
   id: z.string(),
-  dob: z.string(),
+  dob: z.date(),
   gender: z.string(),
   race: z.string(),
   ssn: z.string(),
@@ -63,15 +70,19 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function PatientRecord() {
+  const { patientName } = useParams();
+  const navigate = useNavigate();
+  const decodedName = decodeURIComponent(patientName || "");
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       id: "",
-      dob: "",
+      dob: new Date(),
       gender: "",
       race: "",
       ssn: "",
-      travelType: "stretcher", // Default value from image
+      travelType: "stretcher",
       warnings: {
         requiresOxygen: false,
         requiresIsolation: false,
@@ -97,7 +108,7 @@ export default function PatientRecord() {
       address: {
         street: "",
         city: "",
-        state: "Georgia", // Default value from image
+        state: "Georgia",
         zip: "",
       },
       phone: {
@@ -111,38 +122,90 @@ export default function PatientRecord() {
 
   const onSubmit = (data: FormValues) => {
     console.log(data);
+    toast.success("Patient record updated successfully");
+  };
+
+  const handleViewProfile = () => {
+    navigate(`/patient-profile/${patientName}`);
   };
 
   return (
     <div className="container mx-auto p-6 bg-[#f5f7fa]">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Edit Patient</h1>
-        <div className="flex gap-2">
-          <Button variant="outline">PDF</Button>
+        <div>
+          <h1 className="text-2xl font-bold">{decodedName}</h1>
+          <Button 
+            variant="link" 
+            onClick={handleViewProfile}
+            className="text-blue-600 p-0 h-auto font-normal hover:text-blue-800"
+          >
+            View Full Profile
+          </Button>
         </div>
+        <Button variant="outline">PDF</Button>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="bg-white p-6 rounded-lg shadow-sm">
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-4">Travel Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
-                name="travelType"
+                name="dob"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Date of Birth</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ssn"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Usually travels by</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select travel type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="stretcher">Stretcher</SelectItem>
-                        <SelectItem value="wheelchair">Wheelchair</SelectItem>
-                        <SelectItem value="ambulatory">Ambulatory</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Social Security Number</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field} 
+                        type="password" 
+                        className="font-mono"
+                        onClick={() => toast.info("Validating SSN...")}
+                      />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -205,8 +268,14 @@ export default function PatientRecord() {
                     <FormItem>
                       <FormLabel>Residence Facility</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input 
+                          {...field} 
+                          onClick={() => {
+                            toast.info("Loading facility details...");
+                          }}
+                        />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
