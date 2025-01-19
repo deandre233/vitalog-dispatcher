@@ -22,29 +22,36 @@ export function UnitDetailView() {
   const { unitId } = useParams();
   const navigate = useNavigate();
 
-  // This would be replaced with actual data fetching
-  const { data: unitData } = useQuery({
+  const { data: unitData, isLoading, error } = useQuery({
     queryKey: ['unit', unitId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('transport_records')
         .select('*')
         .eq('crew_assigned', unitId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      if (!data) {
+        return null;
+      }
+
       return {
-        unitId: unitId || "MED 1",
-        status: "En Route",
+        unitId: unitId || "Unknown Unit",
+        status: data.status || "Unknown",
         progress: 60,
         distance: "4.2 miles",
-        origin: "Emory Dialysis At North Decatur",
-        destination: "Emory University Hospital Midtown",
+        origin: data.pickup_location || "Unknown Origin",
+        destination: data.dropoff_location || "Unknown Destination",
         patient: "Turner, Angela",
         condition: "Breathing problem: Req oxygen",
-        scheduledTime: "12:30 PM",
+        scheduledTime: data.scheduled_time ? new Date(data.scheduled_time).toLocaleTimeString() : "Not scheduled",
         transportType: "BLS",
-        crew: "Kimpson, Deandre + Parker, Patrick",
+        crew: data.crew_assigned || "Unassigned",
         schedule: "6 hours over",
         calls: "0 calls done",
         aiRecommendations: {
@@ -80,7 +87,7 @@ export function UnitDetailView() {
     toast.info("Cancel functionality to be implemented");
   };
 
-  if (!unitData) {
+  if (isLoading) {
     return (
       <Card className="p-6 m-6">
         <div className="flex items-center gap-4">
@@ -93,6 +100,48 @@ export function UnitDetailView() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-2xl font-bold">Loading...</h1>
+        </div>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-6 m-6">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="h-8 w-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-red-600">Error Loading Unit Data</h1>
+            <p className="text-gray-600">Please try again later</p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!unitData) {
+    return (
+      <Card className="p-6 m-6">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="h-8 w-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">Unit Not Found</h1>
+            <p className="text-gray-600">No active transport found for unit {unitId}</p>
+          </div>
         </div>
       </Card>
     );
