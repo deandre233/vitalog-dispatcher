@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { DollarSign, CreditCard, Receipt, Save, Check, AlertCircle, Upload, Wand2 } from "lucide-react";
+import { DollarSign, CreditCard, Receipt, Save, Check, AlertCircle, Upload, Wand2, Loader2 } from "lucide-react";
 
 interface InsuranceRecord {
   id?: string;
@@ -97,6 +97,9 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
       to: ''
     }
   });
+  const [isUploading, setIsUploading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const fetchBillingSettings = async () => {
     try {
@@ -470,6 +473,75 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     }
   };
 
+  const handleFileUpload = async (type: 'primary' | 'secondary' | 'reserved', event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${patientId}/${type}_${Date.now()}.${fileExt}`;
+
+      const { error: uploadError, data } = await supabase.storage
+        .from('insurance_cards')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('insurance_cards')
+        .getPublicUrl(filePath);
+
+      setIsAnalyzing(true);
+
+      const { data: analysisData, error: analysisError } = await supabase.functions
+        .invoke('analyze-insurance-card', {
+          body: { imageUrl: publicUrl }
+        });
+
+      if (analysisError) {
+        throw analysisError;
+      }
+
+      // Update insurance record with extracted information
+      setInsuranceRecords(prev => 
+        prev.map(record => 
+          record.type === type
+            ? {
+                ...record,
+                carrier_name: analysisData.carrier_name || record.carrier_name,
+                carrier_type: analysisData.carrier_type || record.carrier_type,
+                policy_number: analysisData.policy_number || record.policy_number,
+                group_number: analysisData.group_number || record.group_number,
+                phone: analysisData.claims_phone || record.phone,
+                payor_id: analysisData.payor_id || record.payor_id,
+              }
+            : record
+        )
+      );
+
+      toast({
+        title: "Success",
+        description: "Insurance card scanned and information extracted successfully",
+      });
+    } catch (error) {
+      console.error('Error processing insurance card:', error);
+      setUploadError(error.message);
+      toast({
+        title: "Error",
+        description: "Failed to process insurance card",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      setIsAnalyzing(false);
+    }
+  };
+
   const InsuranceSection = ({ type, record }: { type: 'primary' | 'secondary' | 'reserved', record?: InsuranceRecord }) => (
     <Card className="p-6 space-y-6">
       <div className="flex items-center gap-2">
@@ -675,6 +747,31 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
             />
           </div>
         </div>
+
+        <div className="flex items-center gap-4 mb-4">
+          <Input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleFileUpload(type, e)}
+            className="hidden"
+            id={`insurance-card-${type}`}
+            disabled={isUploading || isAnalyzing}
+          />
+          <Button
+            variant="outline"
+            onClick={() => document.getElementById(`insurance-card-${type}`)?.click()}
+            disabled={isUploading || isAnalyzing}
+            className="w-full"
+          >
+            {isUploading ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Upload className="h-4 w-4 mr-2" />
+            )}
+            {isUploading ? "Uploading..." : isAnalyzing ? "Analyzing..." : "Scan Insurance Card"}
+          </Button>
+        </div>
+
       </div>
     </Card>
   );
