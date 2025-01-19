@@ -14,9 +14,11 @@ import {
   XCircle,
   AlertTriangle,
   Navigation,
-  Truck
+  Truck,
+  Ambulance
 } from "lucide-react";
 import { toast } from "sonner";
+import { format, formatDistanceToNow } from "date-fns";
 
 interface Patient {
   name: string;
@@ -153,6 +155,7 @@ export function DispatchItem({
 
   // Calculate progress based on current status
   const currentProgress = getProgressForStatus(currentStatus);
+  const timeElapsed = formatDistanceToNow(new Date(activationTime));
 
   return (
     <div
@@ -162,168 +165,160 @@ export function DispatchItem({
           : "bg-white hover:bg-gray-50"
       }`}
     >
-      <div className="flex justify-between items-start">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Link 
-              to={`/dispatch/${id}`}
-              className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
-            >
-              Call #{id}
-            </Link>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(currentStatus)}`}>
-              {currentStatus}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleExpand}
-              className="ml-2"
-            >
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
+      {/* Header Section - Always Visible */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <Link 
+            to={`/dispatch/${id}`}
+            className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+          >
+            Call #{id}
+          </Link>
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(currentStatus)}`}>
+            {currentStatus}
+          </span>
+          {assignedTo !== "Unassigned" && (
+            <div className="flex items-center gap-2">
+              <Ambulance className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">{assignedTo}</span>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Clock className="h-4 w-4" />
+              <span>Elapsed: {timeElapsed}</span>
+            </div>
+            {lastUpdated && (
+              <div className="text-xs text-gray-500">
+                Last updated: {format(new Date(lastUpdated), 'HH:mm')}
+              </div>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleExpand}
+            className="ml-2"
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Quick Info - Always Visible */}
+      <div className="mt-2 grid grid-cols-2 gap-4">
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-gray-500" />
+          <Link 
+            to={`/patient/${patient.id}`}
+            className="text-sm hover:text-blue-600 transition-colors"
+          >
+            {patient.name}
+          </Link>
+        </div>
+        <div className="flex items-center gap-2 justify-end">
+          <MapPin className="h-4 w-4 text-gray-500" />
+          <span className="text-sm text-gray-600">{destination}</span>
+        </div>
+      </div>
+
+      {/* Progress Bar - Always Visible */}
+      <div className="mt-4 space-y-1">
+        <div className="flex justify-between text-sm text-gray-600">
+          <span>Transport Progress</span>
+          <span>{currentProgress}%</span>
+        </div>
+        <Progress value={currentProgress} className="h-2" />
+      </div>
+
+      {/* Expanded Content */}
+      {isExpanded && (
+        <div className="mt-4 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              {patient.condition && (
+                <div className="text-sm text-gray-600">{patient.condition}</div>
               )}
-            </Button>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-gray-500" />
+                <span className="text-sm text-gray-600">From: {origin}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-gray-500" />
+                <span className="text-sm text-gray-600">To: {destination}</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {assignedTo === "Unassigned" ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openAssignModal}
+                  className="w-full"
+                >
+                  Assign Crew
+                </Button>
+              ) : (
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleUnassign}
+                    className="flex items-center gap-1"
+                  >
+                    <XCircle className="h-4 w-4" />
+                    Unassign
+                  </Button>
+                </div>
+              )}
+
+              <DispatchStatusBar
+                currentStatus={currentStatus}
+                onStatusChange={handleStatusChange}
+              />
+            </div>
           </div>
 
           {warnings && (
-            <div className="flex items-center gap-2 text-yellow-600">
+            <div className="flex items-center gap-2 text-yellow-600 bg-yellow-50 p-2 rounded">
               <AlertTriangle className="h-4 w-4" />
               <span className="text-sm">{warnings}</span>
             </div>
           )}
-        </div>
 
-        <div className="text-right space-y-1">
-          <div className="flex items-center gap-2 justify-end">
-            <Clock className="w-4 h-4 text-gray-500" />
-            <span className="text-sm text-gray-600">{activationTime}</span>
-          </div>
-          {elapsedTime && (
-            <div className="text-sm text-gray-500">
-              Elapsed: {elapsedTime}
+          {aiRecommendations.insights && aiRecommendations.insights.length > 0 && (
+            <div className="bg-blue-50 p-3 rounded-md">
+              <h4 className="font-medium text-blue-900 mb-1">AI Insights:</h4>
+              <ul className="list-disc list-inside space-y-1">
+                {aiRecommendations.insights.map((insight, index) => (
+                  <li key={index} className="text-sm text-blue-800">
+                    {insight}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
-        </div>
-      </div>
 
-      <div className={`mt-4 space-y-4 ${isExpanded ? "" : "hidden"}`}>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div>
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4 text-gray-500" />
-                <Link 
-                  to={`/patient/${patient.id}`}
-                  className="text-base hover:text-blue-600 transition-colors"
-                >
-                  {patient.name}
-                </Link>
-              </div>
-              {patient.condition && (
-                <div className="text-sm text-gray-600">{patient.condition}</div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{origin}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{destination}</span>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-end gap-2">
-              <div className="space-y-4 w-full">
-                {assignedTo !== "Unassigned" ? (
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm text-gray-600">
-                      Assigned to: {assignedTo}
-                    </span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={handleUnassign}
-                        className="flex items-center gap-1"
-                      >
-                        <XCircle className="w-4 h-4" />
-                        Unassign
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={openAssignModal}
-                    >
-                      Assign Crew
-                    </Button>
-                  </div>
-                )}
-
-                <div className="space-y-4">
-                  <DispatchStatusBar
-                    currentStatus={currentStatus}
-                    onStatusChange={handleStatusChange}
-                  />
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Transport Progress</span>
-                      <span>{currentProgress}%</span>
-                    </div>
-                    <Progress value={currentProgress} className="h-2" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {efficiency !== undefined && (
-              <div className="text-sm text-gray-600 text-right">
-                Efficiency: {Math.round(efficiency * 100)}%
-              </div>
-            )}
-
-            {lastUpdated && (
-              <div className="text-sm text-gray-500 text-right">
-                Last updated: {lastUpdated}
-              </div>
-            )}
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleTrackTransport}
+              className="flex items-center gap-1"
+            >
+              <Truck className="h-4 w-4" />
+              Track Transport
+            </Button>
           </div>
         </div>
-
-        <div className="flex justify-end">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleTrackTransport}
-            className="flex items-center gap-1"
-          >
-            <Truck className="w-4 h-4" />
-            Track Transport
-          </Button>
-        </div>
-
-        {aiRecommendations.insights && aiRecommendations.insights.length > 0 && (
-          <div className="bg-blue-50 p-3 rounded-md">
-            <h4 className="font-medium text-blue-900 mb-1">AI Insights:</h4>
-            <ul className="list-disc list-inside space-y-1">
-              {aiRecommendations.insights.map((insight, index) => (
-                <li key={index} className="text-sm text-blue-800">
-                  {insight}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+      )}
 
       <CrewAssignmentModal
         isOpen={isAssignModalOpen}
