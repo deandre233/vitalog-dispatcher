@@ -12,7 +12,11 @@ const dispatches = [
     id: "PT-001",
     activationTime: "12:30",
     assignedTo: "Team A",
-    patient: "Smith, Helen",
+    patient: {
+      name: "Smith, Helen",
+      dob: "1965-03-15",
+      condition: "Stable"
+    },
     serviceType: "BLS",
     origin: "Parkside at Budd Terrace, 508A",
     destination: "Neurology/Emory Brain Health Center",
@@ -31,7 +35,11 @@ const dispatches = [
     id: "PT-002",
     activationTime: "13:00",
     assignedTo: "Unassigned",
-    patient: "Johnson, Michael",
+    patient: {
+      name: "Johnson, Michael",
+      dob: "1972-08-21",
+      condition: "Requires oxygen"
+    },
     serviceType: "BLS",
     origin: "Parkside at Budd Terrace, 613",
     destination: "Emory University Hospital Midtown",
@@ -50,7 +58,10 @@ const dispatches = [
     id: "PT-003",
     activationTime: "08:30",
     assignedTo: "Team C",
-    patient: "Brown, Angela",
+    patient: {
+      name: "Brown, Angela",
+      dob: "1958-11-30"
+    },
     serviceType: "BLS",
     origin: "CROSSING AT EASTLAKE",
     destination: "Emory Dialysis At Candler",
