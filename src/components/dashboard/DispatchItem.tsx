@@ -148,7 +148,10 @@ export function DispatchItem({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }}
           className="ml-2"
         >
           {isExpanded ? (
@@ -198,11 +201,8 @@ export function DispatchItem({
                   {patient.name}
                 </Button>
               </div>
-              {patient.dob && (
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">{patient.dob}</span>
-                </div>
+              {patient.condition && (
+                <div className="text-sm text-gray-600">{patient.condition}</div>
               )}
             </div>
 
@@ -229,7 +229,10 @@ export function DispatchItem({
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={handleUnassign}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUnassign();
+                    }}
                     className="flex items-center gap-1"
                   >
                     <XCircle className="w-4 h-4" />
@@ -240,7 +243,10 @@ export function DispatchItem({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setIsAssignModalOpen(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsAssignModalOpen(true);
+                  }}
                 >
                   Assign Crew
                 </Button>
