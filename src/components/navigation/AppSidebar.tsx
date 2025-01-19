@@ -6,7 +6,7 @@ const menuItems = [
   { title: "Employee Directory", icon: Users, url: "/employees", description: "Access employee list including crew, management, and admin staff" },
   { title: "Real-Time Route Map", icon: Map, url: "/live-map", description: "Track real-time locations and routes of crews" },
   { title: "Shift History & Checklists", icon: ClipboardCheck, url: "/shifts", description: "Review completed shifts and task checklists" },
-  { title: "Vertex AI Route Optimization", icon: Brain, url: "/route-optimization", description: "AI-powered routing suggestions" },
+  { title: "AI Route Planning", icon: Brain, url: "/route-optimization", description: "AI-powered route suggestions and optimization" },
   { title: "Pending Approvals Queue", icon: Inbox, url: "/approvals", description: "Manage requests requiring approval" },
   { title: "Upcoming Schedule", icon: Calendar, url: "/schedule", description: "View upcoming crew and service schedules" },
   { title: "Closed Requests", icon: Archive, url: "/closed-requests", description: "Review completed transport requests" },
@@ -30,30 +30,35 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-medium text-medical-primary mb-1">
-            Main Menu
-          </SidebarGroupLabel>
+          <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title} className="my-0.5">
-                  <SidebarMenuButton asChild>
-                    <a 
-                      href={item.url} 
-                      className={`flex items-center gap-2 py-1.5 px-2 rounded-md transition-colors ${
-                        location.pathname === item.url 
-                          ? "bg-medical-primary/10 text-medical-primary" 
-                          : "hover:bg-gray-100"
+                <SidebarMenuItem key={item.url}>
+                  <SidebarMenuButton
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                      location.pathname === item.url
+                        ? "bg-medical-primary/10 text-medical-primary"
+                        : "hover:bg-gray-100"
+                    }`}
+                    title={item.description}
+                  >
+                    <item.icon
+                      className={`w-4 h-4 ${
+                        location.pathname === item.url
+                          ? "text-medical-primary"
+                          : "text-gray-500"
                       }`}
-                      title={item.description}
+                    />
+                    <span
+                      className={
+                        location.pathname === item.url
+                          ? "font-medium"
+                          : "text-gray-700"
+                      }
                     >
-                      <item.icon className={`w-4 h-4 ${
-                        location.pathname === item.url 
-                          ? "text-medical-primary" 
-                          : "text-gray-600"
-                      }`} />
-                      <span className="text-sm">{item.title}</span>
-                    </a>
+                      {item.title}
+                    </span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
