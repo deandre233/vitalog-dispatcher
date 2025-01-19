@@ -8,6 +8,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { getTrafficInfo } from "@/utils/aiDispatchUtils";
 
 interface Patient {
   name: string;
@@ -19,6 +20,11 @@ interface AIRecommendations {
   route: string;
   crew: string;
   billing: string;
+  trafficStatus?: {
+    congestionLevel: "low" | "medium" | "high";
+    estimatedDelay: number;
+    alternateRouteAvailable: boolean;
+  };
 }
 
 interface Dispatch {
@@ -38,6 +44,7 @@ interface Dispatch {
   progress?: number;
   elapsedTime?: string;
   lastUpdated?: string;
+  efficiency?: number;
 }
 
 const mockDispatches: Dispatch[] = [
@@ -96,8 +103,7 @@ const filterDispatches = (dispatches: Dispatch[], status: "assigned" | "unassign
   );
 };
 
-// New function to simulate real-time updates
-const simulateRealTimeUpdates = (dispatch: Dispatch): Dispatch => {
+const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> => {
   const now = new Date();
   const activationTime = new Date(dispatch.activationTime);
   const elapsedMinutes = Math.floor((now.getTime() - activationTime.getTime()) / (1000 * 60));
@@ -107,12 +113,40 @@ const simulateRealTimeUpdates = (dispatch: Dispatch): Dispatch => {
     progress = Math.min(100, progress + Math.random() * 5);
   }
 
+  // Get traffic updates
+  const trafficInfo = getTrafficInfo(
+    { lat: 33.7720, lng: -84.3960 }, // Mock origin coordinates
+    { lat: 33.7490, lng: -84.3880 }  // Mock destination coordinates
+  );
+
+  // Calculate efficiency score based on progress and traffic
+  const efficiency = calculateEfficiencyScore(progress, trafficInfo.congestionLevel);
+
   return {
     ...dispatch,
     progress,
     elapsedTime: `${elapsedMinutes} min`,
     lastUpdated: now.toISOString(),
+    efficiency,
+    aiRecommendations: {
+      ...dispatch.aiRecommendations,
+      trafficStatus: {
+        congestionLevel: trafficInfo.congestionLevel,
+        estimatedDelay: trafficInfo.delayMinutes,
+        alternateRouteAvailable: trafficInfo.alternateRouteAvailable
+      }
+    }
   };
+};
+
+const calculateEfficiencyScore = (progress: number, congestionLevel: "low" | "medium" | "high"): number => {
+  const baseScore = progress;
+  const trafficMultiplier = 
+    congestionLevel === "low" ? 1 :
+    congestionLevel === "medium" ? 0.8 :
+    0.6;
+  
+  return Math.round(baseScore * trafficMultiplier);
 };
 
 export function DispatchBoard() {
@@ -123,14 +157,15 @@ export function DispatchBoard() {
 
   // Simulate real-time updates
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDispatches(currentDispatches => 
-        currentDispatches.map(dispatch => simulateRealTimeUpdates(dispatch))
+    const interval = setInterval(async () => {
+      const updatedDispatches = await Promise.all(
+        dispatches.map(dispatch => simulateRealTimeUpdates(dispatch))
       );
-    }, 5000); // Update every 5 seconds
+      setDispatches(updatedDispatches);
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [dispatches]);
 
   const unassignedDispatches = useMemo(() => 
     filterDispatches(dispatches, "unassigned"),
@@ -142,8 +177,9 @@ export function DispatchBoard() {
     [dispatches]
   );
 
-  // AI Insights notification
+  // AI Insights notifications
   useEffect(() => {
+    // Check for high priority dispatches
     if (unassignedDispatches.length > 0) {
       const highPriorityDispatches = unassignedDispatches.filter(d => d.priority === "high");
       if (highPriorityDispatches.length > 0) {
@@ -152,7 +188,17 @@ export function DispatchBoard() {
         });
       }
     }
-  }, [unassignedDispatches]);
+
+    // Check for traffic-related issues
+    const dispatchesWithTrafficIssues = dispatches.filter(
+      d => d.aiRecommendations.trafficStatus?.congestionLevel === "high"
+    );
+    if (dispatchesWithTrafficIssues.length > 0) {
+      toast.warning(`Traffic alert for ${dispatchesWithTrafficIssues.length} dispatches`, {
+        description: "AI suggests alternate routes due to heavy traffic"
+      });
+    }
+  }, [unassignedDispatches, dispatches]);
 
   const unassignedTabStyle = unassignedDispatches.length > 0 
     ? "bg-red-100 text-red-700 data-[state=active]:bg-red-200" 
