@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MapPin, Award, Clock, CheckCircle, User } from "lucide-react";
+import { MapPin, Award, Clock, CheckCircle, User, AlertTriangle } from "lucide-react";
 import { recommendCrewWithRoute, crewMembers, calculateDistance, type CrewMember, type CrewWithRoute, type Location } from "@/utils/crewRecommendation";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -35,6 +35,7 @@ export function CrewAssignmentModal({
   const map = useRef<mapboxgl.Map | null>(null);
   const [recommendedCrew, setRecommendedCrew] = useState<CrewWithRoute | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [manualOverride, setManualOverride] = useState(false);
 
   const handleAssignCrew = (crewId: number) => {
     const crew = crewMembers.find(c => c.id === crewId);
@@ -43,15 +44,32 @@ export function CrewAssignmentModal({
         ? Math.round(recommendedCrew.routeInfo.duration)
         : Math.round(calculateDistance(crew, origin) * 2);
         
-      toast.success(`Crew ${crew.name} successfully assigned to dispatch ${dispatchId}!`, {
-        description: `Estimated arrival time: ${estimatedMinutes} minutes`,
-      });
-      
-      if (onAssign) {
-        onAssign(crewId, estimatedMinutes);
+      if (!manualOverride && recommendedCrew && crew.id !== recommendedCrew.id) {
+        toast.warning("You are assigning a non-recommended crew member", {
+          description: "The AI suggests a different crew for optimal response time.",
+          action: {
+            label: "Proceed Anyway",
+            onClick: () => {
+              handleConfirmedAssign(crew, estimatedMinutes);
+            },
+          },
+        });
+        return;
       }
-      onClose();
+
+      handleConfirmedAssign(crew, estimatedMinutes);
     }
+  };
+
+  const handleConfirmedAssign = (crew: CrewMember, estimatedMinutes: number) => {
+    toast.success(`Crew ${crew.name} successfully assigned to dispatch ${dispatchId}!`, {
+      description: `Estimated arrival time: ${estimatedMinutes} minutes`,
+    });
+    
+    if (onAssign) {
+      onAssign(crew.id, estimatedMinutes);
+    }
+    onClose();
   };
 
   useEffect(() => {
@@ -158,6 +176,20 @@ export function CrewAssignmentModal({
                 <div className="w-3 h-3 rounded-full bg-blue-500" /> Available Crew
               </div>
             </div>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => setManualOverride(!manualOverride)}
+            >
+              {manualOverride ? (
+                <>
+                  <AlertTriangle className="w-4 h-4 mr-2 text-yellow-500" />
+                  Manual Override Active
+                </>
+              ) : (
+                "Override AI Recommendation"
+              )}
+            </Button>
           </div>
 
           <ScrollArea className="h-[400px] pr-4">
@@ -180,7 +212,7 @@ export function CrewAssignmentModal({
                       <div
                         key={crew.id}
                         className={`p-4 border rounded-lg ${
-                          isRecommended
+                          isRecommended && !manualOverride
                             ? "bg-medical-accent border-medical-primary"
                             : "bg-white hover:bg-gray-50"
                         }`}
@@ -192,7 +224,7 @@ export function CrewAssignmentModal({
                               {crew.name}
                             </h3>
                           </div>
-                          {isRecommended && (
+                          {isRecommended && !manualOverride && (
                             <span className="px-2 py-1 text-sm bg-green-100 text-green-700 rounded-full flex items-center gap-1">
                               <Award className="w-4 h-4" />
                               Best Match
@@ -222,9 +254,9 @@ export function CrewAssignmentModal({
                           <div className="flex items-center justify-end">
                             <Button
                               onClick={() => handleAssignCrew(crew.id)}
-                              variant={isRecommended ? "default" : "outline"}
+                              variant={isRecommended && !manualOverride ? "default" : "outline"}
                             >
-                              {isRecommended ? "Assign Recommended" : "Assign Crew"}
+                              {isRecommended && !manualOverride ? "Assign Recommended" : "Assign Crew"}
                             </Button>
                           </div>
                         </div>
