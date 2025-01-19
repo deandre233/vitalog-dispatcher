@@ -1,42 +1,35 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import ActiveDispatches from "./pages/ActiveDispatches";
-import CreateDispatch from "./pages/CreateDispatch";
-import CrewAssignment from "./pages/CrewAssignment";
-import ManageRoutes from "./pages/ManageRoutes";
-import Billing from "./pages/Billing";
-import Performance from "./pages/Performance";
-import { DispatchDetailView } from "./components/dashboard/DispatchDetailView";
-import PatientRecord from "./pages/PatientRecord";
-import AlertsConfig from "./pages/AlertsConfig";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/sonner";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/navigation/AppSidebar";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import Index from "@/pages/Index";
+import CreateDispatch from "@/pages/CreateDispatch";
+import { DispatchDetailView } from "@/components/dashboard/DispatchDetailView";
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dispatch" element={<ActiveDispatches />} />
-          <Route path="/dispatch/:id" element={<DispatchDetailView />} />
-          <Route path="/dispatch/new" element={<CreateDispatch />} />
-          <Route path="/crew" element={<CrewAssignment />} />
-          <Route path="/routes" element={<ManageRoutes />} />
-          <Route path="/billing" element={<Billing />} />
-          <Route path="/performance" element={<Performance />} />
-          <Route path="/patient/:patientName" element={<PatientRecord />} />
-          <Route path="/alerts" element={<AlertsConfig />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <Router>
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Header />
+        <div className="flex-1 flex">
+          <SidebarProvider>
+            <AppSidebar />
+            <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/create-dispatch" element={<CreateDispatch />} />
+                <Route path="/dispatch/:id" element={<DispatchDetailView />} />
+              </Routes>
+            </div>
+          </SidebarProvider>
+        </div>
+        <Footer />
+        <Toaster />
+      </div>
+    </Router>
+  );
+}
 
 export default App;
