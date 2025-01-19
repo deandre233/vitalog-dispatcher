@@ -1,12 +1,13 @@
-import { MapPin, Clock, User, Building, ChevronDown, ChevronUp, ArrowRight, AlertTriangle } from "lucide-react";
+import { MapPin, Clock, User, Building, ChevronDown, ChevronUp, ArrowRight, AlertTriangle, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { format, isToday, isTomorrow } from "date-fns";
+import { format, isToday, isTomorrow, parseISO, isWithinInterval, addHours } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ScheduledTransportProps {
   id: string;
@@ -22,7 +23,7 @@ interface ScheduledTransportProps {
   recurrence?: string;
 }
 
-// Mock data with more realistic scenarios
+// Enhanced mock data with more realistic scenarios
 const scheduledTransports: ScheduledTransportProps[] = [
   {
     id: "ST-7685",
@@ -32,7 +33,7 @@ const scheduledTransports: ScheduledTransportProps[] = [
     origin: "Neurology/Emory Brain Health Center",
     destination: "Parkside at Budd Terrace, 508A",
     status: "Scheduled",
-    warnings: ["Neurology Emory Brain Health Center 12 Executive Park Drive Northeast, Atlanta, GA 30329"],
+    warnings: ["Patient requires oxygen support", "Limited mobility assistance needed"],
     recurrence: "Every week on Mon"
   },
   {
@@ -45,7 +46,7 @@ const scheduledTransports: ScheduledTransportProps[] = [
     status: "Assigned",
     unitAssigned: "MED-1",
     progress: 45,
-    warnings: ["Podiatry/Emory Wound and Hyperbaric Center"],
+    warnings: ["Dialysis patient", "Wheelchair required"],
     recurrence: "Every week on Mon"
   },
   {
@@ -68,6 +69,27 @@ const scheduledTransports: ScheduledTransportProps[] = [
     status: "Canceled",
     warnings: ["Limited mobility", "Requires oxygen support"],
     recurrence: "Every week on Mon"
+  },
+  {
+    id: "ST-8087",
+    scheduledTime: "2024-02-21T09:00:00",
+    patient: "Johnson, Sarah",
+    serviceType: "ALS",
+    origin: "Emory Saint Joseph's Hospital",
+    destination: "Wesley Woods Geriatric Hospital",
+    status: "Scheduled",
+    warnings: ["Critical care patient", "Continuous monitoring required"],
+    recurrence: "Every day"
+  },
+  {
+    id: "ST-8088",
+    scheduledTime: "2024-02-21T10:30:00",
+    patient: "Williams, Robert",
+    serviceType: "BLS",
+    origin: "Emory Johns Creek Hospital",
+    destination: "Emory Rehabilitation Hospital",
+    status: "Scheduled",
+    warnings: ["Post-surgery transport", "Pain management required"],
   }
 ];
 
@@ -92,8 +114,97 @@ const getTimeColor = (scheduledTime: string) => {
   return "text-gray-600";
 };
 
+// AI analysis functions
+const analyzeScheduleConflicts = (transports: ScheduledTransportProps[]) => {
+  const conflicts: { id: string; conflictWith: string; reason: string }[] = [];
+  
+  transports.forEach((transport1, i) => {
+    transports.slice(i + 1).forEach(transport2 => {
+      const time1 = parseISO(transport1.scheduledTime);
+      const time2 = parseISO(transport2.scheduledTime);
+      
+      // Check for overlapping time windows (assuming 2 hour transport duration)
+      const interval1 = {
+        start: time1,
+        end: addHours(time1, 2)
+      };
+      
+      const interval2 = {
+        start: time2,
+        end: addHours(time2, 2)
+      };
+      
+      if (
+        isWithinInterval(interval1.start, interval2) ||
+        isWithinInterval(interval1.end, interval2)
+      ) {
+        conflicts.push({
+          id: transport1.id,
+          conflictWith: transport2.id,
+          reason: "Time overlap detected"
+        });
+      }
+      
+      // Check for same unit assignments
+      if (
+        transport1.unitAssigned &&
+        transport2.unitAssigned &&
+        transport1.unitAssigned === transport2.unitAssigned &&
+        transport1.status !== "Completed" &&
+        transport2.status !== "Completed"
+      ) {
+        conflicts.push({
+          id: transport1.id,
+          conflictWith: transport2.id,
+          reason: `Unit ${transport1.unitAssigned} double-booked`
+        });
+      }
+    });
+  });
+  
+  return conflicts;
+};
+
+const analyzeResourceUtilization = (transports: ScheduledTransportProps[]) => {
+  const totalTransports = transports.length;
+  const assignedTransports = transports.filter(t => t.status === "Assigned").length;
+  const utilizationRate = (assignedTransports / totalTransports) * 100;
+  
+  return {
+    utilizationRate,
+    recommendation: utilizationRate < 50 
+      ? "Resource utilization is low. Consider optimizing crew assignments."
+      : "Resource utilization is optimal."
+  };
+};
+
 export function ScheduledTransport() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [conflicts, setConflicts] = useState<ReturnType<typeof analyzeScheduleConflicts>>([]);
+  const [utilization, setUtilization] = useState<ReturnType<typeof analyzeResourceUtilization>>();
+
+  useEffect(() => {
+    // Analyze schedule conflicts
+    const detectedConflicts = analyzeScheduleConflicts(scheduledTransports);
+    setConflicts(detectedConflicts);
+    
+    // Analyze resource utilization
+    const resourceUtilization = analyzeResourceUtilization(scheduledTransports);
+    setUtilization(resourceUtilization);
+    
+    // Show AI insights
+    if (detectedConflicts.length > 0) {
+      toast.warning(`${detectedConflicts.length} scheduling conflicts detected`, {
+        description: "AI has identified potential conflicts in the schedule"
+      });
+    }
+    
+    if (resourceUtilization.utilizationRate < 50) {
+      toast.info("Resource optimization recommended", {
+        description: resourceUtilization.recommendation
+      });
+    }
+  }, []);
 
   const toggleRow = (id: string) => {
     const newExpandedRows = new Set(expandedRows);
@@ -140,6 +251,24 @@ export function ScheduledTransport() {
           <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
+
+      {conflicts.length > 0 && (
+        <Alert variant="destructive" className="mb-4">
+          <Brain className="h-4 w-4" />
+          <AlertDescription>
+            AI Alert: {conflicts.length} scheduling conflicts detected. Please review the affected transports.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {utilization && (
+        <Alert className="mb-4">
+          <Brain className="h-4 w-4" />
+          <AlertDescription>
+            Resource Utilization: {utilization.utilizationRate.toFixed(1)}% - {utilization.recommendation}
+          </AlertDescription>
+        </Alert>
+      )}
       
       <div className="space-y-3">
         {scheduledTransports.map((transport) => (
@@ -150,7 +279,8 @@ export function ScheduledTransport() {
             <div 
               className={cn(
                 "p-4 cursor-pointer hover:bg-gray-50 transition-colors",
-                expandedRows.has(transport.id) ? "border-b" : ""
+                expandedRows.has(transport.id) ? "border-b" : "",
+                conflicts.some(c => c.id === transport.id) ? "bg-red-50" : ""
               )}
               onClick={() => toggleRow(transport.id)}
             >
@@ -235,6 +365,23 @@ export function ScheduledTransport() {
                                 {warning}
                               </li>
                             ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+                    {conflicts.some(c => c.id === transport.id) && (
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 text-red-500 mt-1" />
+                        <div>
+                          <span className="text-sm text-red-600 block">Conflicts:</span>
+                          <ul className="list-disc list-inside space-y-1">
+                            {conflicts
+                              .filter(c => c.id === transport.id)
+                              .map((conflict, index) => (
+                                <li key={index} className="text-red-700 text-sm">
+                                  Conflict with {conflict.conflictWith}: {conflict.reason}
+                                </li>
+                              ))}
                           </ul>
                         </div>
                       </div>
