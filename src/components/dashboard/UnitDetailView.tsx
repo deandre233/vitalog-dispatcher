@@ -25,8 +25,7 @@ export function UnitDetailView() {
   const { data: unitData, isLoading, error } = useQuery({
     queryKey: ['unit', unitId],
     queryFn: async () => {
-      // First try to find by crew_assigned
-      let { data: crewData, error: crewError } = await supabase
+      const { data, error } = await supabase
         .from('transport_records')
         .select(`
           *,
@@ -39,56 +38,37 @@ export function UnitDetailView() {
         .eq('crew_assigned', unitId)
         .maybeSingle();
 
-      // If not found by crew, try by dispatch_id
-      if (!crewData && !crewError) {
-        const { data: dispatchData, error: dispatchError } = await supabase
-          .from('transport_records')
-          .select(`
-            *,
-            patients (
-              first_name,
-              last_name,
-              medical_conditions
-            )
-          `)
-          .eq('dispatch_id', unitId)
-          .maybeSingle();
-
-        if (dispatchError) throw dispatchError;
-        crewData = dispatchData;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
       }
 
-      if (crewError) {
-        console.error("Supabase error:", crewError);
-        throw crewError;
-      }
-
-      if (!crewData) {
+      if (!data) {
         return null;
       }
 
       // Format patient name if available
-      const patientName = crewData.patients 
-        ? `${crewData.patients.last_name}, ${crewData.patients.first_name}`
+      const patientName = data.patients 
+        ? `${data.patients.last_name}, ${data.patients.first_name}`
         : "Unknown Patient";
 
       // Format medical conditions if available
-      const condition = crewData.patients?.medical_conditions 
-        ? crewData.patients.medical_conditions.join(", ")
+      const condition = data.patients?.medical_conditions 
+        ? data.patients.medical_conditions.join(", ")
         : "No conditions recorded";
 
       return {
         unitId: unitId || "Unknown Unit",
-        status: crewData.status || "Unknown",
-        progress: crewData.status === "completed" ? 100 : 60,
-        distance: "4.2 miles",
-        origin: crewData.pickup_location || "Unknown Origin",
-        destination: crewData.dropoff_location || "Unknown Destination",
+        status: data.status || "Unknown",
+        progress: data.status === "completed" ? 100 : 60, // We can make this more dynamic based on status
+        distance: "4.2 miles", // This could be calculated based on coordinates
+        origin: data.pickup_location || "Unknown Origin",
+        destination: data.dropoff_location || "Unknown Destination",
         patient: patientName,
         condition: condition,
-        scheduledTime: crewData.scheduled_time ? new Date(crewData.scheduled_time).toLocaleTimeString() : "Not scheduled",
-        transportType: "BLS",
-        crew: crewData.crew_assigned || "Unassigned",
+        scheduledTime: data.scheduled_time ? new Date(data.scheduled_time).toLocaleTimeString() : "Not scheduled",
+        transportType: "BLS", // This could be added to the transport_records table
+        crew: data.crew_assigned || "Unassigned",
         schedule: "6 hours over",
         calls: "0 calls done",
         aiRecommendations: {
@@ -106,7 +86,7 @@ export function UnitDetailView() {
         } as AIRecommendations
       };
     },
-    refetchInterval: 30000,
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 
   const handleReassign = () => {
