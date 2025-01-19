@@ -3,6 +3,9 @@ import { Brain } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DispatchItem } from "./DispatchItem";
 import { DispatchFilters } from "./DispatchFilters";
+import { ScheduledTransport } from "./ScheduledTransport";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const dispatches = [
   {
@@ -59,12 +62,30 @@ const dispatches = [
 ];
 
 export function DispatchBoard() {
+  const [activeView, setActiveView] = useState<"active" | "scheduled">("active");
+
   return (
     <Card className="p-6 m-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-medical-primary">
-          Active Dispatches
-        </h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl font-semibold text-medical-primary">
+            Dispatch Control
+          </h2>
+          <div className="flex gap-2">
+            <Button
+              variant={activeView === "active" ? "default" : "outline"}
+              onClick={() => setActiveView("active")}
+            >
+              Active Dispatches
+            </Button>
+            <Button
+              variant={activeView === "scheduled" ? "default" : "outline"}
+              onClick={() => setActiveView("scheduled")}
+            >
+              Scheduled Transport
+            </Button>
+          </div>
+        </div>
         <DispatchFilters />
       </div>
 
@@ -76,11 +97,15 @@ export function DispatchBoard() {
         </AlertDescription>
       </Alert>
 
-      <div className="space-y-4">
-        {dispatches.map((dispatch) => (
-          <DispatchItem key={dispatch.id} {...dispatch} />
-        ))}
-      </div>
+      {activeView === "active" ? (
+        <div className="space-y-4">
+          {dispatches.map((dispatch) => (
+            <DispatchItem key={dispatch.id} {...dispatch} />
+          ))}
+        </div>
+      ) : (
+        <ScheduledTransport />
+      )}
     </Card>
   );
 }
