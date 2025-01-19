@@ -9,6 +9,106 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      billing_settings: {
+        Row: {
+          created_at: string | null
+          employer_address: string | null
+          employer_name: string | null
+          employer_phone: string | null
+          id: string
+          next_payment_date: string | null
+          patient_id: string | null
+          preauth_required: string | null
+          pricing_schema: string | null
+          subscription_type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          employer_address?: string | null
+          employer_name?: string | null
+          employer_phone?: string | null
+          id?: string
+          next_payment_date?: string | null
+          patient_id?: string | null
+          preauth_required?: string | null
+          pricing_schema?: string | null
+          subscription_type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          employer_address?: string | null
+          employer_name?: string | null
+          employer_phone?: string | null
+          id?: string
+          next_payment_date?: string | null
+          patient_id?: string | null
+          preauth_required?: string | null
+          pricing_schema?: string | null
+          subscription_type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_settings_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_records: {
+        Row: {
+          activation_date: string | null
+          carrier_name: string
+          carrier_type: string
+          claims_zip: string | null
+          created_at: string | null
+          id: string
+          patient_id: string | null
+          phone: string | null
+          policy_number: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          activation_date?: string | null
+          carrier_name: string
+          carrier_type: string
+          claims_zip?: string | null
+          created_at?: string | null
+          id?: string
+          patient_id?: string | null
+          phone?: string | null
+          policy_number: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          activation_date?: string | null
+          carrier_name?: string
+          carrier_type?: string
+          claims_zip?: string | null
+          created_at?: string | null
+          id?: string
+          patient_id?: string | null
+          phone?: string | null
+          policy_number?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_records_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medical_history: {
         Row: {
           created_at: string | null
