@@ -20,6 +20,9 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+type WarningKeys = "requiresOxygen" | "requiresIsolation" | "bariatric" | "dnrOrder";
+type BarrierKeys = "hearing" | "physical" | "vision" | "cognitive" | "cultural" | "language" | "speech" | "alcohol" | "drug" | "unsupervised";
+
 // Form schema
 const formSchema = z.object({
   id: z.string(),
@@ -236,7 +239,7 @@ export default function PatientRecord() {
               <div className="space-y-2">
                 <FormLabel>Warnings</FormLabel>
                 <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(form.getValues().warnings).map(([key, _]) => (
+                  {(Object.keys(form.getValues().warnings) as WarningKeys[]).map((key) => (
                     <FormField
                       key={key}
                       control={form.control}
@@ -264,7 +267,7 @@ export default function PatientRecord() {
             <section className="space-y-4">
               <h3 className="text-lg font-semibold">Barriers to EMS</h3>
               <div className="grid grid-cols-2 gap-2">
-                {Object.entries(form.getValues().barriers).map(([key, _]) => (
+                {(Object.keys(form.getValues().barriers) as BarrierKeys[]).map((key) => (
                   <FormField
                     key={key}
                     control={form.control}
