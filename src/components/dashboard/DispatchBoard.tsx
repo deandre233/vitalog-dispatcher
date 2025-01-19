@@ -6,80 +6,23 @@ import { DispatchFilters } from "./DispatchFilters";
 import { ScheduledTransport } from "./ScheduledTransport";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const dispatches = [
-  {
-    id: "PT-001",
-    activationTime: "12:30",
-    assignedTo: "Team A",
-    patient: {
-      name: "Smith, Helen",
-      dob: "1965-03-15",
-      condition: "Stable"
-    },
-    serviceType: "BLS",
-    origin: "Parkside at Budd Terrace, 508A",
-    destination: "Neurology/Emory Brain Health Center",
-    status: "En Route",
-    priority: "medium",
-    aiRecommendations: {
-      route: "Current route optimal",
-      crew: "Team assignment confirmed",
-      billing: "Insurance verified",
-    },
-    eta: "15 min",
-    comments: "Call for specific room directions",
-    progress: 75,
-  },
-  {
-    id: "PT-002",
-    activationTime: "13:00",
-    assignedTo: "Unassigned",
-    patient: {
-      name: "Johnson, Michael",
-      dob: "1972-08-21",
-      condition: "Requires oxygen"
-    },
-    serviceType: "BLS",
-    origin: "Parkside at Budd Terrace, 613",
-    destination: "Emory University Hospital Midtown",
-    status: "Pending",
-    priority: "high",
-    aiRecommendations: {
-      route: "Alternate route suggested",
-      crew: "Team B recommended",
-      billing: "Verify insurance",
-    },
-    eta: "22 min",
-    warnings: "Breathing problem: Req oxygen",
-    progress: 25,
-  },
-  {
-    id: "PT-003",
-    activationTime: "08:30",
-    assignedTo: "Team C",
-    patient: {
-      name: "Brown, Angela",
-      dob: "1958-11-30"
-    },
-    serviceType: "BLS",
-    origin: "CROSSING AT EASTLAKE",
-    destination: "Emory Dialysis At Candler",
-    status: "En Route",
-    priority: "high",
-    aiRecommendations: {
-      route: "Route optimized",
-      crew: "Team C assigned",
-      billing: "Medicare confirmed",
-    },
-    eta: "10 min",
-    warnings: "Impaired movement",
-    progress: 90,
-  },
-];
+// Filter dispatches based on assignment status
+const filterDispatches = (dispatches: any[], status: "assigned" | "unassigned") => {
+  return dispatches.filter(dispatch => 
+    status === "assigned" 
+      ? dispatch.assignedTo !== "Unassigned"
+      : dispatch.assignedTo === "Unassigned"
+  );
+};
 
 export function DispatchBoard() {
   const [activeView, setActiveView] = useState<"active" | "scheduled">("active");
+
+  // Separate dispatches into assigned and unassigned
+  const unassignedDispatches = filterDispatches(dispatches, "unassigned");
+  const assignedDispatches = filterDispatches(dispatches, "assigned");
 
   return (
     <Card className="p-6 m-6">
@@ -109,16 +52,49 @@ export function DispatchBoard() {
       <Alert className="mb-4">
         <Brain className="h-4 w-4" />
         <AlertDescription>
-          AI Insight: Current dispatch load is optimal. 2 crews available for emergency response.
+          AI Insight: Current dispatch load is optimal. {unassignedDispatches.length} dispatches waiting for assignment.
         </AlertDescription>
       </Alert>
 
       {activeView === "active" ? (
-        <div className="space-y-4">
-          {dispatches.map((dispatch) => (
-            <DispatchItem key={dispatch.id} {...dispatch} />
-          ))}
-        </div>
+        <Tabs defaultValue="unassigned" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="unassigned">
+              Unassigned ({unassignedDispatches.length})
+            </TabsTrigger>
+            <TabsTrigger value="assigned">
+              Assigned ({assignedDispatches.length})
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="unassigned" className="space-y-4">
+            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-4">
+              <h3 className="text-lg font-medium text-yellow-800 mb-2">
+                Waiting for Assignment
+              </h3>
+              <p className="text-sm text-yellow-600">
+                {unassignedDispatches.length} dispatches need crew assignment
+              </p>
+            </div>
+            {unassignedDispatches.map((dispatch) => (
+              <DispatchItem key={dispatch.id} {...dispatch} />
+            ))}
+          </TabsContent>
+          
+          <TabsContent value="assigned" className="space-y-4">
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200 mb-4">
+              <h3 className="text-lg font-medium text-green-800 mb-2">
+                Active Transports
+              </h3>
+              <p className="text-sm text-green-600">
+                {assignedDispatches.length} dispatches in progress
+              </p>
+            </div>
+            {assignedDispatches.map((dispatch) => (
+              <DispatchItem key={dispatch.id} {...dispatch} />
+            ))}
+          </TabsContent>
+        </Tabs>
       ) : (
         <ScheduledTransport />
       )}
