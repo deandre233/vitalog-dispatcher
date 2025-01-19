@@ -11,11 +11,9 @@ const Index = () => {
     <div className="min-h-screen flex flex-col">
       <Header className="fixed top-0 w-full z-50" />
       <SidebarProvider>
-        <div className="flex flex-1 h-screen pt-16">
-          <div className="fixed left-0 top-16 h-[calc(100vh-4rem)] overflow-y-auto">
-            <AppSidebar />
-          </div>
-          <div className="flex-1 ml-64 bg-[#f4f7fc]">
+        <div className="flex flex-1 pt-16">
+          <AppSidebar />
+          <div className="flex-1 bg-[#f4f7fc]">
             <DashboardHeader />
             <main className="p-4">
               <DashboardMetrics />
