@@ -163,7 +163,9 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       responseTime: 0,
       patientSatisfaction: 0,
       routeEfficiency: 0
-    }
+    },
+    suggestedActions: [],
+    riskLevel: "low" as const
   };
 
   try {
@@ -174,6 +176,8 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       `${elapsedMinutes} min`
     );
     analytics.efficiency = efficiencyResult.efficiency || 0;
+    analytics.suggestedActions = efficiencyResult.suggestedActions || [];
+    analytics.riskLevel = efficiencyResult.riskLevel || "low";
   } catch (error) {
     console.error('Error analyzing dispatch efficiency:', error);
   }
@@ -202,7 +206,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
 
   // Get traffic updates with serializable data
   const trafficInfo = {
-    congestionLevel: 'low' as const,
+    congestionLevel: 'low' as 'low' | 'medium' | 'high',
     delayMinutes: 0,
     alternateRouteAvailable: false
   };
