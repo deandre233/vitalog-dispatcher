@@ -14,10 +14,10 @@ export function WelcomeBanner() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">
+          <h1 className="text-lg font-semibold text-gray-900">
             {getGreeting()}, Dispatcher
           </h1>
           <p className="mt-0.5 text-sm text-gray-600">
@@ -30,7 +30,7 @@ export function WelcomeBanner() {
             className="bg-medical-primary hover:bg-medical-primary/90"
             size="sm"
           >
-            <Plus className="mr-2 h-3 w-3" />
+            <Plus className="mr-1 h-3 w-3" />
             New Dispatch
           </Button>
           <Button
@@ -39,7 +39,7 @@ export function WelcomeBanner() {
             className="border-medical-primary text-medical-primary hover:bg-medical-primary/10"
             size="sm"
           >
-            <Ambulance className="mr-2 h-3 w-3" />
+            <Ambulance className="mr-1 h-3 w-3" />
             View Active
           </Button>
           <Button
@@ -48,7 +48,7 @@ export function WelcomeBanner() {
             className="border-medical-primary text-medical-primary hover:bg-medical-primary/10"
             size="sm"
           >
-            <MapPin className="mr-2 h-3 w-3" />
+            <MapPin className="mr-1 h-3 w-3" />
             Manage Routes
           </Button>
         </div>

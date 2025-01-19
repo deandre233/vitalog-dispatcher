@@ -13,24 +13,26 @@ const Index = () => {
       <Header />
       <div className="flex-1 flex">
         <SidebarProvider>
-          <AppSidebar />
-          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
-            <DashboardHeader />
-            <main className="p-6">
-              <WelcomeBanner />
-              <div className="mt-8">
-                <DashboardMetrics />
-              </div>
-              <div className="mt-8">
-                <DispatchBoard />
-              </div>
-            </main>
+          <div className="min-h-screen flex w-full">
+            <AppSidebar />
+            <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+              <DashboardHeader />
+              <main className="p-6">
+                <WelcomeBanner />
+                <div className="mt-6">
+                  <DashboardMetrics />
+                </div>
+                <div className="mt-6">
+                  <DispatchBoard />
+                </div>
+              </main>
+            </div>
           </div>
         </SidebarProvider>
       </div>
       <Footer />
     </div>
   );
-};
+}
 
 export default Index;
