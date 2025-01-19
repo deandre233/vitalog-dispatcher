@@ -6,7 +6,6 @@ import { DispatchBoard } from "@/components/dashboard/DispatchBoard";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
-import { ScheduledTransport } from "@/components/dashboard/ScheduledTransport";
 import { useState } from "react";
 
 const Index = () => {
@@ -29,9 +28,8 @@ const Index = () => {
       case 'schedule':
         return (
           <div className="p-4">
-            <div className="bg-white rounded-lg shadow p-6">
-              <ScheduledTransport />
-            </div>
+            <h2 className="text-2xl font-semibold mb-4">Scheduled Dispatches</h2>
+            <p className="text-gray-500">Schedule view coming soon...</p>
           </div>
         );
       case 'calendar':
