@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { TooltipProvider } from "../components/ui/tooltip";
-import { Toaster } from "../components/ui/sonner";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { Toaster } from "./components/ui/sonner";
 import { UnitDetailView } from "./components/dashboard/UnitDetailView";
 import { DispatchDetailView } from "./components/dashboard/DispatchDetailView";
 import { DashboardView } from "./components/dashboard/DashboardView";
