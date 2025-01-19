@@ -66,10 +66,20 @@ export type Database = {
           carrier_type: string
           claims_zip: string | null
           created_at: string | null
+          group_name: string | null
+          group_number: string | null
           id: string
+          nsure_payor_code: string | null
           patient_id: string | null
+          patient_relation: string | null
+          payor_id: string | null
           phone: string | null
           policy_number: string
+          policy_type: string | null
+          policyholder_dob: string | null
+          policyholder_gender: string | null
+          policyholder_name: string | null
+          policyholder_phone: string | null
           type: string
           updated_at: string | null
         }
@@ -79,10 +89,20 @@ export type Database = {
           carrier_type: string
           claims_zip?: string | null
           created_at?: string | null
+          group_name?: string | null
+          group_number?: string | null
           id?: string
+          nsure_payor_code?: string | null
           patient_id?: string | null
+          patient_relation?: string | null
+          payor_id?: string | null
           phone?: string | null
           policy_number: string
+          policy_type?: string | null
+          policyholder_dob?: string | null
+          policyholder_gender?: string | null
+          policyholder_name?: string | null
+          policyholder_phone?: string | null
           type: string
           updated_at?: string | null
         }
@@ -92,10 +112,20 @@ export type Database = {
           carrier_type?: string
           claims_zip?: string | null
           created_at?: string | null
+          group_name?: string | null
+          group_number?: string | null
           id?: string
+          nsure_payor_code?: string | null
           patient_id?: string | null
+          patient_relation?: string | null
+          payor_id?: string | null
           phone?: string | null
           policy_number?: string
+          policy_type?: string | null
+          policyholder_dob?: string | null
+          policyholder_gender?: string | null
+          policyholder_name?: string | null
+          policyholder_phone?: string | null
           type?: string
           updated_at?: string | null
         }
@@ -312,7 +342,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      analyze_payer_id: {
+        Args: {
+          payer_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       dispatch_status: "Pending" | "In Progress" | "Completed" | "Canceled"
