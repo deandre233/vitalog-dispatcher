@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CrewAssignmentModal } from "./CrewAssignmentModal";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   ChevronUp,
@@ -12,6 +12,7 @@ import {
   User,
   XCircle,
   AlertTriangle,
+  Navigation,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -75,8 +76,8 @@ export function DispatchItem({
 }: DispatchItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-  // Simplified handlers that don't create nested functions
   const handleUnassign = () => {
     toast.success(`Crew unassigned from dispatch ${id}`);
   };
@@ -87,7 +88,6 @@ export function DispatchItem({
     );
   };
 
-  // Simplified click handlers using primitive data
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
@@ -98,6 +98,11 @@ export function DispatchItem({
 
   const closeAssignModal = () => {
     setIsAssignModalOpen(false);
+  };
+
+  const handleTrackTransport = () => {
+    navigate(`/dispatch/${id}`);
+    toast.success(`Tracking dispatch ${id}`);
   };
 
   return (
@@ -181,7 +186,7 @@ export function DispatchItem({
           </div>
 
           <div className="space-y-2">
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
               {assignedTo !== "Unassigned" ? (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">
@@ -198,13 +203,24 @@ export function DispatchItem({
                   </Button>
                 </div>
               ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={openAssignModal}
-                >
-                  Assign Crew
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={openAssignModal}
+                  >
+                    Assign Crew
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleTrackTransport}
+                    className="flex items-center gap-1"
+                  >
+                    <Navigation className="w-4 h-4" />
+                    Track Transport
+                  </Button>
+                </div>
               )}
             </div>
 
