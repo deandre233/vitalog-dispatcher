@@ -8,9 +8,9 @@ import { Footer } from "@/components/layout/Footer";
 
 const Index = () => {
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex flex-col bg-[#f4f7fc]">
-        <Header />
+    <div className="min-h-screen flex flex-col bg-[#f4f7fc]">
+      <Header />
+      <SidebarProvider>
         <div className="flex flex-1">
           <AppSidebar />
           <div className="flex-1">
@@ -21,9 +21,9 @@ const Index = () => {
             </main>
           </div>
         </div>
-        <Footer />
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+      <Footer />
+    </div>
   );
 };
 
