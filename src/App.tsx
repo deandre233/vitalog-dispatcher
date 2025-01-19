@@ -1,44 +1,35 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import ActiveDispatches from "./pages/ActiveDispatches";
-import CreateDispatch from "./pages/CreateDispatch";
-import CrewAssignment from "./pages/CrewAssignment";
-import ManageRoutes from "./pages/ManageRoutes";
-import Billing from "./pages/Billing";
-import Performance from "./pages/Performance";
-import { DispatchDetailView } from "./components/dashboard/DispatchDetailView";
-import { UnitDetailView } from "./components/dashboard/UnitDetailView";
-import PatientRecord from "./pages/PatientRecord";
-import AlertsConfig from "./pages/AlertsConfig";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
+import { UnitDetailView } from "@/components/dashboard/UnitDetailView";
+import { DispatchDetailView } from "@/components/dashboard/DispatchDetailView";
+import { DashboardView } from "@/components/dashboard/DashboardView";
+import { PatientDetailView } from "@/components/dashboard/PatientDetailView";
+import { SettingsView } from "@/components/dashboard/SettingsView";
+import { Layout } from "@/components/Layout";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dispatch" element={<ActiveDispatches />} />
-          <Route path="/dispatch/:id" element={<DispatchDetailView />} />
-          <Route path="/unit/:unitId" element={<UnitDetailView />} />
-          <Route path="/dispatch/new" element={<CreateDispatch />} />
-          <Route path="/crew" element={<CrewAssignment />} />
-          <Route path="/routes" element={<ManageRoutes />} />
-          <Route path="/billing" element={<Billing />} />
-          <Route path="/performance" element={<Performance />} />
-          <Route path="/patient/:patientName" element={<PatientRecord />} />
-          <Route path="/alerts" element={<AlertsConfig />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<DashboardView />} />
+              <Route path="dispatch/:id" element={<DispatchDetailView />} />
+              <Route path="transport/:unitId" element={<UnitDetailView />} />
+              <Route path="patient/:patientId" element={<PatientDetailView />} />
+              <Route path="settings" element={<SettingsView />} />
+            </Route>
+          </Routes>
+          <Toaster />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
