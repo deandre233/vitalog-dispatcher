@@ -11,6 +11,7 @@ import ManageRoutes from "./pages/ManageRoutes";
 import Billing from "./pages/Billing";
 import Performance from "./pages/Performance";
 import { DispatchDetailView } from "./components/dashboard/DispatchDetailView";
+import { UnitDetailView } from "./components/dashboard/UnitDetailView";
 import PatientRecord from "./pages/PatientRecord";
 import AlertsConfig from "./pages/AlertsConfig";
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/dispatch" element={<ActiveDispatches />} />
           <Route path="/dispatch/:id" element={<DispatchDetailView />} />
+          <Route path="/unit/:unitId" element={<UnitDetailView />} />
           <Route path="/dispatch/new" element={<CreateDispatch />} />
           <Route path="/crew" element={<CrewAssignment />} />
           <Route path="/routes" element={<ManageRoutes />} />
