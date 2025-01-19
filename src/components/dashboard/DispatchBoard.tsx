@@ -151,7 +151,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
   const activationTime = new Date(dispatch.activationTime);
   const elapsedMinutes = Math.floor((now.getTime() - activationTime.getTime()) / (1000 * 60));
   
-  let progress = dispatch.progress || 0;
+  let progress = Number(dispatch.progress || 0);
   if (dispatch.assignedTo !== "Unassigned") {
     progress = Math.min(100, progress + Math.random() * 5);
   }
@@ -165,7 +165,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       routeEfficiency: 0
     },
     suggestedActions: [] as string[],
-    riskLevel: "low" as "low" | "medium" | "high"  // Updated to allow all risk levels
+    riskLevel: "low" as "low" | "medium" | "high"
   };
 
   try {
@@ -176,12 +176,13 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       `${elapsedMinutes} min`
     );
     
-    // Ensure all properties are serializable
-    analytics.efficiency = Number(efficiencyResult?.efficiency || 0);
-    analytics.suggestedActions = Array.isArray(efficiencyResult?.suggestedActions) 
-      ? efficiencyResult.suggestedActions.map(String)
-      : [];
-    analytics.riskLevel = efficiencyResult?.riskLevel || "low";
+    if (efficiencyResult) {
+      analytics.efficiency = Number(efficiencyResult.efficiency || 0);
+      analytics.suggestedActions = Array.isArray(efficiencyResult.suggestedActions) 
+        ? efficiencyResult.suggestedActions.map(String)
+        : [];
+      analytics.riskLevel = String(efficiencyResult.riskLevel || 'low') as "low" | "medium" | "high";
+    }
   } catch (error) {
     console.error('Error analyzing dispatch efficiency:', error);
   }
@@ -211,9 +212,9 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     aiInsights = ['Unable to generate insights'];
   }
 
-  // Initialize traffic info with defaults
+  // Initialize traffic info with serializable defaults
   const trafficInfo = {
-    congestionLevel: 'low' as "low" | "medium" | "high",  // Updated to allow all congestion levels
+    congestionLevel: 'low' as "low" | "medium" | "high",
     delayMinutes: 0,
     alternateRouteAvailable: false
   };
@@ -224,15 +225,17 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       { lat: 33.7490, lng: -84.3880 }
     );
     
-    trafficInfo.congestionLevel = traffic?.congestionLevel || 'low';
-    trafficInfo.delayMinutes = Number(traffic?.delayMinutes || Math.floor(Math.random() * 15));
-    trafficInfo.alternateRouteAvailable = Boolean(traffic?.alternateRouteAvailable);
+    if (traffic) {
+      trafficInfo.congestionLevel = String(traffic.congestionLevel || 'low') as "low" | "medium" | "high";
+      trafficInfo.delayMinutes = Number(traffic.delayMinutes || Math.floor(Math.random() * 15));
+      trafficInfo.alternateRouteAvailable = Boolean(traffic.alternateRouteAvailable);
+    }
   } catch (error) {
     console.error('Error getting traffic info:', error);
   }
 
   // Return a fully serializable object
-  const serializedDispatch: Dispatch = {
+  return {
     ...dispatch,
     id: String(dispatch.id),
     activationTime: String(dispatch.activationTime),
@@ -267,8 +270,6 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       }
     }
   };
-
-  return serializedDispatch;
 };
 
 export function DispatchBoard() {
