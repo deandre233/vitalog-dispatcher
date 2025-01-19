@@ -17,8 +17,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     const fetchInsuranceRecords = async () => {
       try {
         if (!patientId) {
-          console.log("No patient ID provided");
-          setLoading(false);
+          console.log("Waiting for patient ID...");
           return;
         }
 
@@ -28,15 +27,12 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
           .select("*")
           .eq("patient_id", patientId);
 
-        if (error) {
-          console.error("Error fetching insurance records:", error);
-          throw error;
-        }
+        if (error) throw error;
         
         console.log("Fetched insurance records:", data);
         setInsuranceRecords(data || []);
       } catch (error) {
-        console.error("Error in fetchInsuranceRecords:", error);
+        console.error("Error fetching insurance records:", error);
         toast({
           title: "Error",
           description: "Failed to fetch insurance records",
@@ -61,38 +57,16 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
   if (loading) {
     return (
       <Card className="p-4">
-        <p className="text-muted-foreground">Loading insurance records...</p>
+        <p className="text-muted-foreground">Loading insurance information...</p>
       </Card>
     );
   }
 
-  const primaryRecords = insuranceRecords.filter(record => record.type === 'primary');
-  const secondaryRecords = insuranceRecords.filter(record => record.type === 'secondary');
-  const reservedRecords = insuranceRecords.filter(record => record.type === 'reserved');
-
-  console.log("Filtered records:", {
-    primary: primaryRecords,
-    secondary: secondaryRecords,
-    reserved: reservedRecords
-  });
-
   return (
     <div className="space-y-6">
-      <InsuranceSection 
-        type="primary" 
-        title="Primary Insurance" 
-        records={primaryRecords}
-      />
-      <InsuranceSection 
-        type="secondary" 
-        title="Secondary Insurance" 
-        records={secondaryRecords}
-      />
-      <InsuranceSection 
-        type="reserved" 
-        title="Reserved Insurance" 
-        records={reservedRecords}
-      />
+      <InsuranceSection type="primary" title="Primary Insurance" />
+      <InsuranceSection type="secondary" title="Secondary Insurance" />
+      <InsuranceSection type="reserved" title="Reserved Insurance" />
     </div>
   );
 };
