@@ -100,8 +100,11 @@ export function DispatchItem({
     setIsAssignModalOpen(false);
   };
 
-  const handleTrackTransport = () => {
-    navigate(`/dispatch/${id}`);
+  const handleTrackTransport = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const path = `/dispatch/${id}`;
+    navigate(path);
     toast.success(`Tracking dispatch ${id}`);
   };
 
