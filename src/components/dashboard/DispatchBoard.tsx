@@ -156,7 +156,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     progress = Math.min(100, progress + Math.random() * 5);
   }
 
-  // Get analytics data - ensure all data is serializable
+  // Initialize analytics with serializable defaults
   const analytics = {
     efficiency: 0,
     performanceMetrics: {
@@ -165,7 +165,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       routeEfficiency: 0
     },
     suggestedActions: [] as string[],
-    riskLevel: "low" as "low" | "medium" | "high"
+    riskLevel: "low" as const
   };
 
   try {
@@ -177,11 +177,11 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     );
     
     // Ensure all properties are serializable
-    analytics.efficiency = Number(efficiencyResult.efficiency || 0);
-    analytics.suggestedActions = Array.isArray(efficiencyResult.suggestedActions) 
-      ? efficiencyResult.suggestedActions.map(action => String(action))
+    analytics.efficiency = Number(efficiencyResult?.efficiency || 0);
+    analytics.suggestedActions = Array.isArray(efficiencyResult?.suggestedActions) 
+      ? efficiencyResult.suggestedActions.map(String)
       : [];
-    analytics.riskLevel = efficiencyResult.riskLevel || "low";
+    analytics.riskLevel = efficiencyResult?.riskLevel || "low";
   } catch (error) {
     console.error('Error analyzing dispatch efficiency:', error);
   }
@@ -189,7 +189,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
   // Monitor dispatch progress with serializable data
   try {
     monitorDispatchProgress(
-      String(dispatch.status).toLowerCase(), 
+      String(dispatch.status || '').toLowerCase(), 
       String(elapsedMinutes), 
       30
     );
@@ -200,17 +200,20 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
   // Generate AI insights with serializable data
   let aiInsights: string[] = [];
   try {
-    aiInsights = generateAIInsights(analytics).map(insight => 
-      typeof insight === 'string' ? insight : JSON.stringify(insight)
-    );
+    const rawInsights = generateAIInsights(analytics);
+    aiInsights = Array.isArray(rawInsights) 
+      ? rawInsights.map(insight => 
+          typeof insight === 'string' ? insight : JSON.stringify(insight)
+        )
+      : [];
   } catch (error) {
     console.error('Error generating AI insights:', error);
     aiInsights = ['Unable to generate insights'];
   }
 
-  // Get traffic updates with serializable data
+  // Initialize traffic info with defaults
   const trafficInfo = {
-    congestionLevel: 'low' as 'low' | 'medium' | 'high',
+    congestionLevel: 'low' as const,
     delayMinutes: 0,
     alternateRouteAvailable: false
   };
@@ -221,23 +224,42 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       { lat: 33.7490, lng: -84.3880 }
     );
     
-    trafficInfo.congestionLevel = traffic.congestionLevel || 'low';
-    trafficInfo.delayMinutes = Math.floor(Math.random() * 15);
-    trafficInfo.alternateRouteAvailable = Boolean(traffic.alternateRouteAvailable);
+    trafficInfo.congestionLevel = traffic?.congestionLevel || 'low';
+    trafficInfo.delayMinutes = Number(traffic?.delayMinutes || Math.floor(Math.random() * 15));
+    trafficInfo.alternateRouteAvailable = Boolean(traffic?.alternateRouteAvailable);
   } catch (error) {
     console.error('Error getting traffic info:', error);
   }
 
-  // Return a serializable object with all properties explicitly typed
-  return {
+  // Return a fully serializable object
+  const serializedDispatch: Dispatch = {
     ...dispatch,
+    id: String(dispatch.id),
+    activationTime: String(dispatch.activationTime),
+    patient: {
+      ...dispatch.patient,
+      id: String(dispatch.patient.id),
+      name: String(dispatch.patient.name),
+      condition: dispatch.patient.condition ? String(dispatch.patient.condition) : undefined
+    },
+    serviceType: String(dispatch.serviceType),
+    origin: String(dispatch.origin),
+    destination: String(dispatch.destination),
+    status: String(dispatch.status),
+    priority: String(dispatch.priority),
+    assignedTo: String(dispatch.assignedTo),
     progress: Number(progress),
     elapsedTime: String(elapsedMinutes) + ' min',
     lastUpdated: now.toISOString(),
     efficiency: Number(analytics.efficiency),
+    eta: String(dispatch.eta),
+    comments: dispatch.comments ? String(dispatch.comments) : undefined,
+    warnings: dispatch.warnings ? String(dispatch.warnings) : undefined,
     aiRecommendations: {
-      ...dispatch.aiRecommendations,
-      insights: aiInsights.map(String),
+      route: String(dispatch.aiRecommendations.route),
+      crew: String(dispatch.aiRecommendations.crew),
+      billing: String(dispatch.aiRecommendations.billing),
+      insights: aiInsights,
       trafficStatus: {
         congestionLevel: trafficInfo.congestionLevel,
         estimatedDelay: Number(trafficInfo.delayMinutes),
@@ -245,6 +267,8 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       }
     }
   };
+
+  return serializedDispatch;
 };
 
 export function DispatchBoard() {
