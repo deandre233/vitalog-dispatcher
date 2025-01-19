@@ -150,12 +150,28 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         return;
       }
 
-      const validatedRecords: InsuranceRecord[] = (data || []).map(record => ({
-        ...record,
-        type: isValidInsuranceType(record.type) ? record.type : 'primary'
-      }));
+      // Initialize records for each type if they don't exist
+      const types: ('primary' | 'secondary' | 'reserved')[] = ['primary', 'secondary', 'reserved'];
+      const validatedRecords: InsuranceRecord[] = types.map(type => {
+        const existingRecord = (data || []).find(r => r.type === type);
+        if (existingRecord) {
+          return {
+            ...existingRecord,
+            type: isValidInsuranceType(existingRecord.type) ? existingRecord.type : type,
+            patient_relation: existingRecord.patient_relation || ''
+          };
+        }
+        return {
+          type,
+          carrier_type: '',
+          carrier_name: '',
+          policy_number: '',
+          patient_relation: ''
+        };
+      });
 
       setInsuranceRecords(validatedRecords);
+      console.log('Fetched and initialized insurance records:', validatedRecords);
     } catch (err) {
       console.error('Unexpected error in fetchInsuranceRecords:', err);
       toast({
@@ -166,77 +182,36 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     }
   };
 
-  const fetchBillingSettings = async () => {
-    try {
-      if (!patientId) return;
-
-      const { data, error } = await supabase
-        .from('billing_settings')
-        .select('*')
-        .eq('patient_id', patientId)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching billing settings:', error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch billing settings",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (data) {
-        const validatedSettings: BillingSettings = {
-          ...data,
-          preauth_required: isValidPreauthRequired(data.preauth_required) ? data.preauth_required : undefined,
-          pricing_schema: isValidPricingSchema(data.pricing_schema) ? data.pricing_schema : undefined,
-          subscription_type: isValidSubscriptionType(data.subscription_type) ? data.subscription_type : undefined
-        };
-        setBillingSettings(validatedSettings);
-      }
-    } catch (err) {
-      console.error('Unexpected error in fetchBillingSettings:', err);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred while fetching billing settings",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handlePatientRelationChange = (type: 'primary' | 'secondary' | 'reserved', value: string) => {
-    if (value === 'Self') {
-      setInsuranceRecords(prev => 
-        prev.map(record => 
-          record.type === type 
-            ? { 
-                ...record, 
-                patient_relation: value,
-                policyholder_name: `${patientInfo.first_name} ${patientInfo.last_name}`,
-                policyholder_dob: patientInfo.dob,
-                policyholder_gender: patientInfo.gender,
-                policyholder_phone: patientInfo.phone
-              }
-            : record
-        )
-      );
-    } else {
-      setInsuranceRecords(prev => 
-        prev.map(record => 
-          record.type === type 
-            ? { 
-                ...record, 
-                patient_relation: value,
-                policyholder_name: '',
-                policyholder_dob: '',
-                policyholder_gender: '',
-                policyholder_phone: ''
-              }
-            : record
-        )
-      );
-    }
+    console.log('Handling patient relation change:', { type, value });
+    setInsuranceRecords(prev => 
+      prev.map(record => {
+        if (record.type === type) {
+          if (value === 'Self') {
+            console.log('Setting self information for', type);
+            return {
+              ...record,
+              patient_relation: value,
+              policyholder_name: `${patientInfo.first_name} ${patientInfo.last_name}`,
+              policyholder_dob: patientInfo.dob,
+              policyholder_gender: patientInfo.gender,
+              policyholder_phone: patientInfo.phone
+            };
+          } else {
+            console.log('Clearing policyholder information for', type);
+            return {
+              ...record,
+              patient_relation: value,
+              policyholder_name: '',
+              policyholder_dob: '',
+              policyholder_gender: '',
+              policyholder_phone: ''
+            };
+          }
+        }
+        return record;
+      })
+    );
   };
 
   const handleInsuranceChange = (type: 'primary' | 'secondary' | 'reserved', field: keyof InsuranceRecord, value: string) => {
@@ -569,7 +544,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
           <Label className="text-sm font-medium">Policyholder Information</Label>
           <div className="grid grid-cols-2 gap-4">
             <Input
-              value={record?.policyholder_name}
+              value={record?.policyholder_name || ''}
               onChange={(e) => handleInsuranceChange(type, 'policyholder_name', e.target.value)}
               className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
               placeholder="Policyholder Name"
@@ -578,7 +553,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
             />
             <Input
               type="date"
-              value={record?.policyholder_dob}
+              value={record?.policyholder_dob || ''}
               onChange={(e) => handleInsuranceChange(type, 'policyholder_dob', e.target.value)}
               className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
               readOnly={record?.patient_relation === 'Self'}
@@ -587,7 +562,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Select
-              value={record?.policyholder_gender}
+              value={record?.policyholder_gender || ''}
               onValueChange={(value) => handleInsuranceChange(type, 'policyholder_gender', value)}
               disabled={record?.patient_relation === 'Self'}
             >
@@ -602,7 +577,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               </SelectContent>
             </Select>
             <Input
-              value={record?.policyholder_phone}
+              value={record?.policyholder_phone || ''}
               onChange={(e) => handleInsuranceChange(type, 'policyholder_phone', e.target.value)}
               className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
               placeholder="Phone"
