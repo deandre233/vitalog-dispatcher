@@ -129,9 +129,11 @@ const PatientRecord = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const { validateField, handleZipCodeChange, isValidating } = useAIDemographics(patientData);
+
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    const target = e.target as HTMLInputElement; // Type assertion for checkbox handling
+    const target = e.target as HTMLInputElement;
     
     if (name.includes('.')) {
       // Handle nested objects (warnings and barriersToEMS)
@@ -154,6 +156,24 @@ const PatientRecord = () => {
         ...prev,
         [name]: target.type === 'checkbox' ? target.checked : value
       }));
+
+      // AI validation for specific fields
+      if (['phone', 'email', 'zip'].includes(name)) {
+        await validateField(name, value);
+      }
+
+      // Handle ZIP code auto-fill
+      if (name === 'zip') {
+        const locationData = await handleZipCodeChange(value);
+        if (locationData) {
+          setPatientData(prev => ({
+            ...prev,
+            city: locationData.city,
+            state: locationData.state,
+            county: locationData.county
+          }));
+        }
+      }
     }
   };
 
