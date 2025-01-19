@@ -236,16 +236,16 @@ export default function PatientRecord() {
               <div className="space-y-2">
                 <FormLabel>Warnings</FormLabel>
                 <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(form.getValues().warnings).map(([key, value]) => (
+                  {Object.entries(form.getValues().warnings).map(([key, _]) => (
                     <FormField
                       key={key}
                       control={form.control}
-                      name={`warnings.${key}` as keyof FormValues}
+                      name={`warnings.${key}` as const}
                       render={({ field }) => (
                         <div className="flex items-center space-x-2">
                           <Checkbox 
                             id={key} 
-                            checked={field.value as boolean} 
+                            checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!isEditing}
                           />
@@ -264,16 +264,16 @@ export default function PatientRecord() {
             <section className="space-y-4">
               <h3 className="text-lg font-semibold">Barriers to EMS</h3>
               <div className="grid grid-cols-2 gap-2">
-                {Object.entries(form.getValues().barriers).map(([key, value]) => (
+                {Object.entries(form.getValues().barriers).map(([key, _]) => (
                   <FormField
                     key={key}
                     control={form.control}
-                    name={`barriers.${key}` as keyof FormValues}
+                    name={`barriers.${key}` as const}
                     render={({ field }) => (
                       <div className="flex items-center space-x-2">
                         <Checkbox 
                           id={`barrier-${key}`} 
-                          checked={field.value as boolean} 
+                          checked={field.value}
                           onCheckedChange={field.onChange}
                           disabled={!isEditing}
                         />
