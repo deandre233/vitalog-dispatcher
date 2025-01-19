@@ -19,6 +19,7 @@ import {
 } from "@/utils/aiLearningUtils";
 
 interface Patient {
+  id: string;  // Added id as required
   name: string;
   dob?: string;
   condition?: string;
@@ -61,7 +62,7 @@ const mockDispatches: Dispatch[] = [
     id: "7684",
     activationTime: "2024-02-20T10:30:00",
     patient: {
-      id: "pat-001",  // Added patient ID
+      id: "pat-001",
       name: "Turner, Angela",
       condition: "Breathing problem: Req oxygen"
     },
@@ -84,7 +85,7 @@ const mockDispatches: Dispatch[] = [
     id: "7601",
     activationTime: "2024-02-20T09:15:00",
     patient: {
-      id: "pat-002",  // Added patient ID
+      id: "pat-002",
       name: "Smith, John",
       condition: "Impaired movement"
     },
