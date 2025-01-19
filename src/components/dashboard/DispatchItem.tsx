@@ -72,6 +72,7 @@ export function DispatchItem({
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<DispatchStatus>(status.toLowerCase().replace(" ", "") as DispatchStatus);
+  const [currentAssignedTo, setCurrentAssignedTo] = useState(assignedTo);
 
   const calculateProgress = (status: DispatchStatus): number => {
     const statusValues = {
