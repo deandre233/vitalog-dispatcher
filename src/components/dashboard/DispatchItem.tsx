@@ -14,7 +14,8 @@ import {
   AlertTriangle,
   Navigation,
   Truck,
-  Ambulance
+  Ambulance,
+  AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
 import { format, formatDistanceToNow } from "date-fns";
@@ -161,6 +162,10 @@ export function DispatchItem({
   };
 
   const handleStatusChange = (newStatus: DispatchStatus) => {
+    if (assignedTo === "Unassigned") {
+      toast.error("Cannot change status until dispatch is assigned to a crew");
+      return;
+    }
     setCurrentStatus(newStatus);
     toast.success(`Status updated to ${newStatus}`);
   };
@@ -296,10 +301,19 @@ export function DispatchItem({
                 </div>
               )}
 
-              <DispatchStatusBar
-                currentStatus={currentStatus}
-                onStatusChange={handleStatusChange}
-              />
+              {assignedTo === "Unassigned" ? (
+                <div className="bg-yellow-50 p-3 rounded-md flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-yellow-600" />
+                  <span className="text-sm text-yellow-600">
+                    Assign a crew to enable status updates
+                  </span>
+                </div>
+              ) : (
+                <DispatchStatusBar
+                  currentStatus={currentStatus}
+                  onStatusChange={handleStatusChange}
+                />
+              )}
             </div>
           </div>
 
