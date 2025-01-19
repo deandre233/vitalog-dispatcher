@@ -94,7 +94,6 @@ export function CrewAssignmentModal({
   useEffect(() => {
     if (!mapContainer.current || !isOpen || !recommendedCrew) return;
 
-    // Initialize map
     mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN';
     
     map.current = new mapboxgl.Map({
@@ -104,12 +103,10 @@ export function CrewAssignmentModal({
       zoom: 12
     });
 
-    // Add markers
     new mapboxgl.Marker({ color: '#FF0000' })
       .setLngLat([origin.lng, origin.lat])
       .addTo(map.current);
 
-    // Add route if available
     if (recommendedCrew.routeInfo.route) {
       map.current.on('load', () => {
         if (!map.current) return;
@@ -119,10 +116,7 @@ export function CrewAssignmentModal({
           data: {
             type: 'Feature',
             properties: {},
-            geometry: {
-              type: 'LineString',
-              coordinates: recommendedCrew.routeInfo.route!.geometry.coordinates
-            }
+            geometry: recommendedCrew.routeInfo.route!.geometry
           }
         });
 
@@ -142,7 +136,6 @@ export function CrewAssignmentModal({
       });
     }
 
-    // Add crew markers
     crewMembers.forEach(crew => {
       const color = recommendedCrew.id === crew.id ? '#00FF00' : '#0000FF';
       new mapboxgl.Marker({ color })
