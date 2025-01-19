@@ -1,8 +1,8 @@
-import { Package, Car, MapPin, Ambulance, Flag, CheckCircle } from "lucide-react";
+import { Package, Car, MapPin, Ambulance, Flag, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export type DispatchStatus = "dispatch" | "enroute" | "onscene" | "transporting" | "destination" | "available";
+export type DispatchStatus = "dispatch" | "enroute" | "onscene" | "transporting" | "destination" | "available" | "canceled";
 
 interface DispatchStatusBarProps {
   currentStatus: DispatchStatus;
@@ -51,6 +51,13 @@ const statusConfig = [
     icon: CheckCircle, 
     color: "bg-emerald-500 hover:bg-emerald-600",
     progressColor: "bg-emerald-500"
+  },
+  { 
+    id: "canceled", 
+    label: "Canceled", 
+    icon: XCircle, 
+    color: "bg-red-500 hover:bg-red-600",
+    progressColor: "bg-red-500"
   },
 ] as const;
 
