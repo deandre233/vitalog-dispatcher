@@ -19,7 +19,7 @@ export const useAIDemographics = (patientData: any) => {
         toast({
           title: "Warning",
           description: data.message,
-          variant: "warning",
+          variant: "default", // Changed from "warning" to "default"
         });
       } else if (data.type === 'error') {
         toast({

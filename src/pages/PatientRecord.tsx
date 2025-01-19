@@ -10,8 +10,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { useAIDemographics } from "@/hooks/useAIDemographics"; // Added this import
 import { 
   FileText, 
   Phone, 
@@ -37,6 +38,7 @@ import {
   AlertTriangle,
   Heart
 } from "lucide-react";
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BillingTabContent } from "@/components/patient/BillingTabContent";
@@ -954,3 +956,4 @@ const PatientRecord = () => {
 };
 
 export default PatientRecord;
+
