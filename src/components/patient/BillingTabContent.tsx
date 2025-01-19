@@ -558,16 +558,18 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
             <Input
               value={record?.policyholder_name}
               onChange={(e) => handleInsuranceChange(type, 'policyholder_name', e.target.value)}
-              className="h-9"
+              className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
               placeholder="Policyholder Name"
               readOnly={record?.patient_relation === 'Self'}
+              disabled={record?.patient_relation === 'Self'}
             />
             <Input
               type="date"
               value={record?.policyholder_dob}
               onChange={(e) => handleInsuranceChange(type, 'policyholder_dob', e.target.value)}
-              className="h-9"
+              className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
               readOnly={record?.patient_relation === 'Self'}
+              disabled={record?.patient_relation === 'Self'}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -576,7 +578,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               onValueChange={(value) => handleInsuranceChange(type, 'policyholder_gender', value)}
               disabled={record?.patient_relation === 'Self'}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className={`w-full ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}>
                 <SelectValue placeholder="Select Gender" />
               </SelectTrigger>
               <SelectContent>
@@ -589,9 +591,10 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
             <Input
               value={record?.policyholder_phone}
               onChange={(e) => handleInsuranceChange(type, 'policyholder_phone', e.target.value)}
-              className="h-9"
+              className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
               placeholder="Phone"
               readOnly={record?.patient_relation === 'Self'}
+              disabled={record?.patient_relation === 'Self'}
             />
           </div>
         </div>
