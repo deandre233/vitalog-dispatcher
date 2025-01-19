@@ -45,6 +45,7 @@ const PatientRecord = () => {
   const { patientName } = useParams();
   const decodedName = decodeURIComponent(patientName || "");
   const [isEditing, setIsEditing] = useState(false);
+  const { toast } = useToast();
   const [patientData, setPatientData] = useState({
     id: '', // Add this line
     phone: "(678) 875-9912",
@@ -106,7 +107,6 @@ const PatientRecord = () => {
     mobilePhone: "",
     additionalWarnings: ""
   });
-  const { toast } = useToast();
 
   const handleEdit = () => {
     setIsEditing(!isEditing);
@@ -160,32 +160,63 @@ const PatientRecord = () => {
   useEffect(() => {
     // Fetch patient data when component mounts
     const fetchPatientData = async () => {
-      const { data, error } = await supabase
-        .from('patients')
-        .select('*')
-        .eq('last_name', decodedName.split(',')[0].trim())
-        .eq('first_name', decodedName.split(',')[1].trim())
-        .single();
+      try {
+        const lastName = decodedName.split(',')[0].trim();
+        const firstName = decodedName.split(',')[1].trim();
 
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch patient data",
-          variant: "destructive",
-        });
-        return;
-      }
+        const { data, error } = await supabase
+          .from('patients')
+          .select('*')
+          .eq('last_name', lastName)
+          .eq('first_name', firstName)
+          .maybeSingle();
 
-      if (data) {
+        if (error) {
+          console.error('Error fetching patient:', error);
+          toast({
+            title: "Error",
+            description: "Failed to fetch patient data",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (!data) {
+          toast({
+            title: "Patient Not Found",
+            description: `No patient record found for ${firstName} ${lastName}`,
+            variant: "destructive",
+          });
+          return;
+        }
+
         setPatientData(prev => ({
           ...prev,
-          id: data.id
+          id: data.id,
+          phone: data.phone || prev.phone,
+          email: data.email || prev.email,
+          address: data.address || prev.address,
+          city: data.city || prev.city,
+          state: data.state || prev.state,
+          zip: data.zip || prev.zip,
+          medicalConditions: data.medical_conditions || prev.medicalConditions,
+          allergies: data.allergies || prev.allergies,
+          medications: data.medications || prev.medications,
+          emergencyContactName: data.emergency_contact_name || prev.emergencyContactName,
+          emergencyContactPhone: data.emergency_contact_phone || prev.emergencyContactPhone,
         }));
+      } catch (err) {
+        console.error('Error in fetchPatientData:', err);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred while fetching patient data",
+          variant: "destructive",
+        });
       }
     };
 
     fetchPatientData();
-  }, [decodedName]);
+  }, [decodedName, toast]);
 
   return (
     <div className="min-h-screen flex flex-col">
