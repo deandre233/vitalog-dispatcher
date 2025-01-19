@@ -73,6 +73,8 @@ const getProgressForStatus = (status: DispatchStatus): number => {
       return 80;
     case "available":
       return 100;
+    case "canceled":
+      return 0;
     default:
       return 0;
   }
@@ -92,6 +94,8 @@ const getStatusColor = (status: DispatchStatus): string => {
       return "bg-yellow-100 text-yellow-700";
     case "available":
       return "bg-emerald-100 text-emerald-700";
+    case "canceled":
+      return "bg-red-100 text-red-700";
     default:
       return "bg-gray-100 text-gray-700";
   }

@@ -315,7 +315,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      dispatch_status: "Pending" | "In Progress" | "Completed"
+      dispatch_status: "Pending" | "In Progress" | "Completed" | "Canceled"
     }
     CompositeTypes: {
       [_ in never]: never
