@@ -8,25 +8,29 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+interface Patient {
+  name: string;
+  dob?: string;
+  condition?: string;
+}
+
+interface AIRecommendations {
+  route: string;
+  crew: string;
+  billing: string;
+}
+
 interface Dispatch {
   id: string;
   activationTime: string;
-  patient: {
-    name: string;
-    dob?: string;
-    condition?: string;
-  };
+  patient: Patient;
   serviceType: string;
   origin: string;
   destination: string;
   status: string;
   priority: string;
   assignedTo: string;
-  aiRecommendations: {
-    route: string;
-    crew: string;
-    billing: string;
-  };
+  aiRecommendations: AIRecommendations;
   eta: string;
   comments?: string;
   warnings?: string;
@@ -82,8 +86,7 @@ const mockDispatches: Dispatch[] = [
   }
 ];
 
-// Filter dispatches based on assignment status
-const filterDispatches = (dispatches: Dispatch[], status: "assigned" | "unassigned") => {
+const filterDispatches = (dispatches: Dispatch[], status: "assigned" | "unassigned"): Dispatch[] => {
   return dispatches.filter(dispatch => 
     status === "assigned" 
       ? dispatch.assignedTo !== "Unassigned"
@@ -93,12 +96,11 @@ const filterDispatches = (dispatches: Dispatch[], status: "assigned" | "unassign
 
 export function DispatchBoard() {
   const [activeView, setActiveView] = useState<"active" | "scheduled">("active");
+  const [dispatches] = useState<Dispatch[]>(mockDispatches);
 
-  // Separate dispatches into assigned and unassigned
-  const unassignedDispatches = filterDispatches(mockDispatches, "unassigned");
-  const assignedDispatches = filterDispatches(mockDispatches, "assigned");
+  const unassignedDispatches = filterDispatches(dispatches, "unassigned");
+  const assignedDispatches = filterDispatches(dispatches, "assigned");
 
-  // Style for unassigned tab when there are unassigned dispatches
   const unassignedTabStyle = unassignedDispatches.length > 0 
     ? "bg-red-100 text-red-700 data-[state=active]:bg-red-200" 
     : "";
