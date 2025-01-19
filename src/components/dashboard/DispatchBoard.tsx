@@ -4,7 +4,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DispatchItem } from "./DispatchItem";
 import { DispatchFilters } from "./DispatchFilters";
 import { ScheduledTransport } from "./ScheduledTransport";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -96,10 +96,17 @@ const filterDispatches = (dispatches: Dispatch[], status: "assigned" | "unassign
 
 export function DispatchBoard() {
   const [activeView, setActiveView] = useState<"active" | "scheduled">("active");
-  const [dispatches] = useState<Dispatch[]>(mockDispatches);
+  const [dispatches] = useState<Dispatch[]>(JSON.parse(JSON.stringify(mockDispatches)));
 
-  const unassignedDispatches = filterDispatches(dispatches, "unassigned");
-  const assignedDispatches = filterDispatches(dispatches, "assigned");
+  const unassignedDispatches = useMemo(() => 
+    filterDispatches(dispatches, "unassigned"),
+    [dispatches]
+  );
+
+  const assignedDispatches = useMemo(() => 
+    filterDispatches(dispatches, "assigned"),
+    [dispatches]
+  );
 
   const unassignedTabStyle = unassignedDispatches.length > 0 
     ? "bg-red-100 text-red-700 data-[state=active]:bg-red-200" 
