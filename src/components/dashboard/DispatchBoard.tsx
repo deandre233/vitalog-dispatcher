@@ -13,7 +13,9 @@ import { analyzeDispatchEfficiency, monitorDispatchProgress, generateAIInsights 
 import { 
   analyzeHistoricalData, 
   predictMaintenance, 
-  predictStaffingNeeds 
+  predictStaffingNeeds,
+  type MaintenancePrediction,
+  type StaffingPrediction
 } from "@/utils/aiLearningUtils";
 
 interface Patient {
