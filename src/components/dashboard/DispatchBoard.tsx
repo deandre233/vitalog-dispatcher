@@ -3,6 +3,9 @@ import { Brain } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DispatchItem } from "./DispatchItem";
 import { DispatchFilters } from "./DispatchFilters";
+import { ScheduledTransportForm } from "../dispatch/ScheduledTransportForm";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useState } from "react";
 
 const dispatches = [
   {
@@ -59,28 +62,53 @@ const dispatches = [
 ];
 
 export function DispatchBoard() {
+  const [activeView, setActiveView] = useState("active");
+
   return (
     <Card className="p-6 m-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-medical-primary">
-          Active Dispatches
+          Dispatch Management
         </h2>
         <DispatchFilters />
       </div>
 
-      <Alert className="mb-4">
-        <Brain className="h-4 w-4" />
-        <AlertDescription>
-          AI Insight: Current dispatch load is optimal. 2 crews available for
-          emergency response.
-        </AlertDescription>
-      </Alert>
-
-      <div className="space-y-4">
-        {dispatches.map((dispatch) => (
-          <DispatchItem key={dispatch.id} {...dispatch} />
-        ))}
+      <div className="flex justify-center mb-6">
+        <ToggleGroup
+          type="single"
+          value={activeView}
+          onValueChange={(value) => {
+            if (value) setActiveView(value);
+          }}
+        >
+          <ToggleGroupItem value="active" aria-label="Active Dispatches">
+            Active Dispatches
+          </ToggleGroupItem>
+          <ToggleGroupItem value="scheduled" aria-label="Scheduled Transport">
+            Scheduled Transport
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
+
+      {activeView === "active" ? (
+        <>
+          <Alert className="mb-4">
+            <Brain className="h-4 w-4" />
+            <AlertDescription>
+              AI Insight: Current dispatch load is optimal. 2 crews available for
+              emergency response.
+            </AlertDescription>
+          </Alert>
+
+          <div className="space-y-4">
+            {dispatches.map((dispatch) => (
+              <DispatchItem key={dispatch.id} {...dispatch} />
+            ))}
+          </div>
+        </>
+      ) : (
+        <ScheduledTransportForm />
+      )}
     </Card>
   );
 }
