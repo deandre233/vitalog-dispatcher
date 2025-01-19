@@ -61,6 +61,7 @@ const mockDispatches: Dispatch[] = [
     id: "7684",
     activationTime: "2024-02-20T10:30:00",
     patient: {
+      id: "pat-001",  // Added patient ID
       name: "Turner, Angela",
       condition: "Breathing problem: Req oxygen"
     },
@@ -83,6 +84,7 @@ const mockDispatches: Dispatch[] = [
     id: "7601",
     activationTime: "2024-02-20T09:15:00",
     patient: {
+      id: "pat-002",  // Added patient ID
       name: "Smith, John",
       condition: "Impaired movement"
     },
@@ -367,3 +369,4 @@ export function DispatchBoard() {
     </Card>
   );
 }
+
