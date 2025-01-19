@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { payerDatabase } from './payerDatabase.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,12 +12,30 @@ serve(async (req) => {
   }
 
   try {
+    const { payerId } = await req.json()
+    
+    // First try exact match in our database
+    const exactMatch = payerDatabase.find(p => p.payerId === payerId)
+    if (exactMatch) {
+      return new Response(JSON.stringify({
+        carrier_type: exactMatch.carrierType,
+        carrier_name: exactMatch.carrierName,
+        policy_type: exactMatch.policyType
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // If no exact match, use OpenAI to analyze
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
     if (!OPENAI_API_KEY) {
       throw new Error('OPENAI_API_KEY is not set')
     }
 
-    const { payerId } = await req.json()
+    // Use similar payer IDs from our database to help GPT make better predictions
+    const similarPayers = payerDatabase
+      .filter(p => p.payerId.startsWith(payerId.substring(0, 2)))
+      .slice(0, 5)
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -25,11 +44,13 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-4",
         messages: [
           {
             role: "system",
-            content: "You are an expert in healthcare insurance payer IDs. Return JSON with carrier_type, carrier_name, and policy_type based on the payer ID. Only return valid values that match the system's predefined options."
+            content: `You are an expert in healthcare insurance payer IDs. Analyze the given payer ID and return carrier information.
+            Here are some similar payer IDs from our database for reference:
+            ${JSON.stringify(similarPayers, null, 2)}`
           },
           {
             role: "user",
