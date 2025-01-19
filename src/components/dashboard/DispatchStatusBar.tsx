@@ -10,12 +10,12 @@ interface DispatchStatusBarProps {
 }
 
 const statusConfig = [
-  { id: "dispatch", label: "Dispatch", icon: Package },
-  { id: "enroute", label: "En Route", icon: Car },
-  { id: "onscene", label: "On Scene", icon: MapPin },
-  { id: "transporting", label: "Transporting", icon: Ambulance },
-  { id: "destination", label: "At Destination", icon: Flag },
-  { id: "available", label: "Available", icon: CheckCircle },
+  { id: "dispatch", label: "Dispatch", icon: Package, color: "bg-gray-500 hover:bg-gray-600" },
+  { id: "enroute", label: "En Route", icon: Car, color: "bg-yellow-500 hover:bg-yellow-600" },
+  { id: "onscene", label: "On Scene", icon: MapPin, color: "bg-green-500 hover:bg-green-600" },
+  { id: "transporting", label: "Transporting", icon: Ambulance, color: "bg-blue-500 hover:bg-blue-600" },
+  { id: "destination", label: "At Destination", icon: Flag, color: "bg-orange-500 hover:bg-orange-600" },
+  { id: "available", label: "Available", icon: CheckCircle, color: "bg-emerald-500 hover:bg-emerald-600" },
 ] as const;
 
 export function DispatchStatusBar({ currentStatus, onStatusChange }: DispatchStatusBarProps) {
@@ -37,7 +37,7 @@ export function DispatchStatusBar({ currentStatus, onStatusChange }: DispatchSta
               size="sm"
               className={cn(
                 "w-full transition-all",
-                isActive && "bg-blue-500 hover:bg-blue-600",
+                isActive && status.color,
                 isPast && "bg-gray-200 text-gray-700"
               )}
               onClick={() => onStatusChange(status.id as DispatchStatus)}
@@ -50,7 +50,7 @@ export function DispatchStatusBar({ currentStatus, onStatusChange }: DispatchSta
                 <div 
                   className={cn(
                     "h-full transition-all",
-                    (isActive || isPast) ? "bg-blue-500" : "bg-gray-200"
+                    (isActive || isPast) ? status.color.split(' ')[0] : "bg-gray-200"
                   )}
                   style={{
                     width: isPast ? "100%" : isActive ? "50%" : "0%"
