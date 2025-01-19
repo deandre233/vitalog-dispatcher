@@ -13,7 +13,6 @@ import {
   Home,
   FileText,
   History,
-  AlertCircle,
   User,
 } from "lucide-react";
 
@@ -79,33 +78,29 @@ export function AppSidebar() {
   const pathname = useLocation().pathname;
 
   return (
-    <div className="space-y-4 py-4 flex flex-col h-full bg-white text-white">
-      <div className="px-3 py-2">
-        <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight text-black">
-          Navigation
-        </h2>
-        <div className="space-y-1">
-          {routes.map((route) => (
-            <Button
-              key={route.href}
-              variant={pathname === route.href ? "default" : "ghost"}
-              className={cn("w-full justify-start", {
-                "bg-accent text-accent-foreground":
-                  pathname === route.href,
-              })}
-              asChild
-            >
-              <Link to={route.href}>
-                <route.icon className="mr-2 h-4 w-4" />
-                {route.label}
-              </Link>
-            </Button>
-          ))}
-        </div>
+    <div className="w-64 border-r border-gray-200 bg-white">
+      <div className="space-y-2 py-2">
+        <h2 className="px-4 text-lg font-semibold text-gray-900">Navigation</h2>
+        <ScrollArea className="h-[calc(100vh-4rem)]">
+          <div className="space-y-1 px-2">
+            {routes.map((route) => (
+              <Button
+                key={route.href}
+                variant={pathname === route.href ? "secondary" : "ghost"}
+                className={cn("w-full justify-start", {
+                  "bg-gray-100": pathname === route.href,
+                })}
+                asChild
+              >
+                <Link to={route.href}>
+                  <route.icon className="mr-2 h-4 w-4" />
+                  {route.label}
+                </Link>
+              </Button>
+            ))}
+          </div>
+        </ScrollArea>
       </div>
-      <ScrollArea className="flex-1 px-3">
-        <div className="space-y-1 p-2"></div>
-      </ScrollArea>
     </div>
   );
 }
