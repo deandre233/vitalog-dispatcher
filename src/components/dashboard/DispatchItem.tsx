@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CrewAssignmentModal } from "./CrewAssignmentModal";
+import { Link } from "react-router-dom";
 import {
   ChevronDown,
   ChevronUp,
@@ -18,6 +19,7 @@ interface Patient {
   name: string;
   dob?: string;
   condition?: string;
+  id: string; // Added id for patient
 }
 
 interface AIRecommendations {
@@ -109,9 +111,12 @@ export function DispatchItem({
       <div className="flex justify-between items-start">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <Link 
+              to={`/dispatch/${id}`}
+              className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+            >
               Call #{id}
-            </h3>
+            </Link>
             <Button
               variant="ghost"
               size="sm"
@@ -153,7 +158,12 @@ export function DispatchItem({
             <div>
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-gray-500" />
-                <span className="text-base">{patient.name}</span>
+                <Link 
+                  to={`/patient/${patient.id}`}
+                  className="text-base hover:text-blue-600 transition-colors"
+                >
+                  {patient.name}
+                </Link>
               </div>
               {patient.condition && (
                 <div className="text-sm text-gray-600">{patient.condition}</div>
