@@ -26,6 +26,24 @@ export default {
           accent: "#F5F7F9",
           highlight: "#E3F2FD",
         },
+        // Insurance section specific colors
+        insurance: {
+          primary: {
+            bg: "#F1F0FB",
+            accent: "#7E69AB",
+            text: "#403E43",
+          },
+          secondary: {
+            bg: "#E7F0FD",
+            accent: "#0FA0CE",
+            text: "#222222",
+          },
+          reserved: {
+            bg: "#FEF9F9",
+            accent: "#D946EF",
+            text: "#222222",
+          },
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
