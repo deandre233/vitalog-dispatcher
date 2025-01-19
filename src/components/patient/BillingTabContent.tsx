@@ -189,6 +189,162 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     });
   };
 
+  const handleSave = async () => {
+    try {
+      if (!patientId) {
+        toast({
+          title: "Error",
+          description: "Patient ID is required to save billing information",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update insurance records
+      for (const record of insuranceRecords) {
+        if (record.id) {
+          // Update existing record
+          const { error: updateError } = await supabase
+            .from('insurance_records')
+            .update({
+              carrier_type: record.carrier_type,
+              carrier_name: record.carrier_name,
+              policy_type: record.policy_type,
+              group_number: record.group_number,
+              group_name: record.group_name,
+              policy_number: record.policy_number,
+              phone: record.phone,
+              claims_zip: record.claims_zip,
+              activation_date: record.activation_date,
+              patient_relation: record.patient_relation,
+              policyholder_name: record.policyholder_name,
+              policyholder_dob: record.policyholder_dob,
+              policyholder_gender: record.policyholder_gender,
+              policyholder_phone: record.policyholder_phone,
+              payor_id: record.payor_id,
+              nsure_payor_code: record.nsure_payor_code,
+            })
+            .eq('id', record.id);
+
+          if (updateError) {
+            console.error('Error updating insurance record:', updateError);
+            toast({
+              title: "Error",
+              description: "Failed to update insurance record",
+              variant: "destructive",
+            });
+            return;
+          }
+        } else {
+          // Insert new record
+          const { error: insertError } = await supabase
+            .from('insurance_records')
+            .insert({
+              patient_id: patientId,
+              type: record.type,
+              carrier_type: record.carrier_type,
+              carrier_name: record.carrier_name,
+              policy_type: record.policy_type,
+              group_number: record.group_number,
+              group_name: record.group_name,
+              policy_number: record.policy_number,
+              phone: record.phone,
+              claims_zip: record.claims_zip,
+              activation_date: record.activation_date,
+              patient_relation: record.patient_relation,
+              policyholder_name: record.policyholder_name,
+              policyholder_dob: record.policyholder_dob,
+              policyholder_gender: record.policyholder_gender,
+              policyholder_phone: record.policyholder_phone,
+              payor_id: record.payor_id,
+              nsure_payor_code: record.nsure_payor_code,
+            });
+
+          if (insertError) {
+            console.error('Error inserting insurance record:', insertError);
+            toast({
+              title: "Error",
+              description: "Failed to create insurance record",
+              variant: "destructive",
+            });
+            return;
+          }
+        }
+      }
+
+      // Update billing settings
+      if (billingSettings.id) {
+        // Update existing settings
+        const { error: updateError } = await supabase
+          .from('billing_settings')
+          .update({
+            preauth_required: billingSettings.preauth_required,
+            pricing_schema: billingSettings.pricing_schema,
+            subscription_type: billingSettings.subscription_type,
+            subscription_amount: billingSettings.subscription_amount,
+            next_payment_date: billingSettings.next_payment_date,
+            employer_name: billingSettings.employer_name,
+            employer_phone: billingSettings.employer_phone,
+            employer_address: billingSettings.employer_address,
+            patient_notes: billingSettings.patient_notes,
+          })
+          .eq('id', billingSettings.id);
+
+        if (updateError) {
+          console.error('Error updating billing settings:', updateError);
+          toast({
+            title: "Error",
+            description: "Failed to update billing settings",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else {
+        // Insert new settings
+        const { error: insertError } = await supabase
+          .from('billing_settings')
+          .insert({
+            patient_id: patientId,
+            preauth_required: billingSettings.preauth_required,
+            pricing_schema: billingSettings.pricing_schema,
+            subscription_type: billingSettings.subscription_type,
+            subscription_amount: billingSettings.subscription_amount,
+            next_payment_date: billingSettings.next_payment_date,
+            employer_name: billingSettings.employer_name,
+            employer_phone: billingSettings.employer_phone,
+            employer_address: billingSettings.employer_address,
+            patient_notes: billingSettings.patient_notes,
+          });
+
+        if (insertError) {
+          console.error('Error inserting billing settings:', insertError);
+          toast({
+            title: "Error",
+            description: "Failed to create billing settings",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      toast({
+        title: "Success",
+        description: "Billing information saved successfully",
+      });
+
+      // Refresh the data
+      fetchInsuranceRecords();
+      fetchBillingSettings();
+    } catch (err) {
+      console.error('Unexpected error in handleSave:', err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while saving billing information",
+        variant: "destructive",
+      });
+    }
+  };
+
   const InsuranceSection = ({ type, record }: { type: 'primary' | 'secondary' | 'reserved', record?: InsuranceRecord }) => (
     <Card className="p-6 space-y-6">
       <div className="flex items-center gap-2">
