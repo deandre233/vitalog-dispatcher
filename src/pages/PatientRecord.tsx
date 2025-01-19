@@ -19,8 +19,6 @@ import {
   UserRound,
   HeartPulse,
   Stethoscope,
-  Ambulance,
-  Hospital,
   DollarSign,
   Receipt,
   History,
@@ -82,19 +80,19 @@ const PatientRecord = () => {
                     <Button variant="outline">Edit Profile</Button>
                   </div>
 
-                  <Tabs defaultValue="demographics" className="mt-6">
-                    <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+                  <Tabs defaultValue="demographics" className="w-full">
+                    <TabsList className="w-full justify-start border-b">
                       <TabsTrigger value="demographics" className="flex items-center gap-2">
                         <UserRound className="h-4 w-4" />
                         Demographics
                       </TabsTrigger>
-                      <TabsTrigger value="medical" className="flex items-center gap-2">
-                        <Stethoscope className="h-4 w-4" />
-                        Medical
-                      </TabsTrigger>
                       <TabsTrigger value="billing" className="flex items-center gap-2">
                         <DollarSign className="h-4 w-4" />
                         Billing
+                      </TabsTrigger>
+                      <TabsTrigger value="medical" className="flex items-center gap-2">
+                        <Stethoscope className="h-4 w-4" />
+                        Medical
                       </TabsTrigger>
                       <TabsTrigger value="history" className="flex items-center gap-2">
                         <History className="h-4 w-4" />
