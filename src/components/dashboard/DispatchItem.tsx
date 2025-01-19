@@ -189,8 +189,8 @@ export function DispatchItem({
 
           <div className="space-y-2">
             <div className="flex justify-end gap-2">
-              {assignedTo !== "Unassigned" ? (
-                <div className="space-y-4 w-full">
+              <div className="space-y-4 w-full">
+                {assignedTo !== "Unassigned" ? (
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm text-gray-600">
                       Assigned to: {assignedTo}
@@ -205,38 +205,42 @@ export function DispatchItem({
                         <XCircle className="w-4 h-4" />
                         Unassign
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleTrackTransport}
-                        className="flex items-center gap-1"
-                      >
-                        <Truck className="w-4 h-4" />
-                        Track Transport
-                      </Button>
                     </div>
                   </div>
-                  {progress !== undefined && (
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-sm text-gray-600">
-                        <span>Transport Progress</span>
-                        <span>{progress}%</span>
-                      </div>
-                      <Progress value={progress} className="h-2" />
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex gap-2">
+                ) : (
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={openAssignModal}
+                    >
+                      Assign Crew
+                    </Button>
+                  </div>
+                )}
+                
+                <div className="flex justify-end">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={openAssignModal}
+                    onClick={handleTrackTransport}
+                    className="flex items-center gap-1"
                   >
-                    Assign Crew
+                    <Truck className="w-4 h-4" />
+                    Track Transport
                   </Button>
                 </div>
-              )}
+
+                {progress !== undefined && (
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Transport Progress</span>
+                      <span>{progress}%</span>
+                    </div>
+                    <Progress value={progress} className="h-2" />
+                  </div>
+                )}
+              </div>
             </div>
 
             {efficiency !== undefined && (
