@@ -32,6 +32,13 @@ export function ScheduledTransport() {
     fetchTransports();
   }, []);
 
+  const validateStatus = (status: string): ScheduledTransportProps["status"] => {
+    const validStatuses: ScheduledTransportProps["status"][] = ["Scheduled", "Assigned", "Completed", "Canceled"];
+    return validStatuses.includes(status as ScheduledTransportProps["status"]) 
+      ? (status as ScheduledTransportProps["status"]) 
+      : "Scheduled";
+  };
+
   const fetchTransports = async () => {
     try {
       const { data, error } = await supabase
@@ -41,14 +48,14 @@ export function ScheduledTransport() {
 
       if (error) throw error;
 
-      const formattedTransports = data.map(record => ({
+      const formattedTransports: ScheduledTransportProps[] = data.map(record => ({
         id: record.dispatch_id,
         scheduledTime: record.scheduled_time || new Date().toISOString(),
         patient: record.patient_id || 'Unknown Patient',
         serviceType: 'BLS',
         origin: record.pickup_location,
         destination: record.dropoff_location,
-        status: record.dispatch_status || 'Scheduled',
+        status: validateStatus(record.dispatch_status || 'Scheduled'),
         warnings: record.warnings || [],
         unitAssigned: record.crew_assigned,
         recurrence: record.recurrence_type ? `Every ${record.recurrence_day}` : undefined
