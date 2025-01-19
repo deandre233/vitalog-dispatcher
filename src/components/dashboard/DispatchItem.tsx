@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CrewAssignmentModal } from "./CrewAssignmentModal";
+import { DispatchStatusBar, type DispatchStatus } from "./DispatchStatusBar";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ChevronDown,
@@ -77,6 +78,7 @@ export function DispatchItem({
 }: DispatchItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState<DispatchStatus>("dispatch");
   const navigate = useNavigate();
 
   const handleUnassign = () => {
@@ -105,6 +107,11 @@ export function DispatchItem({
   const handleTrackTransport = () => {
     navigate(`/dispatch/${id}`);
     toast.success(`Tracking dispatch ${id}`);
+  };
+
+  const handleStatusChange = (newStatus: DispatchStatus) => {
+    setCurrentStatus(newStatus);
+    toast.success(`Status updated to ${newStatus}`);
   };
 
   return (
@@ -231,7 +238,11 @@ export function DispatchItem({
                   </Button>
                 </div>
 
-                {progress !== undefined && (
+                <div className="space-y-4">
+                  <DispatchStatusBar
+                    currentStatus={currentStatus}
+                    onStatusChange={handleStatusChange}
+                  />
                   <div className="space-y-1">
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Transport Progress</span>
@@ -239,7 +250,7 @@ export function DispatchItem({
                     </div>
                     <Progress value={progress} className="h-2" />
                   </div>
-                )}
+                </div>
               </div>
             </div>
 
