@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/tooltip";
 import { useState } from "react";
 import { CrewAssignmentModal } from "./CrewAssignmentModal";
-import { format } from "date-fns";
+import { DispatchStatusBar, DispatchStatus } from "./DispatchStatusBar";
+import { toast } from "sonner";
 
 interface AIRecommendations {
   route: string;
@@ -69,6 +70,12 @@ export function DispatchItem({
 }: DispatchItemProps) {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState<DispatchStatus>(status.toLowerCase().replace(" ", "") as DispatchStatus);
+
+  const handleStatusChange = (newStatus: DispatchStatus) => {
+    setCurrentStatus(newStatus);
+    toast.success(`Dispatch ${id} status updated to ${newStatus}`);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -113,6 +120,14 @@ export function DispatchItem({
             <ChevronDown className="w-4 h-4" />
           )}
         </Button>
+      </div>
+
+      {/* Status Bar */}
+      <div className="px-4 py-2 border-b">
+        <DispatchStatusBar 
+          currentStatus={currentStatus}
+          onStatusChange={handleStatusChange}
+        />
       </div>
 
       {/* Main Content */}
