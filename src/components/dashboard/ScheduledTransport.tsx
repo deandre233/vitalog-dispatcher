@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { format, isToday, isTomorrow } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ScheduledTransportProps {
   id: string;
@@ -66,13 +67,22 @@ export function ScheduledTransport() {
   };
 
   const handleAssignCrew = (id: string) => {
-    // In a real app, this would make an API call
     toast.success("Crew assignment modal would open here");
   };
 
-  const handleCancelTransport = (id: string) => {
-    // In a real app, this would make an API call
-    toast.success("Transport canceled successfully");
+  const handleCancelTransport = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('transport_records')
+        .update({ dispatch_status: 'Canceled' })
+        .eq('dispatch_id', id);
+
+      if (error) throw error;
+      toast.success(`Transport ${id} has been canceled`);
+    } catch (error) {
+      console.error('Error canceling transport:', error);
+      toast.error('Failed to cancel transport');
+    }
   };
 
   return (
@@ -157,60 +167,29 @@ export function ScheduledTransport() {
                   </div>
                   
                   <div className="space-y-2">
-                    {transport.warnings && transport.warnings.length > 0 && (
-                      <div className="bg-red-50 p-2 rounded-md">
-                        <span className="text-sm font-medium text-red-700">Warnings:</span>
-                        <ul className="list-disc list-inside text-sm text-red-600">
-                          {transport.warnings.map((warning, index) => (
-                            <li key={index}>{warning}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    {transport.progress !== undefined && (
-                      <div className="space-y-1">
-                        <div className="text-sm text-gray-600">Progress</div>
-                        <Progress value={transport.progress} className="w-full" />
-                        <div className="text-sm text-gray-600 text-right">
-                          {transport.progress}%
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-4 flex gap-2">
-                  {transport.status === "Scheduled" && (
-                    <>
+                    <div className="flex gap-2">
                       <Button 
                         variant="default"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAssignCrew(transport.id);
-                        }}
+                        onClick={() => handleAssignCrew(transport.id)}
+                        className="flex-1"
                       >
                         Assign Crew
                       </Button>
                       <Button 
                         variant="destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCancelTransport(transport.id);
-                        }}
+                        onClick={() => handleCancelTransport(transport.id)}
+                        className="flex-1"
                       >
                         Cancel Transport
                       </Button>
-                    </>
-                  )}
-                  {transport.status === "Assigned" && (
-                    <Button variant="outline">
-                      Track Transport
-                    </Button>
-                  )}
-                  <Button variant="outline">
-                    View Details
-                  </Button>
+                    </div>
+                    
+                    {transport.status === "Assigned" && (
+                      <Button variant="outline" className="w-full">
+                        Track Transport
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

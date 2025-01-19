@@ -8,7 +8,6 @@ import {
   ChevronDown,
   ChevronUp,
   MapPin,
-  Calendar,
   Clock,
   User,
   XCircle,
@@ -19,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { format, formatDistanceToNow } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Patient {
   name: string;
@@ -124,11 +124,19 @@ export function DispatchItem({
     toast.success(`Crew unassigned from dispatch ${id}`);
   };
 
-  const handleAssign = (crewId: number, estimatedMinutes: number) => {
-    toast.success(
-      `Crew ${crewId} assigned to dispatch ${id}. ETA: ${estimatedMinutes} minutes`
-    );
-    setIsAssignModalOpen(false);
+  const handleCancel = async () => {
+    try {
+      const { error } = await supabase
+        .from('transport_records')
+        .update({ dispatch_status: 'Canceled' })
+        .eq('dispatch_id', id);
+
+      if (error) throw error;
+      toast.success(`Dispatch ${id} has been canceled`);
+    } catch (error) {
+      console.error('Error canceling dispatch:', error);
+      toast.error('Failed to cancel dispatch');
+    }
   };
 
   const toggleExpand = () => {
@@ -153,7 +161,6 @@ export function DispatchItem({
     toast.success(`Status updated to ${newStatus}`);
   };
 
-  // Calculate progress based on current status
   const currentProgress = getProgressForStatus(currentStatus);
   const timeElapsed = formatDistanceToNow(new Date(activationTime));
 
@@ -165,7 +172,6 @@ export function DispatchItem({
           : "bg-white hover:bg-gray-50"
       }`}
     >
-      {/* Header Section - Always Visible */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Link 
@@ -211,7 +217,6 @@ export function DispatchItem({
         </div>
       </div>
 
-      {/* Quick Info - Always Visible */}
       <div className="mt-2 grid grid-cols-2 gap-4">
         <div className="flex items-center gap-2">
           <User className="h-4 w-4 text-gray-500" />
@@ -228,7 +233,6 @@ export function DispatchItem({
         </div>
       </div>
 
-      {/* Progress Bar - Always Visible */}
       <div className="mt-4 space-y-1">
         <div className="flex justify-between text-sm text-gray-600">
           <span>Transport Progress</span>
@@ -237,7 +241,6 @@ export function DispatchItem({
         <Progress value={currentProgress} className="h-2" />
       </div>
 
-      {/* Expanded Content */}
       {isExpanded && (
         <div className="mt-4 space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -257,14 +260,24 @@ export function DispatchItem({
 
             <div className="space-y-2">
               {assignedTo === "Unassigned" ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={openAssignModal}
-                  className="w-full"
-                >
-                  Assign Crew
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={openAssignModal}
+                    className="flex-1"
+                  >
+                    Assign Crew
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleCancel}
+                    className="flex-1"
+                  >
+                    Cancel Dispatch
+                  </Button>
+                </div>
               ) : (
                 <div className="flex justify-end gap-2">
                   <Button
