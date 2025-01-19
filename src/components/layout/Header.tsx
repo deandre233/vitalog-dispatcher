@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 
-export function Header() {
+export function Header({ className = "" }) {
   return (
-    <header className="bg-blue-700 text-white border-b border-blue-800">
+    <header className={`bg-blue-700 text-white border-b border-blue-800 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">

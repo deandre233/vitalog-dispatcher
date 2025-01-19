@@ -8,12 +8,12 @@ import { Footer } from "@/components/layout/Footer";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#f4f7fc]">
-      <Header />
+    <div className="min-h-screen flex flex-col">
+      <Header className="fixed top-0 w-full z-50" />
       <SidebarProvider>
-        <div className="flex flex-1">
+        <div className="flex flex-1 pt-16">
           <AppSidebar />
-          <div className="flex-1">
+          <div className="flex-1 bg-[#f4f7fc]">
             <DashboardHeader />
             <main className="p-4">
               <DashboardMetrics />
