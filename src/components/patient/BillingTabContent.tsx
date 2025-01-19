@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { DollarSign, CreditCard, Receipt, Save, Check, AlertCircle, Upload } from "lucide-react";
+import { DollarSign, CreditCard, Receipt, Save, Check, AlertCircle, Upload, Wand2 } from "lucide-react";
 
 interface InsuranceRecord {
   id?: string;
@@ -119,7 +119,6 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
       }
 
       if (data) {
-        // Validate and transform the preauth_required field
         const transformedData: BillingSettings = {
           ...data,
           preauth_required: isValidPreauthRequired(data.preauth_required) ? data.preauth_required : undefined,
@@ -192,7 +191,6 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         return;
       }
 
-      // Initialize records for each type if they don't exist
       const types: ('primary' | 'secondary' | 'reserved')[] = ['primary', 'secondary', 'reserved'];
       const validatedRecords: InsuranceRecord[] = types.map(type => {
         const existingRecord = (data || []).find(r => r.type === type);
@@ -219,6 +217,52 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
       toast({
         title: "Error",
         description: "An unexpected error occurred while fetching insurance records",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const analyzePayerId = async (type: 'primary' | 'secondary' | 'reserved', payerId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-payer-id', {
+        body: { payerId }
+      });
+
+      if (error) {
+        console.error('Error analyzing payer ID:', error);
+        toast({
+          title: "Error",
+          description: "Failed to analyze payer ID",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data) {
+        setInsuranceRecords(prev => 
+          prev.map(record => 
+            record.type === type 
+              ? { 
+                  ...record, 
+                  carrier_type: data.carrier_type,
+                  carrier_name: data.carrier_name,
+                  policy_type: data.policy_type,
+                  payor_id: payerId
+                }
+              : record
+          )
+        );
+
+        toast({
+          title: "Success",
+          description: "Insurance information updated based on payer ID",
+        });
+      }
+    } catch (err) {
+      console.error('Error in analyzePayerId:', err);
+      toast({
+        title: "Error",
+        description: "An error occurred while analyzing the payer ID",
         variant: "destructive",
       });
     }
@@ -288,10 +332,8 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         return;
       }
 
-      // Update insurance records
       for (const record of insuranceRecords) {
         if (record.id) {
-          // Update existing record
           const { error: updateError } = await supabase
             .from('insurance_records')
             .update({
@@ -324,7 +366,6 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
             return;
           }
         } else {
-          // Insert new record
           const { error: insertError } = await supabase
             .from('insurance_records')
             .insert({
@@ -360,9 +401,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         }
       }
 
-      // Update billing settings
       if (billingSettings.id) {
-        // Update existing settings
         const { error: updateError } = await supabase
           .from('billing_settings')
           .update({
@@ -388,7 +427,6 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
           return;
         }
       } else {
-        // Insert new settings
         const { error: insertError } = await supabase
           .from('billing_settings')
           .insert({
@@ -420,7 +458,6 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         description: "Billing information saved successfully",
       });
 
-      // Refresh the data
       fetchInsuranceRecords();
       fetchBillingSettings();
     } catch (err) {
@@ -506,12 +543,22 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-sm font-medium">Payor ID</Label>
-            <Input
-              value={record?.payor_id}
-              onChange={(e) => handleInsuranceChange(type, 'payor_id', e.target.value)}
-              className="h-9"
-              placeholder="e.g. 10202"
-            />
+            <div className="flex gap-2">
+              <Input
+                value={record?.payor_id}
+                onChange={(e) => handleInsuranceChange(type, 'payor_id', e.target.value)}
+                className="h-9"
+                placeholder="e.g. 10202"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => record?.payor_id && analyzePayerId(type, record.payor_id)}
+                title="Analyze Payer ID"
+              >
+                <Wand2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           <div>
             <Label className="text-sm font-medium">NSure Payor Code</Label>
