@@ -130,7 +130,7 @@ export function DispatchItem({
           )}
         </Button>
       </div>
-
+      
       {/* Status Bar */}
       <div className="px-4 py-2 border-b">
         <DispatchStatusBar 
@@ -143,7 +143,6 @@ export function DispatchItem({
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6 flex-1">
-            {/* Service Type */}
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-full ${
                 priority === "high" ? "bg-red-100" : 
@@ -189,8 +188,21 @@ export function DispatchItem({
           {/* Actions */}
           <div className="flex items-center gap-4">
             <div className="text-sm font-medium">ETA: {eta}</div>
-            {currentAssignedTo === "Unassigned" ? (
-              <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              {currentAssignedTo !== "Unassigned" ? (
+                <>
+                  <span className="text-sm font-medium">Assigned to: {currentAssignedTo}</span>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleUnassign}
+                    className="flex items-center gap-1"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Unassign
+                  </Button>
+                </>
+              ) : (
                 <Button
                   variant="outline"
                   size="sm"
@@ -198,24 +210,11 @@ export function DispatchItem({
                 >
                   Assign Crew
                 </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Assigned to: {currentAssignedTo}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-red-500 hover:text-red-600"
-                  onClick={handleUnassign}
-                >
-                  <XCircle className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Progress Section */}
         {progress > 0 && (
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
