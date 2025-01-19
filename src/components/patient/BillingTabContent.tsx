@@ -54,19 +54,23 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     );
   }
 
-  if (loading) {
-    return (
-      <Card className="p-4">
-        <p className="text-muted-foreground">Loading insurance information...</p>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      <InsuranceSection type="primary" title="Primary Insurance" />
-      <InsuranceSection type="secondary" title="Secondary Insurance" />
-      <InsuranceSection type="reserved" title="Reserved Insurance" />
+      <InsuranceSection 
+        type="primary" 
+        title="Primary Insurance" 
+        records={insuranceRecords.filter(record => record.type === 'primary')}
+      />
+      <InsuranceSection 
+        type="secondary" 
+        title="Secondary Insurance" 
+        records={insuranceRecords.filter(record => record.type === 'secondary')}
+      />
+      <InsuranceSection 
+        type="reserved" 
+        title="Reserved Insurance" 
+        records={insuranceRecords.filter(record => record.type === 'reserved')}
+      />
     </div>
   );
 };
