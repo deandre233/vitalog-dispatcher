@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MapPin, Award, Clock, CheckCircle, User } from "lucide-react";
-import { recommendCrewWithRoute, crewMembers } from "@/utils/crewRecommendation";
+import { recommendCrewWithRoute, crewMembers, calculateDistance, type CrewMember, type CrewWithRoute, type Location } from "@/utils/crewRecommendation";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
@@ -19,15 +19,7 @@ interface CrewAssignmentModalProps {
   onClose: () => void;
   dispatchId: string;
   serviceType: string;
-  origin: { lat: number; lng: number };
-}
-
-interface CrewWithRoute extends CrewMember {
-  routeInfo: {
-    distance: number;
-    duration: number;
-    route: any;
-  };
+  origin: Location;
 }
 
 export function CrewAssignmentModal({
@@ -119,7 +111,7 @@ export function CrewAssignmentModal({
 
     // Add crew markers
     crewMembers.forEach(crew => {
-      const color = recommendedCrew?.id === crew.id ? '#00FF00' : '#0000FF';
+      const color = recommendedCrew.id === crew.id ? '#00FF00' : '#0000FF';
       new mapboxgl.Marker({ color })
         .setLngLat([crew.location.lng, crew.location.lat])
         .addTo(map.current!);
@@ -167,9 +159,10 @@ export function CrewAssignmentModal({
                   .filter(crew => crew.available)
                   .map((crew) => {
                     const isRecommended = recommendedCrew?.id === crew.id;
+                    const distance = calculateDistance(crew, origin);
                     const estimatedMinutes = isRecommended 
                       ? Math.round(recommendedCrew.routeInfo.duration)
-                      : Math.round(calculateDistance(crew, origin) * 2);
+                      : Math.round(distance * 2);
 
                     return (
                       <div
@@ -206,7 +199,7 @@ export function CrewAssignmentModal({
                               <span>
                                 {isRecommended 
                                   ? `${recommendedCrew.routeInfo.distance.toFixed(2)} km via route`
-                                  : `${calculateDistance(crew, origin).toFixed(2)} km direct`}
+                                  : `${distance.toFixed(2)} km direct`}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600">

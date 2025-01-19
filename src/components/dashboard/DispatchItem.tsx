@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { recommendCrew } from "@/utils/crewRecommendation";
+import { recommendCrew, calculateDistance } from "@/utils/crewRecommendation";
 import { useState } from "react";
 import { CrewAssignmentModal } from "./CrewAssignmentModal";
 
@@ -55,7 +55,7 @@ export function DispatchItem({
 
   const recommendedCrew = recommendCrew(mockDispatch);
   const crewRecommendation = recommendedCrew
-    ? `Recommended: ${recommendedCrew.name} (${recommendedCrew.distance.toFixed(2)}km away)`
+    ? `Recommended: ${recommendedCrew.name} (${calculateDistance(recommendedCrew, mockDispatch.origin).toFixed(2)}km away)`
     : "No crew available";
 
   return (
