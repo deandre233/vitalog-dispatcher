@@ -119,6 +119,11 @@ export function DispatchItem({
     navigate(`/dispatch/${id}`);
   };
 
+  const handlePatientClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the dispatch detail view
+    navigate(`/patient/${encodeURIComponent(patient.name)}`);
+  };
+
   return (
     <div 
       className="flex flex-col bg-white border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
@@ -185,7 +190,13 @@ export function DispatchItem({
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-medium">{patient.name}</span>
+                <Button
+                  variant="link"
+                  className="p-0 h-auto font-medium"
+                  onClick={handlePatientClick}
+                >
+                  {patient.name}
+                </Button>
               </div>
               {patient.dob && (
                 <div className="flex items-center gap-2">

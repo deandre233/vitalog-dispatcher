@@ -11,6 +11,7 @@ import ManageRoutes from "./pages/ManageRoutes";
 import Billing from "./pages/Billing";
 import Performance from "./pages/Performance";
 import { DispatchDetailView } from "./components/dashboard/DispatchDetailView";
+import PatientRecord from "./pages/PatientRecord";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/routes" element={<ManageRoutes />} />
           <Route path="/billing" element={<Billing />} />
           <Route path="/performance" element={<Performance />} />
+          <Route path="/patient/:patientName" element={<PatientRecord />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
