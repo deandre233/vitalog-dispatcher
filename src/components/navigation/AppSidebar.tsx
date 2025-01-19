@@ -1,70 +1,92 @@
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { Users, Map, ClipboardCheck, Brain, Inbox, Calendar, Archive, Bell, ShieldCheck, FolderLock, Building, Network, UserRound, Upload, BookOpen, Tags, History } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Link, useLocation } from "react-router-dom";
+import {
+  Bell,
+  BarChart3,
+  ClipboardList,
+  CreditCard,
+  MapPin,
+  Users,
+  PlusCircle,
+  Home,
+} from "lucide-react";
 
-const menuItems = [
-  { title: "Employee Directory", icon: Users, url: "/employees", description: "Access employee list including crew, management, and admin staff" },
-  { title: "Real-Time Route Map", icon: Map, url: "/live-map", description: "Track real-time locations and routes of crews" },
-  { title: "Shift History & Checklists", icon: ClipboardCheck, url: "/shifts", description: "Review completed shifts and task checklists" },
-  { title: "AI Route Planning", icon: Brain, url: "/route-optimization", description: "AI-powered route suggestions and optimization" },
-  { title: "Pending Approvals Queue", icon: Inbox, url: "/approvals", description: "Manage requests requiring approval" },
-  { title: "Upcoming Schedule", icon: Calendar, url: "/schedule", description: "View upcoming crew and service schedules" },
-  { title: "Closed Requests", icon: Archive, url: "/closed-requests", description: "Review completed transport requests" },
-  { title: "Incoming Service Requests", icon: Bell, url: "/requests", description: "View new unprocessed service requests" },
-  { title: "Authorization Approval Queue", icon: ShieldCheck, url: "/authorizations", description: "Manage pending prior authorizations" },
-  { title: "Auth File Management", icon: FolderLock, url: "/auth-files", description: "Access existing prior authorizations" },
-  { title: "Facility Directory", icon: Building, url: "/facilities", description: "View list of service facilities" },
-  { title: "Partner Organizations", icon: Network, url: "/partners", description: "Manage partner organizations" },
-  { title: "Patient Records", icon: UserRound, url: "/patients", description: "Access patient transport information" },
-  { title: "Upload Patient Documents", icon: Upload, url: "/upload", description: "Upload and manage patient documents" },
-  { title: "Resource Library", icon: BookOpen, url: "/resources", description: "Access educational and training materials" },
-  { title: "Tagging System", icon: Tags, url: "/tags", description: "Manage dispatch and service categorization" },
-  { title: "Schedule Past Dispatch", icon: History, url: "/backdated", description: "Book or update past dispatches" },
+const routes = [
+  {
+    label: "Home",
+    icon: Home,
+    href: "/",
+  },
+  {
+    label: "Active Dispatches",
+    icon: ClipboardList,
+    href: "/dispatch",
+  },
+  {
+    label: "Create Dispatch",
+    icon: PlusCircle,
+    href: "/dispatch/new",
+  },
+  {
+    label: "Crew Assignment",
+    icon: Users,
+    href: "/crew",
+  },
+  {
+    label: "Manage Routes",
+    icon: MapPin,
+    href: "/routes",
+  },
+  {
+    label: "Billing",
+    icon: CreditCard,
+    href: "/billing",
+  },
+  {
+    label: "Performance",
+    icon: BarChart3,
+    href: "/performance",
+  },
+  {
+    label: "Alert Settings",
+    icon: Bell,
+    href: "/alerts",
+  },
 ];
 
 export function AppSidebar() {
-  const location = useLocation();
+  const pathname = useLocation().pathname;
 
   return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                      location.pathname === item.url
-                        ? "bg-medical-primary/10 text-medical-primary"
-                        : "hover:bg-gray-100"
-                    }`}
-                    title={item.description}
-                  >
-                    <item.icon
-                      className={`w-4 h-4 ${
-                        location.pathname === item.url
-                          ? "text-medical-primary"
-                          : "text-gray-500"
-                      }`}
-                    />
-                    <span
-                      className={
-                        location.pathname === item.url
-                          ? "font-medium"
-                          : "text-gray-700"
-                      }
-                    >
-                      {item.title}
-                    </span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <div className="space-y-4 py-4 flex flex-col h-full bg-white text-white">
+      <div className="px-3 py-2">
+        <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight text-black">
+          Navigation
+        </h2>
+        <div className="space-y-1">
+          {routes.map((route) => (
+            <Button
+              key={route.href}
+              variant={pathname === route.href ? "default" : "ghost"}
+              className={cn("w-full justify-start", {
+                "bg-accent text-accent-foreground":
+                  pathname === route.href,
+              })}
+              asChild
+            >
+              <Link to={route.href}>
+                <route.icon className="mr-2 h-4 w-4" />
+                {route.label}
+              </Link>
+            </Button>
+          ))}
+        </div>
+      </div>
+      <ScrollArea className="flex-1 px-3">
+        <div className="space-y-1 p-2"></div>
+      </ScrollArea>
+    </div>
   );
 }

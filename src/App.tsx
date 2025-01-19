@@ -12,6 +12,7 @@ import Billing from "./pages/Billing";
 import Performance from "./pages/Performance";
 import { DispatchDetailView } from "./components/dashboard/DispatchDetailView";
 import PatientRecord from "./pages/PatientRecord";
+import AlertsConfig from "./pages/AlertsConfig";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/billing" element={<Billing />} />
           <Route path="/performance" element={<Performance />} />
           <Route path="/patient/:patientName" element={<PatientRecord />} />
+          <Route path="/alerts" element={<AlertsConfig />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
