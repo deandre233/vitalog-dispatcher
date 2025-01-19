@@ -248,7 +248,31 @@ export function DispatchBoard() {
   );
 
   const assignedDispatches = useMemo(() => 
-    filterDispatches(dispatches, "assigned"),
+    filterDispatches(dispatches, "assigned").concat(
+      scheduledTransports.filter(t => t.status === "Assigned").map(t => ({
+        id: t.id,
+        activationTime: t.scheduledTime,
+        patient: {
+          id: "pat-" + Math.random().toString(36).substr(2, 9),
+          name: t.patient,
+          condition: t.warnings?.join(", ")
+        },
+        serviceType: t.serviceType,
+        origin: t.origin,
+        destination: t.destination,
+        status: "En Route",
+        priority: "medium",
+        assignedTo: t.unitAssigned || "Unassigned",
+        aiRecommendations: {
+          route: `Recommended Route: ${t.origin} to ${t.destination}`,
+          crew: `Recommended Crew: ${t.unitAssigned || 'TBD'}`,
+          billing: "Insurance: TBD"
+        },
+        eta: "TBD",
+        progress: t.progress,
+        elapsedTime: "In Progress"
+      }))
+    ),
     [dispatches]
   );
 
@@ -370,4 +394,3 @@ export function DispatchBoard() {
     </Card>
   );
 }
-

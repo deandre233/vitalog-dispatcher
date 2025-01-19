@@ -233,9 +233,9 @@ export function ScheduledTransport() {
   const [utilization, setUtilization] = useState<ReturnType<typeof analyzeResourceUtilization>>();
   const [patterns, setPatterns] = useState<ReturnType<typeof analyzeTravelPatterns>>([]);
 
-  // Updated filter to include both scheduled and assigned transports
+  // Filter to show only scheduled (unassigned) transports
   const activeTransports = scheduledTransports.filter(
-    transport => transport.status === "Scheduled" || transport.status === "Assigned"
+    transport => transport.status === "Scheduled"
   );
 
   useEffect(() => {
@@ -261,7 +261,7 @@ export function ScheduledTransport() {
       }
     }
     
-    if (resourceUtilization.peakLoadWarning) {
+    if (resourceUtilization?.peakLoadWarning) {
       toast.warning(resourceUtilization.peakLoadWarning, {
         description: "AI suggests schedule redistribution"
       });
@@ -308,51 +308,16 @@ export function ScheduledTransport() {
       <div className="flex justify-between items-center mb-6">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold text-medical-primary">
-            Scheduled & Assigned Transports
+            Scheduled Transports
           </h2>
           <p className="text-gray-500">
-            Showing {activeTransports.length} active transports
+            Showing {activeTransports.length} scheduled transports
           </p>
         </div>
         <Button variant="outline" className="gap-2">
           <Calendar className="w-4 h-4" />
           <span>Schedule New</span>
         </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Brain className="w-5 h-5 text-purple-500" />
-            <h3 className="font-semibold">AI Resource Analysis</h3>
-          </div>
-          {utilization && (
-            <div className="space-y-2">
-              <p className="text-sm">
-                Resource Utilization: {utilization.utilizationRate.toFixed(1)}%
-              </p>
-              <Progress value={utilization.utilizationRate} className="h-2" />
-              <p className="text-sm text-gray-600">{utilization.recommendation}</p>
-            </div>
-          )}
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Truck className="w-5 h-5 text-blue-500" />
-            <h3 className="font-semibold">Route Optimization</h3>
-          </div>
-          <div className="space-y-2">
-            {patterns.map((pattern, index) => (
-              <div key={index} className="text-sm">
-                <p className="font-medium">{pattern.route}</p>
-                {pattern.recommendation && (
-                  <p className="text-gray-600">{pattern.recommendation}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
       </div>
 
       {conflicts.length > 0 && (
