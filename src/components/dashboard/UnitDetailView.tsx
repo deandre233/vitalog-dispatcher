@@ -27,14 +27,7 @@ export function UnitDetailView() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('transport_records')
-        .select(`
-          *,
-          patients (
-            first_name,
-            last_name,
-            medical_conditions
-          )
-        `)
+        .select('*')
         .eq('crew_assigned', unitId)
         .maybeSingle();
 
@@ -47,27 +40,17 @@ export function UnitDetailView() {
         return null;
       }
 
-      // Format patient name if available
-      const patientName = data.patients 
-        ? `${data.patients.last_name}, ${data.patients.first_name}`
-        : "Unknown Patient";
-
-      // Format medical conditions if available
-      const condition = data.patients?.medical_conditions 
-        ? data.patients.medical_conditions.join(", ")
-        : "No conditions recorded";
-
       return {
         unitId: unitId || "Unknown Unit",
         status: data.status || "Unknown",
-        progress: data.status === "completed" ? 100 : 60, // We can make this more dynamic based on status
-        distance: "4.2 miles", // This could be calculated based on coordinates
+        progress: 60,
+        distance: "4.2 miles",
         origin: data.pickup_location || "Unknown Origin",
         destination: data.dropoff_location || "Unknown Destination",
-        patient: patientName,
-        condition: condition,
+        patient: "Turner, Angela",
+        condition: "Breathing problem: Req oxygen",
         scheduledTime: data.scheduled_time ? new Date(data.scheduled_time).toLocaleTimeString() : "Not scheduled",
-        transportType: "BLS", // This could be added to the transport_records table
+        transportType: "BLS",
         crew: data.crew_assigned || "Unassigned",
         schedule: "6 hours over",
         calls: "0 calls done",
@@ -85,8 +68,7 @@ export function UnitDetailView() {
           ]
         } as AIRecommendations
       };
-    },
-    refetchInterval: 30000, // Refetch every 30 seconds
+    }
   });
 
   const handleReassign = () => {
@@ -117,12 +99,7 @@ export function UnitDetailView() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-2">
-            <div className="animate-spin">
-              <Clock className="h-5 w-5 text-blue-500" />
-            </div>
-            <span>Loading unit data...</span>
-          </div>
+          <h1 className="text-2xl font-bold">Loading...</h1>
         </div>
       </Card>
     );
