@@ -134,13 +134,19 @@ const PatientRecord = () => {
     if (name.includes('.')) {
       // Handle nested objects (warnings and barriersToEMS)
       const [parent, child] = name.split('.');
-      setPatientData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent as keyof typeof prev],
-          [child]: target.type === 'checkbox' ? target.checked : value
+      setPatientData(prev => {
+        const parentObj = prev[parent as keyof typeof prev];
+        if (typeof parentObj === 'object' && parentObj !== null) {
+          return {
+            ...prev,
+            [parent]: {
+              ...parentObj,
+              [child]: target.type === 'checkbox' ? target.checked : value
+            }
+          };
         }
-      }));
+        return prev;
+      });
     } else {
       setPatientData(prev => ({
         ...prev,
