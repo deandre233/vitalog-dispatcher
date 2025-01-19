@@ -14,6 +14,7 @@ import {
   FileText,
   History,
   User,
+  Archive,
 } from "lucide-react";
 
 const routes = [
@@ -41,6 +42,11 @@ const routes = [
     label: "Active Dispatches",
     icon: ClipboardList,
     href: "/dispatch",
+  },
+  {
+    label: "Closed Dispatches",
+    icon: Archive,
+    href: "/closed-dispatches",
   },
   {
     label: "Create Dispatch",
