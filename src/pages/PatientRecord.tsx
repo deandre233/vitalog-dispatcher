@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   FileText, 
   Phone, 
@@ -30,7 +31,11 @@ import {
   Clock,
   CalendarClock,
   Ambulance,
-  Building2
+  Building2,
+  Contact,
+  Pill,
+  AlertTriangle,
+  Heart
 } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,7 +50,26 @@ const PatientRecord = () => {
     address: "855 Fayetteville Rd Se",
     city: "Atlanta",
     state: "GA",
-    zip: "30316"
+    zip: "30316",
+    dob: "1965-03-15",
+    gender: "Female",
+    ssn: "XXX-XX-4789",
+    maritalStatus: "Married",
+    occupation: "Teacher",
+    preferredLanguage: "English",
+    medicalConditions: ["Asthma", "Hypertension"],
+    allergies: ["Penicillin", "Latex"],
+    medications: ["Albuterol", "Lisinopril"],
+    emergencyContactName: "Robert Turner",
+    emergencyContactRelation: "Spouse",
+    emergencyContactPhone: "(678) 875-9913",
+    bloodType: "A+",
+    height: "5'6\"",
+    weight: "145 lbs",
+    primaryCarePhysician: "Dr. Sarah Johnson",
+    insuranceProvider: "Blue Cross Blue Shield",
+    insurancePolicyNumber: "BCB123456789",
+    lastPhysical: "2023-09-15"
   });
   const { toast } = useToast();
 
@@ -56,7 +80,6 @@ const PatientRecord = () => {
   const handleSave = async () => {
     try {
       // Here we would update the patient data in Supabase
-      // For now, just toggle editing mode and show success toast
       setIsEditing(false);
       toast({
         title: "Success",
@@ -71,13 +94,15 @@ const PatientRecord = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setPatientData(prev => ({
       ...prev,
       [name]: value
     }));
   };
+
+  // ... keep existing code (breadcrumb and header section)
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -171,13 +196,100 @@ const PatientRecord = () => {
                             <UserRound className="h-4 w-4" />
                             Personal Information
                           </h3>
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-2 text-sm">
-                              <Calendar className="h-4 w-4 text-gray-500" />
-                              <span>DOB: 08/17/1967</span>
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-sm text-gray-500">Date of Birth</label>
+                                {isEditing ? (
+                                  <Input
+                                    name="dob"
+                                    value={patientData.dob}
+                                    onChange={handleInputChange}
+                                    className="h-8 text-sm"
+                                    type="date"
+                                  />
+                                ) : (
+                                  <p className="text-sm">{patientData.dob}</p>
+                                )}
+                              </div>
+                              <div>
+                                <label className="text-sm text-gray-500">Gender</label>
+                                {isEditing ? (
+                                  <Input
+                                    name="gender"
+                                    value={patientData.gender}
+                                    onChange={handleInputChange}
+                                    className="h-8 text-sm"
+                                  />
+                                ) : (
+                                  <p className="text-sm">{patientData.gender}</p>
+                                )}
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2 text-sm">
-                              <Phone className="h-4 w-4 text-gray-500" />
+                            <div>
+                              <label className="text-sm text-gray-500">SSN</label>
+                              {isEditing ? (
+                                <Input
+                                  name="ssn"
+                                  value={patientData.ssn}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                  type="password"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.ssn}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-sm text-gray-500">Marital Status</label>
+                              {isEditing ? (
+                                <Input
+                                  name="maritalStatus"
+                                  value={patientData.maritalStatus}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.maritalStatus}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-sm text-gray-500">Occupation</label>
+                              {isEditing ? (
+                                <Input
+                                  name="occupation"
+                                  value={patientData.occupation}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.occupation}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-sm text-gray-500">Preferred Language</label>
+                              {isEditing ? (
+                                <Input
+                                  name="preferredLanguage"
+                                  value={patientData.preferredLanguage}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.preferredLanguage}</p>
+                              )}
+                            </div>
+                          </div>
+                        </Card>
+
+                        <Card className="p-4">
+                          <h3 className="font-semibold mb-4 flex items-center gap-2">
+                            <Contact className="h-4 w-4" />
+                            Contact Information
+                          </h3>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="text-sm text-gray-500">Phone</label>
                               {isEditing ? (
                                 <Input
                                   name="phone"
@@ -186,11 +298,11 @@ const PatientRecord = () => {
                                   className="h-8 text-sm"
                                 />
                               ) : (
-                                <span>{patientData.phone}</span>
+                                <p className="text-sm">{patientData.phone}</p>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 text-sm">
-                              <Mail className="h-4 w-4 text-gray-500" />
+                            <div>
+                              <label className="text-sm text-gray-500">Email</label>
                               {isEditing ? (
                                 <Input
                                   name="email"
@@ -199,108 +311,234 @@ const PatientRecord = () => {
                                   className="h-8 text-sm"
                                 />
                               ) : (
-                                <span>{patientData.email}</span>
+                                <p className="text-sm">{patientData.email}</p>
                               )}
                             </div>
-                            <div className="flex items-start gap-2 text-sm">
-                              <MapPin className="h-4 w-4 text-gray-500 mt-1" />
-                              <div className="flex-1">
-                                {isEditing ? (
-                                  <div className="space-y-2">
+                            <div>
+                              <label className="text-sm text-gray-500">Address</label>
+                              {isEditing ? (
+                                <div className="space-y-2">
+                                  <Input
+                                    name="address"
+                                    value={patientData.address}
+                                    onChange={handleInputChange}
+                                    className="h-8 text-sm"
+                                    placeholder="Street Address"
+                                  />
+                                  <div className="grid grid-cols-3 gap-2">
                                     <Input
-                                      name="address"
-                                      value={patientData.address}
+                                      name="city"
+                                      value={patientData.city}
                                       onChange={handleInputChange}
                                       className="h-8 text-sm"
-                                      placeholder="Street Address"
+                                      placeholder="City"
                                     />
-                                    <div className="grid grid-cols-3 gap-2">
-                                      <Input
-                                        name="city"
-                                        value={patientData.city}
-                                        onChange={handleInputChange}
-                                        className="h-8 text-sm"
-                                        placeholder="City"
-                                      />
-                                      <Input
-                                        name="state"
-                                        value={patientData.state}
-                                        onChange={handleInputChange}
-                                        className="h-8 text-sm"
-                                        placeholder="State"
-                                      />
-                                      <Input
-                                        name="zip"
-                                        value={patientData.zip}
-                                        onChange={handleInputChange}
-                                        className="h-8 text-sm"
-                                        placeholder="ZIP"
-                                      />
-                                    </div>
+                                    <Input
+                                      name="state"
+                                      value={patientData.state}
+                                      onChange={handleInputChange}
+                                      className="h-8 text-sm"
+                                      placeholder="State"
+                                    />
+                                    <Input
+                                      name="zip"
+                                      value={patientData.zip}
+                                      onChange={handleInputChange}
+                                      className="h-8 text-sm"
+                                      placeholder="ZIP"
+                                    />
                                   </div>
+                                </div>
+                              ) : (
+                                <div className="text-sm">
+                                  <p>{patientData.address}</p>
+                                  <p>{patientData.city}, {patientData.state} {patientData.zip}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </Card>
+
+                        <Card className="p-4">
+                          <h3 className="font-semibold mb-4 flex items-center gap-2">
+                            <Heart className="h-4 w-4" />
+                            Health Information
+                          </h3>
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-sm text-gray-500">Blood Type</label>
+                                {isEditing ? (
+                                  <Input
+                                    name="bloodType"
+                                    value={patientData.bloodType}
+                                    onChange={handleInputChange}
+                                    className="h-8 text-sm"
+                                  />
                                 ) : (
-                                  <>
-                                    <p>{patientData.address}</p>
-                                    <p>{patientData.city}, {patientData.state} {patientData.zip}</p>
-                                  </>
+                                  <p className="text-sm">{patientData.bloodType}</p>
+                                )}
+                              </div>
+                              <div>
+                                <label className="text-sm text-gray-500">Height</label>
+                                {isEditing ? (
+                                  <Input
+                                    name="height"
+                                    value={patientData.height}
+                                    onChange={handleInputChange}
+                                    className="h-8 text-sm"
+                                  />
+                                ) : (
+                                  <p className="text-sm">{patientData.height}</p>
                                 )}
                               </div>
                             </div>
+                            <div>
+                              <label className="text-sm text-gray-500">Weight</label>
+                              {isEditing ? (
+                                <Input
+                                  name="weight"
+                                  value={patientData.weight}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.weight}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-sm text-gray-500">Primary Care Physician</label>
+                              {isEditing ? (
+                                <Input
+                                  name="primaryCarePhysician"
+                                  value={patientData.primaryCarePhysician}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.primaryCarePhysician}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-sm text-gray-500">Last Physical</label>
+                              {isEditing ? (
+                                <Input
+                                  name="lastPhysical"
+                                  value={patientData.lastPhysical}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                  type="date"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.lastPhysical}</p>
+                              )}
+                            </div>
                           </div>
                         </Card>
 
                         <Card className="p-4">
                           <h3 className="font-semibold mb-4 flex items-center gap-2">
-                            <HeartPulse className="h-4 w-4" />
-                            Medical Alerts
+                            <AlertTriangle className="h-4 w-4" />
+                            Medical Conditions & Allergies
                           </h3>
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-red-500">
-                              <AlertCircle className="h-4 w-4" />
-                              <span className="text-sm">Requires oxygen</span>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="text-sm text-gray-500">Medical Conditions</label>
+                              {isEditing ? (
+                                <Textarea
+                                  name="medicalConditions"
+                                  value={patientData.medicalConditions.join(", ")}
+                                  onChange={handleInputChange}
+                                  className="h-20 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.medicalConditions.join(", ")}</p>
+                              )}
                             </div>
-                            <div className="flex items-center gap-2 text-yellow-500">
-                              <AlertCircle className="h-4 w-4" />
-                              <span className="text-sm">DNR order</span>
+                            <div>
+                              <label className="text-sm text-gray-500">Allergies</label>
+                              {isEditing ? (
+                                <Textarea
+                                  name="allergies"
+                                  value={patientData.allergies.join(", ")}
+                                  onChange={handleInputChange}
+                                  className="h-20 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.allergies.join(", ")}</p>
+                              )}
                             </div>
                           </div>
                         </Card>
 
                         <Card className="p-4">
                           <h3 className="font-semibold mb-4 flex items-center gap-2">
-                            <Stethoscope className="h-4 w-4" />
-                            Medical History
+                            <Pill className="h-4 w-4" />
+                            Medications
                           </h3>
-                          <ScrollArea className="h-[200px]">
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-2 text-sm">
-                                <FileText className="h-4 w-4 text-gray-500" />
-                                <span>Asthma</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-sm">
-                                <FileText className="h-4 w-4 text-gray-500" />
-                                <span>Hypertension</span>
-                              </div>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="text-sm text-gray-500">Current Medications</label>
+                              {isEditing ? (
+                                <Textarea
+                                  name="medications"
+                                  value={patientData.medications.join(", ")}
+                                  onChange={handleInputChange}
+                                  className="h-20 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.medications.join(", ")}</p>
+                              )}
                             </div>
-                          </ScrollArea>
+                          </div>
                         </Card>
 
                         <Card className="p-4">
                           <h3 className="font-semibold mb-4 flex items-center gap-2">
-                            <Ambulance className="h-4 w-4" />
-                            Transport History
+                            <Contact className="h-4 w-4" />
+                            Emergency Contact
                           </h3>
-                          <ScrollArea className="h-[200px]">
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-2 text-sm">
-                                <Building2 className="h-4 w-4 text-gray-500" />
-                                <div>
-                                  <p className="font-medium">Emory University Hospital</p>
-                                  <p className="text-gray-500">Last transport: 3 days ago</p>
-                                </div>
-                              </div>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="text-sm text-gray-500">Name</label>
+                              {isEditing ? (
+                                <Input
+                                  name="emergencyContactName"
+                                  value={patientData.emergencyContactName}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.emergencyContactName}</p>
+                              )}
                             </div>
-                          </ScrollArea>
+                            <div>
+                              <label className="text-sm text-gray-500">Relationship</label>
+                              {isEditing ? (
+                                <Input
+                                  name="emergencyContactRelation"
+                                  value={patientData.emergencyContactRelation}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.emergencyContactRelation}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-sm text-gray-500">Phone</label>
+                              {isEditing ? (
+                                <Input
+                                  name="emergencyContactPhone"
+                                  value={patientData.emergencyContactPhone}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                />
+                              ) : (
+                                <p className="text-sm">{patientData.emergencyContactPhone}</p>
+                              )}
+                            </div>
+                          </div>
                         </Card>
                       </div>
                     </TabsContent>
