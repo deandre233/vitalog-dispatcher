@@ -74,6 +74,7 @@ export function DispatchItem({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
+  // Simplified handlers that don't create nested functions
   const handleUnassign = () => {
     toast.success(`Crew unassigned from dispatch ${id}`);
   };
@@ -84,19 +85,17 @@ export function DispatchItem({
     );
   };
 
-  const handleExpandClick = (event: React.MouseEvent) => {
-    event.preventDefault();
+  // Simplified click handlers using primitive data
+  const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const handleAssignClick = (event: React.MouseEvent) => {
-    event.preventDefault();
+  const openAssignModal = () => {
     setIsAssignModalOpen(true);
   };
 
-  const handleUnassignClick = (event: React.MouseEvent) => {
-    event.preventDefault();
-    handleUnassign();
+  const closeAssignModal = () => {
+    setIsAssignModalOpen(false);
   };
 
   return (
@@ -116,7 +115,7 @@ export function DispatchItem({
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleExpandClick}
+              onClick={toggleExpand}
               className="ml-2"
             >
               {isExpanded ? (
@@ -154,12 +153,7 @@ export function DispatchItem({
             <div>
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-gray-500" />
-                <Button
-                  variant="link"
-                  className="p-0 h-auto font-normal text-base"
-                >
-                  {patient.name}
-                </Button>
+                <span className="text-base">{patient.name}</span>
               </div>
               {patient.condition && (
                 <div className="text-sm text-gray-600">{patient.condition}</div>
@@ -186,7 +180,7 @@ export function DispatchItem({
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={handleUnassignClick}
+                    onClick={handleUnassign}
                     className="flex items-center gap-1"
                   >
                     <XCircle className="w-4 h-4" />
@@ -197,7 +191,7 @@ export function DispatchItem({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleAssignClick}
+                  onClick={openAssignModal}
                 >
                   Assign Crew
                 </Button>
@@ -244,7 +238,7 @@ export function DispatchItem({
 
       <CrewAssignmentModal
         isOpen={isAssignModalOpen}
-        onClose={() => setIsAssignModalOpen(false)}
+        onClose={closeAssignModal}
         dispatchId={id}
         serviceType={serviceType}
         origin={{ lat: 33.7490, lng: -84.3880 }}
