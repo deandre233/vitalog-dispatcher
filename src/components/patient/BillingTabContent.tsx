@@ -482,11 +482,19 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
 
     try {
       const fileExt = file.name.split('.').pop();
-      const filePath = `${patientId}/${type}_${Date.now()}.${fileExt}`;
+      const fileName = `${type}_${Date.now()}.${fileExt}`;
+      const filePath = `${patientId}/${fileName}`;
 
-      const { error: uploadError, data } = await supabase.storage
+      // Create a new array buffer from the file
+      const arrayBuffer = await file.arrayBuffer();
+      const fileData = new Uint8Array(arrayBuffer);
+
+      const { error: uploadError } = await supabase.storage
         .from('insurance_cards')
-        .upload(filePath, file);
+        .upload(filePath, fileData, {
+          contentType: file.type,
+          cacheControl: '3600'
+        });
 
       if (uploadError) {
         throw uploadError;
