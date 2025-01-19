@@ -107,6 +107,38 @@ const mockDispatches: Dispatch[] = [
   }
 ];
 
+// Import the scheduledTransports type and data
+interface ScheduledTransportProps {
+  id: string;
+  scheduledTime: string;
+  patient: string;
+  serviceType: string;
+  origin: string;
+  destination: string;
+  status: "Scheduled" | "Assigned" | "Completed" | "Canceled";
+  warnings?: string[];
+  unitAssigned?: string;
+  progress?: number;
+  recurrence?: string;
+}
+
+// Mock data for scheduled transports that are assigned
+const assignedScheduledTransports: ScheduledTransportProps[] = [
+  {
+    id: "ST-7602",
+    scheduledTime: "2024-02-20T16:30:00",
+    patient: "Schaebick, Michael",
+    serviceType: "BLS",
+    origin: "Emory University Hospital Midtown",
+    destination: "Parkside at Budd Terrace, 613",
+    status: "Assigned",
+    unitAssigned: "MED-1",
+    progress: 45,
+    warnings: ["Dialysis patient", "Wheelchair required"],
+    recurrence: "Every week on Mon"
+  }
+];
+
 const filterDispatches = (dispatches: Dispatch[], status: "assigned" | "unassigned"): Dispatch[] => {
   return dispatches.filter(dispatch => 
     status === "assigned" 
@@ -249,7 +281,7 @@ export function DispatchBoard() {
 
   const assignedDispatches = useMemo(() => 
     filterDispatches(dispatches, "assigned").concat(
-      scheduledTransports.filter(t => t.status === "Assigned").map(t => ({
+      assignedScheduledTransports.filter(t => t.status === "Assigned").map(t => ({
         id: t.id,
         activationTime: t.scheduledTime,
         patient: {
