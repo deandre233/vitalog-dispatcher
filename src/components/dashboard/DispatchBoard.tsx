@@ -164,8 +164,8 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       patientSatisfaction: 0,
       routeEfficiency: 0
     },
-    suggestedActions: [],
-    riskLevel: "low" as const
+    suggestedActions: [] as string[],
+    riskLevel: "low" as "low" | "medium" | "high"
   };
 
   try {
@@ -177,7 +177,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     );
     analytics.efficiency = efficiencyResult.efficiency || 0;
     analytics.suggestedActions = efficiencyResult.suggestedActions || [];
-    analytics.riskLevel = efficiencyResult.riskLevel || "low";
+    analytics.riskLevel = efficiencyResult.riskLevel;
   } catch (error) {
     console.error('Error analyzing dispatch efficiency:', error);
   }
@@ -217,7 +217,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       { lat: 33.7490, lng: -84.3880 }
     );
     
-    trafficInfo.congestionLevel = traffic.congestionLevel || 'low';
+    trafficInfo.congestionLevel = traffic.congestionLevel;
     trafficInfo.delayMinutes = Math.floor(Math.random() * 15);
     trafficInfo.alternateRouteAvailable = Boolean(traffic.alternateRouteAvailable);
   } catch (error) {
