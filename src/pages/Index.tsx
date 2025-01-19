@@ -10,24 +10,36 @@ import { AlertsConfig } from "@/components/dashboard/AlertsConfig";
 
 const Index = () => {
   return (
-    <div className="flex-1 flex flex-col">
-      <DashboardHeader />
-      <main className="flex-1 p-4">
-        <WelcomeBanner />
-        <div className="mt-4">
-          <DashboardMetrics />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-4">
-          <div className="lg:col-span-3">
-            <DispatchBoard />
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="flex-1 flex">
+        <SidebarProvider defaultOpen={true}>
+          <div className="min-h-screen flex w-full">
+            <AppSidebar />
+            <SidebarRail />
+            <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+              <DashboardHeader />
+              <main className="p-4">
+                <WelcomeBanner />
+                <div className="mt-4">
+                  <DashboardMetrics />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-4">
+                  <div className="lg:col-span-3">
+                    <DispatchBoard />
+                  </div>
+                  <div className="lg:col-span-1">
+                    <AlertsConfig />
+                  </div>
+                </div>
+              </main>
+            </div>
           </div>
-          <div className="lg:col-span-1">
-            <AlertsConfig />
-          </div>
-        </div>
-      </main>
+        </SidebarProvider>
+      </div>
+      <Footer />
     </div>
   );
-};
+}
 
 export default Index;
