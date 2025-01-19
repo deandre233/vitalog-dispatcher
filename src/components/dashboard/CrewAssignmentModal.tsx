@@ -6,8 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MapPin, Award, Clock, CheckCircle, User, AlertTriangle } from "lucide-react";
+import { MapPin, Award, Clock, CheckCircle, User, AlertTriangle, ThumbsUp, Activity } from "lucide-react";
 import { recommendCrewWithRoute, crewMembers, calculateDistance, type CrewMember, type CrewWithRoute, type Location } from "@/utils/crewRecommendation";
+import { analyzeCrewPerformance, getTrafficInfo, calculateSkillMatch } from "@/utils/aiDispatchUtils";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
@@ -40,31 +41,49 @@ export function CrewAssignmentModal({
   const handleAssignCrew = (crewId: number) => {
     const crew = crewMembers.find(c => c.id === crewId);
     if (crew) {
+      const trafficInfo = getTrafficInfo(origin, crew.location);
+      const skillMatch = calculateSkillMatch(crew.certification, serviceType);
+      const performance = analyzeCrewPerformance(crew);
+      
       const estimatedMinutes = recommendedCrew?.id === crew.id
-        ? Math.round(recommendedCrew.routeInfo.duration)
-        : Math.round(calculateDistance(crew.location, origin) * 2);
-        
+        ? Math.round(recommendedCrew.routeInfo.duration + trafficInfo.delayMinutes)
+        : Math.round(calculateDistance(crew.location, origin) * 2 + trafficInfo.delayMinutes);
+
       if (!manualOverride && recommendedCrew && crew.id !== recommendedCrew.id) {
         toast.warning("You are assigning a non-recommended crew member", {
           description: "The AI suggests a different crew for optimal response time.",
           action: {
             label: "Proceed Anyway",
             onClick: () => {
-              handleConfirmedAssign(crew, estimatedMinutes);
+              handleConfirmedAssign(crew, estimatedMinutes, skillMatch, performance, trafficInfo);
             },
           },
         });
         return;
       }
 
-      handleConfirmedAssign(crew, estimatedMinutes);
+      handleConfirmedAssign(crew, estimatedMinutes, skillMatch, performance, trafficInfo);
     }
   };
 
-  const handleConfirmedAssign = (crew: CrewMember, estimatedMinutes: number) => {
-    toast.success(`Crew ${crew.name} successfully assigned to dispatch ${dispatchId}!`, {
-      description: `Estimated arrival time: ${estimatedMinutes} minutes`,
-    });
+  const handleConfirmedAssign = (
+    crew: CrewMember, 
+    estimatedMinutes: number,
+    skillMatch: number,
+    performance: { responseTime: number, patientSatisfaction: number },
+    trafficInfo: { congestionLevel: string, delayMinutes: number }
+  ) => {
+    toast.success(
+      <div className="space-y-2">
+        <p>Crew {crew.name} successfully assigned to dispatch {dispatchId}!</p>
+        <div className="text-sm text-gray-500">
+          <p>ETA: {estimatedMinutes} minutes (including {trafficInfo.delayMinutes}min traffic delay)</p>
+          <p>Skill Match: {Math.round(skillMatch * 100)}%</p>
+          <p>Avg Response Time: {performance.responseTime}min</p>
+          <p>Patient Satisfaction: {performance.patientSatisfaction}%</p>
+        </div>
+      </div>
+    );
     
     if (onAssign) {
       onAssign(crew.id, estimatedMinutes);
@@ -157,7 +176,7 @@ export function CrewAssignmentModal({
         <DialogHeader>
           <DialogTitle>Assign Crew to Dispatch {dispatchId}</DialogTitle>
           <DialogDescription>
-            AI has analyzed available crews and calculated optimal routes based on current traffic conditions.
+            AI has analyzed available crews based on proximity, skills, and performance metrics.
           </DialogDescription>
         </DialogHeader>
 
@@ -203,9 +222,12 @@ export function CrewAssignmentModal({
                   .map((crew) => {
                     const isRecommended = recommendedCrew?.id === crew.id;
                     const distance = calculateDistance(crew.location, origin);
+                    const skillMatch = calculateSkillMatch(crew.certification, serviceType);
+                    const performance = analyzeCrewPerformance(crew);
+                    const trafficInfo = getTrafficInfo(crew.location, origin);
                     const estimatedMinutes = isRecommended 
-                      ? Math.round(recommendedCrew.routeInfo.duration)
-                      : Math.round(distance * 2);
+                      ? Math.round(recommendedCrew.routeInfo.duration + trafficInfo.delayMinutes)
+                      : Math.round(distance * 2 + trafficInfo.delayMinutes);
 
                     return (
                       <div
@@ -234,8 +256,17 @@ export function CrewAssignmentModal({
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <CheckCircle className="w-4 h-4 text-medical-secondary" />
-                              <span>Certification: {crew.certification}</span>
+                              <Award className="w-4 h-4 text-medical-secondary" />
+                              <span>
+                                Certification: {crew.certification}
+                                <span className={`ml-1 ${
+                                  skillMatch > 0.8 ? "text-green-500" : 
+                                  skillMatch > 0.5 ? "text-yellow-500" : 
+                                  "text-red-500"
+                                }`}>
+                                  ({Math.round(skillMatch * 100)}% match)
+                                </span>
+                              </span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <MapPin className="w-4 h-4 text-medical-secondary" />
@@ -247,7 +278,26 @@ export function CrewAssignmentModal({
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Clock className="w-4 h-4 text-medical-secondary" />
-                              <span>ETA: {estimatedMinutes} minutes</span>
+                              <span>
+                                ETA: {estimatedMinutes} min
+                                {trafficInfo.delayMinutes > 0 && (
+                                  <span className="text-yellow-500 ml-1">
+                                    (+{trafficInfo.delayMinutes} traffic delay)
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Activity className="w-4 h-4 text-medical-secondary" />
+                              <span>
+                                Avg Response: {performance.responseTime}min
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <ThumbsUp className="w-4 h-4 text-medical-secondary" />
+                              <span>
+                                Patient Satisfaction: {performance.patientSatisfaction}%
+                              </span>
                             </div>
                           </div>
                           <div className="flex items-center justify-end">
