@@ -1,16 +1,18 @@
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { Ambulance, FileText, DollarSign, Users, Settings, PlusCircle, MapPin, Bell, HelpCircle } from "lucide-react";
+import { Users, Map, ClipboardCheck, ListTodo, FileCheck, BookOpen, Ambulance, PlusCircle, MapPin, Bell, Settings } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 const menuItems = [
+  { title: "Employees List", icon: Users, url: "/employees" },
+  { title: "Live Map", icon: Map, url: "/live-map" },
+  { title: "Ended Shifts", icon: ClipboardCheck, url: "/shifts" },
+  { title: "Request Queue", icon: ListTodo, url: "/requests" },
+  { title: "Prior Authorization", icon: FileCheck, url: "/authorizations" },
+  { title: "Book Back-Dated", icon: BookOpen, url: "/backdated" },
   { title: "Active Dispatches", icon: Ambulance, url: "/dispatch" },
-  { title: "Create New Dispatch", icon: PlusCircle, url: "/dispatch/new" },
+  { title: "Create Dispatch", icon: PlusCircle, url: "/dispatch/new" },
   { title: "Manage Routes", icon: MapPin, url: "/routes" },
-  { title: "PCR", icon: FileText, url: "/pcr" },
-  { title: "Billing", icon: DollarSign, url: "/billing" },
-  { title: "Crew", icon: Users, url: "/crew" },
   { title: "Notifications", icon: Bell, url: "/notifications" },
-  { title: "Help/Support", icon: HelpCircle, url: "/help" },
   { title: "Settings", icon: Settings, url: "/settings" },
 ];
 

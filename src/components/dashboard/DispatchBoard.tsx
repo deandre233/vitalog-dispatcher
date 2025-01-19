@@ -25,23 +25,26 @@ const dispatches = [
     },
     eta: "15 min",
     comments: "Call for specific room directions",
+    progress: 75,
   },
   {
     id: "PT-002",
     activationTime: "13:00",
-    assignedTo: "Team B",
+    assignedTo: "Unassigned",
     patient: "Johnson, Michael",
     serviceType: "BLS",
     origin: "Parkside at Budd Terrace, 613",
     destination: "Emory University Hospital Midtown",
     status: "Pending",
-    priority: "medium",
+    priority: "high",
     aiRecommendations: {
       route: "Alternate route suggested",
       crew: "Team B recommended",
       billing: "Verify insurance",
     },
     eta: "22 min",
+    warnings: "Breathing problem: Req oxygen",
+    progress: 25,
   },
   {
     id: "PT-003",
@@ -59,7 +62,8 @@ const dispatches = [
       billing: "Medicare confirmed",
     },
     eta: "10 min",
-    warnings: "Breathing problem: Req oxygen",
+    warnings: "Impaired movement",
+    progress: 90,
   },
 ];
 
@@ -94,8 +98,7 @@ export function DispatchBoard() {
       <Alert className="mb-4">
         <Brain className="h-4 w-4" />
         <AlertDescription>
-          AI Insight: Current dispatch load is optimal. 2 crews available for
-          emergency response.
+          AI Insight: Current dispatch load is optimal. 2 crews available for emergency response.
         </AlertDescription>
       </Alert>
 
