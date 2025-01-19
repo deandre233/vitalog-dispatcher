@@ -133,7 +133,7 @@ export function DispatchItem({
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-gray-600">#{id}</span>
+            <span className="font-semibold text-gray-600">Call #{id}</span>
             {elapsedTime && (
               <div className="flex items-center gap-1 text-sm text-gray-500">
                 <Clock className="w-4 h-4" />
