@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -34,6 +33,22 @@ interface BillingSettings {
 interface BillingTabContentProps {
   patientId: string;
 }
+
+const isValidInsuranceType = (type: string): type is InsuranceRecord['type'] => {
+  return ['primary', 'secondary', 'reserved'].includes(type);
+};
+
+const isValidPreauthRequired = (value: string): value is BillingSettings['preauth_required'] => {
+  return ['situational', 'always', 'never'].includes(value);
+};
+
+const isValidPricingSchema = (value: string): value is BillingSettings['pricing_schema'] => {
+  return ['retail', 'insurance'].includes(value);
+};
+
+const isValidSubscriptionType = (value: string): value is BillingSettings['subscription_type'] => {
+  return ['monthly', 'annually'].includes(value);
+};
 
 export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
   const { toast } = useToast();
@@ -65,7 +80,13 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
       return;
     }
 
-    setInsuranceRecords(data || []);
+    // Validate and transform the data
+    const validatedRecords: InsuranceRecord[] = (data || []).map(record => ({
+      ...record,
+      type: isValidInsuranceType(record.type) ? record.type : 'primary'
+    }));
+
+    setInsuranceRecords(validatedRecords);
   };
 
   const fetchBillingSettings = async () => {
@@ -73,9 +94,9 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
       .from('billing_settings')
       .select('*')
       .eq('patient_id', patientId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+    if (error && error.code !== 'PGRST116') {
       toast({
         title: "Error",
         description: "Failed to fetch billing settings",
@@ -84,7 +105,15 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
       return;
     }
 
-    setBillingSettings(data || {});
+    if (data) {
+      const validatedSettings: BillingSettings = {
+        ...data,
+        preauth_required: isValidPreauthRequired(data.preauth_required) ? data.preauth_required : undefined,
+        pricing_schema: isValidPricingSchema(data.pricing_schema) ? data.pricing_schema : undefined,
+        subscription_type: isValidSubscriptionType(data.subscription_type) ? data.subscription_type : undefined
+      };
+      setBillingSettings(validatedSettings);
+    }
   };
 
   const handleInsuranceChange = (type: 'primary' | 'secondary' | 'reserved', field: keyof InsuranceRecord, value: string) => {

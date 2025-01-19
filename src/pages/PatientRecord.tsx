@@ -37,7 +37,7 @@ import {
   AlertTriangle,
   Heart
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BillingTabContent } from "@/components/patient/BillingTabContent";
 
@@ -46,6 +46,7 @@ const PatientRecord = () => {
   const decodedName = decodeURIComponent(patientName || "");
   const [isEditing, setIsEditing] = useState(false);
   const [patientData, setPatientData] = useState({
+    id: '', // Add this line
     phone: "(678) 875-9912",
     email: "angela.turner@email.com",
     address: "855 Fayetteville Rd Se",
@@ -155,6 +156,36 @@ const PatientRecord = () => {
       }));
     }
   };
+
+  useEffect(() => {
+    // Fetch patient data when component mounts
+    const fetchPatientData = async () => {
+      const { data, error } = await supabase
+        .from('patients')
+        .select('*')
+        .eq('last_name', decodedName.split(',')[0].trim())
+        .eq('first_name', decodedName.split(',')[1].trim())
+        .single();
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch patient data",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data) {
+        setPatientData(prev => ({
+          ...prev,
+          id: data.id
+        }));
+      }
+    };
+
+    fetchPatientData();
+  }, [decodedName]);
 
   return (
     <div className="min-h-screen flex flex-col">
