@@ -11,14 +11,12 @@ interface CrewMember {
   available: boolean;
 }
 
-interface Dispatch {
-  id: string | number;
-  origin: Location;
-  destination: Location;
-  serviceType: string;
+interface RouteInfo {
+  distance: number;
+  duration: number;
+  route: any; // Mapbox route response
 }
 
-// Sample data for crew members
 export const crewMembers: CrewMember[] = [
   {
     id: 1,
@@ -36,31 +34,64 @@ export const crewMembers: CrewMember[] = [
   },
 ];
 
-// Calculate the distance between the dispatch and crew
-export function calculateDistance(crew: CrewMember, dispatchLocation: Location): number {
+// Calculate the straight-line distance between two points
+export function calculateDistance(crew: CrewMember, origin: Location): number {
   const R = 6371; // Earth radius in km
-  const dLat = (dispatchLocation.lat - crew.location.lat) * Math.PI / 180;
-  const dLng = (dispatchLocation.lng - crew.location.lng) * Math.PI / 180;
+  const dLat = (origin.lat - crew.location.lat) * Math.PI / 180;
+  const dLng = (origin.lng - crew.location.lng) * Math.PI / 180;
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(crew.location.lat * Math.PI / 180) *
-    Math.cos(dispatchLocation.lat * Math.PI / 180) *
+    Math.cos(origin.lat * Math.PI / 180) *
     Math.sin(dLng / 2) * Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in km
+  return R * c;
 }
 
-// AI recommends crew based on proximity and availability
-export function recommendCrew(dispatch: Dispatch): CrewMember & { distance: number } | null {
+// Get route information using Mapbox Directions API
+async function getRouteInfo(start: Location, end: Location): Promise<RouteInfo> {
+  const response = await fetch(
+    `https://api.mapbox.com/directions/v5/mapbox/driving/${start.lng},${start.lat};${end.lng},${end.lat}?access_token=${mapboxgl.accessToken}`
+  );
+  const data = await response.json();
+  
+  if (data.routes && data.routes.length > 0) {
+    return {
+      distance: data.routes[0].distance / 1000, // Convert to kilometers
+      duration: data.routes[0].duration / 60, // Convert to minutes
+      route: data.routes[0]
+    };
+  }
+  
+  throw new Error('No route found');
+}
+
+// Recommend crew based on proximity and route information
+export async function recommendCrewWithRoute(dispatch: { origin: Location, serviceType: string }): Promise<(CrewMember & { routeInfo: RouteInfo }) | null> {
   const availableCrew = crewMembers.filter(crew => crew.available);
   if (availableCrew.length === 0) return null;
 
-  const crewWithDistances = availableCrew.map(crew => ({
-    ...crew,
-    distance: calculateDistance(crew, dispatch.origin)
-  }));
+  // Get route information for all available crews
+  const crewWithRoutes = await Promise.all(
+    availableCrew.map(async (crew) => {
+      try {
+        const routeInfo = await getRouteInfo(crew.location, dispatch.origin);
+        return { ...crew, routeInfo };
+      } catch (error) {
+        console.error(`Failed to get route for crew ${crew.id}:`, error);
+        // Fallback to straight-line distance if route calculation fails
+        return {
+          ...crew,
+          routeInfo: {
+            distance: calculateDistance(crew, dispatch.origin),
+            duration: calculateDistance(crew, dispatch.origin) * 2, // Rough estimate
+            route: null
+          }
+        };
+      }
+    })
+  );
 
-  // Sort crew by proximity (shortest distance first)
-  crewWithDistances.sort((a, b) => a.distance - b.distance);
-
-  return crewWithDistances[0];
+  // Sort by duration and return the best option
+  crewWithRoutes.sort((a, b) => a.routeInfo.duration - b.routeInfo.duration);
+  return crewWithRoutes[0];
 }

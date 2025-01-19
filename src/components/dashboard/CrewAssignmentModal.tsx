@@ -7,10 +7,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MapPin, Award, Clock, CheckCircle, User } from "lucide-react";
-import { recommendCrew, crewMembers } from "@/utils/crewRecommendation";
+import { recommendCrewWithRoute, crewMembers } from "@/utils/crewRecommendation";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -22,6 +22,14 @@ interface CrewAssignmentModalProps {
   origin: { lat: number; lng: number };
 }
 
+interface CrewWithRoute extends CrewMember {
+  routeInfo: {
+    distance: number;
+    duration: number;
+    route: any;
+  };
+}
+
 export function CrewAssignmentModal({
   isOpen,
   onClose,
@@ -31,16 +39,8 @@ export function CrewAssignmentModal({
 }: CrewAssignmentModalProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-
-  const mockDispatch = {
-    id: dispatchId,
-    origin,
-    destination: origin,
-    serviceType,
-  };
-
-  const recommendedCrew = recommendCrew(mockDispatch);
-  const availableCrews = crewMembers.filter(crew => crew.available);
+  const [recommendedCrew, setRecommendedCrew] = useState<CrewWithRoute | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleAssignCrew = (crewId: number) => {
     const crew = crewMembers.find(c => c.id === crewId);
@@ -51,10 +51,29 @@ export function CrewAssignmentModal({
   };
 
   useEffect(() => {
-    if (!mapContainer.current || !isOpen) return;
+    if (!isOpen) return;
+
+    const loadRecommendations = async () => {
+      setIsLoading(true);
+      try {
+        const recommended = await recommendCrewWithRoute({ origin, serviceType });
+        setRecommendedCrew(recommended);
+      } catch (error) {
+        console.error('Failed to get recommendations:', error);
+        toast.error('Failed to load crew recommendations');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadRecommendations();
+  }, [isOpen, origin, serviceType]);
+
+  useEffect(() => {
+    if (!mapContainer.current || !isOpen || !recommendedCrew) return;
 
     // Initialize map
-    mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN'; // Replace with your Mapbox token
+    mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN';
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -63,22 +82,53 @@ export function CrewAssignmentModal({
       zoom: 12
     });
 
-    // Add markers for dispatch location and crew locations
+    // Add markers
     new mapboxgl.Marker({ color: '#FF0000' })
       .setLngLat([origin.lng, origin.lat])
       .addTo(map.current);
 
-    availableCrews.forEach(crew => {
+    // Add route if available
+    if (recommendedCrew.routeInfo.route) {
+      map.current.on('load', () => {
+        if (!map.current) return;
+        
+        map.current.addSource('route', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: recommendedCrew.routeInfo.route.geometry
+          }
+        });
+
+        map.current.addLayer({
+          id: 'route',
+          type: 'line',
+          source: 'route',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#3b82f6',
+            'line-width': 4
+          }
+        });
+      });
+    }
+
+    // Add crew markers
+    crewMembers.forEach(crew => {
       const color = recommendedCrew?.id === crew.id ? '#00FF00' : '#0000FF';
       new mapboxgl.Marker({ color })
         .setLngLat([crew.location.lng, crew.location.lat])
-        .addTo(map.current);
+        .addTo(map.current!);
     });
 
     return () => {
       map.current?.remove();
     };
-  }, [isOpen, origin, recommendedCrew?.id]);
+  }, [isOpen, origin, recommendedCrew]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -86,8 +136,7 @@ export function CrewAssignmentModal({
         <DialogHeader>
           <DialogTitle>Assign Crew to Dispatch {dispatchId}</DialogTitle>
           <DialogDescription>
-            AI has analyzed available crews and recommended the best match based on
-            proximity, skills, and current conditions.
+            AI has analyzed available crews and calculated optimal routes based on current traffic conditions.
           </DialogDescription>
         </DialogHeader>
 
@@ -108,64 +157,75 @@ export function CrewAssignmentModal({
           </div>
 
           <ScrollArea className="h-[400px] pr-4">
-            {availableCrews.length > 0 ? (
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-medical-primary" />
+              </div>
+            ) : crewMembers.filter(crew => crew.available).length > 0 ? (
               <div className="space-y-4">
-                {availableCrews.map((crew) => {
-                  const distance = calculateDistance(crew, origin);
-                  const estimatedMinutes = Math.round(distance * 2);
-                  const isRecommended = recommendedCrew?.id === crew.id;
+                {crewMembers
+                  .filter(crew => crew.available)
+                  .map((crew) => {
+                    const isRecommended = recommendedCrew?.id === crew.id;
+                    const estimatedMinutes = isRecommended 
+                      ? Math.round(recommendedCrew.routeInfo.duration)
+                      : Math.round(calculateDistance(crew, origin) * 2);
 
-                  return (
-                    <div
-                      key={crew.id}
-                      className={`p-4 border rounded-lg ${
-                        isRecommended
-                          ? "bg-medical-accent border-medical-primary"
-                          : "bg-white hover:bg-gray-50"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <User className="w-5 h-5 text-medical-secondary" />
-                          <h3 className="text-lg font-semibold text-medical-primary">
-                            {crew.name}
-                          </h3>
+                    return (
+                      <div
+                        key={crew.id}
+                        className={`p-4 border rounded-lg ${
+                          isRecommended
+                            ? "bg-medical-accent border-medical-primary"
+                            : "bg-white hover:bg-gray-50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <User className="w-5 h-5 text-medical-secondary" />
+                            <h3 className="text-lg font-semibold text-medical-primary">
+                              {crew.name}
+                            </h3>
+                          </div>
+                          {isRecommended && (
+                            <span className="px-2 py-1 text-sm bg-green-100 text-green-700 rounded-full flex items-center gap-1">
+                              <Award className="w-4 h-4" />
+                              Best Match
+                            </span>
+                          )}
                         </div>
-                        {isRecommended && (
-                          <span className="px-2 py-1 text-sm bg-green-100 text-green-700 rounded-full flex items-center gap-1">
-                            <Award className="w-4 h-4" />
-                            Best Match
-                          </span>
-                        )}
-                      </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <CheckCircle className="w-4 h-4 text-medical-secondary" />
-                            <span>Certification: {crew.certification}</span>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <CheckCircle className="w-4 h-4 text-medical-secondary" />
+                              <span>Certification: {crew.certification}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <MapPin className="w-4 h-4 text-medical-secondary" />
+                              <span>
+                                {isRecommended 
+                                  ? `${recommendedCrew.routeInfo.distance.toFixed(2)} km via route`
+                                  : `${calculateDistance(crew, origin).toFixed(2)} km direct`}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Clock className="w-4 h-4 text-medical-secondary" />
+                              <span>ETA: {estimatedMinutes} minutes</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <MapPin className="w-4 h-4 text-medical-secondary" />
-                            <span>{distance.toFixed(2)} km from location</span>
+                          <div className="flex items-center justify-end">
+                            <Button
+                              onClick={() => handleAssignCrew(crew.id)}
+                              variant={isRecommended ? "default" : "outline"}
+                            >
+                              {isRecommended ? "Assign Recommended" : "Assign Crew"}
+                            </Button>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Clock className="w-4 h-4 text-medical-secondary" />
-                            <span>ETA: {estimatedMinutes} minutes</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-end">
-                          <Button
-                            onClick={() => handleAssignCrew(crew.id)}
-                            variant={isRecommended ? "default" : "outline"}
-                          >
-                            {isRecommended ? "Assign Recommended" : "Assign Crew"}
-                          </Button>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             ) : (
               <div className="text-center py-4">
@@ -177,16 +237,4 @@ export function CrewAssignmentModal({
       </DialogContent>
     </Dialog>
   );
-}
-
-function calculateDistance(crew: { location: { lat: number; lng: number } }, origin: { lat: number; lng: number }): number {
-  const R = 6371; // Earth radius in km
-  const dLat = (origin.lat - crew.location.lat) * Math.PI / 180;
-  const dLng = (origin.lng - crew.location.lng) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(crew.location.lat * Math.PI / 180) *
-    Math.cos(origin.lat * Math.PI / 180) *
-    Math.sin(dLng / 2) * Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
 }
