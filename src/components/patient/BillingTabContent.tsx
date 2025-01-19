@@ -61,58 +61,92 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
   });
 
   useEffect(() => {
+    if (!patientId) {
+      console.error('No patient ID provided');
+      toast({
+        title: "Error",
+        description: "Patient ID is required to fetch billing information",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     fetchInsuranceRecords();
     fetchBillingSettings();
   }, [patientId]);
 
   const fetchInsuranceRecords = async () => {
-    const { data, error } = await supabase
-      .from('insurance_records')
-      .select('*')
-      .eq('patient_id', patientId);
+    try {
+      if (!patientId) return;
 
-    if (error) {
+      const { data, error } = await supabase
+        .from('insurance_records')
+        .select('*')
+        .eq('patient_id', patientId);
+
+      if (error) {
+        console.error('Error fetching insurance records:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch insurance records",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate and transform the data
+      const validatedRecords: InsuranceRecord[] = (data || []).map(record => ({
+        ...record,
+        type: isValidInsuranceType(record.type) ? record.type : 'primary'
+      }));
+
+      setInsuranceRecords(validatedRecords);
+    } catch (err) {
+      console.error('Unexpected error in fetchInsuranceRecords:', err);
       toast({
         title: "Error",
-        description: "Failed to fetch insurance records",
+        description: "An unexpected error occurred while fetching insurance records",
         variant: "destructive",
       });
-      return;
     }
-
-    // Validate and transform the data
-    const validatedRecords: InsuranceRecord[] = (data || []).map(record => ({
-      ...record,
-      type: isValidInsuranceType(record.type) ? record.type : 'primary'
-    }));
-
-    setInsuranceRecords(validatedRecords);
   };
 
   const fetchBillingSettings = async () => {
-    const { data, error } = await supabase
-      .from('billing_settings')
-      .select('*')
-      .eq('patient_id', patientId)
-      .maybeSingle();
+    try {
+      if (!patientId) return;
 
-    if (error && error.code !== 'PGRST116') {
+      const { data, error } = await supabase
+        .from('billing_settings')
+        .select('*')
+        .eq('patient_id', patientId)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching billing settings:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch billing settings",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data) {
+        const validatedSettings: BillingSettings = {
+          ...data,
+          preauth_required: isValidPreauthRequired(data.preauth_required) ? data.preauth_required : undefined,
+          pricing_schema: isValidPricingSchema(data.pricing_schema) ? data.pricing_schema : undefined,
+          subscription_type: isValidSubscriptionType(data.subscription_type) ? data.subscription_type : undefined
+        };
+        setBillingSettings(validatedSettings);
+      }
+    } catch (err) {
+      console.error('Unexpected error in fetchBillingSettings:', err);
       toast({
         title: "Error",
-        description: "Failed to fetch billing settings",
+        description: "An unexpected error occurred while fetching billing settings",
         variant: "destructive",
       });
-      return;
-    }
-
-    if (data) {
-      const validatedSettings: BillingSettings = {
-        ...data,
-        preauth_required: isValidPreauthRequired(data.preauth_required) ? data.preauth_required : undefined,
-        pricing_schema: isValidPricingSchema(data.pricing_schema) ? data.pricing_schema : undefined,
-        subscription_type: isValidSubscriptionType(data.subscription_type) ? data.subscription_type : undefined
-      };
-      setBillingSettings(validatedSettings);
     }
   };
 
