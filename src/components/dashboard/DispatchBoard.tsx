@@ -98,6 +98,11 @@ export function DispatchBoard() {
   const unassignedDispatches = filterDispatches(mockDispatches, "unassigned");
   const assignedDispatches = filterDispatches(mockDispatches, "assigned");
 
+  // Style for unassigned tab when there are unassigned dispatches
+  const unassignedTabStyle = unassignedDispatches.length > 0 
+    ? "bg-red-100 text-red-700 data-[state=active]:bg-red-200" 
+    : "";
+
   return (
     <Card className="p-6 m-6">
       <div className="flex justify-between items-center mb-6">
@@ -133,7 +138,10 @@ export function DispatchBoard() {
       {activeView === "active" ? (
         <Tabs defaultValue="unassigned" className="space-y-4">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="unassigned">
+            <TabsTrigger 
+              value="unassigned"
+              className={unassignedTabStyle}
+            >
               Unassigned ({unassignedDispatches.length})
             </TabsTrigger>
             <TabsTrigger value="assigned">
