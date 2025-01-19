@@ -233,7 +233,7 @@ export function ScheduledTransport() {
   const [utilization, setUtilization] = useState<ReturnType<typeof analyzeResourceUtilization>>();
   const [patterns, setPatterns] = useState<ReturnType<typeof analyzeTravelPatterns>>([]);
 
-  // Filter to show only active scheduled transports
+  // Updated filter to include both scheduled and assigned transports
   const activeTransports = scheduledTransports.filter(
     transport => transport.status === "Scheduled" || transport.status === "Assigned"
   );
@@ -308,10 +308,10 @@ export function ScheduledTransport() {
       <div className="flex justify-between items-center mb-6">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold text-medical-primary">
-            Active Scheduled Transports
+            Scheduled & Assigned Transports
           </h2>
           <p className="text-gray-500">
-            Showing {activeTransports.length} active scheduled transports
+            Showing {activeTransports.length} active transports
           </p>
         </div>
         <Button variant="outline" className="gap-2">
