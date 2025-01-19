@@ -165,7 +165,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       routeEfficiency: 0
     },
     suggestedActions: [] as string[],
-    riskLevel: "low" as const
+    riskLevel: "low" as "low" | "medium" | "high"  // Updated to allow all risk levels
   };
 
   try {
@@ -213,7 +213,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
 
   // Initialize traffic info with defaults
   const trafficInfo = {
-    congestionLevel: 'low' as const,
+    congestionLevel: 'low' as "low" | "medium" | "high",  // Updated to allow all congestion levels
     delayMinutes: 0,
     alternateRouteAvailable: false
   };
