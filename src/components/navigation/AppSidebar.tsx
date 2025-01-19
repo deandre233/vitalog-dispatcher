@@ -1,5 +1,5 @@
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { Users, Map, ClipboardCheck, Brain, Inbox, Calendar, Archive, Bell, ShieldCheck, FolderLock, Building, Network, UserRound, Upload, BookOpen, Tags, History, Link2 } from "lucide-react";
+import { Users, Map, ClipboardCheck, Brain, Inbox, Calendar, Archive, Bell, ShieldCheck, FolderLock, Building, Network, UserRound, Upload, BookOpen, Tags, History } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 const menuItems = [
@@ -20,7 +20,6 @@ const menuItems = [
   { title: "Resource Library", icon: BookOpen, url: "/resources", description: "Access educational and training materials" },
   { title: "Tagging System", icon: Tags, url: "/tags", description: "Manage dispatch and service categorization" },
   { title: "Schedule Past Dispatch", icon: History, url: "/backdated", description: "Book or update past dispatches" },
-  { title: "Custom Shortcut", icon: Link2, url: "/custom", description: "Customizable shortcuts to frequent tools" },
 ];
 
 export function AppSidebar() {
