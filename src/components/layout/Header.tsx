@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
 
 export function Header({ className = "" }) {
   return (
     <header className={`bg-blue-700 text-white border-b border-blue-800 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <div className="text-xl font-bold">Loveable AI</div>
+          <div className="flex items-center gap-2">
+            <Heart className="w-6 h-6 text-white" />
+            <div className="text-xl font-bold">Heart Medical Transport</div>
           </div>
           <nav className="hidden sm:flex sm:space-x-8">
             <Link 
