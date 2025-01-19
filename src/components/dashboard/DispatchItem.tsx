@@ -24,6 +24,7 @@ import { useState } from "react";
 import { CrewAssignmentModal } from "./CrewAssignmentModal";
 import { DispatchStatusBar, DispatchStatus } from "./DispatchStatusBar";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface AIRecommendations {
   route: string;
@@ -71,6 +72,7 @@ export function DispatchItem({
   progress = 0,
   elapsedTime,
 }: DispatchItemProps) {
+  const navigate = useNavigate();
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<DispatchStatus>(status.toLowerCase().replace(" ", "") as DispatchStatus);
@@ -113,8 +115,15 @@ export function DispatchItem({
     }
   };
 
+  const handleItemClick = () => {
+    navigate(`/dispatch/${id}`);
+  };
+
   return (
-    <div className="flex flex-col bg-white border rounded-lg hover:bg-gray-50 transition-colors">
+    <div 
+      className="flex flex-col bg-white border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+      onClick={handleItemClick}
+    >
       {/* Header Section */}
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-4">

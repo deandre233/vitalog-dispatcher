@@ -10,6 +10,7 @@ import CrewAssignment from "./pages/CrewAssignment";
 import ManageRoutes from "./pages/ManageRoutes";
 import Billing from "./pages/Billing";
 import Performance from "./pages/Performance";
+import { DispatchDetailView } from "./components/dashboard/DispatchDetailView";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dispatch" element={<ActiveDispatches />} />
+          <Route path="/dispatch/:id" element={<DispatchDetailView />} />
           <Route path="/dispatch/new" element={<CreateDispatch />} />
           <Route path="/crew" element={<CrewAssignment />} />
           <Route path="/routes" element={<ManageRoutes />} />
