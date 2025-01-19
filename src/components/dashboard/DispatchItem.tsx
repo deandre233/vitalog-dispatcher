@@ -72,7 +72,18 @@ export function DispatchItem({
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<DispatchStatus>(status.toLowerCase().replace(" ", "") as DispatchStatus);
-  const [currentAssignedTo, setCurrentAssignedTo] = useState(assignedTo);
+
+  const calculateProgress = (status: DispatchStatus): number => {
+    const statusValues = {
+      dispatch: 0,
+      enroute: 20,
+      onscene: 40,
+      transporting: 60,
+      destination: 80,
+      available: 100
+    };
+    return statusValues[status] || 0;
+  };
 
   const handleStatusChange = (newStatus: DispatchStatus) => {
     setCurrentStatus(newStatus);
@@ -215,15 +226,14 @@ export function DispatchItem({
           </div>
         </div>
 
-        {progress > 0 && (
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">Transport Progress</span>
-              <span className="text-sm font-medium">{progress}%</span>
-            </div>
-            <Progress value={progress} className="h-2" />
+        {/* Progress Bar */}
+        <div className="mt-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-600">Transport Progress</span>
+            <span className="text-sm font-medium">{calculateProgress(currentStatus)}%</span>
           </div>
-        )}
+          <Progress value={calculateProgress(currentStatus)} className="h-2" />
+        </div>
 
         {/* Expanded Content */}
         {isExpanded && (
