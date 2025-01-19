@@ -175,9 +175,13 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       undefined,
       `${elapsedMinutes} min`
     );
-    analytics.efficiency = efficiencyResult.efficiency || 0;
-    analytics.suggestedActions = efficiencyResult.suggestedActions || [];
-    analytics.riskLevel = efficiencyResult.riskLevel;
+    
+    // Ensure all properties are serializable
+    analytics.efficiency = Number(efficiencyResult.efficiency || 0);
+    analytics.suggestedActions = Array.isArray(efficiencyResult.suggestedActions) 
+      ? efficiencyResult.suggestedActions.map(action => String(action))
+      : [];
+    analytics.riskLevel = efficiencyResult.riskLevel || "low";
   } catch (error) {
     console.error('Error analyzing dispatch efficiency:', error);
   }
@@ -185,8 +189,8 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
   // Monitor dispatch progress with serializable data
   try {
     monitorDispatchProgress(
-      dispatch.status.toLowerCase(), 
-      `${elapsedMinutes}`, 
+      String(dispatch.status).toLowerCase(), 
+      String(elapsedMinutes), 
       30
     );
   } catch (error) {
@@ -217,27 +221,27 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
       { lat: 33.7490, lng: -84.3880 }
     );
     
-    trafficInfo.congestionLevel = traffic.congestionLevel;
+    trafficInfo.congestionLevel = traffic.congestionLevel || 'low';
     trafficInfo.delayMinutes = Math.floor(Math.random() * 15);
     trafficInfo.alternateRouteAvailable = Boolean(traffic.alternateRouteAvailable);
   } catch (error) {
     console.error('Error getting traffic info:', error);
   }
 
-  // Return a serializable object
+  // Return a serializable object with all properties explicitly typed
   return {
     ...dispatch,
-    progress,
-    elapsedTime: `${elapsedMinutes} min`,
+    progress: Number(progress),
+    elapsedTime: String(elapsedMinutes) + ' min',
     lastUpdated: now.toISOString(),
-    efficiency: analytics.efficiency,
+    efficiency: Number(analytics.efficiency),
     aiRecommendations: {
       ...dispatch.aiRecommendations,
-      insights: aiInsights,
+      insights: aiInsights.map(String),
       trafficStatus: {
         congestionLevel: trafficInfo.congestionLevel,
-        estimatedDelay: trafficInfo.delayMinutes,
-        alternateRouteAvailable: trafficInfo.alternateRouteAvailable
+        estimatedDelay: Number(trafficInfo.delayMinutes),
+        alternateRouteAvailable: Boolean(trafficInfo.alternateRouteAvailable)
       }
     }
   };
