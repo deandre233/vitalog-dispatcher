@@ -10,7 +10,7 @@ import { AlertsConfig } from "@/components/dashboard/AlertsConfig";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col">
       <Header />
       <div className="flex-1 flex">
         <SidebarProvider defaultOpen={true}>
@@ -19,12 +19,12 @@ const Index = () => {
             <SidebarRail />
             <div className="flex-1 bg-[#f4f7fc] overflow-auto">
               <DashboardHeader />
-              <main className="p-6">
+              <main className="p-4">
                 <WelcomeBanner />
-                <div className="mt-6">
+                <div className="mt-4">
                   <DashboardMetrics />
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-4">
                   <div className="lg:col-span-3">
                     <DispatchBoard />
                   </div>

@@ -9,7 +9,151 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      medical_history: {
+        Row: {
+          created_at: string | null
+          date: string | null
+          description: string
+          id: string
+          notes: string | null
+          patient_id: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string | null
+          description: string
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string | null
+          description?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_history_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patients: {
+        Row: {
+          address: string | null
+          allergies: string[] | null
+          city: string | null
+          created_at: string | null
+          dob: string | null
+          email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          first_name: string
+          id: string
+          last_name: string
+          medical_conditions: string[] | null
+          medications: string[] | null
+          phone: string | null
+          state: string | null
+          updated_at: string | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          allergies?: string[] | null
+          city?: string | null
+          created_at?: string | null
+          dob?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          medical_conditions?: string[] | null
+          medications?: string[] | null
+          phone?: string | null
+          state?: string | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          allergies?: string[] | null
+          city?: string | null
+          created_at?: string | null
+          dob?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          medical_conditions?: string[] | null
+          medications?: string[] | null
+          phone?: string | null
+          state?: string | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
+      transport_records: {
+        Row: {
+          created_at: string | null
+          crew_assigned: string | null
+          dispatch_id: string
+          dropoff_location: string
+          id: string
+          notes: string | null
+          patient_id: string | null
+          pickup_location: string
+          status: string
+          transport_date: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          crew_assigned?: string | null
+          dispatch_id: string
+          dropoff_location: string
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          pickup_location: string
+          status: string
+          transport_date?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          crew_assigned?: string | null
+          dispatch_id?: string
+          dropoff_location?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          pickup_location?: string
+          status?: string
+          transport_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transport_records_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
