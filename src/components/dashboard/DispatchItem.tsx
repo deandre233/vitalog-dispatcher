@@ -13,6 +13,7 @@ import {
   XCircle,
   AlertTriangle,
   Navigation,
+  Truck
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,7 +21,7 @@ interface Patient {
   name: string;
   dob?: string;
   condition?: string;
-  id: string; // Added id for patient
+  id: string;
 }
 
 interface AIRecommendations {
@@ -86,6 +87,7 @@ export function DispatchItem({
     toast.success(
       `Crew ${crewId} assigned to dispatch ${id}. ETA: ${estimatedMinutes} minutes`
     );
+    setIsAssignModalOpen(false);
   };
 
   const toggleExpand = () => {
@@ -155,7 +157,6 @@ export function DispatchItem({
             </div>
           )}
         </div>
-
       </div>
 
       <div className={`mt-4 space-y-4 ${isExpanded ? "" : "hidden"}`}>
@@ -189,19 +190,41 @@ export function DispatchItem({
           <div className="space-y-2">
             <div className="flex justify-end gap-2">
               {assignedTo !== "Unassigned" ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">
-                    Assigned to: {assignedTo}
-                  </span>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleUnassign}
-                    className="flex items-center gap-1"
-                  >
-                    <XCircle className="w-4 h-4" />
-                    Unassign
-                  </Button>
+                <div className="space-y-4 w-full">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm text-gray-600">
+                      Assigned to: {assignedTo}
+                    </span>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleUnassign}
+                        className="flex items-center gap-1"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        Unassign
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleTrackTransport}
+                        className="flex items-center gap-1"
+                      >
+                        <Truck className="w-4 h-4" />
+                        Track Transport
+                      </Button>
+                    </div>
+                  </div>
+                  {progress !== undefined && (
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Transport Progress</span>
+                        <span>{progress}%</span>
+                      </div>
+                      <Progress value={progress} className="h-2" />
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="flex gap-2">
@@ -212,28 +235,9 @@ export function DispatchItem({
                   >
                     Assign Crew
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleTrackTransport}
-                    className="flex items-center gap-1"
-                  >
-                    <Navigation className="w-4 h-4" />
-                    Track Transport
-                  </Button>
                 </div>
               )}
             </div>
-
-            {progress !== undefined && progress > 0 && (
-              <div className="space-y-1">
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Progress</span>
-                  <span>{progress}%</span>
-                </div>
-                <Progress value={progress} className="h-2" />
-              </div>
-            )}
 
             {efficiency !== undefined && (
               <div className="text-sm text-gray-600 text-right">
