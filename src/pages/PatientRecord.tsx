@@ -66,82 +66,65 @@ const formSchema = z.object({
   email: z.string().email().optional()
 });
 
-// Mock data - In a real app, this would come from an API
-const patientData = {
-  "Turner, Angela": {
-    id: "12345",
-    dob: "1967-08-17",
-    gender: "Female",
-    race: "Black or African American",
-    ssn: "XXX-XX-1234",
-    travelType: "Stretcher",
-    warnings: {
-      requiresOxygen: true,
-      requiresIsolation: false,
-      bariatric: false,
-      dnrOrder: false
-    },
-    barriers: {
-      hearing: true,
-      physical: true,
-      vision: false,
-      cognitive: false,
-      cultural: false,
-      language: false,
-      speech: false,
-      alcohol: false,
-      drug: false,
-      unsupervised: false
-    },
-    residenceFacility: "CROSSING AT EASTLAKE",
-    room: "205",
-    medicalId: "2HD2-QU6-TU95",
-    barcode: "",
-    address: {
-      street: "855 Fayetteville Rd Se",
-      floor: "",
-      city: "ATLANTA",
-      state: "Georgia",
-      zip: "30316-2925",
-      county: "DeKalb"
-    },
-    phone: {
-      home: "6788875912",
-      work: "",
-      mobile: ""
-    },
-    email: ""
-  }
-};
+type FormValues = z.infer<typeof formSchema>;
 
 export default function PatientRecord() {
   const { patientName } = useParams();
   const navigate = useNavigate();
-  const patient = patientData[patientName as keyof typeof patientData];
   const [isEditing, setIsEditing] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: patient
+    defaultValues: {
+      id: "12345",
+      dob: "1967-08-17",
+      gender: "Female",
+      race: "Black or African American",
+      ssn: "XXX-XX-1234",
+      travelType: "Stretcher",
+      warnings: {
+        requiresOxygen: true,
+        requiresIsolation: false,
+        bariatric: false,
+        dnrOrder: false
+      },
+      barriers: {
+        hearing: true,
+        physical: true,
+        vision: false,
+        cognitive: false,
+        cultural: false,
+        language: false,
+        speech: false,
+        alcohol: false,
+        drug: false,
+        unsupervised: false
+      },
+      residenceFacility: "CROSSING AT EASTLAKE",
+      room: "205",
+      medicalId: "2HD2-QU6-TU95",
+      barcode: "",
+      address: {
+        street: "855 Fayetteville Rd Se",
+        floor: "",
+        city: "ATLANTA",
+        state: "Georgia",
+        zip: "30316-2925",
+        county: "DeKalb"
+      },
+      phone: {
+        home: "6788875912",
+        work: "",
+        mobile: ""
+      },
+      email: ""
+    }
   });
 
-  if (!patient) {
-    return (
-      <div className="p-6">
-        <Card className="p-6">
-          <h2 className="text-2xl font-semibold mb-4">Patient not found</h2>
-          <Button onClick={() => navigate(-1)}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
-          </Button>
-        </Card>
-      </div>
-    );
-  }
-
-  const handleSave = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: FormValues) => {
     toast.success("Patient information updated successfully");
     setIsEditing(false);
-    console.log("Form values:", values);
+    console.log(values);
   };
 
   return (
@@ -160,7 +143,7 @@ export default function PatientRecord() {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Demographics Section */}
             <section className="space-y-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -253,16 +236,16 @@ export default function PatientRecord() {
               <div className="space-y-2">
                 <FormLabel>Warnings</FormLabel>
                 <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(patient.warnings).map(([key, value]) => (
+                  {Object.entries(form.getValues().warnings).map(([key, value]) => (
                     <FormField
                       key={key}
                       control={form.control}
-                      name={`warnings.${key}`}
+                      name={`warnings.${key}` as keyof FormValues}
                       render={({ field }) => (
                         <div className="flex items-center space-x-2">
                           <Checkbox 
                             id={key} 
-                            checked={field.value} 
+                            checked={field.value as boolean} 
                             onCheckedChange={field.onChange}
                             disabled={!isEditing}
                           />
@@ -281,16 +264,16 @@ export default function PatientRecord() {
             <section className="space-y-4">
               <h3 className="text-lg font-semibold">Barriers to EMS</h3>
               <div className="grid grid-cols-2 gap-2">
-                {Object.entries(patient.barriers).map(([key, value]) => (
+                {Object.entries(form.getValues().barriers).map(([key, value]) => (
                   <FormField
                     key={key}
                     control={form.control}
-                    name={`barriers.${key}`}
+                    name={`barriers.${key}` as keyof FormValues}
                     render={({ field }) => (
                       <div className="flex items-center space-x-2">
                         <Checkbox 
                           id={`barrier-${key}`} 
-                          checked={field.value} 
+                          checked={field.value as boolean} 
                           onCheckedChange={field.onChange}
                           disabled={!isEditing}
                         />
