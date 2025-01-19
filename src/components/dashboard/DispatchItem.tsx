@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { recommendCrew, calculateDistance } from "@/utils/crewRecommendation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CrewAssignmentModal } from "./CrewAssignmentModal";
 
 interface AIRecommendations {
@@ -41,9 +41,11 @@ export function DispatchItem({
   status,
   priority,
   aiRecommendations,
-  eta,
+  eta: initialEta,
 }: DispatchItemProps) {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [eta, setEta] = useState(initialEta);
+  const [assignedCrew, setAssignedCrew] = useState<number | null>(null);
 
   // Mock coordinates for demonstration
   const mockDispatch = {
@@ -57,6 +59,27 @@ export function DispatchItem({
   const crewRecommendation = recommendedCrew
     ? `Recommended: ${recommendedCrew.name} (${calculateDistance(recommendedCrew, mockDispatch.origin).toFixed(2)}km away)`
     : "No crew available";
+
+  const handleCrewAssign = (crewId: number, estimatedMinutes: number) => {
+    setAssignedCrew(crewId);
+    setEta(`${estimatedMinutes} min`);
+  };
+
+  // Simulate real-time ETA updates
+  useEffect(() => {
+    if (assignedCrew && status === "En Route") {
+      const interval = setInterval(() => {
+        // This is a mock update - in a real application, you would fetch the actual ETA
+        setEta((currentEta) => {
+          const minutes = parseInt(currentEta);
+          if (isNaN(minutes) || minutes <= 1) return "1 min";
+          return `${minutes - 1} min`;
+        });
+      }, 60000); // Update every minute
+
+      return () => clearInterval(interval);
+    }
+  }, [assignedCrew, status]);
 
   return (
     <>
@@ -152,6 +175,7 @@ export function DispatchItem({
         dispatchId={id}
         serviceType={serviceType}
         origin={mockDispatch.origin}
+        onAssign={handleCrewAssign}
       />
     </>
   );

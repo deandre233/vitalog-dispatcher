@@ -20,6 +20,7 @@ interface CrewAssignmentModalProps {
   dispatchId: string;
   serviceType: string;
   origin: Location;
+  onAssign?: (crewId: number, eta: number) => void;
 }
 
 export function CrewAssignmentModal({
@@ -28,6 +29,7 @@ export function CrewAssignmentModal({
   dispatchId,
   serviceType,
   origin,
+  onAssign,
 }: CrewAssignmentModalProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -37,7 +39,17 @@ export function CrewAssignmentModal({
   const handleAssignCrew = (crewId: number) => {
     const crew = crewMembers.find(c => c.id === crewId);
     if (crew) {
-      toast.success(`Crew ${crew.name} assigned to dispatch ${dispatchId}`);
+      const estimatedMinutes = recommendedCrew?.id === crew.id
+        ? Math.round(recommendedCrew.routeInfo.duration)
+        : Math.round(calculateDistance(crew, origin) * 2);
+        
+      toast.success(`Crew ${crew.name} successfully assigned to dispatch ${dispatchId}!`, {
+        description: `Estimated arrival time: ${estimatedMinutes} minutes`,
+      });
+      
+      if (onAssign) {
+        onAssign(crewId, estimatedMinutes);
+      }
       onClose();
     }
   };
