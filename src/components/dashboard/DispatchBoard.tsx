@@ -10,6 +10,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { getTrafficInfo } from "@/utils/aiDispatchUtils";
 import { analyzeDispatchEfficiency, monitorDispatchProgress, generateAIInsights } from "@/utils/aiDispatchAnalytics";
+import { 
+  analyzeHistoricalData, 
+  predictMaintenance, 
+  predictStaffingNeeds 
+} from "@/utils/aiLearningUtils";
 
 interface Patient {
   name: string;
@@ -159,6 +164,20 @@ export function DispatchBoard() {
     JSON.parse(JSON.stringify(mockDispatches))
   );
 
+  // Add new state for AI predictions
+  const [aiPredictions, setAiPredictions] = useState<{
+    maintenance: MaintenancePrediction[];
+    staffing: StaffingPrediction;
+  }>({
+    maintenance: [],
+    staffing: {
+      timeSlot: "",
+      recommendedStaffCount: 0,
+      confidence: 0,
+      reason: ""
+    }
+  });
+
   // Simulate real-time updates
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -169,6 +188,53 @@ export function DispatchBoard() {
     }, 5000);
 
     return () => clearInterval(interval);
+  }, [dispatches]);
+
+  // Effect for AI learning and predictions
+  useEffect(() => {
+    // Analyze historical data
+    const { patterns, recommendations } = analyzeHistoricalData(
+      dispatches.map(d => ({
+        efficiency: d.efficiency || 0,
+        suggestedActions: [],
+        riskLevel: "low",
+        performanceMetrics: {
+          responseTime: 0,
+          patientSatisfaction: 0,
+          routeEfficiency: 0
+        }
+      })),
+      "day"
+    );
+
+    // Get maintenance predictions for each vehicle
+    const maintenancePredictions = dispatches
+      .filter(d => d.assignedTo !== "Unassigned")
+      .map(d => predictMaintenance(d.assignedTo));
+
+    // Get staffing predictions
+    const staffingPrediction = predictStaffingNeeds(
+      new Date(),
+      { lat: 33.7490, lng: -84.3880 }
+    );
+
+    setAiPredictions({
+      maintenance: maintenancePredictions,
+      staffing: staffingPrediction
+    });
+
+    // Show AI insights as toasts
+    if (recommendations.length > 0) {
+      toast.info("New AI Insights Available", {
+        description: recommendations[0]
+      });
+    }
+
+    if (maintenancePredictions.some(p => p.maintenanceType === "urgent")) {
+      toast.warning("Urgent Maintenance Required", {
+        description: "Some vehicles require immediate attention"
+      });
+    }
   }, [dispatches]);
 
   const unassignedDispatches = useMemo(() => 
@@ -238,8 +304,18 @@ export function DispatchBoard() {
         <AlertDescription>
           AI Insight: {unassignedDispatches.length} dispatches waiting for assignment. 
           {assignedDispatches.length > 0 && ` ${assignedDispatches.length} active transports progressing normally.`}
+          {aiPredictions.staffing.recommendedStaffCount > 0 && 
+            ` Recommended staff: ${aiPredictions.staffing.recommendedStaffCount} for current time slot.`}
         </AlertDescription>
       </Alert>
+
+      {aiPredictions.maintenance.some(p => p.maintenanceType === "urgent") && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>
+            Urgent maintenance required for some vehicles. Check maintenance dashboard for details.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {activeView === "active" ? (
         <Tabs defaultValue="unassigned" className="space-y-4">
