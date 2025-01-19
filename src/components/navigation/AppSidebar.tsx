@@ -15,7 +15,7 @@ const menuItems = [
 
 export function AppSidebar() {
   return (
-    <Sidebar className="min-h-full">
+    <Sidebar>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs font-medium text-medical-primary mb-1">
@@ -26,7 +26,7 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title} className="my-0.5">
                   <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center gap-2 py-1.5 px-2 w-full">
+                    <a href={item.url} className="flex items-center gap-2 py-1.5 px-2">
                       <item.icon className="w-4 h-4 text-medical-primary" />
                       <span className="text-sm">{item.title}</span>
                     </a>
