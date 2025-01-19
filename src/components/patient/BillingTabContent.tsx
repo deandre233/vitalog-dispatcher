@@ -550,7 +550,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         <div>
           <Label className="text-sm font-medium">Patient Relation</Label>
           <Select
-            value={record?.patient_relation}
+            value={record?.patient_relation || ''}
             onValueChange={(value) => handlePatientRelationChange(type, value)}
           >
             <SelectTrigger className="w-full">
