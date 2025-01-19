@@ -1,13 +1,14 @@
 import type { Config } from "tailwindcss";
 
-const config: Config = {
+export default {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
+  prefix: "",
   theme: {
     container: {
       center: true,
@@ -18,6 +19,13 @@ const config: Config = {
     },
     extend: {
       colors: {
+        // Custom medical theme colors
+        medical: {
+          primary: "#0A2342",
+          secondary: "#2CA3DC",
+          accent: "#F5F7F9",
+          highlight: "#E3F2FD",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -51,22 +59,14 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        insurance: {
-          'primary-bg': '#F1F0FB',
-          'primary-accent': '#6366F1',
-          'primary-text': '#4F46E5',
-          'secondary-bg': '#E7F0FD',
-          'secondary-accent': '#3B82F6',
-          'secondary-text': '#2563EB',
-          'reserved-bg': '#FEF9F9',
-          'reserved-accent': '#F43F5E',
-          'reserved-text': '#E11D48',
-        }
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
@@ -84,7 +84,5 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
-};
-
-export default config;
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config;
