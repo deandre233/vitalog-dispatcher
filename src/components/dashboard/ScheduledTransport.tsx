@@ -1,17 +1,11 @@
 import { MapPin, Clock, User, Building, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
+import { format, isToday, isTomorrow } from "date-fns";
 
 interface ScheduledTransportProps {
   id: string;
@@ -20,7 +14,7 @@ interface ScheduledTransportProps {
   serviceType: string;
   origin: string;
   destination: string;
-  status: "Scheduled" | "Assigned" | "Completed";
+  status: "Scheduled" | "Assigned" | "Completed" | "Canceled";
   warnings?: string[];
   unitAssigned?: string;
   progress?: number;
@@ -29,7 +23,7 @@ interface ScheduledTransportProps {
 const scheduledTransports: ScheduledTransportProps[] = [
   {
     id: "ST-001",
-    scheduledTime: "12:30",
+    scheduledTime: "2024-02-20T12:30:00",
     patient: "Martin, Jane",
     serviceType: "BLS",
     origin: "Parkside at Budd Terrace, 508A",
@@ -39,7 +33,7 @@ const scheduledTransports: ScheduledTransportProps[] = [
   },
   {
     id: "ST-002",
-    scheduledTime: "13:00",
+    scheduledTime: "2024-02-21T13:00:00",
     patient: "Michael, Robert",
     serviceType: "BLS",
     origin: "Parkside at Budd Terrace, 613",
@@ -51,17 +45,11 @@ const scheduledTransports: ScheduledTransportProps[] = [
   },
 ];
 
-const getStatusColor = (status: ScheduledTransportProps["status"]) => {
-  switch (status) {
-    case "Scheduled":
-      return "bg-gray-100 text-gray-700";
-    case "Assigned":
-      return "bg-yellow-100 text-yellow-700";
-    case "Completed":
-      return "bg-green-100 text-green-700";
-    default:
-      return "bg-gray-100 text-gray-700";
-  }
+const getStatusColor = (scheduledTime: string, status: ScheduledTransportProps["status"]) => {
+  if (status === "Canceled") return "bg-gray-100 text-gray-700";
+  if (isToday(new Date(scheduledTime))) return "bg-red-100 text-red-700";
+  if (isTomorrow(new Date(scheduledTime))) return "bg-orange-100 text-orange-700";
+  return "bg-green-100 text-green-700";
 };
 
 export function ScheduledTransport() {
@@ -75,6 +63,16 @@ export function ScheduledTransport() {
       newExpandedRows.add(id);
     }
     setExpandedRows(newExpandedRows);
+  };
+
+  const handleAssignCrew = (id: string) => {
+    // In a real app, this would make an API call
+    toast.success("Crew assignment modal would open here");
+  };
+
+  const handleCancelTransport = (id: string) => {
+    // In a real app, this would make an API call
+    toast.success("Transport canceled successfully");
   };
 
   return (
@@ -98,10 +96,16 @@ export function ScheduledTransport() {
             >
               <div className="flex items-center gap-4">
                 <div className="flex flex-col">
-                  <span className="font-medium">{transport.id}</span>
+                  <Link 
+                    to={`/transport/${transport.id}`}
+                    className="text-blue-600 hover:underline font-medium"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {transport.id}
+                  </Link>
                   <span className={cn(
-                    "px-2 py-1 rounded-full text-sm font-medium",
-                    getStatusColor(transport.status)
+                    "px-2 py-1 rounded-full text-sm font-medium mt-1",
+                    getStatusColor(transport.scheduledTime, transport.status)
                   )}>
                     {transport.status}
                   </span>
@@ -109,7 +113,7 @@ export function ScheduledTransport() {
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-gray-500" />
-                    {transport.scheduledTime}
+                    {format(new Date(transport.scheduledTime), "MMM d, yyyy h:mm a")}
                   </div>
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4 text-gray-500" />
@@ -178,9 +182,26 @@ export function ScheduledTransport() {
 
                 <div className="mt-4 flex gap-2">
                   {transport.status === "Scheduled" && (
-                    <Button variant="default">
-                      Assign Crew
-                    </Button>
+                    <>
+                      <Button 
+                        variant="default"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAssignCrew(transport.id);
+                        }}
+                      >
+                        Assign Crew
+                      </Button>
+                      <Button 
+                        variant="destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCancelTransport(transport.id);
+                        }}
+                      >
+                        Cancel Transport
+                      </Button>
+                    </>
                   )}
                   {transport.status === "Assigned" && (
                     <Button variant="outline">
