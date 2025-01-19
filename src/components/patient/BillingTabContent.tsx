@@ -92,6 +92,34 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     }
   });
 
+  const fetchBillingSettings = async () => {
+    try {
+      if (!patientId) return;
+
+      const { data, error } = await supabase
+        .from('billing_settings')
+        .select('*')
+        .eq('patient_id', patientId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching billing settings:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch billing settings",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data) {
+        setBillingSettings(data);
+      }
+    } catch (err) {
+      console.error('Error in fetchBillingSettings:', err);
+    }
+  };
+
   useEffect(() => {
     if (!patientId) {
       console.error('No patient ID provided');
