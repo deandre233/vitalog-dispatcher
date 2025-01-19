@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { 
   FileText, 
   Phone, 
@@ -19,9 +20,16 @@ import {
   HeartPulse,
   Stethoscope,
   Ambulance,
-  Hospital
+  Hospital,
+  DollarSign,
+  Receipt,
+  History,
+  Bell,
+  ShieldCheck,
+  CreditCard,
+  Clock,
+  CalendarClock
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 const PatientRecord = () => {
   const { patientName } = useParams();
@@ -75,11 +83,39 @@ const PatientRecord = () => {
                   </div>
 
                   <Tabs defaultValue="demographics" className="mt-6">
-                    <TabsList className="grid w-full grid-cols-4 lg:grid-cols-6">
-                      <TabsTrigger value="demographics">Demographics</TabsTrigger>
-                      <TabsTrigger value="medical">Medical</TabsTrigger>
-                      <TabsTrigger value="transport">Transport</TabsTrigger>
-                      <TabsTrigger value="billing">Billing</TabsTrigger>
+                    <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+                      <TabsTrigger value="demographics" className="flex items-center gap-2">
+                        <UserRound className="h-4 w-4" />
+                        Demographics
+                      </TabsTrigger>
+                      <TabsTrigger value="medical" className="flex items-center gap-2">
+                        <Stethoscope className="h-4 w-4" />
+                        Medical
+                      </TabsTrigger>
+                      <TabsTrigger value="billing" className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4" />
+                        Billing
+                      </TabsTrigger>
+                      <TabsTrigger value="history" className="flex items-center gap-2">
+                        <History className="h-4 w-4" />
+                        History (447)
+                      </TabsTrigger>
+                      <TabsTrigger value="upcoming" className="flex items-center gap-2">
+                        <CalendarClock className="h-4 w-4" />
+                        Upcoming (5)
+                      </TabsTrigger>
+                      <TabsTrigger value="claims" className="flex items-center gap-2">
+                        <ShieldCheck className="h-4 w-4" />
+                        Claims (421)
+                      </TabsTrigger>
+                      <TabsTrigger value="payments" className="flex items-center gap-2">
+                        <CreditCard className="h-4 w-4" />
+                        Payments
+                      </TabsTrigger>
+                      <TabsTrigger value="invoices" className="flex items-center gap-2">
+                        <Receipt className="h-4 w-4" />
+                        Invoices
+                      </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="demographics" className="mt-6 space-y-6">
@@ -170,27 +206,84 @@ const PatientRecord = () => {
 
                     <TabsContent value="medical">
                       <Card className="p-4">
-                        <h3 className="font-semibold mb-4">Medical History</h3>
+                        <h3 className="font-semibold mb-4 flex items-center gap-2">
+                          <Stethoscope className="h-4 w-4" />
+                          Medical Information
+                        </h3>
                         <div className="space-y-4">
-                          {/* Medical history content will go here */}
-                        </div>
-                      </Card>
-                    </TabsContent>
-
-                    <TabsContent value="transport">
-                      <Card className="p-4">
-                        <h3 className="font-semibold mb-4">Transport History</h3>
-                        <div className="space-y-4">
-                          {/* Transport history content will go here */}
+                          <p className="text-gray-500">Medical information will be displayed here</p>
                         </div>
                       </Card>
                     </TabsContent>
 
                     <TabsContent value="billing">
                       <Card className="p-4">
-                        <h3 className="font-semibold mb-4">Billing Information</h3>
+                        <h3 className="font-semibold mb-4 flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          Billing Information
+                        </h3>
                         <div className="space-y-4">
-                          {/* Billing content will go here */}
+                          <p className="text-gray-500">Billing information will be displayed here</p>
+                        </div>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="history">
+                      <Card className="p-4">
+                        <h3 className="font-semibold mb-4 flex items-center gap-2">
+                          <History className="h-4 w-4" />
+                          Transport History
+                        </h3>
+                        <div className="space-y-4">
+                          <p className="text-gray-500">Transport history will be displayed here</p>
+                        </div>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="upcoming">
+                      <Card className="p-4">
+                        <h3 className="font-semibold mb-4 flex items-center gap-2">
+                          <CalendarClock className="h-4 w-4" />
+                          Upcoming Appointments
+                        </h3>
+                        <div className="space-y-4">
+                          <p className="text-gray-500">Upcoming appointments will be displayed here</p>
+                        </div>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="claims">
+                      <Card className="p-4">
+                        <h3 className="font-semibold mb-4 flex items-center gap-2">
+                          <ShieldCheck className="h-4 w-4" />
+                          Claims
+                        </h3>
+                        <div className="space-y-4">
+                          <p className="text-gray-500">Claims information will be displayed here</p>
+                        </div>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="payments">
+                      <Card className="p-4">
+                        <h3 className="font-semibold mb-4 flex items-center gap-2">
+                          <CreditCard className="h-4 w-4" />
+                          Payments
+                        </h3>
+                        <div className="space-y-4">
+                          <p className="text-gray-500">Payment information will be displayed here</p>
+                        </div>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="invoices">
+                      <Card className="p-4">
+                        <h3 className="font-semibold mb-4 flex items-center gap-2">
+                          <Receipt className="h-4 w-4" />
+                          Invoices
+                        </h3>
+                        <div className="space-y-4">
+                          <p className="text-gray-500">Invoice information will be displayed here</p>
                         </div>
                       </Card>
                     </TabsContent>
