@@ -10,37 +10,75 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Dispatch {
   id: string;
-  patientName: string;
-  pickupLocation: string;
-  dropoffLocation: string;
+  activationTime: string;
+  patient: {
+    name: string;
+    dob?: string;
+    condition?: string;
+  };
   serviceType: string;
-  assignedTo: string;
+  origin: string;
+  destination: string;
   status: string;
-  timeWaiting?: string;
+  priority: string;
+  assignedTo: string;
+  aiRecommendations: {
+    route: string;
+    crew: string;
+    billing: string;
+  };
+  eta: string;
   comments?: string;
+  warnings?: string;
+  progress?: number;
+  elapsedTime?: string;
 }
 
 const mockDispatches: Dispatch[] = [
   {
     id: "7684",
-    patientName: "Turner, Angela",
-    pickupLocation: "Emory Dialysis At North Decatur",
-    dropoffLocation: "Emory University Hospital Midtown",
+    activationTime: "2024-02-20T10:30:00",
+    patient: {
+      name: "Turner, Angela",
+      condition: "Breathing problem: Req oxygen"
+    },
     serviceType: "BLS",
-    assignedTo: "Unassigned",
+    origin: "Emory Dialysis At North Decatur",
+    destination: "Emory University Hospital Midtown",
     status: "Pending",
-    timeWaiting: "will call",
-    comments: "Breathing problem: Req oxygen"
+    priority: "medium",
+    assignedTo: "Unassigned",
+    aiRecommendations: {
+      route: "Recommended Route: I-85 S",
+      crew: "Recommended Crew: Team A",
+      billing: "Insurance: Medicare"
+    },
+    eta: "25 mins",
+    comments: "Breathing problem: Req oxygen",
+    elapsedTime: "will call"
   },
   {
     id: "7601",
-    patientName: "Smith, John",
-    pickupLocation: "Emory Dialysis At Candler",
-    dropoffLocation: "CROSSING AT EASTLAKE",
+    activationTime: "2024-02-20T09:15:00",
+    patient: {
+      name: "Smith, John",
+      condition: "Impaired movement"
+    },
     serviceType: "BLS",
-    assignedTo: "MED 1",
+    origin: "Emory Dialysis At Candler",
+    destination: "CROSSING AT EASTLAKE",
     status: "En Route",
-    comments: "Impaired movement"
+    priority: "medium",
+    assignedTo: "MED 1",
+    aiRecommendations: {
+      route: "Recommended Route: Candler Rd",
+      crew: "Recommended Crew: MED 1",
+      billing: "Insurance: Private"
+    },
+    eta: "15 mins",
+    comments: "Impaired movement",
+    progress: 45,
+    elapsedTime: "00:45:00"
   }
 ];
 
