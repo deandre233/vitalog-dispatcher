@@ -5,30 +5,44 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { DollarSign, CreditCard, Receipt, Save, Check, AlertCircle, Info } from "lucide-react";
+import { DollarSign, CreditCard, Receipt, Save, Check, AlertCircle, Upload } from "lucide-react";
 
 interface InsuranceRecord {
   id?: string;
   type: 'primary' | 'secondary' | 'reserved';
   carrier_type: string;
   carrier_name: string;
+  policy_type?: string;
+  group_number?: string;
+  group_name?: string;
   policy_number: string;
   phone?: string;
   claims_zip?: string;
   activation_date?: string;
+  patient_relation?: string;
+  policyholder_name?: string;
+  policyholder_dob?: string;
+  policyholder_gender?: string;
+  policyholder_phone?: string;
+  payor_id?: string;
+  nsure_payor_code?: string;
 }
 
 interface BillingSettings {
   id?: string;
   preauth_required?: 'situational' | 'always' | 'never';
   pricing_schema?: 'retail' | 'insurance';
-  subscription_type?: 'monthly' | 'annually';
+  subscription_type?: 'none' | 'monthly' | 'annually';
+  subscription_amount?: number;
   next_payment_date?: string;
   employer_name?: string;
   employer_phone?: string;
   employer_address?: string;
+  patient_notes?: string;
 }
 
 interface BillingTabContentProps {
@@ -48,7 +62,7 @@ const isValidPricingSchema = (value: string): value is BillingSettings['pricing_
 };
 
 const isValidSubscriptionType = (value: string): value is BillingSettings['subscription_type'] => {
-  return ['monthly', 'annually'].includes(value);
+  return ['none', 'monthly', 'annually'].includes(value);
 };
 
 export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
@@ -58,7 +72,11 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
   const [saveOptions, setSaveOptions] = useState({
     currentCheckpoint: true,
     createSupplementary: false,
-    saveAllFuture: false
+    saveAllFuture: false,
+    dateRange: {
+      from: '',
+      to: ''
+    }
   });
 
   useEffect(() => {
@@ -95,7 +113,6 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         return;
       }
 
-      // Validate and transform the data
       const validatedRecords: InsuranceRecord[] = (data || []).map(record => ({
         ...record,
         type: isValidInsuranceType(record.type) ? record.type : 'primary'
@@ -161,55 +178,15 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     );
   };
 
-  const handleBillingSettingsChange = (field: keyof BillingSettings, value: string) => {
+  const handleBillingSettingsChange = (field: keyof BillingSettings, value: string | number) => {
     setBillingSettings(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = async () => {
-    try {
-      const saveToast = toast({
-        title: "Saving...",
-        description: <div className="flex items-center gap-2"><Save className="animate-spin" size={16} /> Saving billing information</div>,
-      });
-
-      // Update insurance records
-      for (const record of insuranceRecords) {
-        if (record.id) {
-          await supabase
-            .from('insurance_records')
-            .update(record)
-            .eq('id', record.id);
-        } else {
-          await supabase
-            .from('insurance_records')
-            .insert({ ...record, patient_id: patientId });
-        }
-      }
-
-      // Update billing settings
-      if (billingSettings.id) {
-        await supabase
-          .from('billing_settings')
-          .update(billingSettings)
-          .eq('id', billingSettings.id);
-      } else {
-        await supabase
-          .from('billing_settings')
-          .insert({ ...billingSettings, patient_id: patientId });
-      }
-
-      saveToast.dismiss();
-      toast({
-        title: "Success",
-        description: <div className="flex items-center gap-2"><Check className="text-green-500" size={16} /> Billing information saved successfully</div>,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: <div className="flex items-center gap-2"><AlertCircle className="text-red-500" size={16} /> Failed to save billing information</div>,
-        variant: "destructive",
-      });
-    }
+  const handleAttachCards = () => {
+    toast({
+      title: "Coming Soon",
+      description: "Insurance card upload functionality will be available soon",
+    });
   };
 
   const InsuranceSection = ({ type, record }: { type: 'primary' | 'secondary' | 'reserved', record?: InsuranceRecord }) => (
@@ -232,48 +209,134 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
             </Select>
           </div>
           <div>
-            <Label className="text-sm font-medium">Carrier Name</Label>
+            <Label className="text-sm font-medium">Policy Type</Label>
+            <Select
+              value={record?.policy_type}
+              onValueChange={(value) => handleInsuranceChange(type, 'policy_type', value)}
+            >
+              <option value="Medicare part B [MB]">Medicare part B [MB]</option>
+              <option value="Medicaid [MC]">Medicaid [MC]</option>
+              <option value="Other">Other insurance is primary [47]</option>
+            </Select>
+          </div>
+        </div>
+        
+        <div>
+          <Label className="text-sm font-medium">Company Name</Label>
+          <Input
+            value={record?.carrier_name}
+            onChange={(e) => handleInsuranceChange(type, 'carrier_name', e.target.value)}
+            className="h-9"
+            placeholder="e.g. Medicare Georgia"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium">Payor ID</Label>
             <Input
-              value={record?.carrier_name}
-              onChange={(e) => handleInsuranceChange(type, 'carrier_name', e.target.value)}
+              value={record?.payor_id}
+              onChange={(e) => handleInsuranceChange(type, 'payor_id', e.target.value)}
+              className="h-9"
+              placeholder="e.g. 10202"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium">NSure Payor Code</Label>
+            <Input
+              value={record?.nsure_payor_code}
+              onChange={(e) => handleInsuranceChange(type, 'nsure_payor_code', e.target.value)}
+              className="h-9"
+              placeholder="e.g. 00472"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium">Group Number</Label>
+            <Input
+              value={record?.group_number}
+              onChange={(e) => handleInsuranceChange(type, 'group_number', e.target.value)}
+              className="h-9"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium">Group Name</Label>
+            <Input
+              value={record?.group_name}
+              onChange={(e) => handleInsuranceChange(type, 'group_name', e.target.value)}
               className="h-9"
             />
           </div>
         </div>
+
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label className="text-sm font-medium">Policy Number</Label>
-            <Input
-              value={record?.policy_number}
-              onChange={(e) => handleInsuranceChange(type, 'policy_number', e.target.value)}
-              className="h-9"
-            />
-          </div>
           <div>
             <Label className="text-sm font-medium">Claims Phone</Label>
             <Input
               value={record?.phone}
               onChange={(e) => handleInsuranceChange(type, 'phone', e.target.value)}
               className="h-9"
+              placeholder="(877) 567-7271"
             />
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-sm font-medium">Claims ZIP</Label>
             <Input
               value={record?.claims_zip}
               onChange={(e) => handleInsuranceChange(type, 'claims_zip', e.target.value)}
               className="h-9"
+              placeholder="#####"
             />
           </div>
-          <div>
-            <Label className="text-sm font-medium">Activation Date</Label>
+        </div>
+
+        <div>
+          <Label className="text-sm font-medium">Patient Relation</Label>
+          <Select
+            value={record?.patient_relation}
+            onValueChange={(value) => handleInsuranceChange(type, 'patient_relation', value)}
+          >
+            <option value="Self">Self</option>
+            <option value="Spouse">Spouse</option>
+            <option value="Child">Child</option>
+            <option value="Other">Other</option>
+          </Select>
+        </div>
+
+        <div className="space-y-4">
+          <Label className="text-sm font-medium">Policyholder Information</Label>
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              value={record?.policyholder_name}
+              onChange={(e) => handleInsuranceChange(type, 'policyholder_name', e.target.value)}
+              className="h-9"
+              placeholder="Policyholder Name"
+            />
             <Input
               type="date"
-              value={record?.activation_date}
-              onChange={(e) => handleInsuranceChange(type, 'activation_date', e.target.value)}
+              value={record?.policyholder_dob}
+              onChange={(e) => handleInsuranceChange(type, 'policyholder_dob', e.target.value)}
               className="h-9"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Select
+              value={record?.policyholder_gender}
+              onValueChange={(value) => handleInsuranceChange(type, 'policyholder_gender', value)}
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+              <option value="Not recorded">Not recorded</option>
+            </Select>
+            <Input
+              value={record?.policyholder_phone}
+              onChange={(e) => handleInsuranceChange(type, 'policyholder_phone', e.target.value)}
+              className="h-9"
+              placeholder="Phone"
             />
           </div>
         </div>
@@ -300,36 +363,91 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
 
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-4">
+          <Upload className="h-5 w-5 text-gray-500" />
+          <h3 className="text-lg font-semibold">Insurance Cards</h3>
+        </div>
+        <Button onClick={handleAttachCards} className="w-full">
+          + Attach a Scan of Insurance Cards
+        </Button>
+      </Card>
+
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-4">
           <Save className="h-5 w-5 text-gray-500" />
           <h3 className="text-lg font-semibold">Save Insurance Info</h3>
         </div>
         <div className="space-y-3">
           <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={saveOptions.currentCheckpoint}
-              onCheckedChange={(checked) => 
-                setSaveOptions(prev => ({ ...prev, currentCheckpoint: checked as boolean }))
-              }
-            />
-            <Label className="text-sm">Save to currently selected checkpoint (2025-01-06)</Label>
+            <RadioGroup
+              value={saveOptions.currentCheckpoint ? "current" : saveOptions.createSupplementary ? "supplementary" : "future"}
+              onValueChange={(value) => {
+                setSaveOptions({
+                  ...saveOptions,
+                  currentCheckpoint: value === "current",
+                  createSupplementary: value === "supplementary",
+                  saveAllFuture: value === "future"
+                });
+              }}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="current" id="current" />
+                <Label htmlFor="current">Currently selected checkpoint (2025-01-06)</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="supplementary" id="supplementary" />
+                <Label htmlFor="supplementary">Create a supplementary checkpoint for the current dispatch</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="future" id="future" />
+                <Label htmlFor="future">All checkpoints after the currently selected checkpoint</Label>
+              </div>
+            </RadioGroup>
           </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={saveOptions.createSupplementary}
-              onCheckedChange={(checked) => 
-                setSaveOptions(prev => ({ ...prev, createSupplementary: checked as boolean }))
-              }
-            />
-            <Label className="text-sm">Create a supplementary checkpoint for the current dispatch</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={saveOptions.saveAllFuture}
-              onCheckedChange={(checked) => 
-                setSaveOptions(prev => ({ ...prev, saveAllFuture: checked as boolean }))
-              }
-            />
-            <Label className="text-sm">Save all changes to future records</Label>
+          <div className="pl-6">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                checked={Boolean(saveOptions.dateRange.from)}
+                onCheckedChange={(checked) => 
+                  setSaveOptions(prev => ({
+                    ...prev,
+                    dateRange: {
+                      ...prev.dateRange,
+                      from: checked ? '01/01/2025' : ''
+                    }
+                  }))
+                }
+              />
+              <Label>All checkpoints that cover dates on or after</Label>
+              <Input
+                type="date"
+                value={saveOptions.dateRange.from}
+                onChange={(e) => 
+                  setSaveOptions(prev => ({
+                    ...prev,
+                    dateRange: {
+                      ...prev.dateRange,
+                      from: e.target.value
+                    }
+                  }))
+                }
+                className="h-8 w-40"
+              />
+              <Label>but before</Label>
+              <Input
+                type="date"
+                value={saveOptions.dateRange.to}
+                onChange={(e) => 
+                  setSaveOptions(prev => ({
+                    ...prev,
+                    dateRange: {
+                      ...prev.dateRange,
+                      to: e.target.value
+                    }
+                  }))
+                }
+                className="h-8 w-40"
+              />
+            </div>
           </div>
         </div>
       </Card>
@@ -339,18 +457,31 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
           <DollarSign className="h-5 w-5 text-gray-500" />
           <h3 className="text-lg font-semibold">Preauth & Pricing</h3>
         </div>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="space-y-6">
           <div>
             <Label className="text-sm font-medium">Preauth Required</Label>
-            <Select
-              value={billingSettings.preauth_required}
-              onValueChange={(value) => handleBillingSettingsChange('preauth_required', value)}
+            <RadioGroup
+              value={billingSettings.preauth_required || 'situational'}
+              onValueChange={(value: 'situational' | 'always' | 'never') => 
+                handleBillingSettingsChange('preauth_required', value)
+              }
+              className="flex space-x-4"
             >
-              <option value="situational">Situational</option>
-              <option value="always">Always</option>
-              <option value="never">Never</option>
-            </Select>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="situational" id="situational" />
+                <Label htmlFor="situational">Situational</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="always" id="always" />
+                <Label htmlFor="always">Always</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="never" id="never" />
+                <Label htmlFor="never">Never</Label>
+              </div>
+            </RadioGroup>
           </div>
+
           <div>
             <Label className="text-sm font-medium">Pricing Schema</Label>
             <Select
@@ -361,16 +492,44 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               <option value="insurance">Insurance</option>
             </Select>
           </div>
-          <div>
-            <Label className="text-sm font-medium">Subscription Type</Label>
-            <Select
-              value={billingSettings.subscription_type}
-              onValueChange={(value) => handleBillingSettingsChange('subscription_type', value)}
+
+          <div className="space-y-4">
+            <Label className="text-sm font-medium">Subscription</Label>
+            <RadioGroup
+              value={billingSettings.subscription_type || 'none'}
+              onValueChange={(value: 'none' | 'monthly' | 'annually') => 
+                handleBillingSettingsChange('subscription_type', value)
+              }
             >
-              <option value="monthly">Monthly</option>
-              <option value="annually">Annually</option>
-            </Select>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="none" id="none" />
+                <Label htmlFor="none">None / No flat fee for this price schema</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="monthly" id="monthly" />
+                <Label htmlFor="monthly">Monthly for $</Label>
+                <Input
+                  type="number"
+                  value={billingSettings.subscription_type === 'monthly' ? billingSettings.subscription_amount : ''}
+                  onChange={(e) => handleBillingSettingsChange('subscription_amount', parseFloat(e.target.value))}
+                  className="h-8 w-24"
+                  disabled={billingSettings.subscription_type !== 'monthly'}
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="annually" id="annually" />
+                <Label htmlFor="annually">Annually for $</Label>
+                <Input
+                  type="number"
+                  value={billingSettings.subscription_type === 'annually' ? billingSettings.subscription_amount : ''}
+                  onChange={(e) => handleBillingSettingsChange('subscription_amount', parseFloat(e.target.value))}
+                  className="h-8 w-24"
+                  disabled={billingSettings.subscription_type !== 'annually'}
+                />
+              </div>
+            </RadioGroup>
           </div>
+
           <div>
             <Label className="text-sm font-medium">Next Payment Date</Label>
             <Input
@@ -386,34 +545,14 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-4">
           <Receipt className="h-5 w-5 text-gray-500" />
-          <h3 className="text-lg font-semibold">Employer Information</h3>
+          <h3 className="text-lg font-semibold">Patient Notes</h3>
         </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <Label className="text-sm font-medium">Employer Name</Label>
-            <Input
-              value={billingSettings.employer_name}
-              onChange={(e) => handleBillingSettingsChange('employer_name', e.target.value)}
-              className="h-9"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium">Employer Phone</Label>
-            <Input
-              value={billingSettings.employer_phone}
-              onChange={(e) => handleBillingSettingsChange('employer_phone', e.target.value)}
-              className="h-9"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <Label className="text-sm font-medium">Employer Address</Label>
-            <Input
-              value={billingSettings.employer_address}
-              onChange={(e) => handleBillingSettingsChange('employer_address', e.target.value)}
-              className="h-9"
-            />
-          </div>
-        </div>
+        <Textarea
+          value={billingSettings.patient_notes}
+          onChange={(e) => handleBillingSettingsChange('patient_notes', e.target.value)}
+          placeholder="Notes are for internal billing use: they never appear in any report or invoice."
+          className="min-h-[100px]"
+        />
       </Card>
 
       <div className="flex justify-end">
