@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings } from "lucide-react";
+import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings, User } from "lucide-react";
 
 export function Header({ className = "" }) {
   const navItems = [
@@ -8,6 +8,7 @@ export function Header({ className = "" }) {
     { name: "Schedule", icon: Calendar, path: "/schedule" },
     { name: "Performance", icon: BarChart, path: "/performance" },
     { name: "Billing", icon: DollarSign, path: "/billing" },
+    { name: "Patients", icon: User, path: "/patients" },
     { name: "Settings", icon: Settings, path: "/settings" }
   ];
 

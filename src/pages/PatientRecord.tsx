@@ -1,370 +1,157 @@
+import { SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/navigation/AppSidebar";
+import { Header } from "@/components/layout/Header";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { useParams } from "react-router-dom";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate, useParams } from "react-router-dom";
-import { CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FileText, Phone, Mail, MapPin, Calendar, Clock, AlertCircle } from "lucide-react";
 
-type WarningKeys = "requiresOxygen" | "requiresIsolation" | "bariatric" | "dnrOrder";
-type BarrierKeys = "hearing" | "physical" | "vision" | "cognitive" | "cultural" | "language" | "speech" | "alcohol" | "drug" | "unsupervised";
-
-const formSchema = z.object({
-  id: z.string(),
-  dob: z.date(),
-  gender: z.string(),
-  race: z.string(),
-  ssn: z.string(),
-  travelType: z.string(),
-  warnings: z.object({
-    requiresOxygen: z.boolean(),
-    requiresIsolation: z.boolean(),
-    bariatric: z.boolean(),
-    dnrOrder: z.boolean(),
-  }),
-  barriers: z.object({
-    hearing: z.boolean(),
-    physical: z.boolean(),
-    vision: z.boolean(),
-    cognitive: z.boolean(),
-    cultural: z.boolean(),
-    language: z.boolean(),
-    speech: z.boolean(),
-    alcohol: z.boolean(),
-    drug: z.boolean(),
-    unsupervised: z.boolean(),
-  }),
-  residenceFacility: z.string(),
-  room: z.string(),
-  medicalId: z.string(),
-  barcode: z.string(),
-  address: z.object({
-    street: z.string(),
-    city: z.string(),
-    state: z.string(),
-    zip: z.string(),
-  }),
-  phone: z.object({
-    home: z.string(),
-    work: z.string(),
-    mobile: z.string(),
-  }),
-  email: z.string(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-export default function PatientRecord() {
+const PatientRecord = () => {
   const { patientName } = useParams();
-  const navigate = useNavigate();
   const decodedName = decodeURIComponent(patientName || "");
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      id: "",
-      dob: new Date(),
-      gender: "",
-      race: "",
-      ssn: "",
-      travelType: "stretcher",
-      warnings: {
-        requiresOxygen: false,
-        requiresIsolation: false,
-        bariatric: false,
-        dnrOrder: false,
-      },
-      barriers: {
-        hearing: false,
-        physical: false,
-        vision: false,
-        cognitive: false,
-        cultural: false,
-        language: false,
-        speech: false,
-        alcohol: false,
-        drug: false,
-        unsupervised: false,
-      },
-      residenceFacility: "",
-      room: "",
-      medicalId: "",
-      barcode: "",
-      address: {
-        street: "",
-        city: "",
-        state: "Georgia",
-        zip: "",
-      },
-      phone: {
-        home: "",
-        work: "",
-        mobile: "",
-      },
-      email: "",
-    },
-  });
-
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
-    toast.success("Patient record updated successfully");
-  };
-
-  const handleViewProfile = () => {
-    navigate(`/patient-profile/${patientName}`);
-  };
-
   return (
-    <div className="container mx-auto p-6 bg-[#f5f7fa]">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">{decodedName}</h1>
-          <Button 
-            variant="link" 
-            onClick={handleViewProfile}
-            className="text-blue-600 p-0 h-auto font-normal hover:text-blue-800"
-          >
-            View Full Profile
-          </Button>
-        </div>
-        <Button variant="outline">PDF</Button>
-      </div>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <div className="flex-1 flex">
+        <SidebarProvider defaultOpen={true}>
+          <div className="min-h-screen flex w-full">
+            <AppSidebar />
+            <SidebarRail />
+            <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+              <div className="p-6">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink href="/dispatch">Patients</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{decodedName}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+                <div className="mt-4">
+                  <Card className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex gap-4">
+                        <Avatar className="h-20 w-20">
+                          <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${decodedName}`} />
+                          <AvatarFallback>{decodedName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h1 className="text-2xl font-bold">{decodedName}</h1>
+                          <div className="mt-2 space-y-1">
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Phone className="mr-2 h-4 w-4" />
+                              (555) 123-4567
+                            </div>
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Mail className="mr-2 h-4 w-4" />
+                              {decodedName.toLowerCase().replace(' ', '.')}@email.com
+                            </div>
+                            <div className="flex items-center text-sm text-gray-500">
+                              <MapPin className="mr-2 h-4 w-4" />
+                              123 Medical Center Dr, Healthcare City
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <Button variant="outline">Edit Profile</Button>
+                    </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="dob"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Date of Birth</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    <Tabs defaultValue="overview" className="mt-6">
+                      <TabsList>
+                        <TabsTrigger value="overview">Overview</TabsTrigger>
+                        <TabsTrigger value="medical-history">Medical History</TabsTrigger>
+                        <TabsTrigger value="transport-history">Transport History</TabsTrigger>
+                        <TabsTrigger value="documents">Documents</TabsTrigger>
+                      </TabsList>
 
-              <FormField
-                control={form.control}
-                name="ssn"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Social Security Number</FormLabel>
-                    <FormControl>
-                      <Input 
-                        {...field} 
-                        type="password" 
-                        className="font-mono"
-                        onClick={() => toast.info("Validating SSN...")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                      <TabsContent value="overview" className="mt-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <Card className="p-4">
+                            <h3 className="font-semibold mb-2">Recent Activity</h3>
+                            <ScrollArea className="h-[200px]">
+                              <div className="space-y-4">
+                                <div className="flex items-center gap-2">
+                                  <Calendar className="h-4 w-4 text-gray-500" />
+                                  <span className="text-sm">Last transport: 3 days ago</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-gray-500" />
+                                  <span className="text-sm">Next scheduled: Tomorrow, 10:00 AM</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <FileText className="h-4 w-4 text-gray-500" />
+                                  <span className="text-sm">Medical records updated: 1 week ago</span>
+                                </div>
+                              </div>
+                            </ScrollArea>
+                          </Card>
 
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-4">Warnings</h2>
-              <div className="grid grid-cols-2 gap-4">
-                {(Object.keys(form.getValues().warnings) as WarningKeys[]).map((key) => (
-                  <FormField
-                    key={key}
-                    control={form.control}
-                    name={`warnings.${key}` as const}
-                    render={({ field }) => (
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel className="!mt-0 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                ))}
-              </div>
-            </div>
+                          <Card className="p-4">
+                            <h3 className="font-semibold mb-2">Alerts</h3>
+                            <ScrollArea className="h-[200px]">
+                              <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-red-500">
+                                  <AlertCircle className="h-4 w-4" />
+                                  <span className="text-sm">Allergic to penicillin</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-yellow-500">
+                                  <AlertCircle className="h-4 w-4" />
+                                  <span className="text-sm">Requires wheelchair assistance</span>
+                                </div>
+                              </div>
+                            </ScrollArea>
+                          </Card>
+                        </div>
+                      </TabsContent>
 
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-4">Barriers to EMS</h2>
-              <div className="grid grid-cols-2 gap-4 bg-[#e8f5e9] p-4 rounded-md">
-                {(Object.keys(form.getValues().barriers) as BarrierKeys[]).map((key) => (
-                  <FormField
-                    key={key}
-                    control={form.control}
-                    name={`barriers.${key}` as const}
-                    render={({ field }) => (
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel className="!mt-0 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                ))}
-              </div>
-            </div>
+                      <TabsContent value="medical-history">
+                        <Card className="p-4">
+                          <h3 className="font-semibold mb-4">Medical History</h3>
+                          <div className="space-y-4">
+                            {/* Add medical history content here */}
+                          </div>
+                        </Card>
+                      </TabsContent>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="residenceFacility"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Residence Facility</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          onClick={() => {
-                            toast.info("Loading facility details...");
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <TabsContent value="transport-history">
+                        <Card className="p-4">
+                          <h3 className="font-semibold mb-4">Transport History</h3>
+                          <div className="space-y-4">
+                            {/* Add transport history content here */}
+                          </div>
+                        </Card>
+                      </TabsContent>
 
-                <FormField
-                  control={form.control}
-                  name="room"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Room</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="medicalId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Medical ID</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="address.street"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Street Address</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="address.city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="address.state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select state" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Georgia">Georgia</SelectItem>
-                            {/* Add other states as needed */}
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
+                      <TabsContent value="documents">
+                        <Card className="p-4">
+                          <h3 className="font-semibold mb-4">Documents</h3>
+                          <div className="space-y-4">
+                            {/* Add documents content here */}
+                          </div>
+                        </Card>
+                      </TabsContent>
+                    </Tabs>
+                  </Card>
                 </div>
               </div>
             </div>
-
-            <div className="mt-6">
-              <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                Save
-              </Button>
-            </div>
           </div>
-        </form>
-      </Form>
+        </SidebarProvider>
+      </div>
     </div>
   );
-}
+};
+
+export default PatientRecord;

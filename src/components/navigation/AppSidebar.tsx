@@ -11,6 +11,10 @@ import {
   Users,
   PlusCircle,
   Home,
+  FileText,
+  History,
+  AlertCircle,
+  User,
 } from "lucide-react";
 
 const routes = [
@@ -18,6 +22,21 @@ const routes = [
     label: "Home",
     icon: Home,
     href: "/",
+  },
+  {
+    label: "Patient Profile",
+    icon: User,
+    href: "/patient-profile",
+  },
+  {
+    label: "Medical Records",
+    icon: FileText,
+    href: "/medical-records",
+  },
+  {
+    label: "Transport History",
+    icon: History,
+    href: "/transport-history",
   },
   {
     label: "Active Dispatches",
