@@ -542,239 +542,255 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     }
   };
 
-  const InsuranceSection = ({ type, record }: { type: 'primary' | 'secondary' | 'reserved', record?: InsuranceRecord }) => (
-    <Card className="p-6 space-y-6">
-      <div className="flex items-center gap-2">
-        <CreditCard className="h-5 w-5 text-gray-500" />
-        <h3 className="text-lg font-semibold capitalize">{type} Insurance</h3>
-      </div>
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label className="text-sm font-medium">Carrier Type</Label>
-            <Select
-              value={record?.carrier_type}
-              onValueChange={(value) => handleInsuranceChange(type, 'carrier_type', value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Carrier Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Medicare">Medicare</SelectItem>
-                <SelectItem value="Medicaid">Medicaid [MC]</SelectItem>
-                <SelectItem value="Blue Cross">Blue Cross / Blue Shield [BL]</SelectItem>
-                <SelectItem value="Commercial">Commercial Insurance [CI]</SelectItem>
-                <SelectItem value="HMO">HMO Medicare Risk [16]</SelectItem>
-                <SelectItem value="Disability">Disability [DS]</SelectItem>
-                <SelectItem value="Federal">Federal Employees Program [F1]</SelectItem>
-                <SelectItem value="Liability">Liability Medical [LM]</SelectItem>
-                <SelectItem value="Self">Self-administered Group [SA]</SelectItem>
-                <SelectItem value="Title V">Title V [TV]</SelectItem>
-                <SelectItem value="VA">Veteran Affairs [VA]</SelectItem>
-                <SelectItem value="Workers">Workers Compensation [WC]</SelectItem>
-                <SelectItem value="Other">Other Insurance</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label className="text-sm font-medium">Policy Type</Label>
-            <Select
-              value={record?.policy_type}
-              onValueChange={(value) => handleInsuranceChange(type, 'policy_type', value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Policy Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Medicare part B [MB]">Medicare part B [MB]</SelectItem>
-                <SelectItem value="Medicare part A [MA]">Medicare part A [MA]</SelectItem>
-                <SelectItem value="Medicare part C [ME]">Medicare part C / Advantage [ME]</SelectItem>
-                <SelectItem value="Medicaid [MC]">Medicaid [MC]</SelectItem>
-                <SelectItem value="Blue Cross [BL]">Blue Cross / Blue Shield [BL]</SelectItem>
-                <SelectItem value="Commercial [CI]">Commercial Insurance [CI]</SelectItem>
-                <SelectItem value="HMO [HM]">Health Maint Organization [HM]</SelectItem>
-                <SelectItem value="EPO [14]">Exclusive Prov Organization [14]</SelectItem>
-                <SelectItem value="PPO [12]">Preferred Prov Organization [12]</SelectItem>
-                <SelectItem value="POS [13]">Point Of Service [13]</SelectItem>
-                <SelectItem value="Other [47]">Other Insurance [47]</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        
-        <div>
-          <Label className="text-sm font-medium">Company Name</Label>
-          <Input
-            value={record?.carrier_name}
-            onChange={(e) => handleInsuranceChange(type, 'carrier_name', e.target.value)}
-            className="h-9"
-            placeholder="e.g. Medicare Georgia"
-          />
-        </div>
+  const InsuranceSection = ({ type, record }: { type: 'primary' | 'secondary' | 'reserved', record?: InsuranceRecord }) => {
+    // Get background color based on insurance type
+    const getBgColor = () => {
+      switch (type) {
+        case 'primary':
+          return 'bg-blue-50'; // Light blue for primary
+        case 'secondary':
+          return 'bg-purple-50'; // Light purple for secondary
+        case 'reserved':
+          return 'bg-pink-50'; // Light pink for reserved
+        default:
+          return '';
+      }
+    };
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label className="text-sm font-medium">Payor ID</Label>
-            <div className="flex gap-2">
-              <Input
-                value={record?.payor_id}
-                onChange={(e) => handleInsuranceChange(type, 'payor_id', e.target.value)}
-                className="h-9"
-                placeholder="e.g. 10202"
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => record?.payor_id && analyzePayerId(type, record.payor_id)}
-                title="Analyze Payer ID"
+    return (
+      <Card className={`p-6 space-y-6 ${getBgColor()}`}>
+        <div className="flex items-center gap-2">
+          <CreditCard className="h-5 w-5 text-gray-500" />
+          <h3 className="text-lg font-semibold capitalize">{type} Insurance</h3>
+        </div>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm font-medium">Carrier Type</Label>
+              <Select
+                value={record?.carrier_type}
+                onValueChange={(value) => handleInsuranceChange(type, 'carrier_type', value)}
               >
-                <Wand2 className="h-4 w-4" />
-              </Button>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Carrier Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Medicare">Medicare</SelectItem>
+                  <SelectItem value="Medicaid">Medicaid [MC]</SelectItem>
+                  <SelectItem value="Blue Cross">Blue Cross / Blue Shield [BL]</SelectItem>
+                  <SelectItem value="Commercial">Commercial Insurance [CI]</SelectItem>
+                  <SelectItem value="HMO">HMO Medicare Risk [16]</SelectItem>
+                  <SelectItem value="Disability">Disability [DS]</SelectItem>
+                  <SelectItem value="Federal">Federal Employees Program [F1]</SelectItem>
+                  <SelectItem value="Liability">Liability Medical [LM]</SelectItem>
+                  <SelectItem value="Self">Self-administered Group [SA]</SelectItem>
+                  <SelectItem value="Title V">Title V [TV]</SelectItem>
+                  <SelectItem value="VA">Veteran Affairs [VA]</SelectItem>
+                  <SelectItem value="Workers">Workers Compensation [WC]</SelectItem>
+                  <SelectItem value="Other">Other Insurance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Policy Type</Label>
+              <Select
+                value={record?.policy_type}
+                onValueChange={(value) => handleInsuranceChange(type, 'policy_type', value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Policy Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Medicare part B [MB]">Medicare part B [MB]</SelectItem>
+                  <SelectItem value="Medicare part A [MA]">Medicare part A [MA]</SelectItem>
+                  <SelectItem value="Medicare part C [ME]">Medicare part C / Advantage [ME]</SelectItem>
+                  <SelectItem value="Medicaid [MC]">Medicaid [MC]</SelectItem>
+                  <SelectItem value="Blue Cross [BL]">Blue Cross / Blue Shield [BL]</SelectItem>
+                  <SelectItem value="Commercial [CI]">Commercial Insurance [CI]</SelectItem>
+                  <SelectItem value="HMO [HM]">Health Maint Organization [HM]</SelectItem>
+                  <SelectItem value="EPO [14]">Exclusive Prov Organization [14]</SelectItem>
+                  <SelectItem value="PPO [12]">Preferred Prov Organization [12]</SelectItem>
+                  <SelectItem value="POS [13]">Point Of Service [13]</SelectItem>
+                  <SelectItem value="Other [47]">Other Insurance [47]</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
+          
           <div>
-            <Label className="text-sm font-medium">NSure Payor Code</Label>
+            <Label className="text-sm font-medium">Company Name</Label>
             <Input
-              value={record?.nsure_payor_code}
-              onChange={(e) => handleInsuranceChange(type, 'nsure_payor_code', e.target.value)}
+              value={record?.carrier_name}
+              onChange={(e) => handleInsuranceChange(type, 'carrier_name', e.target.value)}
               className="h-9"
-              placeholder="e.g. 00472"
+              placeholder="e.g. Medicare Georgia"
             />
           </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label className="text-sm font-medium">Group Number</Label>
-            <Input
-              value={record?.group_number}
-              onChange={(e) => handleInsuranceChange(type, 'group_number', e.target.value)}
-              className="h-9"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium">Group Name</Label>
-            <Input
-              value={record?.group_name}
-              onChange={(e) => handleInsuranceChange(type, 'group_name', e.target.value)}
-              className="h-9"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label className="text-sm font-medium">Claims Phone</Label>
-            <Input
-              value={record?.phone}
-              onChange={(e) => handleInsuranceChange(type, 'phone', e.target.value)}
-              className="h-9"
-              placeholder="(877) 567-7271"
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium">Claims ZIP</Label>
-            <Input
-              value={record?.claims_zip}
-              onChange={(e) => handleInsuranceChange(type, 'claims_zip', e.target.value)}
-              className="h-9"
-              placeholder="#####"
-            />
-          </div>
-        </div>
-
-        <div>
-          <Label className="text-sm font-medium">Patient Relation</Label>
-          <Select
-            value={record?.patient_relation || ''}
-            onValueChange={(value) => handlePatientRelationChange(type, value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Relation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Self">Self</SelectItem>
-              <SelectItem value="Spouse">Spouse</SelectItem>
-              <SelectItem value="Child">Child</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-4">
-          <Label className="text-sm font-medium">Policyholder Information</Label>
           <div className="grid grid-cols-2 gap-4">
-            <Input
-              value={record?.policyholder_name || ''}
-              onChange={(e) => handleInsuranceChange(type, 'policyholder_name', e.target.value)}
-              className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
-              placeholder="Policyholder Name"
-              readOnly={record?.patient_relation === 'Self'}
-              disabled={record?.patient_relation === 'Self'}
-            />
-            <Input
-              type="date"
-              value={record?.policyholder_dob || ''}
-              onChange={(e) => handleInsuranceChange(type, 'policyholder_dob', e.target.value)}
-              className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
-              readOnly={record?.patient_relation === 'Self'}
-              disabled={record?.patient_relation === 'Self'}
-            />
+            <div>
+              <Label className="text-sm font-medium">Payor ID</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={record?.payor_id}
+                  onChange={(e) => handleInsuranceChange(type, 'payor_id', e.target.value)}
+                  className="h-9"
+                  placeholder="e.g. 10202"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => record?.payor_id && analyzePayerId(type, record.payor_id)}
+                  title="Analyze Payer ID"
+                >
+                  <Wand2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div>
+              <Label className="text-sm font-medium">NSure Payor Code</Label>
+              <Input
+                value={record?.nsure_payor_code}
+                onChange={(e) => handleInsuranceChange(type, 'nsure_payor_code', e.target.value)}
+                className="h-9"
+                placeholder="e.g. 00472"
+              />
+            </div>
           </div>
+
           <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm font-medium">Group Number</Label>
+              <Input
+                value={record?.group_number}
+                onChange={(e) => handleInsuranceChange(type, 'group_number', e.target.value)}
+                className="h-9"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Group Name</Label>
+              <Input
+                value={record?.group_name}
+                onChange={(e) => handleInsuranceChange(type, 'group_name', e.target.value)}
+                className="h-9"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm font-medium">Claims Phone</Label>
+              <Input
+                value={record?.phone}
+                onChange={(e) => handleInsuranceChange(type, 'phone', e.target.value)}
+                className="h-9"
+                placeholder="(877) 567-7271"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Claims ZIP</Label>
+              <Input
+                value={record?.claims_zip}
+                onChange={(e) => handleInsuranceChange(type, 'claims_zip', e.target.value)}
+                className="h-9"
+                placeholder="#####"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-sm font-medium">Patient Relation</Label>
             <Select
-              value={record?.policyholder_gender || ''}
-              onValueChange={(value) => handleInsuranceChange(type, 'policyholder_gender', value)}
-              disabled={record?.patient_relation === 'Self'}
+              value={record?.patient_relation || ''}
+              onValueChange={(value) => handlePatientRelationChange(type, value)}
             >
-              <SelectTrigger className={`w-full ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}>
-                <SelectValue placeholder="Select Gender" />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Relation" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Male">Male</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Self">Self</SelectItem>
+                <SelectItem value="Spouse">Spouse</SelectItem>
+                <SelectItem value="Child">Child</SelectItem>
                 <SelectItem value="Other">Other</SelectItem>
-                <SelectItem value="Not recorded">Not recorded</SelectItem>
               </SelectContent>
             </Select>
-            <Input
-              value={record?.policyholder_phone || ''}
-              onChange={(e) => handleInsuranceChange(type, 'policyholder_phone', e.target.value)}
-              className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
-              placeholder="Phone"
-              readOnly={record?.patient_relation === 'Self'}
-              disabled={record?.patient_relation === 'Self'}
-            />
           </div>
-        </div>
 
-        <div className="flex items-center gap-4 mb-4">
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleFileUpload(type, e)}
-            className="hidden"
-            id={`insurance-card-${type}`}
-            disabled={isUploading || isAnalyzing}
-          />
-          <Button
-            variant="outline"
-            onClick={() => document.getElementById(`insurance-card-${type}`)?.click()}
-            disabled={isUploading || isAnalyzing}
-            className="w-full"
-          >
-            {isUploading ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Upload className="h-4 w-4 mr-2" />
-            )}
-            {isUploading ? "Uploading..." : isAnalyzing ? "Analyzing..." : "Scan Insurance Card"}
-          </Button>
-        </div>
+          <div className="space-y-4">
+            <Label className="text-sm font-medium">Policyholder Information</Label>
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                value={record?.policyholder_name || ''}
+                onChange={(e) => handleInsuranceChange(type, 'policyholder_name', e.target.value)}
+                className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
+                placeholder="Policyholder Name"
+                readOnly={record?.patient_relation === 'Self'}
+                disabled={record?.patient_relation === 'Self'}
+              />
+              <Input
+                type="date"
+                value={record?.policyholder_dob || ''}
+                onChange={(e) => handleInsuranceChange(type, 'policyholder_dob', e.target.value)}
+                className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
+                readOnly={record?.patient_relation === 'Self'}
+                disabled={record?.patient_relation === 'Self'}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Select
+                value={record?.policyholder_gender || ''}
+                onValueChange={(value) => handleInsuranceChange(type, 'policyholder_gender', value)}
+                disabled={record?.patient_relation === 'Self'}
+              >
+                <SelectTrigger className={`w-full ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}>
+                  <SelectValue placeholder="Select Gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Male">Male</SelectItem>
+                  <SelectItem value="Female">Female</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                  <SelectItem value="Not recorded">Not recorded</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input
+                value={record?.policyholder_phone || ''}
+                onChange={(e) => handleInsuranceChange(type, 'policyholder_phone', e.target.value)}
+                className={`h-9 ${record?.patient_relation === 'Self' ? 'bg-gray-100' : ''}`}
+                placeholder="Phone"
+                readOnly={record?.patient_relation === 'Self'}
+                disabled={record?.patient_relation === 'Self'}
+              />
+            </div>
+          </div>
 
-      </div>
-    </Card>
-  );
+          <div className="flex items-center gap-4 mb-4">
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFileUpload(type, e)}
+              className="hidden"
+              id={`insurance-card-${type}`}
+              disabled={isUploading || isAnalyzing}
+            />
+            <Button
+              variant="outline"
+              onClick={() => document.getElementById(`insurance-card-${type}`)?.click()}
+              disabled={isUploading || isAnalyzing}
+              className="w-full"
+            >
+              {isUploading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4 mr-2" />
+              )}
+              {isUploading ? "Uploading..." : isAnalyzing ? "Analyzing..." : "Scan Insurance Card"}
+            </Button>
+          </div>
+
+        </div>
+      </Card>
+    );
+  };
 
   return (
     <div className="space-y-6">
