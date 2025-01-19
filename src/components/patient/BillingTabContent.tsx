@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { DollarSign, CreditCard, Receipt, Save, Check, AlertCircle, Info } from "lucide-react";
 
 interface InsuranceRecord {
   id?: string;
@@ -166,6 +167,11 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
 
   const handleSave = async () => {
     try {
+      const saveToast = toast({
+        title: "Saving...",
+        description: <div className="flex items-center gap-2"><Save className="animate-spin" size={16} /> Saving billing information</div>,
+      });
+
       // Update insurance records
       for (const record of insuranceRecords) {
         if (record.id) {
@@ -192,69 +198,84 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
           .insert({ ...billingSettings, patient_id: patientId });
       }
 
+      saveToast.dismiss();
       toast({
         title: "Success",
-        description: "Billing information saved successfully",
+        description: <div className="flex items-center gap-2"><Check className="text-green-500" size={16} /> Billing information saved successfully</div>,
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to save billing information",
+        description: <div className="flex items-center gap-2"><AlertCircle className="text-red-500" size={16} /> Failed to save billing information</div>,
         variant: "destructive",
       });
     }
   };
 
   const InsuranceSection = ({ type, record }: { type: 'primary' | 'secondary' | 'reserved', record?: InsuranceRecord }) => (
-    <Card className="p-4">
-      <h3 className="text-lg font-semibold mb-4 capitalize">{type} Insurance</h3>
+    <Card className="p-6 space-y-6">
+      <div className="flex items-center gap-2">
+        <CreditCard className="h-5 w-5 text-gray-500" />
+        <h3 className="text-lg font-semibold capitalize">{type} Insurance</h3>
+      </div>
       <div className="space-y-4">
-        <div>
-          <Label>Carrier Type</Label>
-          <Select
-            value={record?.carrier_type}
-            onValueChange={(value) => handleInsuranceChange(type, 'carrier_type', value)}
-          >
-            <option value="Medicare">Medicare</option>
-            <option value="Medicaid">Medicaid</option>
-            <option value="Private">Private Insurance</option>
-          </Select>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium">Carrier Type</Label>
+            <Select
+              value={record?.carrier_type}
+              onValueChange={(value) => handleInsuranceChange(type, 'carrier_type', value)}
+            >
+              <option value="Medicare">Medicare</option>
+              <option value="Medicaid">Medicaid</option>
+              <option value="Private">Private Insurance</option>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-sm font-medium">Carrier Name</Label>
+            <Input
+              value={record?.carrier_name}
+              onChange={(e) => handleInsuranceChange(type, 'carrier_name', e.target.value)}
+              className="h-9"
+            />
+          </div>
         </div>
-        <div>
-          <Label>Carrier Name</Label>
-          <Input
-            value={record?.carrier_name}
-            onChange={(e) => handleInsuranceChange(type, 'carrier_name', e.target.value)}
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium">Policy Number</Label>
+            <Input
+              value={record?.policy_number}
+              onChange={(e) => handleInsuranceChange(type, 'policy_number', e.target.value)}
+              className="h-9"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium">Claims Phone</Label>
+            <Input
+              value={record?.phone}
+              onChange={(e) => handleInsuranceChange(type, 'phone', e.target.value)}
+              className="h-9"
+            />
+          </div>
         </div>
-        <div>
-          <Label>Policy Number</Label>
-          <Input
-            value={record?.policy_number}
-            onChange={(e) => handleInsuranceChange(type, 'policy_number', e.target.value)}
-          />
-        </div>
-        <div>
-          <Label>Claims Phone</Label>
-          <Input
-            value={record?.phone}
-            onChange={(e) => handleInsuranceChange(type, 'phone', e.target.value)}
-          />
-        </div>
-        <div>
-          <Label>Claims ZIP</Label>
-          <Input
-            value={record?.claims_zip}
-            onChange={(e) => handleInsuranceChange(type, 'claims_zip', e.target.value)}
-          />
-        </div>
-        <div>
-          <Label>Activation Date</Label>
-          <Input
-            type="date"
-            value={record?.activation_date}
-            onChange={(e) => handleInsuranceChange(type, 'activation_date', e.target.value)}
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium">Claims ZIP</Label>
+            <Input
+              value={record?.claims_zip}
+              onChange={(e) => handleInsuranceChange(type, 'claims_zip', e.target.value)}
+              className="h-9"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium">Activation Date</Label>
+            <Input
+              type="date"
+              value={record?.activation_date}
+              onChange={(e) => handleInsuranceChange(type, 'activation_date', e.target.value)}
+              className="h-9"
+            />
+          </div>
         </div>
       </div>
     </Card>
@@ -262,7 +283,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-6">
         <InsuranceSection 
           type="primary" 
           record={insuranceRecords.find(r => r.type === 'primary')} 
@@ -277,9 +298,12 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         />
       </div>
 
-      <Card className="p-4">
-        <h3 className="text-lg font-semibold mb-4">Save Insurance Info</h3>
-        <div className="space-y-2">
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Save className="h-5 w-5 text-gray-500" />
+          <h3 className="text-lg font-semibold">Save Insurance Info</h3>
+        </div>
+        <div className="space-y-3">
           <div className="flex items-center space-x-2">
             <Checkbox
               checked={saveOptions.currentCheckpoint}
@@ -287,7 +311,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
                 setSaveOptions(prev => ({ ...prev, currentCheckpoint: checked as boolean }))
               }
             />
-            <Label>Save to currently selected checkpoint (2025-01-06)</Label>
+            <Label className="text-sm">Save to currently selected checkpoint (2025-01-06)</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -296,7 +320,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
                 setSaveOptions(prev => ({ ...prev, createSupplementary: checked as boolean }))
               }
             />
-            <Label>Create a supplementary checkpoint for the current dispatch</Label>
+            <Label className="text-sm">Create a supplementary checkpoint for the current dispatch</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -305,16 +329,19 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
                 setSaveOptions(prev => ({ ...prev, saveAllFuture: checked as boolean }))
               }
             />
-            <Label>Save all changes to future records</Label>
+            <Label className="text-sm">Save all changes to future records</Label>
           </div>
         </div>
       </Card>
 
-      <Card className="p-4">
-        <h3 className="text-lg font-semibold mb-4">Preauth & Pricing</h3>
-        <div className="space-y-4">
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <DollarSign className="h-5 w-5 text-gray-500" />
+          <h3 className="text-lg font-semibold">Preauth & Pricing</h3>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
           <div>
-            <Label>Preauth Required</Label>
+            <Label className="text-sm font-medium">Preauth Required</Label>
             <Select
               value={billingSettings.preauth_required}
               onValueChange={(value) => handleBillingSettingsChange('preauth_required', value)}
@@ -325,7 +352,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
             </Select>
           </div>
           <div>
-            <Label>Pricing Schema</Label>
+            <Label className="text-sm font-medium">Pricing Schema</Label>
             <Select
               value={billingSettings.pricing_schema}
               onValueChange={(value) => handleBillingSettingsChange('pricing_schema', value)}
@@ -335,7 +362,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
             </Select>
           </div>
           <div>
-            <Label>Subscription Type</Label>
+            <Label className="text-sm font-medium">Subscription Type</Label>
             <Select
               value={billingSettings.subscription_type}
               onValueChange={(value) => handleBillingSettingsChange('subscription_type', value)}
@@ -345,45 +372,58 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
             </Select>
           </div>
           <div>
-            <Label>Next Payment Date</Label>
+            <Label className="text-sm font-medium">Next Payment Date</Label>
             <Input
               type="date"
               value={billingSettings.next_payment_date}
               onChange={(e) => handleBillingSettingsChange('next_payment_date', e.target.value)}
+              className="h-9"
             />
           </div>
         </div>
       </Card>
 
-      <Card className="p-4">
-        <h3 className="text-lg font-semibold mb-4">Employer Information</h3>
-        <div className="space-y-4">
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Receipt className="h-5 w-5 text-gray-500" />
+          <h3 className="text-lg font-semibold">Employer Information</h3>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
           <div>
-            <Label>Employer Name</Label>
+            <Label className="text-sm font-medium">Employer Name</Label>
             <Input
               value={billingSettings.employer_name}
               onChange={(e) => handleBillingSettingsChange('employer_name', e.target.value)}
+              className="h-9"
             />
           </div>
           <div>
-            <Label>Employer Phone</Label>
+            <Label className="text-sm font-medium">Employer Phone</Label>
             <Input
               value={billingSettings.employer_phone}
               onChange={(e) => handleBillingSettingsChange('employer_phone', e.target.value)}
+              className="h-9"
             />
           </div>
-          <div>
-            <Label>Employer Address</Label>
+          <div className="md:col-span-2">
+            <Label className="text-sm font-medium">Employer Address</Label>
             <Input
               value={billingSettings.employer_address}
               onChange={(e) => handleBillingSettingsChange('employer_address', e.target.value)}
+              className="h-9"
             />
           </div>
         </div>
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={handleSave}>Save Changes</Button>
+        <Button 
+          onClick={handleSave}
+          className="flex items-center gap-2"
+        >
+          <Save className="h-4 w-4" />
+          Save Changes
+        </Button>
       </div>
     </div>
   );
