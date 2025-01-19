@@ -100,11 +100,8 @@ export function DispatchItem({
     setIsAssignModalOpen(false);
   };
 
-  const handleTrackTransport = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const path = `/dispatch/${id}`;
-    navigate(path);
+  const handleTrackTransport = () => {
+    navigate(`/dispatch/${id}`);
     toast.success(`Tracking dispatch ${id}`);
   };
 
@@ -158,6 +155,7 @@ export function DispatchItem({
             </div>
           )}
         </div>
+
       </div>
 
       <div className={`mt-4 space-y-4 ${isExpanded ? "" : "hidden"}`}>
