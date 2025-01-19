@@ -6,6 +6,7 @@ import { DispatchBoard } from "@/components/dashboard/DispatchBoard";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
+import { AlertsConfig } from "@/components/dashboard/AlertsConfig";
 
 const Index = () => {
   return (
@@ -23,8 +24,13 @@ const Index = () => {
                 <div className="mt-6">
                   <DashboardMetrics />
                 </div>
-                <div className="mt-6">
-                  <DispatchBoard />
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
+                  <div className="lg:col-span-3">
+                    <DispatchBoard />
+                  </div>
+                  <div className="lg:col-span-1">
+                    <AlertsConfig />
+                  </div>
                 </div>
               </main>
             </div>
