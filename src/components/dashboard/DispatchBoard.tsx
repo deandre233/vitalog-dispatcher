@@ -8,8 +8,44 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+interface Dispatch {
+  id: string;
+  patientName: string;
+  pickupLocation: string;
+  dropoffLocation: string;
+  serviceType: string;
+  assignedTo: string;
+  status: string;
+  timeWaiting?: string;
+  comments?: string;
+}
+
+const mockDispatches: Dispatch[] = [
+  {
+    id: "7684",
+    patientName: "Turner, Angela",
+    pickupLocation: "Emory Dialysis At North Decatur",
+    dropoffLocation: "Emory University Hospital Midtown",
+    serviceType: "BLS",
+    assignedTo: "Unassigned",
+    status: "Pending",
+    timeWaiting: "will call",
+    comments: "Breathing problem: Req oxygen"
+  },
+  {
+    id: "7601",
+    patientName: "Smith, John",
+    pickupLocation: "Emory Dialysis At Candler",
+    dropoffLocation: "CROSSING AT EASTLAKE",
+    serviceType: "BLS",
+    assignedTo: "MED 1",
+    status: "En Route",
+    comments: "Impaired movement"
+  }
+];
+
 // Filter dispatches based on assignment status
-const filterDispatches = (dispatches: any[], status: "assigned" | "unassigned") => {
+const filterDispatches = (dispatches: Dispatch[], status: "assigned" | "unassigned") => {
   return dispatches.filter(dispatch => 
     status === "assigned" 
       ? dispatch.assignedTo !== "Unassigned"
@@ -21,8 +57,8 @@ export function DispatchBoard() {
   const [activeView, setActiveView] = useState<"active" | "scheduled">("active");
 
   // Separate dispatches into assigned and unassigned
-  const unassignedDispatches = filterDispatches(dispatches, "unassigned");
-  const assignedDispatches = filterDispatches(dispatches, "assigned");
+  const unassignedDispatches = filterDispatches(mockDispatches, "unassigned");
+  const assignedDispatches = filterDispatches(mockDispatches, "assigned");
 
   return (
     <Card className="p-6 m-6">
