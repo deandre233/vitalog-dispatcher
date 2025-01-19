@@ -222,7 +222,20 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         )
       );
     } else {
-      handleInsuranceChange(type, 'patient_relation', value);
+      setInsuranceRecords(prev => 
+        prev.map(record => 
+          record.type === type 
+            ? { 
+                ...record, 
+                patient_relation: value,
+                policyholder_name: '',
+                policyholder_dob: '',
+                policyholder_gender: '',
+                policyholder_phone: ''
+              }
+            : record
+        )
+      );
     }
   };
 
