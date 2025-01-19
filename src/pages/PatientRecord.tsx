@@ -53,7 +53,6 @@ const PatientRecord = () => {
     zip: "30316",
     dob: "1965-03-15",
     gender: "Female",
-    ssn: "XXX-XX-4789",
     maritalStatus: "Married",
     occupation: "Teacher",
     preferredLanguage: "English",
@@ -129,11 +128,25 @@ const PatientRecord = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
-    setPatientData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    const { name, value } = e.target;
+    const target = e.target as HTMLInputElement; // Type assertion for checkbox handling
+    
+    if (name.includes('.')) {
+      // Handle nested objects (warnings and barriersToEMS)
+      const [parent, child] = name.split('.');
+      setPatientData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent as keyof typeof prev],
+          [child]: target.type === 'checkbox' ? target.checked : value
+        }
+      }));
+    } else {
+      setPatientData(prev => ({
+        ...prev,
+        [name]: target.type === 'checkbox' ? target.checked : value
+      }));
+    }
   };
 
   return (
