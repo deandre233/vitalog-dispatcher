@@ -1,13 +1,14 @@
-import { MapPin, Clock, User, Building, ChevronDown, ChevronUp, ArrowRight, AlertTriangle, Brain } from "lucide-react";
+import { MapPin, Clock, User, Building, ChevronDown, ChevronUp, ArrowRight, AlertTriangle, Brain, Calendar, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { format, isToday, isTomorrow, parseISO, isWithinInterval, addHours } from "date-fns";
+import { format, isToday, isTomorrow, parseISO, isWithinInterval, addHours, differenceInMinutes } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card } from "@/components/ui/card";
 
 interface ScheduledTransportProps {
   id: string;
@@ -114,9 +115,9 @@ const getTimeColor = (scheduledTime: string) => {
   return "text-gray-600";
 };
 
-// AI analysis functions
+// Enhanced AI analysis functions
 const analyzeScheduleConflicts = (transports: ScheduledTransportProps[]) => {
-  const conflicts: { id: string; conflictWith: string; reason: string }[] = [];
+  const conflicts: { id: string; conflictWith: string; reason: string; severity: 'high' | 'medium' | 'low' }[] = [];
   
   transports.forEach((transport1, i) => {
     transports.slice(i + 1).forEach(transport2 => {
@@ -138,10 +139,14 @@ const analyzeScheduleConflicts = (transports: ScheduledTransportProps[]) => {
         isWithinInterval(interval1.start, interval2) ||
         isWithinInterval(interval1.end, interval2)
       ) {
+        const timeDiff = Math.abs(differenceInMinutes(time1, time2));
+        const severity = timeDiff < 30 ? 'high' : timeDiff < 60 ? 'medium' : 'low';
+        
         conflicts.push({
           id: transport1.id,
           conflictWith: transport2.id,
-          reason: "Time overlap detected"
+          reason: `Time overlap detected (${timeDiff} minutes)`,
+          severity
         });
       }
       
@@ -149,14 +154,24 @@ const analyzeScheduleConflicts = (transports: ScheduledTransportProps[]) => {
       if (
         transport1.unitAssigned &&
         transport2.unitAssigned &&
-        transport1.unitAssigned === transport2.unitAssigned &&
-        transport1.status !== "Completed" &&
-        transport2.status !== "Completed"
+        transport1.unitAssigned === transport2.unitAssigned
       ) {
         conflicts.push({
           id: transport1.id,
           conflictWith: transport2.id,
-          reason: `Unit ${transport1.unitAssigned} double-booked`
+          reason: `Unit ${transport1.unitAssigned} double-booked`,
+          severity: 'high'
+        });
+      }
+      
+      // Check for same origin/destination conflicts
+      if (transport1.origin === transport2.origin && 
+          Math.abs(differenceInMinutes(time1, time2)) < 30) {
+        conflicts.push({
+          id: transport1.id,
+          conflictWith: transport2.id,
+          reason: 'Multiple pickups at same location within 30 minutes',
+          severity: 'medium'
         });
       }
     });
@@ -170,41 +185,94 @@ const analyzeResourceUtilization = (transports: ScheduledTransportProps[]) => {
   const assignedTransports = transports.filter(t => t.status === "Assigned").length;
   const utilizationRate = (assignedTransports / totalTransports) * 100;
   
+  const timeSlots = transports.reduce((acc, transport) => {
+    const hour = new Date(transport.scheduledTime).getHours();
+    acc[hour] = (acc[hour] || 0) + 1;
+    return acc;
+  }, {} as Record<number, number>);
+  
+  const peakHour = Object.entries(timeSlots).reduce((a, b) => 
+    timeSlots[Number(a[0])] > timeSlots[Number(b[0])] ? a : b
+  )[0];
+  
   return {
     utilizationRate,
+    peakHour,
     recommendation: utilizationRate < 50 
       ? "Resource utilization is low. Consider optimizing crew assignments."
-      : "Resource utilization is optimal."
+      : utilizationRate > 80
+      ? "High resource utilization. Consider adding more units during peak hours."
+      : "Resource utilization is optimal.",
+    peakLoadWarning: timeSlots[Number(peakHour)] > 3
+      ? `High load detected at ${peakHour}:00. Consider redistributing schedules.`
+      : null
   };
+};
+
+const analyzeTravelPatterns = (transports: ScheduledTransportProps[]) => {
+  const patterns = transports.reduce((acc, transport) => {
+    const route = `${transport.origin} -> ${transport.destination}`;
+    acc[route] = (acc[route] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const frequentRoutes = Object.entries(patterns)
+    .filter(([_, count]) => count > 1)
+    .map(([route, count]) => ({
+      route,
+      count,
+      recommendation: count > 2 ? "Consider dedicated resource allocation for this route" : null
+    }));
+
+  return frequentRoutes;
 };
 
 export function ScheduledTransport() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [conflicts, setConflicts] = useState<ReturnType<typeof analyzeScheduleConflicts>>([]);
   const [utilization, setUtilization] = useState<ReturnType<typeof analyzeResourceUtilization>>();
+  const [patterns, setPatterns] = useState<ReturnType<typeof analyzeTravelPatterns>>([]);
+
+  // Filter to show only active scheduled transports
+  const activeTransports = scheduledTransports.filter(
+    transport => transport.status === "Scheduled" || transport.status === "Assigned"
+  );
 
   useEffect(() => {
     // Analyze schedule conflicts
-    const detectedConflicts = analyzeScheduleConflicts(scheduledTransports);
+    const detectedConflicts = analyzeScheduleConflicts(activeTransports);
     setConflicts(detectedConflicts);
     
     // Analyze resource utilization
-    const resourceUtilization = analyzeResourceUtilization(scheduledTransports);
+    const resourceUtilization = analyzeResourceUtilization(activeTransports);
     setUtilization(resourceUtilization);
+    
+    // Analyze travel patterns
+    const travelPatterns = analyzeTravelPatterns(activeTransports);
+    setPatterns(travelPatterns);
     
     // Show AI insights
     if (detectedConflicts.length > 0) {
-      toast.warning(`${detectedConflicts.length} scheduling conflicts detected`, {
-        description: "AI has identified potential conflicts in the schedule"
+      const highSeverityConflicts = detectedConflicts.filter(c => c.severity === 'high');
+      if (highSeverityConflicts.length > 0) {
+        toast.error(`${highSeverityConflicts.length} high-priority scheduling conflicts detected`, {
+          description: "Immediate attention required for schedule optimization"
+        });
+      }
+    }
+    
+    if (resourceUtilization.peakLoadWarning) {
+      toast.warning(resourceUtilization.peakLoadWarning, {
+        description: "AI suggests schedule redistribution"
       });
     }
     
-    if (resourceUtilization.utilizationRate < 50) {
-      toast.info("Resource optimization recommended", {
-        description: resourceUtilization.recommendation
+    if (patterns.length > 0) {
+      toast.info(`${patterns.length} frequent transport routes identified`, {
+        description: "AI suggests optimizing resource allocation"
       });
     }
-  }, []);
+  }, [activeTransports]);
 
   const toggleRow = (id: string) => {
     const newExpandedRows = new Set(expandedRows);
@@ -240,47 +308,76 @@ export function ScheduledTransport() {
       <div className="flex justify-between items-center mb-6">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold text-medical-primary">
-            Scheduled Transports
+            Active Scheduled Transports
           </h2>
           <p className="text-gray-500">
-            Showing all scheduled transports for the next 7 days
+            Showing {activeTransports.length} active scheduled transports
           </p>
         </div>
         <Button variant="outline" className="gap-2">
-          <span>New Transport</span>
-          <ArrowRight className="w-4 h-4" />
+          <Calendar className="w-4 h-4" />
+          <span>Schedule New</span>
         </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Brain className="w-5 h-5 text-purple-500" />
+            <h3 className="font-semibold">AI Resource Analysis</h3>
+          </div>
+          {utilization && (
+            <div className="space-y-2">
+              <p className="text-sm">
+                Resource Utilization: {utilization.utilizationRate.toFixed(1)}%
+              </p>
+              <Progress value={utilization.utilizationRate} className="h-2" />
+              <p className="text-sm text-gray-600">{utilization.recommendation}</p>
+            </div>
+          )}
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Truck className="w-5 h-5 text-blue-500" />
+            <h3 className="font-semibold">Route Optimization</h3>
+          </div>
+          <div className="space-y-2">
+            {patterns.map((pattern, index) => (
+              <div key={index} className="text-sm">
+                <p className="font-medium">{pattern.route}</p>
+                {pattern.recommendation && (
+                  <p className="text-gray-600">{pattern.recommendation}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
       </div>
 
       {conflicts.length > 0 && (
         <Alert variant="destructive" className="mb-4">
-          <Brain className="h-4 w-4" />
+          <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            AI Alert: {conflicts.length} scheduling conflicts detected. Please review the affected transports.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {utilization && (
-        <Alert className="mb-4">
-          <Brain className="h-4 w-4" />
-          <AlertDescription>
-            Resource Utilization: {utilization.utilizationRate.toFixed(1)}% - {utilization.recommendation}
+            {conflicts.length} scheduling conflicts detected. 
+            {conflicts.filter(c => c.severity === 'high').length} require immediate attention.
           </AlertDescription>
         </Alert>
       )}
       
       <div className="space-y-3">
-        {scheduledTransports.map((transport) => (
+        {activeTransports.map((transport) => (
           <div 
             key={transport.id}
-            className="border rounded-lg bg-white shadow-sm overflow-hidden"
+            className={cn(
+              "border rounded-lg bg-white shadow-sm overflow-hidden",
+              conflicts.some(c => c.id === transport.id) ? "border-red-300" : ""
+            )}
           >
             <div 
               className={cn(
                 "p-4 cursor-pointer hover:bg-gray-50 transition-colors",
-                expandedRows.has(transport.id) ? "border-b" : "",
-                conflicts.some(c => c.id === transport.id) ? "bg-red-50" : ""
+                expandedRows.has(transport.id) ? "border-b" : ""
               )}
               onClick={() => toggleRow(transport.id)}
             >
