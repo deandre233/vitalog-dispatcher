@@ -46,16 +46,20 @@ export function DispatchDetailView() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { data: transportRecord, isLoading } = useQuery({
+  const { data: transportRecord, isLoading, error } = useQuery({
     queryKey: ['transport', id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('transport_records')
         .select('*')
         .eq('dispatch_id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) {
+        toast.error("Transport record not found");
+        return null;
+      }
       return data as TransportRecord;
     },
   });
@@ -99,6 +103,29 @@ export function DispatchDetailView() {
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (!transportRecord) {
+    return (
+      <Card className="p-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="h-8 w-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h2 className="text-xl font-semibold text-red-600">
+            Transport Record Not Found
+          </h2>
+        </div>
+        <p className="text-gray-600">
+          The transport record with dispatch ID #{id} could not be found.
+        </p>
+      </Card>
+    );
   }
 
   return (
