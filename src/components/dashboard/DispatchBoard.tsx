@@ -122,7 +122,7 @@ interface ScheduledTransportProps {
   recurrence?: string;
 }
 
-// Mock data for scheduled transports that are assigned
+// Move assignedScheduledTransports before it's used
 const assignedScheduledTransports: ScheduledTransportProps[] = [
   {
     id: "ST-7602",
@@ -280,7 +280,7 @@ export function DispatchBoard() {
 
   const assignedDispatches = useMemo(() => {
     const assignedRegularDispatches = filterDispatches(dispatches, "assigned");
-    const assignedScheduledTransports = assignedScheduledTransports
+    const scheduledTransportsAssigned = assignedScheduledTransports
       .filter(t => t.status === "Assigned")
       .map(t => ({
         id: t.id,
@@ -306,7 +306,7 @@ export function DispatchBoard() {
         elapsedTime: "In Progress"
       }));
 
-    return [...assignedRegularDispatches, ...assignedScheduledTransports];
+    return [...assignedRegularDispatches, ...scheduledTransportsAssigned];
   }, [dispatches]);
 
   // AI Insights notifications
