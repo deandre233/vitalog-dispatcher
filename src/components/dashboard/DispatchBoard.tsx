@@ -158,13 +158,7 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
 
   // Get analytics data - ensure all data is serializable
   const analytics = {
-    ...analyzeDispatchEfficiency(
-      { lat: 33.7720, lng: -84.3960 },
-      { lat: 33.7490, lng: -84.3880 },
-      undefined,
-      `${elapsedMinutes} min`
-    ),
-    // Convert any complex objects to simple data types
+    efficiency: 0,
     performanceMetrics: {
       responseTime: 0,
       patientSatisfaction: 0,
@@ -172,21 +166,59 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     }
   };
 
+  try {
+    const efficiencyResult = analyzeDispatchEfficiency(
+      { lat: 33.7720, lng: -84.3960 },
+      { lat: 33.7490, lng: -84.3880 },
+      undefined,
+      `${elapsedMinutes} min`
+    );
+    analytics.efficiency = efficiencyResult.efficiency || 0;
+  } catch (error) {
+    console.error('Error analyzing dispatch efficiency:', error);
+  }
+
   // Monitor dispatch progress with serializable data
-  monitorDispatchProgress(dispatch.status.toLowerCase(), `${elapsedMinutes}`, 30);
+  try {
+    monitorDispatchProgress(
+      dispatch.status.toLowerCase(), 
+      `${elapsedMinutes}`, 
+      30
+    );
+  } catch (error) {
+    console.error('Error monitoring dispatch progress:', error);
+  }
 
   // Generate AI insights with serializable data
-  const aiInsights = generateAIInsights(analytics).map(insight => String(insight));
+  let aiInsights: string[] = [];
+  try {
+    aiInsights = generateAIInsights(analytics).map(insight => 
+      typeof insight === 'string' ? insight : JSON.stringify(insight)
+    );
+  } catch (error) {
+    console.error('Error generating AI insights:', error);
+    aiInsights = ['Unable to generate insights'];
+  }
 
   // Get traffic updates with serializable data
   const trafficInfo = {
-    ...getTrafficInfo(
+    congestionLevel: 'low' as const,
+    delayMinutes: 0,
+    alternateRouteAvailable: false
+  };
+
+  try {
+    const traffic = getTrafficInfo(
       { lat: 33.7720, lng: -84.3960 },
       { lat: 33.7490, lng: -84.3880 }
-    ),
-    // Ensure all properties are serializable
-    delayMinutes: Math.floor(Math.random() * 15)
-  };
+    );
+    
+    trafficInfo.congestionLevel = traffic.congestionLevel || 'low';
+    trafficInfo.delayMinutes = Math.floor(Math.random() * 15);
+    trafficInfo.alternateRouteAvailable = Boolean(traffic.alternateRouteAvailable);
+  } catch (error) {
+    console.error('Error getting traffic info:', error);
+  }
 
   // Return a serializable object
   return {
@@ -194,14 +226,14 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     progress,
     elapsedTime: `${elapsedMinutes} min`,
     lastUpdated: now.toISOString(),
-    efficiency: analytics.efficiency || 0,
+    efficiency: analytics.efficiency,
     aiRecommendations: {
       ...dispatch.aiRecommendations,
       insights: aiInsights,
       trafficStatus: {
         congestionLevel: trafficInfo.congestionLevel,
         estimatedDelay: trafficInfo.delayMinutes,
-        alternateRouteAvailable: Boolean(trafficInfo.alternateRouteAvailable)
+        alternateRouteAvailable: trafficInfo.alternateRouteAvailable
       }
     }
   };
