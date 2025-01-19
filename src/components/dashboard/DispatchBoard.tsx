@@ -4,9 +4,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DispatchItem } from "./DispatchItem";
 import { DispatchFilters } from "./DispatchFilters";
 import { ScheduledTransport } from "./ScheduledTransport";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 interface Patient {
   name: string;
@@ -36,6 +37,7 @@ interface Dispatch {
   warnings?: string;
   progress?: number;
   elapsedTime?: string;
+  lastUpdated?: string;
 }
 
 const mockDispatches: Dispatch[] = [
@@ -94,9 +96,41 @@ const filterDispatches = (dispatches: Dispatch[], status: "assigned" | "unassign
   );
 };
 
+// New function to simulate real-time updates
+const simulateRealTimeUpdates = (dispatch: Dispatch): Dispatch => {
+  const now = new Date();
+  const activationTime = new Date(dispatch.activationTime);
+  const elapsedMinutes = Math.floor((now.getTime() - activationTime.getTime()) / (1000 * 60));
+  
+  let progress = dispatch.progress || 0;
+  if (dispatch.assignedTo !== "Unassigned") {
+    progress = Math.min(100, progress + Math.random() * 5);
+  }
+
+  return {
+    ...dispatch,
+    progress,
+    elapsedTime: `${elapsedMinutes} min`,
+    lastUpdated: now.toISOString(),
+  };
+};
+
 export function DispatchBoard() {
   const [activeView, setActiveView] = useState<"active" | "scheduled">("active");
-  const [dispatches] = useState<Dispatch[]>(JSON.parse(JSON.stringify(mockDispatches)));
+  const [dispatches, setDispatches] = useState<Dispatch[]>(
+    JSON.parse(JSON.stringify(mockDispatches))
+  );
+
+  // Simulate real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDispatches(currentDispatches => 
+        currentDispatches.map(dispatch => simulateRealTimeUpdates(dispatch))
+      );
+    }, 5000); // Update every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const unassignedDispatches = useMemo(() => 
     filterDispatches(dispatches, "unassigned"),
@@ -107,6 +141,18 @@ export function DispatchBoard() {
     filterDispatches(dispatches, "assigned"),
     [dispatches]
   );
+
+  // AI Insights notification
+  useEffect(() => {
+    if (unassignedDispatches.length > 0) {
+      const highPriorityDispatches = unassignedDispatches.filter(d => d.priority === "high");
+      if (highPriorityDispatches.length > 0) {
+        toast.warning(`${highPriorityDispatches.length} high-priority dispatches need attention`, {
+          description: "AI suggests immediate crew assignment for optimal response time"
+        });
+      }
+    }
+  }, [unassignedDispatches]);
 
   const unassignedTabStyle = unassignedDispatches.length > 0 
     ? "bg-red-100 text-red-700 data-[state=active]:bg-red-200" 
@@ -140,7 +186,8 @@ export function DispatchBoard() {
       <Alert className="mb-4">
         <Brain className="h-4 w-4" />
         <AlertDescription>
-          AI Insight: Current dispatch load is optimal. {unassignedDispatches.length} dispatches waiting for assignment.
+          AI Insight: {unassignedDispatches.length} dispatches waiting for assignment. 
+          {assignedDispatches.length > 0 && ` ${assignedDispatches.length} active transports progressing normally.`}
         </AlertDescription>
       </Alert>
 
