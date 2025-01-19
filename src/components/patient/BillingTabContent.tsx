@@ -69,6 +69,13 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
   const { toast } = useToast();
   const [insuranceRecords, setInsuranceRecords] = useState<InsuranceRecord[]>([]);
   const [billingSettings, setBillingSettings] = useState<BillingSettings>({});
+  const [patientInfo, setPatientInfo] = useState({
+    first_name: '',
+    last_name: '',
+    dob: '',
+    gender: '',
+    phone: ''
+  });
   const [saveOptions, setSaveOptions] = useState({
     currentCheckpoint: true,
     createSupplementary: false,
@@ -92,7 +99,31 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     
     fetchInsuranceRecords();
     fetchBillingSettings();
+    fetchPatientInfo();
   }, [patientId]);
+
+  const fetchPatientInfo = async () => {
+    try {
+      if (!patientId) return;
+
+      const { data, error } = await supabase
+        .from('patients')
+        .select('first_name, last_name, dob, gender, phone')
+        .eq('id', patientId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching patient info:', error);
+        return;
+      }
+
+      if (data) {
+        setPatientInfo(data);
+      }
+    } catch (err) {
+      console.error('Error in fetchPatientInfo:', err);
+    }
+  };
 
   const fetchInsuranceRecords = async () => {
     try {
@@ -165,6 +196,27 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         description: "An unexpected error occurred while fetching billing settings",
         variant: "destructive",
       });
+    }
+  };
+
+  const handlePatientRelationChange = (type: 'primary' | 'secondary' | 'reserved', value: string) => {
+    if (value === 'Self') {
+      setInsuranceRecords(prev => 
+        prev.map(record => 
+          record.type === type 
+            ? { 
+                ...record, 
+                patient_relation: value,
+                policyholder_name: `${patientInfo.first_name} ${patientInfo.last_name}`,
+                policyholder_dob: patientInfo.dob,
+                policyholder_gender: patientInfo.gender,
+                policyholder_phone: patientInfo.phone
+              }
+            : record
+        )
+      );
+    } else {
+      handleInsuranceChange(type, 'patient_relation', value);
     }
   };
 
@@ -359,9 +411,13 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               value={record?.carrier_type}
               onValueChange={(value) => handleInsuranceChange(type, 'carrier_type', value)}
             >
+              <option value="">Select Carrier Type</option>
               <option value="Medicare">Medicare</option>
               <option value="Medicaid">Medicaid</option>
-              <option value="Private">Private Insurance</option>
+              <option value="Blue Cross / Blue Shield">Blue Cross / Blue Shield</option>
+              <option value="Commercial">Commercial Insurance</option>
+              <option value="HMO">HMO Medicare Risk</option>
+              <option value="Other">Other</option>
             </Select>
           </div>
           <div>
@@ -370,8 +426,13 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               value={record?.policy_type}
               onValueChange={(value) => handleInsuranceChange(type, 'policy_type', value)}
             >
+              <option value="">Select Policy Type</option>
               <option value="Medicare part B [MB]">Medicare part B [MB]</option>
+              <option value="Medicare part A [MA]">Medicare part A [MA]</option>
               <option value="Medicaid [MC]">Medicaid [MC]</option>
+              <option value="Blue Cross / Blue Shield [BL]">Blue Cross / Blue Shield [BL]</option>
+              <option value="Commercial insurance [CI]">Commercial insurance [CI]</option>
+              <option value="Health Maint Organization [HM]">Health Maint Organization [HM]</option>
               <option value="Other">Other insurance is primary [47]</option>
             </Select>
           </div>
@@ -452,8 +513,9 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
           <Label className="text-sm font-medium">Patient Relation</Label>
           <Select
             value={record?.patient_relation}
-            onValueChange={(value) => handleInsuranceChange(type, 'patient_relation', value)}
+            onValueChange={(value) => handlePatientRelationChange(type, value)}
           >
+            <option value="">Select Relation</option>
             <option value="Self">Self</option>
             <option value="Spouse">Spouse</option>
             <option value="Child">Child</option>
@@ -469,18 +531,21 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               onChange={(e) => handleInsuranceChange(type, 'policyholder_name', e.target.value)}
               className="h-9"
               placeholder="Policyholder Name"
+              readOnly={record?.patient_relation === 'Self'}
             />
             <Input
               type="date"
               value={record?.policyholder_dob}
               onChange={(e) => handleInsuranceChange(type, 'policyholder_dob', e.target.value)}
               className="h-9"
+              readOnly={record?.patient_relation === 'Self'}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Select
               value={record?.policyholder_gender}
               onValueChange={(value) => handleInsuranceChange(type, 'policyholder_gender', value)}
+              disabled={record?.patient_relation === 'Self'}
             >
               <option value="">Select Gender</option>
               <option value="Male">Male</option>
@@ -493,6 +558,7 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
               onChange={(e) => handleInsuranceChange(type, 'policyholder_phone', e.target.value)}
               className="h-9"
               placeholder="Phone"
+              readOnly={record?.patient_relation === 'Self'}
             />
           </div>
         </div>
