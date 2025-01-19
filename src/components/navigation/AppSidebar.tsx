@@ -1,11 +1,15 @@
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { Ambulance, FileText, DollarSign, Users, Settings } from "lucide-react";
+import { Ambulance, FileText, DollarSign, Users, Settings, PlusCircle, MapPin, Bell, HelpCircle } from "lucide-react";
 
 const menuItems = [
-  { title: "Dispatch", icon: Ambulance, url: "#dispatch" },
+  { title: "Active Dispatches", icon: Ambulance, url: "#dispatch" },
+  { title: "Create New Dispatch", icon: PlusCircle, url: "#new" },
+  { title: "Manage Routes", icon: MapPin, url: "#routes" },
   { title: "PCR", icon: FileText, url: "#pcr" },
   { title: "Billing", icon: DollarSign, url: "#billing" },
   { title: "Crew", icon: Users, url: "#crew" },
+  { title: "Notifications", icon: Bell, url: "#notifications" },
+  { title: "Help/Support", icon: HelpCircle, url: "#help" },
   { title: "Settings", icon: Settings, url: "#settings" },
 ];
 
