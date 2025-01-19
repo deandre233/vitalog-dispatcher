@@ -49,7 +49,7 @@ export function DispatchItem({
 
   // Mock coordinates for demonstration
   const mockDispatch = {
-    id,
+    id: parseInt(id), // Convert string id to number
     origin: { lat: 33.7720, lng: -84.3960 },
     destination: { lat: 33.7890, lng: -84.3920 },
     serviceType,
@@ -57,7 +57,7 @@ export function DispatchItem({
 
   const recommendedCrew = recommendCrew(mockDispatch);
   const crewRecommendation = recommendedCrew
-    ? `Recommended: ${recommendedCrew.name} (${calculateDistance(recommendedCrew, mockDispatch.origin).toFixed(2)}km away)`
+    ? `Recommended: ${recommendedCrew.name} (${calculateDistance(recommendedCrew.location, mockDispatch.origin).toFixed(2)}km away)`
     : "No crew available";
 
   const handleCrewAssign = (crewId: number, estimatedMinutes: number) => {
