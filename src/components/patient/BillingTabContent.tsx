@@ -17,7 +17,8 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     const fetchInsuranceRecords = async () => {
       try {
         if (!patientId) {
-          console.log("Waiting for patient ID...");
+          console.log("No patient ID provided");
+          setLoading(false);
           return;
         }
 
@@ -27,12 +28,15 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
           .select("*")
           .eq("patient_id", patientId);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching insurance records:", error);
+          throw error;
+        }
         
         console.log("Fetched insurance records:", data);
         setInsuranceRecords(data || []);
       } catch (error) {
-        console.error("Error fetching insurance records:", error);
+        console.error("Error in fetchInsuranceRecords:", error);
         toast({
           title: "Error",
           description: "Failed to fetch insurance records",
@@ -54,22 +58,40 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
     );
   }
 
+  if (loading) {
+    return (
+      <Card className="p-4">
+        <p className="text-muted-foreground">Loading insurance records...</p>
+      </Card>
+    );
+  }
+
+  const primaryRecords = insuranceRecords.filter(record => record.type === 'primary');
+  const secondaryRecords = insuranceRecords.filter(record => record.type === 'secondary');
+  const reservedRecords = insuranceRecords.filter(record => record.type === 'reserved');
+
+  console.log("Filtered records:", {
+    primary: primaryRecords,
+    secondary: secondaryRecords,
+    reserved: reservedRecords
+  });
+
   return (
     <div className="space-y-6">
       <InsuranceSection 
         type="primary" 
         title="Primary Insurance" 
-        records={insuranceRecords.filter(record => record.type === 'primary')}
+        records={primaryRecords}
       />
       <InsuranceSection 
         type="secondary" 
         title="Secondary Insurance" 
-        records={insuranceRecords.filter(record => record.type === 'secondary')}
+        records={secondaryRecords}
       />
       <InsuranceSection 
         type="reserved" 
         title="Reserved Insurance" 
-        records={insuranceRecords.filter(record => record.type === 'reserved')}
+        records={reservedRecords}
       />
     </div>
   );

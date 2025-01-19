@@ -43,10 +43,12 @@ export const InsuranceSection = ({ type, title, records }: InsuranceSectionProps
     }
   };
 
+  console.log(`Rendering ${type} insurance section with records:`, records);
+
   return (
     <Card className={`p-4 ${getBackgroundColor()} border ${getBorderColor()}`}>
       <h3 className="text-lg font-semibold mb-4">{title}</h3>
-      {records.length > 0 ? (
+      {records && records.length > 0 ? (
         <div className="space-y-4">
           {records.map((record) => (
             <div key={record.id} className="bg-white p-4 rounded-lg shadow-sm">
@@ -86,7 +88,7 @@ export const InsuranceSection = ({ type, title, records }: InsuranceSectionProps
           ))}
         </div>
       ) : (
-        <p className="text-sm text-gray-500">No insurance information available</p>
+        <p className="text-sm text-gray-500">No {type} insurance information available</p>
       )}
     </Card>
   );
