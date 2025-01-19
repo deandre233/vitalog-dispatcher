@@ -246,6 +246,39 @@ export type Database = {
         }
         Relationships: []
       }
+      payer_database: {
+        Row: {
+          carrier_name: string
+          carrier_type: string
+          confidence: number
+          created_at: string | null
+          id: string
+          last_verified: string | null
+          payer_id: string
+          policy_type: string
+        }
+        Insert: {
+          carrier_name: string
+          carrier_type: string
+          confidence?: number
+          created_at?: string | null
+          id?: string
+          last_verified?: string | null
+          payer_id: string
+          policy_type: string
+        }
+        Update: {
+          carrier_name?: string
+          carrier_type?: string
+          confidence?: number
+          created_at?: string | null
+          id?: string
+          last_verified?: string | null
+          payer_id?: string
+          policy_type?: string
+        }
+        Relationships: []
+      }
       transport_records: {
         Row: {
           created_at: string | null

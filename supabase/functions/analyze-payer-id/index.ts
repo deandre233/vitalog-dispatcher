@@ -35,6 +35,7 @@ serve(async (req) => {
       .single()
     
     if (dbMatch) {
+      console.log('Found match in dynamic database:', dbMatch);
       return new Response(JSON.stringify({
         carrier_type: dbMatch.carrier_type,
         carrier_name: dbMatch.carrier_name,
@@ -48,8 +49,9 @@ serve(async (req) => {
     // Then check our static database
     const staticMatch = payerDatabase.find(p => p.payerId === payerId)
     if (staticMatch) {
+      console.log('Found match in static database:', staticMatch);
       // Store this in our dynamic database with high confidence
-      await supabase
+      const { error: insertError } = await supabase
         .from('payer_database')
         .insert({
           payer_id: payerId,
@@ -60,6 +62,10 @@ serve(async (req) => {
           last_verified: new Date().toISOString()
         })
 
+      if (insertError) {
+        console.error('Error storing static match in database:', insertError);
+      }
+
       return new Response(JSON.stringify({
         carrier_type: staticMatch.carrierType,
         carrier_name: staticMatch.carrierName,
@@ -68,12 +74,6 @@ serve(async (req) => {
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
-    }
-
-    // If no exact match, use OpenAI to analyze
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not set')
     }
 
     // Get similar payer IDs from both databases to help GPT
@@ -86,6 +86,17 @@ serve(async (req) => {
     const similarStaticPayers = payerDatabase
       .filter(p => p.payerId.startsWith(payerId.substring(0, 2)))
       .slice(0, 5)
+
+    console.log('Similar payers found:', { 
+      dbPayers: similarDbPayers?.length || 0, 
+      staticPayers: similarStaticPayers.length 
+    });
+
+    // If no exact match, use OpenAI to analyze
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY is not set')
+    }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -103,7 +114,14 @@ serve(async (req) => {
             Dynamic database entries:
             ${JSON.stringify(similarDbPayers, null, 2)}
             Static database entries:
-            ${JSON.stringify(similarStaticPayers, null, 2)}`
+            ${JSON.stringify(similarStaticPayers, null, 2)}
+            
+            Return ONLY a JSON object with these exact fields:
+            {
+              "carrier_type": string (one of: "Medicare", "Medicaid", "Blue Cross", "Commercial", "HMO", "Other"),
+              "carrier_name": string (full name of the insurance carrier),
+              "policy_type": string (one of: "Medicare part B [MB]", "Medicare part A [MA]", "Medicare part C [ME]", "Medicaid [MC]", "Blue Cross [BL]", "Commercial [CI]", "HMO [HM]", "EPO [14]", "PPO [12]", "POS [13]", "Other [47]")
+            }`
           },
           {
             role: "user",
@@ -115,10 +133,16 @@ serve(async (req) => {
     })
 
     const data = await response.json()
+    console.log('OpenAI response:', data);
+    
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response from OpenAI')
+    }
+
     const aiResponse = JSON.parse(data.choices[0].message.content)
     
     // Store AI's analysis in our database with lower confidence
-    await supabase
+    const { error: insertError } = await supabase
       .from('payer_database')
       .insert({
         payer_id: payerId,
@@ -128,6 +152,10 @@ serve(async (req) => {
         confidence: 0.7, // Lower confidence for AI-generated entries
         last_verified: new Date().toISOString()
       })
+
+    if (insertError) {
+      console.error('Error storing AI analysis in database:', insertError);
+    }
 
     return new Response(JSON.stringify({
       ...aiResponse,
