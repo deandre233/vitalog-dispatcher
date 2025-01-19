@@ -76,6 +76,25 @@ const getProgressForStatus = (status: DispatchStatus): number => {
   }
 };
 
+const getStatusColor = (status: DispatchStatus): string => {
+  switch (status) {
+    case "dispatch":
+      return "bg-gray-100 text-gray-700";
+    case "enroute":
+      return "bg-blue-100 text-blue-700";
+    case "onscene":
+      return "bg-green-100 text-green-700";
+    case "transporting":
+      return "bg-orange-100 text-orange-700";
+    case "destination":
+      return "bg-yellow-100 text-yellow-700";
+    case "available":
+      return "bg-emerald-100 text-emerald-700";
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
+};
+
 export function DispatchItem({
   id,
   activationTime,
@@ -90,7 +109,6 @@ export function DispatchItem({
   eta,
   comments,
   warnings,
-  progress = 0,
   elapsedTime,
   lastUpdated,
   efficiency,
@@ -153,6 +171,9 @@ export function DispatchItem({
             >
               Call #{id}
             </Link>
+            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(currentStatus)}`}>
+              {currentStatus}
+            </span>
             <Button
               variant="ghost"
               size="sm"
@@ -247,18 +268,6 @@ export function DispatchItem({
                     </Button>
                   </div>
                 )}
-                
-                <div className="flex justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleTrackTransport}
-                    className="flex items-center gap-1"
-                  >
-                    <Truck className="w-4 h-4" />
-                    Track Transport
-                  </Button>
-                </div>
 
                 <div className="space-y-4">
                   <DispatchStatusBar
@@ -288,6 +297,18 @@ export function DispatchItem({
               </div>
             )}
           </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleTrackTransport}
+            className="flex items-center gap-1"
+          >
+            <Truck className="w-4 h-4" />
+            Track Transport
+          </Button>
         </div>
 
         {aiRecommendations.insights && aiRecommendations.insights.length > 0 && (

@@ -10,17 +10,57 @@ interface DispatchStatusBarProps {
 }
 
 const statusConfig = [
-  { id: "dispatch", label: "Dispatch", icon: Package, color: "bg-gray-500 hover:bg-gray-600" },
-  { id: "enroute", label: "En Route", icon: Car, color: "bg-yellow-500 hover:bg-yellow-600" },
-  { id: "onscene", label: "On Scene", icon: MapPin, color: "bg-green-500 hover:bg-green-600" },
-  { id: "transporting", label: "Transporting", icon: Ambulance, color: "bg-blue-500 hover:bg-blue-600" },
-  { id: "destination", label: "At Destination", icon: Flag, color: "bg-orange-500 hover:bg-orange-600" },
-  { id: "available", label: "Available", icon: CheckCircle, color: "bg-emerald-500 hover:bg-emerald-600" },
+  { 
+    id: "dispatch", 
+    label: "Dispatch", 
+    icon: Package, 
+    color: "bg-gray-500 hover:bg-gray-600",
+    progressColor: "bg-gray-500"
+  },
+  { 
+    id: "enroute", 
+    label: "En Route", 
+    icon: Car, 
+    color: "bg-blue-500 hover:bg-blue-600",
+    progressColor: "bg-blue-500"
+  },
+  { 
+    id: "onscene", 
+    label: "On Scene", 
+    icon: MapPin, 
+    color: "bg-green-500 hover:bg-green-600",
+    progressColor: "bg-green-500"
+  },
+  { 
+    id: "transporting", 
+    label: "Transporting", 
+    icon: Ambulance, 
+    color: "bg-orange-500 hover:bg-orange-600",
+    progressColor: "bg-orange-500"
+  },
+  { 
+    id: "destination", 
+    label: "At Destination", 
+    icon: Flag, 
+    color: "bg-yellow-500 hover:bg-yellow-600",
+    progressColor: "bg-yellow-500"
+  },
+  { 
+    id: "available", 
+    label: "Available", 
+    icon: CheckCircle, 
+    color: "bg-emerald-500 hover:bg-emerald-600",
+    progressColor: "bg-emerald-500"
+  },
 ] as const;
 
 export function DispatchStatusBar({ currentStatus, onStatusChange }: DispatchStatusBarProps) {
   const getStatusIndex = (status: DispatchStatus) => {
     return statusConfig.findIndex(s => s.id === status);
+  };
+
+  const getCurrentStatusConfig = () => {
+    return statusConfig.find(s => s.id === currentStatus) || statusConfig[0];
   };
 
   return (
@@ -50,7 +90,7 @@ export function DispatchStatusBar({ currentStatus, onStatusChange }: DispatchSta
                 <div 
                   className={cn(
                     "h-full transition-all",
-                    (isActive || isPast) ? status.color.split(' ')[0] : "bg-gray-200"
+                    (isActive || isPast) ? status.progressColor : "bg-gray-200"
                   )}
                   style={{
                     width: isPast ? "100%" : isActive ? "50%" : "0%"
