@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import { 
   FileText, 
   Phone, 
@@ -30,10 +32,52 @@ import {
   Ambulance,
   Building2
 } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const PatientRecord = () => {
   const { patientName } = useParams();
   const decodedName = decodeURIComponent(patientName || "");
+  const [isEditing, setIsEditing] = useState(false);
+  const [patientData, setPatientData] = useState({
+    phone: "(678) 875-9912",
+    email: "angela.turner@email.com",
+    address: "855 Fayetteville Rd Se",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30316"
+  });
+  const { toast } = useToast();
+
+  const handleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleSave = async () => {
+    try {
+      // Here we would update the patient data in Supabase
+      // For now, just toggle editing mode and show success toast
+      setIsEditing(false);
+      toast({
+        title: "Success",
+        description: "Patient information updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update patient information",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPatientData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -79,7 +123,9 @@ const PatientRecord = () => {
                         </div>
                       </div>
                     </div>
-                    <Button variant="outline">Edit Profile</Button>
+                    <Button variant="outline" onClick={isEditing ? handleSave : handleEdit}>
+                      {isEditing ? "Save Changes" : "Edit Profile"}
+                    </Button>
                   </div>
 
                   <Tabs defaultValue="demographics" className="w-full">
@@ -132,17 +178,72 @@ const PatientRecord = () => {
                             </div>
                             <div className="flex items-center gap-2 text-sm">
                               <Phone className="h-4 w-4 text-gray-500" />
-                              <span>(678) 875-9912</span>
+                              {isEditing ? (
+                                <Input
+                                  name="phone"
+                                  value={patientData.phone}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                />
+                              ) : (
+                                <span>{patientData.phone}</span>
+                              )}
                             </div>
                             <div className="flex items-center gap-2 text-sm">
                               <Mail className="h-4 w-4 text-gray-500" />
-                              <span>angela.turner@email.com</span>
+                              {isEditing ? (
+                                <Input
+                                  name="email"
+                                  value={patientData.email}
+                                  onChange={handleInputChange}
+                                  className="h-8 text-sm"
+                                />
+                              ) : (
+                                <span>{patientData.email}</span>
+                              )}
                             </div>
                             <div className="flex items-start gap-2 text-sm">
                               <MapPin className="h-4 w-4 text-gray-500 mt-1" />
-                              <div>
-                                <p>855 Fayetteville Rd Se</p>
-                                <p>Atlanta, GA 30316</p>
+                              <div className="flex-1">
+                                {isEditing ? (
+                                  <div className="space-y-2">
+                                    <Input
+                                      name="address"
+                                      value={patientData.address}
+                                      onChange={handleInputChange}
+                                      className="h-8 text-sm"
+                                      placeholder="Street Address"
+                                    />
+                                    <div className="grid grid-cols-3 gap-2">
+                                      <Input
+                                        name="city"
+                                        value={patientData.city}
+                                        onChange={handleInputChange}
+                                        className="h-8 text-sm"
+                                        placeholder="City"
+                                      />
+                                      <Input
+                                        name="state"
+                                        value={patientData.state}
+                                        onChange={handleInputChange}
+                                        className="h-8 text-sm"
+                                        placeholder="State"
+                                      />
+                                      <Input
+                                        name="zip"
+                                        value={patientData.zip}
+                                        onChange={handleInputChange}
+                                        className="h-8 text-sm"
+                                        placeholder="ZIP"
+                                      />
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <p>{patientData.address}</p>
+                                    <p>{patientData.city}, {patientData.state} {patientData.zip}</p>
+                                  </>
+                                )}
                               </div>
                             </div>
                           </div>
