@@ -140,11 +140,10 @@ const assignedScheduledTransports: ScheduledTransportProps[] = [
 ];
 
 const filterDispatches = (dispatches: Dispatch[], status: "assigned" | "unassigned"): Dispatch[] => {
-  return dispatches.filter(dispatch => 
-    status === "assigned" 
-      ? dispatch.assignedTo !== "Unassigned"
-      : dispatch.assignedTo === "Unassigned"
-  );
+  return dispatches.filter(dispatch => {
+    const isAssigned = dispatch.assignedTo && dispatch.assignedTo !== "Unassigned";
+    return status === "assigned" ? isAssigned : !isAssigned;
+  });
 };
 
 const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> => {
@@ -279,9 +278,11 @@ export function DispatchBoard() {
     [dispatches]
   );
 
-  const assignedDispatches = useMemo(() => 
-    filterDispatches(dispatches, "assigned").concat(
-      assignedScheduledTransports.filter(t => t.status === "Assigned").map(t => ({
+  const assignedDispatches = useMemo(() => {
+    const assignedRegularDispatches = filterDispatches(dispatches, "assigned");
+    const assignedScheduledTransports = assignedScheduledTransports
+      .filter(t => t.status === "Assigned")
+      .map(t => ({
         id: t.id,
         activationTime: t.scheduledTime,
         patient: {
@@ -303,10 +304,10 @@ export function DispatchBoard() {
         eta: "TBD",
         progress: t.progress,
         elapsedTime: "In Progress"
-      }))
-    ),
-    [dispatches]
-  );
+      }));
+
+    return [...assignedRegularDispatches, ...assignedScheduledTransports];
+  }, [dispatches]);
 
   // AI Insights notifications
   useEffect(() => {
