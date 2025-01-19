@@ -10,9 +10,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-export function DashboardHeader() {
-  const [view, setView] = useState<'active' | 'schedule' | 'calendar'>('active');
+export type ViewType = 'active' | 'schedule' | 'calendar';
+
+interface DashboardHeaderProps {
+  onViewChange?: (view: ViewType) => void;
+  defaultView?: ViewType;
+}
+
+export function DashboardHeader({ onViewChange, defaultView = 'active' }: DashboardHeaderProps) {
+  const [view, setView] = useState<ViewType>(defaultView);
   const [unattendedMode, setUnattendedMode] = useState(false);
+
+  const handleViewChange = (newView: ViewType) => {
+    setView(newView);
+    onViewChange?.(newView);
+  };
 
   return (
     <div className="flex flex-col bg-white border-b">
@@ -55,7 +67,7 @@ export function DashboardHeader() {
       <div className="flex gap-2 px-6 pb-2">
         <Button
           variant={view === 'active' ? 'default' : 'outline'}
-          onClick={() => setView('active')}
+          onClick={() => handleViewChange('active')}
           className="gap-2"
         >
           <Clock className="w-4 h-4" />
@@ -63,7 +75,7 @@ export function DashboardHeader() {
         </Button>
         <Button
           variant={view === 'schedule' ? 'default' : 'outline'}
-          onClick={() => setView('schedule')}
+          onClick={() => handleViewChange('schedule')}
           className="gap-2"
         >
           <Clock className="w-4 h-4" />
@@ -71,7 +83,7 @@ export function DashboardHeader() {
         </Button>
         <Button
           variant={view === 'calendar' ? 'default' : 'outline'}
-          onClick={() => setView('calendar')}
+          onClick={() => handleViewChange('calendar')}
           className="gap-2"
         >
           <Calendar className="w-4 h-4" />
