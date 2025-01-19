@@ -36,6 +36,9 @@ interface InsuranceRecord {
   policyholder_phone?: string;
   payor_id?: string;
   nsure_payor_code?: string;
+  created_at?: string;
+  updated_at?: string;
+  patient_id?: string;
 }
 
 interface BillingSettings {
@@ -49,6 +52,9 @@ interface BillingSettings {
   employer_phone?: string;
   employer_address?: string;
   patient_notes?: string;
+  created_at?: string;
+  updated_at?: string;
+  patient_id?: string;
 }
 
 interface BillingTabContentProps {
@@ -113,7 +119,15 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
       }
 
       if (data) {
-        setBillingSettings(data);
+        // Validate and transform the preauth_required field
+        const transformedData: BillingSettings = {
+          ...data,
+          preauth_required: isValidPreauthRequired(data.preauth_required) ? data.preauth_required : undefined,
+          pricing_schema: isValidPricingSchema(data.pricing_schema) ? data.pricing_schema : undefined,
+          subscription_type: isValidSubscriptionType(data.subscription_type) ? data.subscription_type : undefined
+        };
+        console.log('Transformed billing settings:', transformedData);
+        setBillingSettings(transformedData);
       }
     } catch (err) {
       console.error('Error in fetchBillingSettings:', err);
