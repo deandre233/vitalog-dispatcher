@@ -42,7 +42,7 @@ export function CrewAssignmentModal({
     if (crew) {
       const estimatedMinutes = recommendedCrew?.id === crew.id
         ? Math.round(recommendedCrew.routeInfo.duration)
-        : Math.round(calculateDistance(crew, origin) * 2);
+        : Math.round(calculateDistance(crew.location, origin) * 2);
         
       if (!manualOverride && recommendedCrew && crew.id !== recommendedCrew.id) {
         toast.warning("You are assigning a non-recommended crew member", {
@@ -119,7 +119,10 @@ export function CrewAssignmentModal({
           data: {
             type: 'Feature',
             properties: {},
-            geometry: recommendedCrew.routeInfo.route.geometry
+            geometry: {
+              type: 'LineString',
+              coordinates: recommendedCrew.routeInfo.route!.geometry.coordinates
+            }
           }
         });
 
