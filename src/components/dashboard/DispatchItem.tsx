@@ -8,7 +8,8 @@ import {
   X,
   Calendar,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  XCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -71,10 +72,18 @@ export function DispatchItem({
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<DispatchStatus>(status.toLowerCase().replace(" ", "") as DispatchStatus);
+  const [currentAssignedTo, setCurrentAssignedTo] = useState(assignedTo);
 
   const handleStatusChange = (newStatus: DispatchStatus) => {
     setCurrentStatus(newStatus);
     toast.success(`Dispatch ${id} status updated to ${newStatus}`);
+  };
+
+  const handleUnassign = () => {
+    setCurrentAssignedTo("Unassigned");
+    toast.success(`Dispatch ${id} has been unassigned`, {
+      description: "The dispatch is now available for reassignment"
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -180,7 +189,7 @@ export function DispatchItem({
           {/* Actions */}
           <div className="flex items-center gap-4">
             <div className="text-sm font-medium">ETA: {eta}</div>
-            {status === "Pending" ? (
+            {currentAssignedTo === "Unassigned" ? (
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -189,17 +198,18 @@ export function DispatchItem({
                 >
                   Assign Crew
                 </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Assigned to: {currentAssignedTo}</span>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="text-red-500 hover:text-red-600"
+                  onClick={handleUnassign}
                 >
-                  <X className="w-4 h-4" />
+                  <XCircle className="w-4 h-4" />
                 </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Assigned to: {assignedTo}</span>
               </div>
             )}
           </div>
