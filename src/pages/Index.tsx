@@ -1,4 +1,4 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
@@ -12,9 +12,10 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       <div className="flex-1 flex">
-        <SidebarProvider>
+        <SidebarProvider defaultOpen={true}>
           <div className="min-h-screen flex w-full">
             <AppSidebar />
+            <SidebarRail />
             <div className="flex-1 bg-[#f4f7fc] overflow-auto">
               <DashboardHeader />
               <main className="p-6">
