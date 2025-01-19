@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { payerDatabase } from './payerDatabase.ts'
 
 const corsHeaders = {
@@ -14,13 +15,56 @@ serve(async (req) => {
   try {
     const { payerId } = await req.json()
     
-    // First try exact match in our database
-    const exactMatch = payerDatabase.find(p => p.payerId === payerId)
-    if (exactMatch) {
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing environment variables')
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    
+    // First check our dynamic database
+    const { data: dbMatch, error: dbError } = await supabase
+      .from('payer_database')
+      .select('*')
+      .eq('payer_id', payerId)
+      .order('confidence', { ascending: false })
+      .limit(1)
+      .single()
+    
+    if (dbMatch) {
       return new Response(JSON.stringify({
-        carrier_type: exactMatch.carrierType,
-        carrier_name: exactMatch.carrierName,
-        policy_type: exactMatch.policyType
+        carrier_type: dbMatch.carrier_type,
+        carrier_name: dbMatch.carrier_name,
+        policy_type: dbMatch.policy_type,
+        confidence: dbMatch.confidence
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Then check our static database
+    const staticMatch = payerDatabase.find(p => p.payerId === payerId)
+    if (staticMatch) {
+      // Store this in our dynamic database with high confidence
+      await supabase
+        .from('payer_database')
+        .insert({
+          payer_id: payerId,
+          carrier_type: staticMatch.carrierType,
+          carrier_name: staticMatch.carrierName,
+          policy_type: staticMatch.policyType,
+          confidence: 1.0,
+          last_verified: new Date().toISOString()
+        })
+
+      return new Response(JSON.stringify({
+        carrier_type: staticMatch.carrierType,
+        carrier_name: staticMatch.carrierName,
+        policy_type: staticMatch.policyType,
+        confidence: 1.0
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -32,8 +76,14 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not set')
     }
 
-    // Use similar payer IDs from our database to help GPT make better predictions
-    const similarPayers = payerDatabase
+    // Get similar payer IDs from both databases to help GPT
+    const { data: similarDbPayers } = await supabase
+      .from('payer_database')
+      .select('*')
+      .order('confidence', { ascending: false })
+      .limit(5)
+
+    const similarStaticPayers = payerDatabase
       .filter(p => p.payerId.startsWith(payerId.substring(0, 2)))
       .slice(0, 5)
 
@@ -49,8 +99,11 @@ serve(async (req) => {
           {
             role: "system",
             content: `You are an expert in healthcare insurance payer IDs. Analyze the given payer ID and return carrier information.
-            Here are some similar payer IDs from our database for reference:
-            ${JSON.stringify(similarPayers, null, 2)}`
+            Here are some similar payer IDs from our databases for reference:
+            Dynamic database entries:
+            ${JSON.stringify(similarDbPayers, null, 2)}
+            Static database entries:
+            ${JSON.stringify(similarStaticPayers, null, 2)}`
           },
           {
             role: "user",
@@ -63,11 +116,27 @@ serve(async (req) => {
 
     const data = await response.json()
     const aiResponse = JSON.parse(data.choices[0].message.content)
+    
+    // Store AI's analysis in our database with lower confidence
+    await supabase
+      .from('payer_database')
+      .insert({
+        payer_id: payerId,
+        carrier_type: aiResponse.carrier_type,
+        carrier_name: aiResponse.carrier_name,
+        policy_type: aiResponse.policy_type,
+        confidence: 0.7, // Lower confidence for AI-generated entries
+        last_verified: new Date().toISOString()
+      })
 
-    return new Response(JSON.stringify(aiResponse), {
+    return new Response(JSON.stringify({
+      ...aiResponse,
+      confidence: 0.7
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {
+    console.error('Error:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
