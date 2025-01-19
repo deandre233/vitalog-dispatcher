@@ -24,13 +24,15 @@ import { format } from "date-fns";
 
 interface TransportRecord {
   id: string;
+  patient_id: string | null;
   dispatch_id: string;
   pickup_location: string;
   dropoff_location: string;
-  transport_date: string;
+  transport_date: string | null;
   status: string;
   crew_assigned: string | null;
   notes: string | null;
+  created_at: string | null;
   recurrence_type: string | null;
   recurrence_day: string | null;
   recurrence_frequency: string | null;

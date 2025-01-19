@@ -213,36 +213,57 @@ export type Database = {
           crew_assigned: string | null
           dispatch_id: string
           dropoff_location: string
+          dropoff_type: string | null
           id: string
           notes: string | null
           patient_id: string | null
           pickup_location: string
+          pickup_type: string | null
+          recurrence_day: string | null
+          recurrence_frequency: string | null
+          recurrence_type: string | null
+          return_trip_id: string | null
           status: string
           transport_date: string | null
+          warnings: string[] | null
         }
         Insert: {
           created_at?: string | null
           crew_assigned?: string | null
           dispatch_id: string
           dropoff_location: string
+          dropoff_type?: string | null
           id?: string
           notes?: string | null
           patient_id?: string | null
           pickup_location: string
+          pickup_type?: string | null
+          recurrence_day?: string | null
+          recurrence_frequency?: string | null
+          recurrence_type?: string | null
+          return_trip_id?: string | null
           status: string
           transport_date?: string | null
+          warnings?: string[] | null
         }
         Update: {
           created_at?: string | null
           crew_assigned?: string | null
           dispatch_id?: string
           dropoff_location?: string
+          dropoff_type?: string | null
           id?: string
           notes?: string | null
           patient_id?: string | null
           pickup_location?: string
+          pickup_type?: string | null
+          recurrence_day?: string | null
+          recurrence_frequency?: string | null
+          recurrence_type?: string | null
+          return_trip_id?: string | null
           status?: string
           transport_date?: string | null
+          warnings?: string[] | null
         }
         Relationships: [
           {
@@ -250,6 +271,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transport_records_return_trip_id_fkey"
+            columns: ["return_trip_id"]
+            isOneToOne: false
+            referencedRelation: "transport_records"
             referencedColumns: ["id"]
           },
         ]
