@@ -202,7 +202,7 @@ export function CrewAssignmentModal({
                   .filter(crew => crew.available)
                   .map((crew) => {
                     const isRecommended = recommendedCrew?.id === crew.id;
-                    const distance = calculateDistance(crew, origin);
+                    const distance = calculateDistance(crew.location, origin);
                     const estimatedMinutes = isRecommended 
                       ? Math.round(recommendedCrew.routeInfo.duration)
                       : Math.round(distance * 2);
