@@ -182,7 +182,6 @@ export function CrewAssignmentModal({
             routeLine.current.setMap(null);
           }
 
-          // Safely access the overview_polyline with optional chaining and type checking
           const route = routeDetails.route.routes[0];
           if (!route?.overview_polyline) return;
 
@@ -192,10 +191,12 @@ export function CrewAssignmentModal({
           if (
             typeof polylinePoints === 'object' && 
             polylinePoints !== null &&
-            'points' in polylinePoints && 
-            typeof polylinePoints.points === 'string'
+            'points' in polylinePoints
           ) {
-            const decodedPath = google.maps.geometry.encoding.decodePath(polylinePoints.points);
+            // Use type assertion after we've verified polylinePoints is valid
+            const points = polylinePoints!.points;
+            const decodedPath = google.maps.geometry.encoding.decodePath(points);
+            
             if (decodedPath) {
               routeLine.current = new google.maps.Polyline({
                 path: decodedPath,
