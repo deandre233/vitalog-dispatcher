@@ -49,6 +49,7 @@ const PatientRecord = () => {
   const { patientId } = useParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const [patientData, setPatientData] = useState({
     id: '',
