@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,10 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, AlertTriangle, Upload, Loader2 } from "lucide-react";
+import { Search, Plus, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MedicalHistorySearch } from "./MedicalHistorySearch";
 
@@ -25,37 +24,34 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   const [documentType, setDocumentType] = useState("facesheet");
   const [medicationSearchTerm, setMedicationSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [predictions, setPredictions] = useState<string[]>([]);
   const [selectedMedication, setSelectedMedication] = useState<any>(null);
   const [medicalHistory, setMedicalHistory] = useState<Array<{ code: string; description: string }>>([]);
 
+  // Add predictive search effect
+  useEffect(() => {
+    const getPredictions = async () => {
+      if (medicationSearchTerm.length >= 2) {
+        try {
+          const { data, error } = await supabase.functions.invoke('predict-medications', {
+            body: { searchTerm: medicationSearchTerm }
+          });
+
+          if (error) throw error;
+          setPredictions(data.suggestions || []);
+        } catch (error) {
+          console.error('Error getting predictions:', error);
+        }
+      } else {
+        setPredictions([]);
+      }
+    };
+
+    const timeoutId = setTimeout(getPredictions, 300);
+    return () => clearTimeout(timeoutId);
+  }, [medicationSearchTerm]);
+
   const handleSearch = async () => {
-    setIsProcessing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('analyze-medical-search', {
-        body: { searchTerm, type: 'condition' }
-      });
-
-      if (error) throw error;
-
-      setSearchResults(data.results);
-      toast({
-        title: "Search Results",
-        description: `Found ${data.results.length} matching conditions`,
-      });
-
-    } catch (error) {
-      console.error('Error searching:', error);
-      toast({
-        title: "Error",
-        description: "Failed to search medical conditions",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleMedicationSearch = async () => {
     setIsProcessing(true);
     try {
       const { data, error } = await supabase.functions.invoke('analyze-medical-search', {
@@ -66,12 +62,12 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
 
       setSearchResults(data.results);
       toast({
-        title: "Medication Search Results",
+        title: "Search Results",
         description: `Found ${data.results.length} matching medications`,
       });
 
     } catch (error) {
-      console.error('Error searching medications:', error);
+      console.error('Error searching:', error);
       toast({
         title: "Error",
         description: "Failed to search medications",
@@ -232,29 +228,50 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
       <Card className="p-6">
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Current Medications</h3>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Search medications (e.g., 'Lisinopril' or 'diabetes')"
-              value={medicationSearchTerm}
-              onChange={(e) => setMedicationSearchTerm(e.target.value)}
-              className="flex-1"
-            />
-            <Button 
-              variant="secondary" 
-              onClick={handleMedicationSearch}
-              disabled={isProcessing}
-            >
-              {isProcessing ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Search className="h-4 w-4 mr-2" />
-              )}
-              Search
-            </Button>
-            <Button onClick={handleAddCondition}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add
-            </Button>
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Input
+                  placeholder="Search medications (e.g., 'Lisinopril' or 'diabetes')"
+                  value={medicationSearchTerm}
+                  onChange={(e) => setMedicationSearchTerm(e.target.value)}
+                  className="w-full"
+                />
+                {predictions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg">
+                    {predictions.map((prediction, index) => (
+                      <div
+                        key={index}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          setMedicationSearchTerm(prediction);
+                          setPredictions([]);
+                          handleSearch();
+                        }}
+                      >
+                        {prediction}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <Button 
+                variant="secondary" 
+                onClick={handleSearch}
+                disabled={isProcessing}
+              >
+                {isProcessing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Search className="h-4 w-4 mr-2" />
+                )}
+                Search
+              </Button>
+              <Button onClick={() => handleAddCondition()}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add
+              </Button>
+            </div>
           </div>
           <ScrollArea className="h-[200px] border rounded-md p-4">
             {searchResults.map((med, index) => (
