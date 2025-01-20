@@ -3,7 +3,7 @@ import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Card } from "@/components/ui/card";
+import { BookingForm } from "@/components/dispatch/BookingForm";
 
 const CreateDispatch = () => {
   return (
@@ -15,10 +15,11 @@ const CreateDispatch = () => {
           <div className="flex-1 bg-[#f4f7fc] overflow-auto">
             <DashboardHeader />
             <main className="p-6">
-              <Card className="p-6">
-                <h2 className="text-2xl font-semibold mb-6">Create New Dispatch</h2>
-                <p className="text-gray-500">Form implementation coming in next iteration</p>
-              </Card>
+              <div className="mb-6">
+                <h2 className="text-2xl font-semibold">Create New Dispatch</h2>
+                <p className="text-gray-500">Fill out the form below to create a new dispatch</p>
+              </div>
+              <BookingForm />
             </main>
           </div>
         </SidebarProvider>

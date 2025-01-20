@@ -207,6 +207,51 @@ export type Database = {
           },
         ]
       }
+      dispatch_locations: {
+        Row: {
+          address: string | null
+          city: string | null
+          county: string | null
+          created_at: string | null
+          floor_room: string | null
+          id: string
+          location_type: string | null
+          name: string
+          state: string | null
+          telephone: string | null
+          updated_at: string | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          county?: string | null
+          created_at?: string | null
+          floor_room?: string | null
+          id?: string
+          location_type?: string | null
+          name: string
+          state?: string | null
+          telephone?: string | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          county?: string | null
+          created_at?: string | null
+          floor_room?: string | null
+          id?: string
+          location_type?: string | null
+          name?: string
+          state?: string | null
+          telephone?: string | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
       dispatch_patterns: {
         Row: {
           confidence_score: number | null
@@ -745,86 +790,185 @@ export type Database = {
       transport_records: {
         Row: {
           actual_arrival: string | null
+          ai_recommendations: Json | null
+          behavioral_illness: boolean | null
+          billing_notes: string | null
+          breathing_problem: boolean | null
+          caller_name: string | null
+          caller_phone: string | null
+          confined_to_bed: boolean | null
           created_at: string | null
           crew_assigned: string | null
           destination_address: string | null
+          destination_floor_room: string | null
+          destination_type: string | null
           dispatch_id: string
           dispatch_status: Database["public"]["Enums"]["dispatch_status"] | null
+          dispatcher_notes: string | null
+          dnr_order: boolean | null
           dropoff_location: string
           dropoff_type: string | null
           estimated_arrival: string | null
+          fresh_prepared: boolean | null
+          hearing_impaired: boolean | null
           id: string
+          language_barrier: boolean | null
           notes: string | null
           origin_address: string | null
+          origin_floor_room: string | null
+          origin_type: string | null
           patient_id: string | null
+          physically_impaired: boolean | null
           pickup_location: string
           pickup_type: string | null
+          prior_auth_number: string | null
+          priority_level: Database["public"]["Enums"]["priority_level"] | null
+          reason_for_destination: string | null
           recurrence_day: string | null
+          recurrence_end_date: string | null
           recurrence_frequency: string | null
+          recurrence_times: number | null
           recurrence_type: string | null
+          requires_bariatric: boolean | null
+          requires_bcs: boolean | null
+          requires_isolation: boolean | null
+          requires_isolation_type: string | null
+          requires_o2: boolean | null
+          requires_ventilator: boolean | null
           return_trip_id: string | null
           scheduled_time: string | null
+          service_type: Database["public"]["Enums"]["service_type"] | null
+          sight_impaired: boolean | null
+          speech_impaired: boolean | null
           status: string
           transport_date: string | null
           transport_type: string | null
+          trip_type: Database["public"]["Enums"]["trip_type"] | null
+          unstable_impaired: boolean | null
           vehicle_number: string | null
           warnings: string[] | null
         }
         Insert: {
           actual_arrival?: string | null
+          ai_recommendations?: Json | null
+          behavioral_illness?: boolean | null
+          billing_notes?: string | null
+          breathing_problem?: boolean | null
+          caller_name?: string | null
+          caller_phone?: string | null
+          confined_to_bed?: boolean | null
           created_at?: string | null
           crew_assigned?: string | null
           destination_address?: string | null
+          destination_floor_room?: string | null
+          destination_type?: string | null
           dispatch_id: string
           dispatch_status?:
             | Database["public"]["Enums"]["dispatch_status"]
             | null
+          dispatcher_notes?: string | null
+          dnr_order?: boolean | null
           dropoff_location: string
           dropoff_type?: string | null
           estimated_arrival?: string | null
+          fresh_prepared?: boolean | null
+          hearing_impaired?: boolean | null
           id?: string
+          language_barrier?: boolean | null
           notes?: string | null
           origin_address?: string | null
+          origin_floor_room?: string | null
+          origin_type?: string | null
           patient_id?: string | null
+          physically_impaired?: boolean | null
           pickup_location: string
           pickup_type?: string | null
+          prior_auth_number?: string | null
+          priority_level?: Database["public"]["Enums"]["priority_level"] | null
+          reason_for_destination?: string | null
           recurrence_day?: string | null
+          recurrence_end_date?: string | null
           recurrence_frequency?: string | null
+          recurrence_times?: number | null
           recurrence_type?: string | null
+          requires_bariatric?: boolean | null
+          requires_bcs?: boolean | null
+          requires_isolation?: boolean | null
+          requires_isolation_type?: string | null
+          requires_o2?: boolean | null
+          requires_ventilator?: boolean | null
           return_trip_id?: string | null
           scheduled_time?: string | null
+          service_type?: Database["public"]["Enums"]["service_type"] | null
+          sight_impaired?: boolean | null
+          speech_impaired?: boolean | null
           status: string
           transport_date?: string | null
           transport_type?: string | null
+          trip_type?: Database["public"]["Enums"]["trip_type"] | null
+          unstable_impaired?: boolean | null
           vehicle_number?: string | null
           warnings?: string[] | null
         }
         Update: {
           actual_arrival?: string | null
+          ai_recommendations?: Json | null
+          behavioral_illness?: boolean | null
+          billing_notes?: string | null
+          breathing_problem?: boolean | null
+          caller_name?: string | null
+          caller_phone?: string | null
+          confined_to_bed?: boolean | null
           created_at?: string | null
           crew_assigned?: string | null
           destination_address?: string | null
+          destination_floor_room?: string | null
+          destination_type?: string | null
           dispatch_id?: string
           dispatch_status?:
             | Database["public"]["Enums"]["dispatch_status"]
             | null
+          dispatcher_notes?: string | null
+          dnr_order?: boolean | null
           dropoff_location?: string
           dropoff_type?: string | null
           estimated_arrival?: string | null
+          fresh_prepared?: boolean | null
+          hearing_impaired?: boolean | null
           id?: string
+          language_barrier?: boolean | null
           notes?: string | null
           origin_address?: string | null
+          origin_floor_room?: string | null
+          origin_type?: string | null
           patient_id?: string | null
+          physically_impaired?: boolean | null
           pickup_location?: string
           pickup_type?: string | null
+          prior_auth_number?: string | null
+          priority_level?: Database["public"]["Enums"]["priority_level"] | null
+          reason_for_destination?: string | null
           recurrence_day?: string | null
+          recurrence_end_date?: string | null
           recurrence_frequency?: string | null
+          recurrence_times?: number | null
           recurrence_type?: string | null
+          requires_bariatric?: boolean | null
+          requires_bcs?: boolean | null
+          requires_isolation?: boolean | null
+          requires_isolation_type?: string | null
+          requires_o2?: boolean | null
+          requires_ventilator?: boolean | null
           return_trip_id?: string | null
           scheduled_time?: string | null
+          service_type?: Database["public"]["Enums"]["service_type"] | null
+          sight_impaired?: boolean | null
+          speech_impaired?: boolean | null
           status?: string
           transport_date?: string | null
           transport_type?: string | null
+          trip_type?: Database["public"]["Enums"]["trip_type"] | null
+          unstable_impaired?: boolean | null
           vehicle_number?: string | null
           warnings?: string[] | null
         }
@@ -907,6 +1051,10 @@ export type Database = {
         | "insurance"
         | "check"
         | "other"
+      priority_level: "Critical" | "Emergency" | "Lower acuity" | "Scheduled"
+      recurrence_type: "Disabled" | "Daily" | "Weekly" | "Monthly"
+      service_type: "WC" | "BLS" | "ALS" | "MICU"
+      trip_type: "One way" | "Wait-and-return" | "Round trip"
     }
     CompositeTypes: {
       [_ in never]: never
