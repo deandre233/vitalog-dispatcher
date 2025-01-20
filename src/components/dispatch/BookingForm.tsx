@@ -49,6 +49,29 @@ const mockCalls = [
   }
 ];
 
+const serviceComplaints = [
+  "Transfer / Palliative care",
+  "Medical alarm",
+  "MIH / CP Visit",
+  "Nausea",
+  "No other appropriate choice",
+  "Overdose / Poisoning / Ingestion",
+  "Pandemic / Epidemic / Outbreak",
+  "Pregnancy / Childbirth",
+  "Psychiatric / Suicidal",
+  "Seizure / Convulsions",
+  "Sick person",
+  "Stab / Gunshot wound / Penetration",
+  "Standby",
+  "Stroke / CVA",
+  "Traffic / Transportation incident",
+  "Heart problems / AICD",
+  "Heat / Cold exposure",
+  "Industrial accident / Entrapments",
+  "Intercept",
+  "Headache"
+];
+
 export function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedMockCall, setSelectedMockCall] = useState(0);
@@ -459,92 +482,84 @@ export function BookingForm() {
       {/* Service Details */}
       <Card className="p-6 border-l-4 border-l-medical-secondary">
         <h3 className="text-lg font-semibold mb-4 text-medical-primary">Service Details</h3>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Service Type</Label>
-            <Select onValueChange={(value) => register("service_type").onChange({ target: { value } })}>
-              <SelectTrigger className="border-medical-secondary/30">
-                <SelectValue placeholder="Select service type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="WC">Wheelchair</SelectItem>
-                <SelectItem value="BLS">Basic Life Support</SelectItem>
-                <SelectItem value="ALS">Advanced Life Support</SelectItem>
-                <SelectItem value="MICU">Mobile ICU</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Priority Level</Label>
-            <RadioGroup 
-              className="flex gap-4" 
-              onValueChange={(value) => register("priority_level").onChange({ target: { value } })}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Critical" id="critical" />
-                <Label htmlFor="critical" className="text-red-500">Critical</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Emergency" id="emergency" />
-                <Label htmlFor="emergency" className="text-orange-500">Emergency</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Lower acuity" id="lower-acuity" />
-                <Label htmlFor="lower-acuity" className="text-yellow-600">Lower Acuity</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Scheduled" id="scheduled" />
-                <Label htmlFor="scheduled" className="text-green-600">Scheduled</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Trip Type</Label>
-            <RadioGroup 
-              className="flex gap-4"
-              onValueChange={(value) => register("trip_type").onChange({ target: { value } })}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="One way" id="one-way" />
-                <Label htmlFor="one-way">One Way</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Wait-and-return" id="wait-return" />
-                <Label htmlFor="wait-return">Wait and Return</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Round trip" id="round-trip" />
-                <Label htmlFor="round-trip">Round Trip</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
-      </Card>
-
-      {/* Enhanced Service Details */}
-      <Card className="p-6 border-l-4 border-l-medical-secondary">
-        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Enhanced Service Details</h3>
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Service Complaint</Label>
-                <Textarea 
-                  {...register("service_complaint")}
-                  className="min-h-[100px] border-medical-secondary/30 focus:border-medical-secondary"
-                  placeholder="Enter service complaint details..."
-                />
+                <Label>Service Type</Label>
+                <Select onValueChange={(value) => register("service_type").onChange({ target: { value } })}>
+                  <SelectTrigger className="border-medical-secondary/30">
+                    <SelectValue placeholder="Select service type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="WC">Wheelchair</SelectItem>
+                    <SelectItem value="BLS">Basic Life Support</SelectItem>
+                    <SelectItem value="ALS">Advanced Life Support</SelectItem>
+                    <SelectItem value="MICU">Mobile ICU</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Price Quote</Label>
-                <Input 
-                  {...register("price_quote")}
-                  className="border-medical-secondary/30 focus:border-medical-secondary"
-                  placeholder="Enter price quote"
-                />
+                <Label>Service Complaint</Label>
+                <Select onValueChange={(value) => register("service_complaint").onChange({ target: { value } })}>
+                  <SelectTrigger className="border-medical-secondary/30">
+                    <SelectValue placeholder="Select complaint" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {serviceComplaints.map((complaint) => (
+                      <SelectItem key={complaint} value={complaint}>
+                        {complaint}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Priority Level</Label>
+                <RadioGroup 
+                  className="flex gap-4" 
+                  onValueChange={(value) => register("priority_level").onChange({ target: { value } })}
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Critical" id="critical" />
+                    <Label htmlFor="critical" className="text-red-500">Critical</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Emergency" id="emergency" />
+                    <Label htmlFor="emergency" className="text-orange-500">Emergency</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Lower acuity" id="lower-acuity" />
+                    <Label htmlFor="lower-acuity" className="text-yellow-600">Lower Acuity</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Scheduled" id="scheduled" />
+                    <Label htmlFor="scheduled" className="text-green-600">Scheduled</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Trip Type</Label>
+                <RadioGroup 
+                  className="flex gap-4"
+                  onValueChange={(value) => register("trip_type").onChange({ target: { value } })}
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="One way" id="one-way" />
+                    <Label htmlFor="one-way">One Way</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Wait-and-return" id="wait-return" />
+                    <Label htmlFor="wait-return">Wait and Return</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Round trip" id="round-trip" />
+                    <Label htmlFor="round-trip">Round Trip</Label>
+                  </div>
+                </RadioGroup>
               </div>
             </div>
 
@@ -582,6 +597,15 @@ export function BookingForm() {
               <div className="flex items-center space-x-2">
                 <Checkbox {...register("cash_upfront")} id="cash-upfront" />
                 <Label htmlFor="cash-upfront">Cash Payment Required Upfront</Label>
+              </div>
+
+              <div className="space-y-2 mt-4">
+                <Label>Price Quote</Label>
+                <Input 
+                  {...register("price_quote")}
+                  className="border-medical-secondary/30 focus:border-medical-secondary"
+                  placeholder="Enter price quote"
+                />
               </div>
             </div>
           </div>
