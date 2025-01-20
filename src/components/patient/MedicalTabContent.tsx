@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Search, Plus, AlertTriangle, Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { MedicalHistorySearch } from "./MedicalHistorySearch";
 
 interface MedicalTabContentProps {
   patientId: string;
@@ -25,6 +26,7 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   const [medicationSearchTerm, setMedicationSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [selectedMedication, setSelectedMedication] = useState<any>(null);
+  const [medicalHistory, setMedicalHistory] = useState<Array<{ code: string; description: string }>>([]);
 
   const handleSearch = async () => {
     setIsProcessing(true);
@@ -167,6 +169,33 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
     }
   };
 
+  const handleHistoryAdd = async (history: { code: string; description: string }) => {
+    try {
+      const { error } = await supabase
+        .from('medical_history')
+        .insert({
+          patient_id: patientId,
+          type: 'condition',
+          description: `${history.code} - ${history.description}`
+        });
+
+      if (error) throw error;
+
+      setMedicalHistory([...medicalHistory, history]);
+      toast({
+        title: "Success",
+        description: "Medical history has been added to the patient's record.",
+      });
+    } catch (error) {
+      console.error('Error adding medical history:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add medical history",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="p-6">
@@ -190,6 +219,13 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
               <Label htmlFor="none">None</Label>
             </div>
           </RadioGroup>
+
+          {selectedStatus === "known" && (
+            <MedicalHistorySearch
+              patientId={patientId}
+              onHistoryAdd={handleHistoryAdd}
+            />
+          )}
         </div>
       </Card>
 
