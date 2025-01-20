@@ -17,6 +17,8 @@ export type Database = {
           id: string
           metadata: Json | null
           patient_id: string | null
+          prediction: string | null
+          recommendation: string | null
           suggestions: string[] | null
           transport_id: string | null
         }
@@ -27,6 +29,8 @@ export type Database = {
           id?: string
           metadata?: Json | null
           patient_id?: string | null
+          prediction?: string | null
+          recommendation?: string | null
           suggestions?: string[] | null
           transport_id?: string | null
         }
@@ -37,6 +41,8 @@ export type Database = {
           id?: string
           metadata?: Json | null
           patient_id?: string | null
+          prediction?: string | null
+          recommendation?: string | null
           suggestions?: string[] | null
           transport_id?: string | null
         }
@@ -402,6 +408,7 @@ export type Database = {
         Row: {
           address: string | null
           allergies: string[] | null
+          blood_type: string | null
           city: string | null
           created_at: string | null
           display_id: string | null
@@ -411,20 +418,29 @@ export type Database = {
           emergency_contact_phone: string | null
           first_name: string
           gender: string | null
+          height: string | null
           id: string
           last_name: string
+          last_physical: string | null
+          marital_status: string | null
           medical_conditions: string[] | null
           medications: string[] | null
+          occupation: string | null
           phone: string | null
+          preferred_language: string | null
+          primary_care_physician: string | null
           primary_insurance: string | null
           secondary_insurance: string | null
           state: string | null
           updated_at: string | null
+          usual_transport_mode: string | null
+          weight: string | null
           zip: string | null
         }
         Insert: {
           address?: string | null
           allergies?: string[] | null
+          blood_type?: string | null
           city?: string | null
           created_at?: string | null
           display_id?: string | null
@@ -434,20 +450,29 @@ export type Database = {
           emergency_contact_phone?: string | null
           first_name: string
           gender?: string | null
+          height?: string | null
           id?: string
           last_name: string
+          last_physical?: string | null
+          marital_status?: string | null
           medical_conditions?: string[] | null
           medications?: string[] | null
+          occupation?: string | null
           phone?: string | null
+          preferred_language?: string | null
+          primary_care_physician?: string | null
           primary_insurance?: string | null
           secondary_insurance?: string | null
           state?: string | null
           updated_at?: string | null
+          usual_transport_mode?: string | null
+          weight?: string | null
           zip?: string | null
         }
         Update: {
           address?: string | null
           allergies?: string[] | null
+          blood_type?: string | null
           city?: string | null
           created_at?: string | null
           display_id?: string | null
@@ -457,15 +482,23 @@ export type Database = {
           emergency_contact_phone?: string | null
           first_name?: string
           gender?: string | null
+          height?: string | null
           id?: string
           last_name?: string
+          last_physical?: string | null
+          marital_status?: string | null
           medical_conditions?: string[] | null
           medications?: string[] | null
+          occupation?: string | null
           phone?: string | null
+          preferred_language?: string | null
+          primary_care_physician?: string | null
           primary_insurance?: string | null
           secondary_insurance?: string | null
           state?: string | null
           updated_at?: string | null
+          usual_transport_mode?: string | null
+          weight?: string | null
           zip?: string | null
         }
         Relationships: []
@@ -529,6 +562,7 @@ export type Database = {
       }
       transport_records: {
         Row: {
+          actual_arrival: string | null
           created_at: string | null
           crew_assigned: string | null
           destination_address: string | null
@@ -536,6 +570,7 @@ export type Database = {
           dispatch_status: Database["public"]["Enums"]["dispatch_status"] | null
           dropoff_location: string
           dropoff_type: string | null
+          estimated_arrival: string | null
           id: string
           notes: string | null
           origin_address: string | null
@@ -549,9 +584,12 @@ export type Database = {
           scheduled_time: string | null
           status: string
           transport_date: string | null
+          transport_type: string | null
+          vehicle_number: string | null
           warnings: string[] | null
         }
         Insert: {
+          actual_arrival?: string | null
           created_at?: string | null
           crew_assigned?: string | null
           destination_address?: string | null
@@ -561,6 +599,7 @@ export type Database = {
             | null
           dropoff_location: string
           dropoff_type?: string | null
+          estimated_arrival?: string | null
           id?: string
           notes?: string | null
           origin_address?: string | null
@@ -574,9 +613,12 @@ export type Database = {
           scheduled_time?: string | null
           status: string
           transport_date?: string | null
+          transport_type?: string | null
+          vehicle_number?: string | null
           warnings?: string[] | null
         }
         Update: {
+          actual_arrival?: string | null
           created_at?: string | null
           crew_assigned?: string | null
           destination_address?: string | null
@@ -586,6 +628,7 @@ export type Database = {
             | null
           dropoff_location?: string
           dropoff_type?: string | null
+          estimated_arrival?: string | null
           id?: string
           notes?: string | null
           origin_address?: string | null
@@ -599,6 +642,8 @@ export type Database = {
           scheduled_time?: string | null
           status?: string
           transport_date?: string | null
+          transport_type?: string | null
+          vehicle_number?: string | null
           warnings?: string[] | null
         }
         Relationships: [
