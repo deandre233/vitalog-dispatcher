@@ -261,7 +261,33 @@ export function BookingForm() {
         </Button>
       </div>
 
-      {/* Patient/Customer Section with Search */}
+      {/* Caller Information - Moved to top */}
+      <Card className="p-6 border-l-4 border-l-medical-secondary">
+        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Caller Information</h3>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="caller_name">Caller Name</Label>
+              <Input
+                id="caller_name"
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+                {...register("caller_name", { required: true })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="caller_phone">Phone</Label>
+              <Input
+                id="caller_phone"
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+                placeholder="###-###-####"
+                {...register("caller_phone", { required: true })}
+              />
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Patient/Customer Section */}
       <Card className="p-6 border-l-4 border-l-medical-secondary">
         <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
           <UserCircle2 className="w-5 h-5" />
@@ -318,32 +344,6 @@ export function BookingForm() {
           >
             Create Patient Record Now
           </Button>
-        </div>
-      </Card>
-
-      {/* Caller Information */}
-      <Card className="p-6 border-l-4 border-l-medical-secondary">
-        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Caller Information</h3>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="caller_name">Caller Name</Label>
-              <Input
-                id="caller_name"
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-                {...register("caller_name", { required: true })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="caller_phone">Phone</Label>
-              <Input
-                id="caller_phone"
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-                placeholder="###-###-####"
-                {...register("caller_phone", { required: true })}
-              />
-            </div>
-          </div>
         </div>
       </Card>
 
