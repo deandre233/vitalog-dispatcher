@@ -18,7 +18,7 @@ export function Header({ className = "" }) {
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-2">
             <Heart className="w-6 h-6 text-white animate-pulse" />
-            <div className="text-xl font-bold">Heart Medical Transport</div>
+            <div className="text-xl font-bold">Vitalog</div>
           </div>
           <nav className="hidden sm:flex sm:space-x-1">
             {navItems.map((item) => (
