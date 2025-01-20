@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
 import { useAIDemographics } from "@/hooks/useAIDemographics";
 import { 
   FileText, 
@@ -114,22 +113,105 @@ const PatientRecord = () => {
     additionalWarnings: ""
   });
 
-  useEffect(() => {
-    const fetchPatientData = async () => {
-      if (!patientId) {
-        setIsLoading(false);
-        return;
+  const handleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleSave = async () => {
+    try {
+      const { error } = await supabase
+        .from('patients')
+        .update({
+          first_name: patientData.firstName,
+          last_name: patientData.lastName,
+          phone: patientData.phone,
+          email: patientData.email,
+          address: patientData.address,
+          city: patientData.city,
+          state: patientData.state,
+          zip: patientData.zip,
+          dob: patientData.dob,
+          gender: patientData.gender,
+          medical_conditions: patientData.medicalConditions,
+          allergies: patientData.allergies,
+          medications: patientData.medications,
+          emergency_contact_name: patientData.emergencyContactName,
+          emergency_contact_phone: patientData.emergencyContactPhone,
+        })
+        .eq('id', patientId);
+
+      if (error) throw error;
+
+      setIsEditing(false);
+      toast({
+        title: "Success",
+        description: "Patient information updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating patient:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update patient information",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const { validateField, handleZipCodeChange, isValidating } = useAIDemographics(patientData);
+
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    const target = e.target as HTMLInputElement;
+    
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setPatientData(prev => {
+        const parentObj = prev[parent as keyof typeof prev];
+        if (typeof parentObj === 'object' && parentObj !== null) {
+          return {
+            ...prev,
+            [parent]: {
+              ...parentObj,
+              [child]: target.type === 'checkbox' ? target.checked : value
+            }
+          };
+        }
+        return prev;
+      });
+    } else {
+      setPatientData(prev => ({
+        ...prev,
+        [name]: target.type === 'checkbox' ? target.checked : value
+      }));
+
+      if (['phone', 'email', 'zip'].includes(name)) {
+        await validateField(name, value);
       }
 
+      if (name === 'zip') {
+        const locationData = await handleZipCodeChange(value);
+        if (locationData) {
+          setPatientData(prev => ({
+            ...prev,
+            city: locationData.city,
+            state: locationData.state,
+            county: locationData.county
+          }));
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const fetchPatientData = async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching patient data for ID:', patientId);
         
         const { data: patient, error } = await supabase
           .from('patients')
           .select('*')
           .eq('id', patientId)
-          .maybeSingle();
+          .single();
 
         if (error) {
           console.error('Error fetching patient:', error);
@@ -138,12 +220,10 @@ const PatientRecord = () => {
             description: "Failed to fetch patient data",
             variant: "destructive",
           });
-          setIsLoading(false);
           return;
         }
 
         if (!patient) {
-          console.log('No patient found with ID:', patientId);
           toast({
             title: "Patient Not Found",
             description: `No patient record found with ID ${patientId}`,
@@ -153,7 +233,7 @@ const PatientRecord = () => {
           return;
         }
 
-        console.log('Patient data fetched successfully:', patient);
+        // Update document title with patient name
         document.title = `Patient Record - ${patient.first_name} ${patient.last_name}`;
 
         setPatientData(prev => ({
@@ -187,38 +267,20 @@ const PatientRecord = () => {
       }
     };
 
-    fetchPatientData();
+    if (patientId) {
+      fetchPatientData();
+    }
   }, [patientId, navigate, toast]);
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <div className="flex-1 flex">
-          <SidebarProvider defaultOpen={true}>
-            <div className="min-h-screen flex w-full">
-              <AppSidebar />
-              <SidebarRail />
-              <div className="flex-1 bg-[#f4f7fc] overflow-auto">
-                <div className="p-6">
-                  <Card className="w-full p-8">
-                    <div className="flex flex-col items-center justify-center space-y-4">
-                      <div className="w-16 h-16 relative">
-                        <Loader2 className="w-16 h-16 animate-spin text-primary" />
-                      </div>
-                      <div className="space-y-2 text-center">
-                        <h3 className="text-lg font-medium">Loading Patient Record</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Please wait while we fetch the patient information...
-                        </p>
-                      </div>
-                      <Progress className="w-64" value={30} />
-                    </div>
-                  </Card>
-                </div>
-              </div>
-            </div>
-          </SidebarProvider>
+        <div className="flex-1 flex justify-center items-center">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+            <p className="text-gray-500">Loading patient data...</p>
+          </div>
         </div>
       </div>
     );
