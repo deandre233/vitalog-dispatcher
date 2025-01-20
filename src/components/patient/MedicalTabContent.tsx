@@ -22,6 +22,7 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   const [selectedStatus, setSelectedStatus] = useState("known");
   const [isProcessing, setIsProcessing] = useState(false);
   const [documentType, setDocumentType] = useState("facesheet");
+  const [medicationSearchTerm, setMedicationSearchTerm] = useState("");
 
   // Medical conditions database with ICD-10 codes
   const medicalConditions = [
@@ -37,11 +38,100 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
     { code: "N18.9", description: "Chronic kidney disease, unspecified" }
   ];
 
-  const handleSearch = () => {
-    toast({
-      title: "Searching medical conditions",
-      description: "AI is analyzing your search query...",
-    });
+  // Medications database with common prescriptions
+  const medications = [
+    { 
+      name: "Lisinopril",
+      genericName: "Lisinopril",
+      class: "ACE Inhibitor",
+      commonDosages: ["10mg", "20mg", "40mg"],
+      frequency: ["once daily", "twice daily"],
+      commonIndications: ["hypertension", "heart failure"]
+    },
+    {
+      name: "Metformin",
+      genericName: "Metformin HCl",
+      class: "Biguanide",
+      commonDosages: ["500mg", "850mg", "1000mg"],
+      frequency: ["once daily", "twice daily"],
+      commonIndications: ["type 2 diabetes"]
+    },
+    {
+      name: "Atorvastatin",
+      genericName: "Atorvastatin Calcium",
+      class: "Statin",
+      commonDosages: ["10mg", "20mg", "40mg", "80mg"],
+      frequency: ["once daily"],
+      commonIndications: ["high cholesterol", "cardiovascular disease prevention"]
+    },
+    {
+      name: "Omeprazole",
+      genericName: "Omeprazole",
+      class: "Proton Pump Inhibitor",
+      commonDosages: ["20mg", "40mg"],
+      frequency: ["once daily", "twice daily"],
+      commonIndications: ["GERD", "acid reflux", "stomach ulcers"]
+    },
+    {
+      name: "Sertraline",
+      genericName: "Sertraline HCl",
+      class: "SSRI",
+      commonDosages: ["25mg", "50mg", "100mg"],
+      frequency: ["once daily"],
+      commonIndications: ["depression", "anxiety"]
+    }
+  ];
+
+  const handleSearch = async () => {
+    setIsProcessing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-medical-search', {
+        body: { searchTerm, type: 'condition' }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Search Results",
+        description: `Found ${data.results.length} matching conditions`,
+      });
+
+    } catch (error) {
+      console.error('Error searching:', error);
+      toast({
+        title: "Error",
+        description: "Failed to search medical conditions",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleMedicationSearch = async () => {
+    setIsProcessing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-medical-search', {
+        body: { searchTerm: medicationSearchTerm, type: 'medication' }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Medication Search Results",
+        description: `Found ${data.results.length} matching medications`,
+      });
+
+    } catch (error) {
+      console.error('Error searching medications:', error);
+      toast({
+        title: "Error",
+        description: "Failed to search medications",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleAddCondition = () => {
@@ -121,96 +211,25 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
     <div className="space-y-6">
       <Card className="p-6">
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Medical and Surgical History</h3>
-            <RadioGroup
-              defaultValue={selectedStatus}
-              onValueChange={setSelectedStatus}
-              className="flex items-center space-x-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="known" id="known" />
-                <Label htmlFor="known">Known</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="unknown" id="unknown" />
-                <Label htmlFor="unknown">Unknown</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="none" id="none" />
-                <Label htmlFor="none">None</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <Input
-                placeholder="Search conditions (e.g., 'diabetes' or 'E11.9')"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
+          <h3 className="text-lg font-semibold">Medical and Surgical History</h3>
+          <RadioGroup
+            defaultValue={selectedStatus}
+            onValueChange={setSelectedStatus}
+            className="flex items-center space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="known" id="known" />
+              <Label htmlFor="known">Known</Label>
             </div>
-            <Button onClick={handleSearch} variant="secondary">
-              <Search className="h-4 w-4 mr-2" />
-              Search
-            </Button>
-            <Button onClick={handleAddCondition}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add
-            </Button>
-            <div className="relative flex gap-2">
-              <Select
-                value={documentType}
-                onValueChange={setDocumentType}
-              >
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Document Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="facesheet">Facesheet</SelectItem>
-                  <SelectItem value="discharge">Discharge Summary</SelectItem>
-                  <SelectItem value="progress">Progress Notes</SelectItem>
-                  <SelectItem value="consultation">Consultation Notes</SelectItem>
-                  <SelectItem value="lab">Lab Results</SelectItem>
-                </SelectContent>
-              </Select>
-              <Input
-                type="file"
-                className="hidden"
-                id="medical-doc-upload"
-                accept=".txt,.pdf,.doc,.docx"
-                onChange={handleFileUpload}
-              />
-              <Button
-                variant="outline"
-                onClick={() => document.getElementById('medical-doc-upload')?.click()}
-                disabled={isProcessing}
-              >
-                {isProcessing ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Upload className="h-4 w-4 mr-2" />
-                )}
-                Scan Document
-              </Button>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="unknown" />
+              <Label htmlFor="unknown">Unknown</Label>
             </div>
-          </div>
-
-          <ScrollArea className="h-[300px] border rounded-md p-4">
-            {medicalConditions.map((condition) => (
-              <div
-                key={condition.code}
-                className="flex items-start space-x-2 py-2 border-b last:border-0"
-              >
-                <Badge variant="outline" className="shrink-0">
-                  {condition.code}
-                </Badge>
-                <span className="text-sm">{condition.description}</span>
-              </div>
-            ))}
-          </ScrollArea>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="none" id="none" />
+              <Label htmlFor="none">None</Label>
+            </div>
+          </RadioGroup>
         </div>
       </Card>
 
@@ -219,11 +238,21 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
           <h3 className="text-lg font-semibold">Current Medications</h3>
           <div className="flex gap-2">
             <Input
-              placeholder="Search medications"
+              placeholder="Search medications (e.g., 'Lisinopril' or 'diabetes')"
+              value={medicationSearchTerm}
+              onChange={(e) => setMedicationSearchTerm(e.target.value)}
               className="flex-1"
             />
-            <Button variant="secondary">
-              <Search className="h-4 w-4 mr-2" />
+            <Button 
+              variant="secondary" 
+              onClick={handleMedicationSearch}
+              disabled={isProcessing}
+            >
+              {isProcessing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="h-4 w-4 mr-2" />
+              )}
               Search
             </Button>
             <Button>
@@ -232,80 +261,46 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
             </Button>
           </div>
           <ScrollArea className="h-[200px] border rounded-md p-4">
-            <div className="text-sm text-muted-foreground">
-              Use the 'Search' box to add a medication.
-            </div>
+            {medications.map((med, index) => (
+              <div key={index} className="py-2 border-b last:border-0">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="font-medium">{med.name}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {med.genericName} - {med.class}
+                    </p>
+                  </div>
+                  <div className="text-sm">
+                    <p>Common dosages: {med.commonDosages.join(", ")}</p>
+                    <p>Frequency: {med.frequency.join(", ")}</p>
+                  </div>
+                </div>
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {med.commonIndications.map((indication, i) => (
+                    <Badge key={i} variant="outline" className="text-xs">
+                      {indication}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            ))}
           </ScrollArea>
         </div>
       </Card>
 
       <Card className="p-6">
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Drug Allergies</h3>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Search allergies"
-              className="flex-1"
-            />
-            <Button variant="secondary">
-              <Search className="h-4 w-4 mr-2" />
-              Search
-            </Button>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add
-            </Button>
-          </div>
+          <h3 className="text-lg font-semibold">Medical Conditions</h3>
           <ScrollArea className="h-[200px] border rounded-md p-4">
-            <div className="text-sm text-muted-foreground">
-              List RxCUI codes or names of all allergic medications, one per line
-            </div>
+            {medicalConditions.map((condition) => (
+              <div key={condition.code} className="flex items-start space-x-2 py-2 border-b last:border-0">
+                <Badge variant="outline" className="shrink-0">
+                  {condition.code}
+                </Badge>
+                <span className="text-sm">{condition.description}</span>
+              </div>
+            ))}
           </ScrollArea>
-
-          <div className="space-y-2">
-            <Label>Environmental Allergies</Label>
-            <Select defaultValue="none">
-              <SelectTrigger>
-                <SelectValue placeholder="Select environmental allergies" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                <SelectItem value="dust">Dust</SelectItem>
-                <SelectItem value="pollen">Pollen</SelectItem>
-                <SelectItem value="mold">Mold</SelectItem>
-                <SelectItem value="pets">Pets</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>PMH-x obtained from:</Label>
-            <div className="flex gap-4">
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" className="form-checkbox" />
-                <span>Patient</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" className="form-checkbox" />
-                <span>Family</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" className="form-checkbox" />
-                <span>Face sheet / Health worker</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" className="form-checkbox" />
-                <span>Bystander</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>Last review by EMS: 2024-12-13 by Kimpson, Deandre (38 days ago)</span>
-            <Button variant="outline" size="sm">
-              Save Changes
-            </Button>
-          </div>
         </div>
       </Card>
     </div>
