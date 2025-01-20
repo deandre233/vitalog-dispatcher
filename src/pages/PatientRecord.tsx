@@ -133,14 +133,12 @@ export function PatientRecord() {
           .eq('legacy_display_id', patientName)
           .maybeSingle();
 
-        // If not found by legacy_display_id, try searching by name
-        if (!data && !error) {
-          const [lastName, firstName] = decodeURIComponent(patientName).split(", ");
+        // If not found by legacy_display_id and the ID looks like a UUID, try UUID
+        if (!data && !error && patientName.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
           ({ data, error } = await supabase
             .from('patients')
             .select('*')
-            .eq('first_name', firstName)
-            .eq('last_name', lastName)
+            .eq('id', patientName)
             .maybeSingle());
         }
 
@@ -152,13 +150,12 @@ export function PatientRecord() {
         if (!data) {
           toast({
             title: "Patient Not Found",
-            description: `No patient record found for ${patientName}`,
+            description: `No patient record found for ID ${patientName}`,
             variant: "destructive",
           });
           return;
         }
 
-        // Update page title with patient name
         document.title = `Patient Record - ${data.first_name} ${data.last_name}`;
 
         setPatientData(prev => ({
