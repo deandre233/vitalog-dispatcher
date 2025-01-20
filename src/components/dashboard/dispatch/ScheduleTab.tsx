@@ -118,7 +118,8 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             <Label className="text-medical-primary">Trip Type</Label>
             <RadioGroup
               value={transportRecord?.trip_type || 'One way'}
-              onValueChange={(value) => onUpdate({ trip_type: value })}
+              onValueChange={(value: 'One way' | 'Wait-and-return' | 'Round trip') => 
+                onUpdate({ trip_type: value })}
               className="flex items-center space-x-4"
             >
               <div className="flex items-center space-x-2">
