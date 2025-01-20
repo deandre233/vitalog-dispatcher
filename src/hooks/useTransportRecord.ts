@@ -20,11 +20,11 @@ export interface TransportRecord {
   pickup_type: string | null;
   dropoff_type: string | null;
   return_trip_id: string | null;
-  // Add the new fields that match our database schema
   origin_address: string | null;
   destination_address: string | null;
   scheduled_time: string | null;
   dispatch_status: 'Pending' | 'In Progress' | 'Completed' | null;
+  trip_type: 'One way' | 'Wait-and-return' | 'Round trip' | null;
 }
 
 export function useTransportRecord(id: string | undefined) {
