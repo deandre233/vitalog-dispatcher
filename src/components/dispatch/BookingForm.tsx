@@ -19,9 +19,41 @@ import {
 import { DispatchFormData } from "@/types/dispatch";
 import { supabase } from "@/integrations/supabase/client";
 
+// Mock data for testing
+const mockCalls = [
+  {
+    caller_name: "John Smith",
+    caller_phone: "(555) 123-4567",
+    patient_name: "Alice Johnson",
+    pickup_location: "Memorial Hospital",
+    dropoff_location: "123 Home Street",
+    service_type: "BLS",
+    priority_level: "Scheduled",
+  },
+  {
+    caller_name: "Mary Wilson",
+    caller_phone: "(555) 987-6543",
+    patient_name: "Bob Anderson",
+    pickup_location: "456 Oak Avenue",
+    dropoff_location: "City Medical Center",
+    service_type: "ALS",
+    priority_level: "Emergency",
+  },
+  {
+    caller_name: "David Brown",
+    caller_phone: "(555) 246-8135",
+    patient_name: "Carol Martinez",
+    pickup_location: "Sunset Nursing Home",
+    dropoff_location: "General Hospital",
+    service_type: "MICU",
+    priority_level: "Critical",
+  }
+];
+
 export function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<DispatchFormData>({
+  const [selectedMockCall, setSelectedMockCall] = useState(0);
+  const { register, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm<DispatchFormData>({
     defaultValues: {
       service_type: 'BLS',
       priority_level: 'Scheduled',
@@ -45,6 +77,15 @@ export function BookingForm() {
       fresh_prepared: false,
     }
   });
+
+  const loadMockCall = () => {
+    const mockCall = mockCalls[selectedMockCall];
+    Object.entries(mockCall).forEach(([key, value]) => {
+      setValue(key as keyof DispatchFormData, value);
+    });
+    setSelectedMockCall((prev) => (prev + 1) % mockCalls.length);
+    toast.success("Mock call data loaded");
+  };
 
   const onSubmit = async (data: DispatchFormData) => {
     setIsSubmitting(true);
@@ -86,6 +127,17 @@ export function BookingForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="flex justify-end mb-4">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={loadMockCall}
+          className="flex items-center gap-2"
+        >
+          Load Mock Call
+        </Button>
+      </div>
+
       <Tabs defaultValue="caller" className="w-full">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="caller">Caller Info</TabsTrigger>
