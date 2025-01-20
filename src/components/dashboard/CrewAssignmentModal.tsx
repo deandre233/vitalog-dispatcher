@@ -182,16 +182,18 @@ export function CrewAssignmentModal({
             routeLine.current.setMap(null);
           }
 
-          routeLine.current = new google.maps.Polyline({
-            path: google.maps.geometry.encoding.decodePath(
-              routeDetails.route.routes[0].overview_polyline.points
-            ),
-            geodesic: true,
-            strokeColor: '#3b82f6',
-            strokeOpacity: 1.0,
-            strokeWeight: 4,
-            map: googleMap.current
-          });
+          // Fix: Properly access the overview_polyline points from the DirectionsResult
+          const path = routeDetails.route.routes[0].overview_polyline?.points;
+          if (path) {
+            routeLine.current = new google.maps.Polyline({
+              path: google.maps.geometry.encoding.decodePath(path),
+              geodesic: true,
+              strokeColor: '#3b82f6',
+              strokeOpacity: 1.0,
+              strokeWeight: 4,
+              map: googleMap.current
+            });
+          }
         } catch (error) {
           console.error('Error drawing route:', error);
         }
