@@ -404,6 +404,7 @@ export type Database = {
           allergies: string[] | null
           city: string | null
           created_at: string | null
+          display_id: string | null
           dob: string | null
           email: string | null
           emergency_contact_name: string | null
@@ -426,6 +427,7 @@ export type Database = {
           allergies?: string[] | null
           city?: string | null
           created_at?: string | null
+          display_id?: string | null
           dob?: string | null
           email?: string | null
           emergency_contact_name?: string | null
@@ -448,6 +450,7 @@ export type Database = {
           allergies?: string[] | null
           city?: string | null
           created_at?: string | null
+          display_id?: string | null
           dob?: string | null
           email?: string | null
           emergency_contact_name?: string | null
@@ -625,6 +628,10 @@ export type Database = {
           payer_id: string
         }
         Returns: Json
+      }
+      generate_display_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       generate_patient_id: {
         Args: Record<PropertyKey, never>
