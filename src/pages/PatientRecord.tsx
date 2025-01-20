@@ -117,7 +117,13 @@ const PatientRecord = () => {
   useEffect(() => {
     const fetchPatientData = async () => {
       if (!patientId) {
-        setIsLoading(false);
+        console.error('No patient ID provided');
+        toast({
+          title: "Error",
+          description: "No patient ID provided",
+          variant: "destructive",
+        });
+        navigate('/patients');
         return;
       }
 
@@ -195,8 +201,20 @@ const PatientRecord = () => {
   };
 
   const handleSave = async () => {
+    if (!patientId) {
+      console.error('No patient ID available for save operation');
+      toast({
+        title: "Error",
+        description: "Cannot save: No patient ID available",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
+      console.log('Saving patient data for ID:', patientId);
+      
       const { error } = await supabase
         .from('patients')
         .update({
@@ -228,6 +246,7 @@ const PatientRecord = () => {
         return;
       }
 
+      console.log('Patient data saved successfully');
       toast({
         title: "Success",
         description: "Patient data saved successfully",
