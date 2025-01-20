@@ -77,6 +77,9 @@ export function BookingForm() {
       dnr_order: false,
       language_barrier: false,
       fresh_prepared: false,
+      patient_last_name: '',
+      patient_first_name: '',
+      patient_dob: '',
     }
   });
 
@@ -197,193 +200,190 @@ export function BookingForm() {
         </div>
       </Card>
 
-      {/* Keep existing sections */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Caller Information */}
-        <Card className="p-6 border-l-4 border-l-medical-secondary">
-          <h3 className="text-lg font-semibold mb-4 text-medical-primary">Caller Information</h3>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="caller_name">Caller Name</Label>
-                <Input
-                  id="caller_name"
-                  className="border-medical-secondary/30 focus:border-medical-secondary"
-                  {...register("caller_name", { required: true })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="caller_phone">Phone</Label>
-                <Input
-                  id="caller_phone"
-                  className="border-medical-secondary/30 focus:border-medical-secondary"
-                  placeholder="###-###-####"
-                  {...register("caller_phone", { required: true })}
-                />
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Origin Location */}
-        <Card className="p-6 border-l-4 border-l-medical-secondary">
-          <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
-            <MapPin className="w-5 h-5" />
-            Origin Location
-          </h3>
-          <div className="space-y-4">
+      {/* Caller Information */}
+      <Card className="p-6 border-l-4 border-l-medical-secondary">
+        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Caller Information</h3>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Location Name</Label>
-              <Input 
-                {...register("pickup_location")} 
+              <Label htmlFor="caller_name">Caller Name</Label>
+              <Input
+                id="caller_name"
                 className="border-medical-secondary/30 focus:border-medical-secondary"
+                {...register("caller_name", { required: true })}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Floor/Room</Label>
-                <Input 
-                  {...register("origin_floor_room")}
-                  className="border-medical-secondary/30 focus:border-medical-secondary"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Type</Label>
-                <Select onValueChange={(value) => register("origin_type").onChange({ target: { value } })}>
-                  <SelectTrigger className="border-medical-secondary/30">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hospital">Hospital</SelectItem>
-                    <SelectItem value="nursing_home">Nursing Home</SelectItem>
-                    <SelectItem value="residence">Residence</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
             <div className="space-y-2">
-              <Label>Address</Label>
-              <Input 
-                {...register("origin_address")}
+              <Label htmlFor="caller_phone">Phone</Label>
+              <Input
+                id="caller_phone"
                 className="border-medical-secondary/30 focus:border-medical-secondary"
+                placeholder="###-###-####"
+                {...register("caller_phone", { required: true })}
               />
             </div>
           </div>
-        </Card>
+        </div>
+      </Card>
 
-        {/* Destination Location */}
-        <Card className="p-6 border-l-4 border-l-medical-secondary">
-          <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
-            <MapPin className="w-5 h-5" />
-            Destination Location
-          </h3>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Location Name</Label>
-              <Input 
-                {...register("dropoff_location")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Floor/Room</Label>
-                <Input 
-                  {...register("destination_floor_room")}
-                  className="border-medical-secondary/30 focus:border-medical-secondary"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Type</Label>
-                <Select onValueChange={(value) => register("destination_type").onChange({ target: { value } })}>
-                  <SelectTrigger className="border-medical-secondary/30">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hospital">Hospital</SelectItem>
-                    <SelectItem value="nursing_home">Nursing Home</SelectItem>
-                    <SelectItem value="residence">Residence</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Address</Label>
-              <Input 
-                {...register("destination_address")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
+      {/* Origin Location */}
+      <Card className="p-6 border-l-4 border-l-medical-secondary">
+        <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
+          <MapPin className="w-5 h-5" />
+          Origin Location
+        </h3>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Location Name</Label>
+            <Input 
+              {...register("pickup_location")} 
+              className="border-medical-secondary/30 focus:border-medical-secondary"
+            />
           </div>
-        </Card>
-
-        {/* Service Details */}
-        <Card className="p-6 border-l-4 border-l-medical-secondary">
-          <h3 className="text-lg font-semibold mb-4 text-medical-primary">Service Details</h3>
-          <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Service Type</Label>
-              <Select onValueChange={(value) => register("service_type").onChange({ target: { value } })}>
+              <Label>Floor/Room</Label>
+              <Input 
+                {...register("origin_floor_room")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select onValueChange={(value) => register("origin_type").onChange({ target: { value } })}>
                 <SelectTrigger className="border-medical-secondary/30">
-                  <SelectValue placeholder="Select service type" />
+                  <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="WC">Wheelchair</SelectItem>
-                  <SelectItem value="BLS">Basic Life Support</SelectItem>
-                  <SelectItem value="ALS">Advanced Life Support</SelectItem>
-                  <SelectItem value="MICU">Mobile ICU</SelectItem>
+                  <SelectItem value="hospital">Hospital</SelectItem>
+                  <SelectItem value="nursing_home">Nursing Home</SelectItem>
+                  <SelectItem value="residence">Residence</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Address</Label>
+            <Input 
+              {...register("origin_address")}
+              className="border-medical-secondary/30 focus:border-medical-secondary"
+            />
+          </div>
+        </div>
+      </Card>
 
+      {/* Destination Location */}
+      <Card className="p-6 border-l-4 border-l-medical-secondary">
+        <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
+          <MapPin className="w-5 h-5" />
+          Destination Location
+        </h3>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Location Name</Label>
+            <Input 
+              {...register("dropoff_location")}
+              className="border-medical-secondary/30 focus:border-medical-secondary"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Priority Level</Label>
-              <RadioGroup 
-                className="flex gap-4" 
-                onValueChange={(value) => register("priority_level").onChange({ target: { value } })}
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Critical" id="critical" />
-                  <Label htmlFor="critical" className="text-red-500">Critical</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Emergency" id="emergency" />
-                  <Label htmlFor="emergency" className="text-orange-500">Emergency</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Lower acuity" id="lower-acuity" />
-                  <Label htmlFor="lower-acuity" className="text-yellow-600">Lower Acuity</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Scheduled" id="scheduled" />
-                  <Label htmlFor="scheduled" className="text-green-600">Scheduled</Label>
-                </div>
-              </RadioGroup>
+              <Label>Floor/Room</Label>
+              <Input 
+                {...register("destination_floor_room")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
             </div>
-
             <div className="space-y-2">
-              <Label>Trip Type</Label>
-              <RadioGroup 
-                className="flex gap-4"
-                onValueChange={(value) => register("trip_type").onChange({ target: { value } })}
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="One way" id="one-way" />
-                  <Label htmlFor="one-way">One Way</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Wait-and-return" id="wait-return" />
-                  <Label htmlFor="wait-return">Wait and Return</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Round trip" id="round-trip" />
-                  <Label htmlFor="round-trip">Round Trip</Label>
-                </div>
-              </RadioGroup>
+              <Label>Type</Label>
+              <Select onValueChange={(value) => register("destination_type").onChange({ target: { value } })}>
+                <SelectTrigger className="border-medical-secondary/30">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="hospital">Hospital</SelectItem>
+                  <SelectItem value="nursing_home">Nursing Home</SelectItem>
+                  <SelectItem value="residence">Residence</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-        </Card>
-      </div>
+          <div className="space-y-2">
+            <Label>Address</Label>
+            <Input 
+              {...register("destination_address")}
+              className="border-medical-secondary/30 focus:border-medical-secondary"
+            />
+          </div>
+        </div>
+      </Card>
+
+      {/* Service Details */}
+      <Card className="p-6 border-l-4 border-l-medical-secondary">
+        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Service Details</h3>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Service Type</Label>
+            <Select onValueChange={(value) => register("service_type").onChange({ target: { value } })}>
+              <SelectTrigger className="border-medical-secondary/30">
+                <SelectValue placeholder="Select service type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="WC">Wheelchair</SelectItem>
+                <SelectItem value="BLS">Basic Life Support</SelectItem>
+                <SelectItem value="ALS">Advanced Life Support</SelectItem>
+                <SelectItem value="MICU">Mobile ICU</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Priority Level</Label>
+            <RadioGroup 
+              className="flex gap-4" 
+              onValueChange={(value) => register("priority_level").onChange({ target: { value } })}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Critical" id="critical" />
+                <Label htmlFor="critical" className="text-red-500">Critical</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Emergency" id="emergency" />
+                <Label htmlFor="emergency" className="text-orange-500">Emergency</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Lower acuity" id="lower-acuity" />
+                <Label htmlFor="lower-acuity" className="text-yellow-600">Lower Acuity</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Scheduled" id="scheduled" />
+                <Label htmlFor="scheduled" className="text-green-600">Scheduled</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Trip Type</Label>
+            <RadioGroup 
+              className="flex gap-4"
+              onValueChange={(value) => register("trip_type").onChange({ target: { value } })}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="One way" id="one-way" />
+                <Label htmlFor="one-way">One Way</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Wait-and-return" id="wait-return" />
+                <Label htmlFor="wait-return">Wait and Return</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Round trip" id="round-trip" />
+                <Label htmlFor="round-trip">Round Trip</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+      </Card>
 
       {/* Requirements Section */}
       <Card className="p-6 border-l-4 border-l-medical-secondary">

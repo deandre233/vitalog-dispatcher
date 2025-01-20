@@ -7,11 +7,14 @@ export type PriorityLevel = 'Critical' | 'Emergency' | 'Lower acuity' | 'Schedul
 export type TripType = 'One way' | 'Wait-and-return' | 'Round trip';
 export type RecurrenceType = 'Disabled' | 'Daily' | 'Weekly' | 'Monthly';
 
-// Update DispatchFormData to match the database schema
+// Update DispatchFormData to include patient information fields
 export type DispatchFormData = Omit<TransportRecord, 'id' | 'created_at' | 'dispatch_id' | 'status'> & {
   caller_name?: string;
   caller_phone?: string;
   patient_name?: string;
+  patient_last_name?: string;
+  patient_first_name?: string;
+  patient_dob?: string;
   service_type: ServiceType;
   priority_level: PriorityLevel;
   trip_type: TripType;
