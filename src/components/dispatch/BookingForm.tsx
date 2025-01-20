@@ -148,6 +148,10 @@ export function BookingForm() {
     }
   });
 
+  // Watch the checkbox values to control dropdown states
+  const billToFacility = watch('bill_to_facility');
+  const billToAffiliate = watch('bill_to_affiliate');
+
   const loadMockCall = () => {
     const mockCall = mockCalls[selectedMockCall];
     Object.entries(mockCall).forEach(([key, value]) => {
@@ -656,7 +660,7 @@ export function BookingForm() {
                 </div>
                 <Select 
                   onValueChange={(value) => setValue('billing_facility', value)}
-                  disabled={!watch('bill_to_facility')}
+                  disabled={!billToFacility}
                 >
                   <SelectTrigger className="w-[200px] border-medical-secondary/30">
                     <SelectValue placeholder="Select facility" />
@@ -678,7 +682,7 @@ export function BookingForm() {
                 </div>
                 <Select 
                   onValueChange={(value) => setValue('billing_affiliate', value)}
-                  disabled={!watch('bill_to_affiliate')}
+                  disabled={!billToAffiliate}
                 >
                   <SelectTrigger className="w-[200px] border-medical-secondary/30">
                     <SelectValue placeholder="Select affiliate" />
