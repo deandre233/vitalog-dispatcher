@@ -54,8 +54,8 @@ export function optimizeRoute(
   // Mock route calculation - would use actual routing service
   const baseRoute = {
     coordinates: [
-      [origin.lng, origin.lat],
-      [destination.lng, destination.lat]
+      [origin.lng, origin.lat] as [number, number],
+      [destination.lng, destination.lat] as [number, number]
     ],
     distance: calculateDistance(origin, destination),
     duration: calculateBaseDuration(origin, destination, traffic)
@@ -67,9 +67,9 @@ export function optimizeRoute(
     alternativeRoutes: [
       {
         coordinates: [
-          [origin.lng, origin.lat],
-          [origin.lng + 0.01, origin.lat + 0.01],
-          [destination.lng, destination.lat]
+          [origin.lng, origin.lat] as [number, number],
+          [origin.lng + 0.01, origin.lat + 0.01] as [number, number],
+          [destination.lng, destination.lat] as [number, number]
         ],
         distance: baseRoute.distance * 1.1,
         duration: baseRoute.duration * 1.2
