@@ -3,7 +3,6 @@ import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { Header } from "@/components/layout/Header";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { useParams, useNavigate } from "react-router-dom";
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,7 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { useAIDemographics } from "@/hooks/useAIDemographics"; // Added this import
 import { 
   FileText, 
   Phone, 
@@ -37,13 +35,14 @@ import {
   Contact,
   Pill,
   AlertTriangle,
-  Heart
+  Heart,
+  Loader2
 } from "lucide-react";
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BillingTabContent } from "@/components/patient/BillingTabContent";
-import { MedicalTabContent } from "@/components/patient/MedicalTabContent"; // Import the new MedicalTabContent
+import { MedicalTabContent } from "@/components/patient/MedicalTabContent";
 
 export function PatientRecord() {
   const { patientName } = useParams();
@@ -52,7 +51,7 @@ export function PatientRecord() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [patientData, setPatientData] = useState({
-    id: '', // Add this line
+    id: '', 
     firstName: 'Angela',
     lastName: 'Turner',
     phone: "(678) 875-9912",
@@ -118,10 +117,7 @@ export function PatientRecord() {
       try {
         setIsLoading(true);
         
-        // Extract the numeric part from the pat-XXX format
-        const patientId = patientName?.replace('pat-', '');
-        
-        if (!patientId) {
+        if (!patientName) {
           toast({
             title: "Error",
             description: "Invalid patient ID format",
@@ -133,7 +129,7 @@ export function PatientRecord() {
         const { data, error } = await supabase
           .from('patients')
           .select('*')
-          .eq('id', patientId)
+          .eq('display_id', patientName)
           .maybeSingle();
 
         if (error) {
@@ -144,13 +140,12 @@ export function PatientRecord() {
         if (!data) {
           toast({
             title: "Patient Not Found",
-            description: `No patient record found for ID ${patientId}`,
+            description: `No patient record found for ID ${patientName}`,
             variant: "destructive",
           });
           return;
         }
 
-        // Update document title with patient name
         document.title = `Patient Record - ${data.first_name} ${data.last_name}`;
 
         setPatientData(prev => ({
@@ -234,7 +229,6 @@ export function PatientRecord() {
     const target = e.target as HTMLInputElement;
     
     if (name.includes('.')) {
-      // Handle nested objects (warnings and barriersToEMS)
       const [parent, child] = name.split('.');
       setPatientData(prev => {
         const parentObj = prev[parent as keyof typeof prev];
