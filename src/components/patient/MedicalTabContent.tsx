@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -13,11 +13,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { MedicalHistorySearch } from "./MedicalHistorySearch";
 
 interface MedicalTabContentProps {
-  patientId: string;
+  patientId?: string;
 }
 
-export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
+export const MedicalTabContent = ({ patientId: propPatientId }: MedicalTabContentProps) => {
   const { toast } = useToast();
+  const { name } = useParams();
+  const [patientId, setPatientId] = useState<string | undefined>(propPatientId);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("known");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -27,6 +29,58 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   const [predictions, setPredictions] = useState<string[]>([]);
   const [selectedMedication, setSelectedMedication] = useState<any>(null);
   const [medicalHistory, setMedicalHistory] = useState<Array<{ code: string; description: string }>>([]);
+  const [isLoadingPatient, setIsLoadingPatient] = useState(true);
+
+  // First, fetch the patient ID if not provided as a prop
+  useEffect(() => {
+    const fetchPatientId = async () => {
+      if (propPatientId) {
+        setPatientId(propPatientId);
+        setIsLoadingPatient(false);
+        return;
+      }
+
+      if (!name) {
+        toast({
+          title: "Error",
+          description: "Patient name is required",
+          variant: "destructive",
+        });
+        setIsLoadingPatient(false);
+        return;
+      }
+
+      try {
+        // Decode the URL-encoded name and split into first and last name
+        const decodedName = decodeURIComponent(name);
+        const [lastName, firstName] = decodedName.split(", ");
+
+        const { data, error } = await supabase
+          .from('patients')
+          .select('id')
+          .eq('first_name', firstName)
+          .eq('last_name', lastName)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          setPatientId(data.id);
+        }
+      } catch (error) {
+        console.error('Error fetching patient:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch patient information",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingPatient(false);
+      }
+    };
+
+    fetchPatientId();
+  }, [name, propPatientId, toast]);
 
   // Add predictive search effect
   useEffect(() => {
@@ -52,6 +106,15 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   }, [medicationSearchTerm]);
 
   const handleSearch = async () => {
+    if (!patientId) {
+      toast({
+        title: "Error",
+        description: "Patient ID is required to search medications",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const { data, error } = await supabase.functions.invoke('analyze-medical-search', {
@@ -79,6 +142,15 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   };
 
   const handleAddCondition = async () => {
+    if (!patientId) {
+      toast({
+        title: "Error",
+        description: "Patient ID is required to add condition",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { data: patient, error: fetchError } = await supabase
         .from('patients')
@@ -191,6 +263,22 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
       });
     }
   };
+
+  if (isLoadingPatient) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!patientId) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-red-500">Unable to load patient information</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
