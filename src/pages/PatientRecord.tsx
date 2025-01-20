@@ -1,26 +1,45 @@
 import { SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { Header } from "@/components/layout/Header";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 import { 
+  FileText, 
+  Phone, 
+  Mail, 
+  MapPin, 
+  Calendar, 
+  AlertCircle, 
   UserRound,
-  DollarSign,
+  HeartPulse,
   Stethoscope,
+  DollarSign,
+  Receipt,
   History,
-  CalendarClock,
+  Bell,
   ShieldCheck,
   CreditCard,
-  Receipt,
+  Clock,
+  CalendarClock,
+  Ambulance,
+  Building2,
+  Contact,
+  Pill,
+  AlertTriangle,
+  Heart,
   Loader2
 } from "lucide-react";
+
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { BillingTabContent } from "@/components/patient/BillingTabContent";
 import { MedicalTabContent } from "@/components/patient/MedicalTabContent";
@@ -256,27 +275,6 @@ export function PatientRecord() {
     );
   }
 
-  if (!patientData.firstName || !patientData.lastName) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="flex-1 flex justify-center items-center">
-          <Card className="p-6 max-w-md w-full">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-red-600 mb-2">Patient Not Found</h2>
-              <p className="text-gray-600 mb-4">
-                No patient record found for ID {patientName}
-              </p>
-              <Button onClick={() => navigate(-1)} variant="outline">
-                Go Back
-              </Button>
-            </div>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -295,7 +293,7 @@ export function PatientRecord() {
                         <AvatarFallback>{`${patientData.firstName?.[0] || ''}${patientData.lastName?.[0] || ''}`}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <h1 className="text-2xl font-bold">{`${patientData.firstName} ${patientData.lastName}`}</h1>
+                        <h1 className="text-2xl font-bold">{`${patientData.firstName || ''} ${patientData.lastName || ''}`}</h1>
                         {patientData.warnings?.requiresOxygen && (
                           <Badge variant="outline" className="mt-2">Requires oxygen</Badge>
                         )}
