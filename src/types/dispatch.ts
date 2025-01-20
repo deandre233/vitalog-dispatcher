@@ -29,12 +29,14 @@ export type DispatchFormData = Omit<TransportRecord, 'id' | 'created_at' | 'disp
   destination_zip?: string;
   destination_county?: string;
   destination_phone?: string;
-  // New billing fields
+  // Billing fields
   is_billable?: boolean;
   requires_pcs?: boolean;
   bill_to_insurance?: boolean;
   bill_to_facility?: boolean;
+  billing_facility?: string;  // Added this field
   bill_to_affiliate?: boolean;
+  billing_affiliate?: string;  // Added this field
   bill_to_patient?: boolean;
   cash_upfront?: boolean;
   price_quote?: string;
