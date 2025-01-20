@@ -202,6 +202,61 @@ export function BookingForm() {
     }
   };
 
+  const handlePatientSearch = async () => {
+    const lastName = watch('patient_last_name');
+    const firstName = watch('patient_first_name');
+    
+    if (!lastName && !firstName) {
+      toast({
+        title: "Search Error",
+        description: "Please enter at least a first or last name to search",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      let query = supabase
+        .from('patients')
+        .select('*');
+      
+      if (lastName) {
+        query = query.ilike('last_name', `${lastName}%`);
+      }
+      if (firstName) {
+        query = query.ilike('first_name', `${firstName}%`);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const patient = data[0]; // Using first match for now
+        setValue('patient_last_name', patient.last_name);
+        setValue('patient_first_name', patient.first_name);
+        setValue('patient_dob', patient.dob);
+        
+        toast({
+          title: "Patient Found",
+          description: `Found patient record for ${patient.first_name} ${patient.last_name}`,
+        });
+      } else {
+        toast({
+          title: "No Results",
+          description: "No matching patient records found",
+        });
+      }
+    } catch (error) {
+      console.error('Error searching patient:', error);
+      toast({
+        title: "Search Error",
+        description: "Failed to search for patient records",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-[1200px] mx-auto bg-white rounded-lg shadow-sm p-6">
       <div className="flex justify-between items-center mb-6">
@@ -216,7 +271,7 @@ export function BookingForm() {
         </Button>
       </div>
 
-      {/* New Patient/Customer Section */}
+      {/* Patient/Customer Section with Search */}
       <Card className="p-6 border-l-4 border-l-medical-secondary">
         <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
           <UserCircle2 className="w-5 h-5" />
@@ -230,14 +285,14 @@ export function BookingForm() {
                 <Input
                   id="patient_last_name"
                   {...register("patient_last_name")}
-                  className="border-medical-secondary/30 focus:border-medical-secondary pr-10"
+                  className="border-medical-secondary/30 focus:border-medical-secondary pr-20"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   className="absolute right-2 top-1/2 -translate-y-1/2"
-                  onClick={() => setIsSearchingPatient(true)}
+                  onClick={handlePatientSearch}
                 >
                   <Search className="w-4 h-4 text-medical-secondary" />
                 </Button>
