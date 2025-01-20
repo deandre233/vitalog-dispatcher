@@ -52,36 +52,36 @@ export function PatientRecord() {
   const [isLoading, setIsLoading] = useState(true);
   const [patientData, setPatientData] = useState({
     id: '', 
-    firstName: 'Angela',
-    lastName: 'Turner',
-    phone: "(678) 875-9912",
-    email: "angela.turner@email.com",
-    address: "855 Fayetteville Rd Se",
-    city: "Atlanta",
-    state: "GA",
-    zip: "30316",
-    dob: "1965-03-15",
-    gender: "Female",
-    maritalStatus: "Married",
-    occupation: "Teacher",
-    preferredLanguage: "English",
-    medicalConditions: ["Asthma", "Hypertension"],
-    allergies: ["Penicillin", "Latex"],
-    medications: ["Albuterol", "Lisinopril"],
-    emergencyContactName: "Robert Turner",
-    emergencyContactRelation: "Spouse",
-    emergencyContactPhone: "(678) 875-9913",
-    bloodType: "A+",
-    height: "5'6\"",
-    weight: "145 lbs",
-    primaryCarePhysician: "Dr. Sarah Johnson",
-    insuranceProvider: "Blue Cross Blue Shield",
-    insurancePolicyNumber: "BCB123456789",
-    lastPhysical: "2023-09-15",
-    usualTransportMode: "stretcher",
-    status: "active",
+    firstName: '',
+    lastName: '',
+    phone: "",
+    email: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    dob: "",
+    gender: "",
+    maritalStatus: "",
+    occupation: "",
+    preferredLanguage: "",
+    medicalConditions: [],
+    allergies: [],
+    medications: [],
+    emergencyContactName: "",
+    emergencyContactRelation: "",
+    emergencyContactPhone: "",
+    bloodType: "",
+    height: "",
+    weight: "",
+    primaryCarePhysician: "",
+    insuranceProvider: "",
+    insurancePolicyNumber: "",
+    lastPhysical: "",
+    usualTransportMode: "",
+    status: "",
     warnings: {
-      requiresOxygen: true,
+      requiresOxygen: false,
       dnrOrder: false,
     },
     barriersToEMS: {
@@ -97,15 +97,15 @@ export function PatientRecord() {
       suspectDrugUse: false,
       unsupervised: false
     },
-    race: "Black or African American",
+    race: "",
     stateDLID: "",
-    mbi: "2HD2-QU6-TU96",
+    mbi: "",
     barcode: "",
-    ssn: "254-29-6865",
-    residenceFacility: "CROSSING AT EASTLAKE",
+    ssn: "",
+    residenceFacility: "",
     floorRoom: "",
-    county: "DeKalb",
-    transience: "Resident",
+    county: "",
+    transience: "",
     censusTract: "",
     workPhone: "",
     mobilePhone: "",
@@ -126,6 +126,7 @@ export function PatientRecord() {
           return;
         }
 
+        // Use maybeSingle() instead of single() to handle cases where no patient is found
         const { data, error } = await supabase
           .from('patients')
           .select('*')
@@ -257,7 +258,7 @@ export function PatientRecord() {
         <Header />
         <div className="flex-1 flex justify-center items-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+            <Loader2 className="h-12 w-12 animate-spin mx-auto text-gray-400" />
             <p className="mt-4 text-gray-600">Loading patient data...</p>
           </div>
         </div>
