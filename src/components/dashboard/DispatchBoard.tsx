@@ -59,10 +59,10 @@ interface Dispatch {
 
 const mockDispatches: Dispatch[] = [
   {
-    id: "DISP-00001",
+    id: "d290f1ee-6c54-4b01-90e6-d701748f0851",
     activationTime: "2024-02-20T10:30:00",
     patient: {
-      id: "PAT-00001",
+      id: "67c6b9c3-7f45-4d3b-9097-765d6c713195",
       name: "Thompson, Robert",
       condition: "Chest pain, shortness of breath"
     },
@@ -75,17 +75,18 @@ const mockDispatches: Dispatch[] = [
     aiRecommendations: {
       route: "Recommended Route: Clifton Rd to Peachtree St",
       crew: "Recommended Crew: ALS-1",
-      billing: "Insurance: Medicare"
+      billing: "Insurance: Medicare",
+      insights: ["High priority case - immediate attention required", "Similar route patterns show 15% faster transit via Peachtree St"]
     },
     eta: "15 mins",
     comments: "Patient requires continuous monitoring",
     elapsedTime: "will call"
   },
   {
-    id: "DISP-00002",
+    id: "7d793b67-d42e-4a89-af25-a1234b567c89",
     activationTime: "2024-02-20T09:15:00",
     patient: {
-      id: "PAT-00002",
+      id: "89d45e12-c678-4f23-b345-d789e123f456",
       name: "Garcia, Maria",
       condition: "Scheduled dialysis transport"
     },
@@ -98,17 +99,18 @@ const mockDispatches: Dispatch[] = [
     aiRecommendations: {
       route: "Recommended Route: Ponce de Leon Ave",
       crew: "Recommended Crew: BLS-2",
-      billing: "Insurance: Medicaid"
+      billing: "Insurance: Medicaid",
+      insights: ["Regular patient - preferred route available", "Historical data shows optimal timing for dialysis transport"]
     },
     eta: "20 mins",
     comments: "Regular dialysis appointment",
     elapsedTime: "will call"
   },
   {
-    id: "DISP-00003",
+    id: "9e123f45-6789-4abc-def0-123456789abc",
     activationTime: "2024-02-20T08:45:00",
     patient: {
-      id: "PAT-00003",
+      id: "34567890-abcd-efgh-ijkl-mnopqrstuvwx",
       name: "Williams, James",
       condition: "Post-surgery transport"
     },
@@ -121,7 +123,8 @@ const mockDispatches: Dispatch[] = [
     aiRecommendations: {
       route: "Recommended Route: I-285 E",
       crew: "Recommended Crew: MED-1",
-      billing: "Insurance: Private"
+      billing: "Insurance: Private",
+      insights: ["Traffic conditions favorable", "Patient history indicates smooth transfers"]
     },
     eta: "10 mins",
     comments: "Stable condition",
@@ -130,25 +133,11 @@ const mockDispatches: Dispatch[] = [
   }
 ];
 
-interface ScheduledTransportProps {
-  id: string;
-  scheduledTime: string;
-  patient: string;
-  serviceType: string;
-  origin: string;
-  destination: string;
-  status: "Scheduled" | "Assigned" | "Completed" | "Canceled";
-  warnings?: string[];
-  unitAssigned?: string;
-  progress?: number;
-  recurrence?: string;
-}
-
 const assignedScheduledTransports: ScheduledTransportProps[] = [
   {
-    id: "DISP-00007",
+    id: "bc123d45-6789-4def-abc1-234567890def",
     scheduledTime: "2024-02-20T15:30:00",
-    patient: "Brown, Michael (PAT-00007)",
+    patient: "Brown, Michael (34a12b56-789c-4def-abc1-234567890def)",
     serviceType: "BLS",
     origin: "Atlanta Medical Center",
     destination: "Peachtree Rehabilitation",
