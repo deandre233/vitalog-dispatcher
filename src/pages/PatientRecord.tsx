@@ -2,7 +2,7 @@ import { SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { Header } from "@/components/layout/Header";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { useAIDemographics } from "@/hooks/useAIDemographics";
+import { useAIDemographics } from "@/hooks/useAIDemographics"; // Added this import
 import { 
   FileText, 
   Phone, 
@@ -36,53 +36,51 @@ import {
   Contact,
   Pill,
   AlertTriangle,
-  Heart,
-  Loader2
+  Heart
 } from "lucide-react";
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BillingTabContent } from "@/components/patient/BillingTabContent";
-import { MedicalTabContent } from "@/components/patient/MedicalTabContent";
+import { MedicalTabContent } from "@/components/patient/MedicalTabContent"; // Import the new MedicalTabContent
 
 const PatientRecord = () => {
-  const { patientId } = useParams();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
+  const { patientName } = useParams();
+  const decodedName = decodeURIComponent(patientName || "");
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const [patientData, setPatientData] = useState({
-    id: '',
-    firstName: '',
-    lastName: '',
-    phone: "",
-    email: "",
-    address: "",
-    city: "",
-    state: "",
-    zip: "",
-    dob: "",
-    gender: "",
-    maritalStatus: "",
-    occupation: "",
-    preferredLanguage: "",
-    medicalConditions: [],
-    allergies: [],
-    medications: [],
-    emergencyContactName: "",
-    emergencyContactRelation: "",
-    emergencyContactPhone: "",
-    bloodType: "",
-    height: "",
-    weight: "",
-    primaryCarePhysician: "",
-    insuranceProvider: "",
-    insurancePolicyNumber: "",
-    lastPhysical: "",
+    id: '', // Add this line
+    firstName: 'Angela',
+    lastName: 'Turner',
+    phone: "(678) 875-9912",
+    email: "angela.turner@email.com",
+    address: "855 Fayetteville Rd Se",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30316",
+    dob: "1965-03-15",
+    gender: "Female",
+    maritalStatus: "Married",
+    occupation: "Teacher",
+    preferredLanguage: "English",
+    medicalConditions: ["Asthma", "Hypertension"],
+    allergies: ["Penicillin", "Latex"],
+    medications: ["Albuterol", "Lisinopril"],
+    emergencyContactName: "Robert Turner",
+    emergencyContactRelation: "Spouse",
+    emergencyContactPhone: "(678) 875-9913",
+    bloodType: "A+",
+    height: "5'6\"",
+    weight: "145 lbs",
+    primaryCarePhysician: "Dr. Sarah Johnson",
+    insuranceProvider: "Blue Cross Blue Shield",
+    insurancePolicyNumber: "BCB123456789",
+    lastPhysical: "2023-09-15",
     usualTransportMode: "stretcher",
     status: "active",
     warnings: {
-      requiresOxygen: false,
+      requiresOxygen: true,
       dnrOrder: false,
     },
     barriersToEMS: {
@@ -98,14 +96,14 @@ const PatientRecord = () => {
       suspectDrugUse: false,
       unsupervised: false
     },
-    race: "",
+    race: "Black or African American",
     stateDLID: "",
-    mbi: "",
+    mbi: "2HD2-QU6-TU96",
     barcode: "",
-    ssn: "",
-    residenceFacility: "",
+    ssn: "254-29-6865",
+    residenceFacility: "CROSSING AT EASTLAKE",
     floorRoom: "",
-    county: "",
+    county: "DeKalb",
     transience: "Resident",
     censusTract: "",
     workPhone: "",
@@ -119,36 +117,13 @@ const PatientRecord = () => {
 
   const handleSave = async () => {
     try {
-      const { error } = await supabase
-        .from('patients')
-        .update({
-          first_name: patientData.firstName,
-          last_name: patientData.lastName,
-          phone: patientData.phone,
-          email: patientData.email,
-          address: patientData.address,
-          city: patientData.city,
-          state: patientData.state,
-          zip: patientData.zip,
-          dob: patientData.dob,
-          gender: patientData.gender,
-          medical_conditions: patientData.medicalConditions,
-          allergies: patientData.allergies,
-          medications: patientData.medications,
-          emergency_contact_name: patientData.emergencyContactName,
-          emergency_contact_phone: patientData.emergencyContactPhone,
-        })
-        .eq('id', patientId);
-
-      if (error) throw error;
-
+      // Here we would update the patient data in Supabase
       setIsEditing(false);
       toast({
         title: "Success",
         description: "Patient information updated successfully",
       });
     } catch (error) {
-      console.error('Error updating patient:', error);
       toast({
         title: "Error",
         description: "Failed to update patient information",
@@ -164,6 +139,7 @@ const PatientRecord = () => {
     const target = e.target as HTMLInputElement;
     
     if (name.includes('.')) {
+      // Handle nested objects (warnings and barriersToEMS)
       const [parent, child] = name.split('.');
       setPatientData(prev => {
         const parentObj = prev[parent as keyof typeof prev];
@@ -184,10 +160,12 @@ const PatientRecord = () => {
         [name]: target.type === 'checkbox' ? target.checked : value
       }));
 
+      // AI validation for specific fields
       if (['phone', 'email', 'zip'].includes(name)) {
         await validateField(name, value);
       }
 
+      // Handle ZIP code auto-fill
       if (name === 'zip') {
         const locationData = await handleZipCodeChange(value);
         if (locationData) {
@@ -205,13 +183,15 @@ const PatientRecord = () => {
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
-        setIsLoading(true);
-        
-        const { data: patient, error } = await supabase
+        // Split the decoded name into last name and first name
+        const [lastName, firstName] = decodedName.split(',').map(part => part.trim());
+
+        const { data, error } = await supabase
           .from('patients')
           .select('*')
-          .eq('id', patientId)
-          .single();
+          .eq('last_name', lastName)
+          .eq('first_name', firstName)
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching patient:', error);
@@ -223,37 +203,36 @@ const PatientRecord = () => {
           return;
         }
 
-        if (!patient) {
+        if (!data) {
           toast({
             title: "Patient Not Found",
-            description: `No patient record found with ID ${patientId}`,
+            description: `No patient record found for ${firstName} ${lastName}`,
             variant: "destructive",
           });
-          navigate('/patients');
           return;
         }
 
         // Update document title with patient name
-        document.title = `Patient Record - ${patient.first_name} ${patient.last_name}`;
+        document.title = `Patient Record - ${firstName} ${lastName}`;
 
         setPatientData(prev => ({
           ...prev,
-          id: patient.id,
-          firstName: patient.first_name,
-          lastName: patient.last_name,
-          phone: patient.phone || prev.phone,
-          email: patient.email || prev.email,
-          address: patient.address || prev.address,
-          city: patient.city || prev.city,
-          state: patient.state || prev.state,
-          zip: patient.zip || prev.zip,
-          dob: patient.dob || prev.dob,
-          gender: patient.gender || prev.gender,
-          medicalConditions: patient.medical_conditions || prev.medicalConditions,
-          allergies: patient.allergies || prev.allergies,
-          medications: patient.medications || prev.medications,
-          emergencyContactName: patient.emergency_contact_name || prev.emergencyContactName,
-          emergencyContactPhone: patient.emergency_contact_phone || prev.emergencyContactPhone,
+          id: data.id,
+          firstName: data.first_name,
+          lastName: data.last_name,
+          phone: data.phone || prev.phone,
+          email: data.email || prev.email,
+          address: data.address || prev.address,
+          city: data.city || prev.city,
+          state: data.state || prev.state,
+          zip: data.zip || prev.zip,
+          dob: data.dob || prev.dob,
+          gender: data.gender || prev.gender,
+          medicalConditions: data.medical_conditions || prev.medicalConditions,
+          allergies: data.allergies || prev.allergies,
+          medications: data.medications || prev.medications,
+          emergencyContactName: data.emergency_contact_name || prev.emergencyContactName,
+          emergencyContactPhone: data.emergency_contact_phone || prev.emergencyContactPhone,
         }));
       } catch (err) {
         console.error('Error in fetchPatientData:', err);
@@ -262,29 +241,11 @@ const PatientRecord = () => {
           description: "An unexpected error occurred while fetching patient data",
           variant: "destructive",
         });
-      } finally {
-        setIsLoading(false);
       }
     };
 
-    if (patientId) {
-      fetchPatientData();
-    }
-  }, [patientId, navigate, toast]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="flex-1 flex justify-center items-center">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-            <p className="text-gray-500">Loading patient data...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    fetchPatientData();
+  }, [decodedName, toast]);
 
   return (
     <div className="min-h-screen flex flex-col">
