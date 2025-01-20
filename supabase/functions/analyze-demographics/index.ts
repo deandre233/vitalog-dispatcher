@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -7,225 +7,99 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { field, value, patientData } = await req.json()
-
+    const { patientId } = await req.json()
+    
     // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
 
-    // Check for duplicates in relevant fields
-    if (['phone', 'email'].includes(field)) {
-      const { data: duplicates } = await supabase
-        .from('patients')
-        .select('id, first_name, last_name')
-        .eq(field, value)
-        .neq('id', patientData.id)
-        .limit(1)
-
-      if (duplicates?.length > 0) {
-        return new Response(
-          JSON.stringify({
-            type: 'warning',
-            message: `Possible duplicate found: ${duplicates[0].first_name} ${duplicates[0].last_name} has the same ${field}`
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    // Fetch patient data
+    const { data: patient, error: patientError } = await supabaseClient
+      .from('patients')
+      .select(`
+        *,
+        medical_history (
+          id,
+          type,
+          description,
+          date
+        ),
+        insurance_records (
+          id,
+          type,
+          carrier_name,
+          policy_number
         )
-      }
-    }
+      `)
+      .eq('id', patientId)
+      .single()
 
-    // Validate phone number format
-    if (field === 'phone' || field === 'emergencyContactPhone') {
-      const phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/
-      if (!phoneRegex.test(value)) {
-        return new Response(
-          JSON.stringify({
-            type: 'error',
-            message: 'Phone number should be in format (XXX) XXX-XXXX'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
+    if (patientError) throw patientError
 
-    // Validate email format
-    if (field === 'email') {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(value)) {
-        return new Response(
-          JSON.stringify({
-            type: 'error',
-            message: 'Invalid email format'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
-    // Validate zip code and fetch location data
-    if (field === 'zip') {
-      const zipRegex = /^\d{5}$/
-      if (!zipRegex.test(value)) {
-        return new Response(
-          JSON.stringify({
-            type: 'error',
-            message: 'ZIP code should be 5 digits'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-
-      // Here you would integrate with a ZIP code API to get city/state
-      // For now, returning mock data
-      return new Response(
-        JSON.stringify({
-          type: 'success',
-          data: {
-            city: 'Atlanta',
-            state: 'GA',
-            county: 'Fulton'
-          }
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Validate date formats
-    if (field === 'dob') {
-      const date = new Date(value)
-      if (isNaN(date.getTime())) {
-        return new Response(
-          JSON.stringify({
-            type: 'error',
-            message: 'Invalid date format'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-
-      // Check if date is in the future
-      if (date > new Date()) {
-        return new Response(
-          JSON.stringify({
-            type: 'error',
-            message: 'Date of birth cannot be in the future'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
-    // Validate name fields
-    if (field === 'firstName' || field === 'lastName') {
-      if (value.length < 2) {
-        return new Response(
-          JSON.stringify({
-            type: 'error',
-            message: `${field} must be at least 2 characters long`
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
-    // Validate address
-    if (field === 'address') {
-      if (value.length < 5) {
-        return new Response(
-          JSON.stringify({
-            type: 'error',
-            message: 'Address must be at least 5 characters long'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
-    // Validate medical conditions
-    if (field === 'medicalConditions') {
-      const conditions = value.split(',')
-      if (conditions.some(condition => condition.length < 2)) {
-        return new Response(
-          JSON.stringify({
-            type: 'warning',
-            message: 'Some medical conditions appear to be too short'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
-    // Validate allergies
-    if (field === 'allergies') {
-      const allergies = value.split(',')
-      if (allergies.some(allergy => allergy.length < 2)) {
-        return new Response(
-          JSON.stringify({
-            type: 'warning',
-            message: 'Some allergies appear to be too short'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
-    // Validate medications
-    if (field === 'medications') {
-      const medications = value.split(',')
-      if (medications.some(medication => medication.length < 2)) {
-        return new Response(
-          JSON.stringify({
-            type: 'warning',
-            message: 'Some medications appear to be too short'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
-    // Validate emergency contact
-    if (field === 'emergencyContact') {
-      const contact = JSON.parse(value)
-      if (!contact.name || !contact.phone || !contact.relation) {
-        return new Response(
-          JSON.stringify({
-            type: 'error',
-            message: 'Emergency contact must include name, phone, and relation'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
+    // Analyze patient data for completeness and suggestions
+    const suggestions = []
+    const warnings = []
 
     // Check for missing critical information
-    const criticalFields = ['phone', 'email', 'address', 'emergency_contact_name', 'emergency_contact_phone']
-    const missingFields = criticalFields.filter(field => !patientData[field])
+    if (!patient.phone) warnings.push('Missing contact phone number')
+    if (!patient.email) warnings.push('Missing email address')
+    if (!patient.emergency_contact_name) warnings.push('Missing emergency contact')
     
-    if (missingFields.length > 0) {
-      return new Response(
-        JSON.stringify({
-          type: 'warning',
-          message: `Missing critical information: ${missingFields.join(', ')}`
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+    // Check medical history
+    const lastVisit = patient.medical_history?.[0]?.date
+    if (!lastVisit) {
+      warnings.push('No medical history records found')
+    } else {
+      const daysSinceLastVisit = Math.floor((Date.now() - new Date(lastVisit).getTime()) / (1000 * 60 * 60 * 24))
+      if (daysSinceLastVisit > 365) {
+        suggestions.push(`Last visit was ${daysSinceLastVisit} days ago. Consider scheduling a check-up.`)
+      }
+    }
+
+    // Check insurance information
+    if (!patient.insurance_records?.length) {
+      warnings.push('No insurance records found')
+    } else {
+      const primaryInsurance = patient.insurance_records.find(r => r.type === 'primary')
+      if (!primaryInsurance) {
+        suggestions.push('Consider adding primary insurance information')
+      }
+    }
+
+    // Format response
+    const analysis = {
+      patientId,
+      completeness: {
+        demographic: patient.dob && patient.gender ? 'complete' : 'incomplete',
+        contact: patient.phone && patient.email ? 'complete' : 'incomplete',
+        insurance: patient.insurance_records?.length > 0 ? 'complete' : 'incomplete',
+        medical: patient.medical_history?.length > 0 ? 'complete' : 'incomplete'
+      },
+      suggestions,
+      warnings
     }
 
     return new Response(
-      JSON.stringify({ type: 'success' }),
+      JSON.stringify(analysis),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
-    console.error('Error in analyze-demographics:', error)
+    console.error('Error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     )
   }
 })

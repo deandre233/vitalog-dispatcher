@@ -545,6 +545,10 @@ export type Database = {
         }
         Returns: Json
       }
+      generate_patient_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       dispatch_status: "Pending" | "In Progress" | "Completed" | "Canceled"
