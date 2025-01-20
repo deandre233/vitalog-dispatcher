@@ -182,10 +182,10 @@ export function CrewAssignmentModal({
             routeLine.current.setMap(null);
           }
 
-          const polyline = routeDetails.route.routes[0].overview_polyline as { points: string };
-          if (polyline && polyline.points) {
+          const polylinePoints = routeDetails.route.routes[0].overview_polyline;
+          if (typeof polylinePoints === 'object' && polylinePoints !== null && 'points' in polylinePoints) {
             routeLine.current = new google.maps.Polyline({
-              path: google.maps.geometry.encoding.decodePath(polyline.points),
+              path: google.maps.geometry.encoding.decodePath((polylinePoints as { points: string }).points),
               geodesic: true,
               strokeColor: '#3b82f6',
               strokeOpacity: 1.0,
