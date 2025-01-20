@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { DispatchFormData } from "@/types/dispatch";
 import { supabase } from "@/integrations/supabase/client";
-import { Bot, MapPin } from "lucide-react";
+import { Bot, MapPin, Search, UserCircle2 } from "lucide-react";
 
 const mockCalls = [
   {
@@ -53,6 +53,7 @@ export function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedMockCall, setSelectedMockCall] = useState(0);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+  const [isSearchingPatient, setIsSearchingPatient] = useState(false);
   
   const { register, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm<DispatchFormData>({
     defaultValues: {
@@ -138,6 +139,65 @@ export function BookingForm() {
         </Button>
       </div>
 
+      {/* New Patient/Customer Section */}
+      <Card className="p-6 border-l-4 border-l-medical-secondary">
+        <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
+          <UserCircle2 className="w-5 h-5" />
+          Patient / Customer Information
+        </h3>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="patient_last_name">Last Name</Label>
+              <div className="relative">
+                <Input
+                  id="patient_last_name"
+                  {...register("patient_last_name")}
+                  className="border-medical-secondary/30 focus:border-medical-secondary pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2"
+                  onClick={() => setIsSearchingPatient(true)}
+                >
+                  <Search className="w-4 h-4 text-medical-secondary" />
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="patient_first_name">First Name</Label>
+              <Input
+                id="patient_first_name"
+                {...register("patient_first_name")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="patient_dob">Date of Birth</Label>
+            <Input
+              id="patient_dob"
+              type="date"
+              {...register("patient_dob")}
+              className="border-medical-secondary/30 focus:border-medical-secondary"
+            />
+          </div>
+          <p className="text-sm text-gray-500 italic">
+            A new patient record will be created when you save this dispatch.
+          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full bg-medical-highlight text-medical-primary hover:bg-medical-highlight/90"
+          >
+            Create Patient Record Now
+          </Button>
+        </div>
+      </Card>
+
+      {/* Keep existing sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Caller Information */}
         <Card className="p-6 border-l-4 border-l-medical-secondary">
