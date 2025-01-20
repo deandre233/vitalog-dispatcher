@@ -6,14 +6,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MapPin, Award, Clock, CheckCircle, User, AlertTriangle, ThumbsUp, Activity } from "lucide-react";
+import { MapPin, Award, Clock, User, AlertTriangle, ThumbsUp, Activity } from "lucide-react";
 import { recommendCrewWithRoute, crewMembers, calculateDistance, type CrewMember, type CrewWithRoute, type Location } from "@/utils/crewRecommendation";
 import { analyzeCrewPerformance, getTrafficInfo, calculateSkillMatch } from "@/utils/aiDispatchUtils";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { getRouteDetails } from "@/utils/googleMapsService";
 import { optimizeRoute, type RouteRecommendation } from "@/utils/aiDispatchOptimization";
 
 interface CrewAssignmentModalProps {
@@ -25,6 +24,9 @@ interface CrewAssignmentModalProps {
   onAssign?: (crewId: number, eta: number) => void;
 }
 
+// Helper function to convert kilometers to miles
+const kmToMiles = (km: number) => km * 0.621371;
+
 export function CrewAssignmentModal({
   isOpen,
   onClose,
@@ -33,8 +35,10 @@ export function CrewAssignmentModal({
   origin,
   onAssign,
 }: CrewAssignmentModalProps) {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const googleMap = useRef<google.maps.Map | null>(null);
+  const markers = useRef<google.maps.Marker[]>([]);
+  const routeLine = useRef<google.maps.Polyline | null>(null);
   const [recommendedCrew, setRecommendedCrew] = useState<CrewWithRoute | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [manualOverride, setManualOverride] = useState(false);
@@ -113,62 +117,94 @@ export function CrewAssignmentModal({
   }, [isOpen, origin, serviceType]);
 
   useEffect(() => {
-    if (!mapContainer.current || !isOpen || !recommendedCrew) return;
+    if (!mapRef.current || !isOpen) return;
 
-    mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN';
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [origin.lng, origin.lat],
-      zoom: 12
+    // Initialize Google Map
+    googleMap.current = new google.maps.Map(mapRef.current, {
+      center: { lat: origin.lat, lng: origin.lng },
+      zoom: 12,
+      styles: [
+        {
+          featureType: "poi",
+          elementType: "labels",
+          stylers: [{ visibility: "off" }]
+        }
+      ]
     });
 
-    new mapboxgl.Marker({ color: '#FF0000' })
-      .setLngLat([origin.lng, origin.lat])
-      .addTo(map.current);
+    // Clear existing markers
+    markers.current.forEach(marker => marker.setMap(null));
+    markers.current = [];
 
-    if (recommendedCrew.routeInfo.route) {
-      map.current.on('load', () => {
-        if (!map.current) return;
-        
-        map.current.addSource('route', {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'LineString',
-              coordinates: recommendedCrew.routeInfo.route!.geometry.coordinates
-            }
-          }
-        });
+    // Add dispatch location marker
+    markers.current.push(
+      new google.maps.Marker({
+        position: { lat: origin.lat, lng: origin.lng },
+        map: googleMap.current,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: '#FF0000',
+          fillOpacity: 1,
+          strokeWeight: 0,
+          scale: 8
+        }
+      })
+    );
 
-        map.current.addLayer({
-          id: 'route',
-          type: 'line',
-          source: 'route',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-          paint: {
-            'line-color': '#3b82f6',
-            'line-width': 4
+    // Add crew markers
+    crewMembers.forEach(crew => {
+      const color = recommendedCrew?.id === crew.id ? '#00FF00' : '#0000FF';
+      markers.current.push(
+        new google.maps.Marker({
+          position: { lat: crew.location.lat, lng: crew.location.lng },
+          map: googleMap.current,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: color,
+            fillOpacity: 1,
+            strokeWeight: 0,
+            scale: 8
           }
-        });
-      });
+        })
+      );
+    });
+
+    // Draw route if recommended crew exists
+    if (recommendedCrew) {
+      const drawRoute = async () => {
+        try {
+          const routeDetails = await getRouteDetails(
+            origin,
+            recommendedCrew.location
+          );
+
+          if (routeLine.current) {
+            routeLine.current.setMap(null);
+          }
+
+          routeLine.current = new google.maps.Polyline({
+            path: google.maps.geometry.encoding.decodePath(
+              routeDetails.route.routes[0].overview_polyline.points
+            ),
+            geodesic: true,
+            strokeColor: '#3b82f6',
+            strokeOpacity: 1.0,
+            strokeWeight: 4,
+            map: googleMap.current
+          });
+        } catch (error) {
+          console.error('Error drawing route:', error);
+        }
+      };
+
+      drawRoute();
     }
 
-    crewMembers.forEach(crew => {
-      const color = recommendedCrew.id === crew.id ? '#00FF00' : '#0000FF';
-      new mapboxgl.Marker({ color })
-        .setLngLat([crew.location.lng, crew.location.lat])
-        .addTo(map.current!);
-    });
-
     return () => {
-      map.current?.remove();
+      markers.current.forEach(marker => marker.setMap(null));
+      if (routeLine.current) {
+        routeLine.current.setMap(null);
+      }
     };
   }, [isOpen, origin, recommendedCrew]);
 
@@ -196,7 +232,7 @@ export function CrewAssignmentModal({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <div ref={mapContainer} className="h-[300px] rounded-lg mb-4" />
+            <div ref={mapRef} className="h-[300px] rounded-lg mb-4" />
             
             {routeOptimization && (
               <div className="bg-blue-50 p-4 rounded-lg mb-4">
@@ -248,6 +284,7 @@ export function CrewAssignmentModal({
                   .map((crew) => {
                     const isRecommended = recommendedCrew?.id === crew.id;
                     const distance = calculateDistance(crew.location, origin);
+                    const distanceInMiles = kmToMiles(distance);
                     const skillMatch = calculateSkillMatch(crew.certification, serviceType);
                     const performance = analyzeCrewPerformance(crew);
                     const trafficInfo = getTrafficInfo(crew.location, origin);
@@ -298,8 +335,8 @@ export function CrewAssignmentModal({
                               <MapPin className="w-4 h-4 text-medical-secondary" />
                               <span>
                                 {isRecommended 
-                                  ? `${recommendedCrew.routeInfo.distance.toFixed(2)} km via route`
-                                  : `${distance.toFixed(2)} km direct`}
+                                  ? `${kmToMiles(recommendedCrew.routeInfo.distance).toFixed(2)} miles via route`
+                                  : `${distanceInMiles.toFixed(2)} miles direct`}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600">
