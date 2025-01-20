@@ -71,6 +71,15 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
   }
 
   const handleAddMedication = async (medication: any) => {
+    if (!patientId) {
+      toast({
+        title: "Error",
+        description: "Patient ID is required to add medication",
+        variant: "destructive",
+      })
+      return
+    }
+
     if (onMedicationAdd) {
       onMedicationAdd(medication)
       
@@ -80,6 +89,42 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
           description: `Common complementary medications: ${medication.recommendations.map((m: any) => m.generic_name).join(', ')}`,
         })
       }
+    }
+  }
+
+  const handleAddHistory = async (history: { code: string; description: string }) => {
+    if (!patientId) {
+      toast({
+        title: "Error",
+        description: "Patient ID is required to add medical history",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('medical_history')
+        .insert({
+          patient_id: patientId,
+          type: 'condition',
+          description: `${history.code} - ${history.description}`
+        })
+
+      if (error) throw error
+
+      onHistoryAdd(history)
+      toast({
+        title: "Success",
+        description: "Medical history has been added to the patient's record.",
+      })
+    } catch (error) {
+      console.error('Error adding medical history:', error)
+      toast({
+        title: "Error",
+        description: "Failed to add medical history",
+        variant: "destructive",
+      })
     }
   }
 
@@ -127,7 +172,7 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
                           variant="ghost"
                           size="sm"
                           className="h-6 hover:bg-gray-100"
-                          onClick={() => result.generic_name ? handleAddMedication(result) : onHistoryAdd(result)}
+                          onClick={() => result.generic_name ? handleAddMedication(result) : handleAddHistory(result)}
                         >
                           <Plus className="h-3 w-3" />
                         </Button>
