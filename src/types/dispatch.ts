@@ -41,4 +41,16 @@ export type DispatchFormData = Omit<TransportRecord, 'id' | 'created_at' | 'disp
   cash_upfront?: boolean;
   price_quote?: string;
   service_complaint?: string;
+
+  // New scheduling fields
+  activation_type?: 'now' | 'later';
+  activation_datetime?: string;
+  pickup_type?: 'asap' | 'scheduled';
+  pickup_time?: string;
+  precise_pickup?: boolean;
+  dropoff_type?: 'asap' | 'scheduled';
+  dropoff_time?: string;
+  return_activation_datetime?: string;
+  return_pickup_time?: string;
+  precise_return?: boolean;
 };
