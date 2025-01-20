@@ -63,6 +63,53 @@ export type Database = {
           },
         ]
       }
+      appointments: {
+        Row: {
+          appointment_date: string
+          created_at: string | null
+          doctor: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          patient_id: string | null
+          purpose: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          appointment_date: string
+          created_at?: string | null
+          doctor?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          patient_id?: string | null
+          purpose?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          appointment_date?: string
+          created_at?: string | null
+          doctor?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          patient_id?: string | null
+          purpose?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       billing_settings: {
         Row: {
           created_at: string | null
@@ -106,6 +153,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "billing_settings_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claims: {
+        Row: {
+          amount_claimed: number
+          amount_paid: number | null
+          claim_number: string
+          created_at: string | null
+          date_filed: string | null
+          description: string | null
+          id: string
+          patient_id: string | null
+          status: Database["public"]["Enums"]["claim_status_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          amount_claimed: number
+          amount_paid?: number | null
+          claim_number: string
+          created_at?: string | null
+          date_filed?: string | null
+          description?: string | null
+          id?: string
+          patient_id?: string | null
+          status?: Database["public"]["Enums"]["claim_status_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          amount_claimed?: number
+          amount_paid?: number | null
+          claim_number?: string
+          created_at?: string | null
+          date_filed?: string | null
+          description?: string | null
+          id?: string
+          patient_id?: string | null
+          status?: Database["public"]["Enums"]["claim_status_type"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claims_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
@@ -317,6 +411,50 @@ export type Database = {
             columns: ["policy_type_id"]
             isOneToOne: false
             referencedRelation: "policy_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount_due: number
+          created_at: string | null
+          description: string | null
+          due_date: string
+          id: string
+          invoice_number: string
+          patient_id: string | null
+          status: Database["public"]["Enums"]["invoice_status_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          amount_due: number
+          created_at?: string | null
+          description?: string | null
+          due_date: string
+          id?: string
+          invoice_number: string
+          patient_id?: string | null
+          status?: Database["public"]["Enums"]["invoice_status_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          amount_due?: number
+          created_at?: string | null
+          description?: string | null
+          due_date?: string
+          id?: string
+          invoice_number?: string
+          patient_id?: string | null
+          status?: Database["public"]["Enums"]["invoice_status_type"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
             referencedColumns: ["id"]
           },
         ]
@@ -536,6 +674,50 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string | null
+          patient_id: string | null
+          payment_amount: number
+          payment_date: string | null
+          payment_method: Database["public"]["Enums"]["payment_method_type"]
+          reference_number: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          payment_amount: number
+          payment_date?: string | null
+          payment_method: Database["public"]["Enums"]["payment_method_type"]
+          reference_number?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          payment_amount?: number
+          payment_date?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method_type"]
+          reference_number?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       policy_types: {
         Row: {
           code: string
@@ -678,6 +860,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_invoice_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       generate_patient_id: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -688,7 +874,39 @@ export type Database = {
       }
     }
     Enums: {
+      claim_status_type:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "in_review"
+        | "appealed"
       dispatch_status: "Pending" | "In Progress" | "Completed" | "Canceled"
+      gender_type:
+        | "male"
+        | "female"
+        | "non_binary"
+        | "other"
+        | "prefer_not_to_say"
+      invoice_status_type:
+        | "paid"
+        | "unpaid"
+        | "overdue"
+        | "cancelled"
+        | "partial"
+      marital_status_type:
+        | "single"
+        | "married"
+        | "divorced"
+        | "widowed"
+        | "separated"
+        | "other"
+      payment_method_type:
+        | "credit_card"
+        | "debit_card"
+        | "cash"
+        | "insurance"
+        | "check"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
