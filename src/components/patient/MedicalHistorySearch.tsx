@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { Search, Plus, Loader2 } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
+import { Card } from "@/components/ui/card"
 
 interface MedicalHistorySearchProps {
   patientId: string;
@@ -57,12 +58,10 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
     const value = e.target.value
     setSearchTerm(value)
 
-    // Clear existing timeout
     if (searchTimeout) {
       window.clearTimeout(searchTimeout)
     }
 
-    // Set new timeout for search
     if (value.length >= 2) {
       const timeout = window.setTimeout(() => {
         handleSearch(value)
@@ -75,7 +74,6 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
     if (onMedicationAdd) {
       onMedicationAdd(medication)
       
-      // If there are recommendations, show them
       if (medication.recommendations?.length > 0) {
         toast({
           title: "Recommended Medications",
@@ -95,52 +93,73 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <Input
-          placeholder="Start typing to search medical conditions (min 2 characters)..."
-          value={searchTerm}
-          onChange={handleSearchInputChange}
-          className="flex-1"
-        />
+      <div className="flex gap-2 items-center">
+        <div className="relative flex-1">
+          <Input
+            placeholder="Start typing to search medical conditions (min 2 characters)..."
+            value={searchTerm}
+            onChange={handleSearchInputChange}
+            className="pl-10"
+          />
+          <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+        </div>
         {isProcessing && (
           <Loader2 className="h-4 w-4 animate-spin" />
         )}
       </div>
 
-      <ScrollArea className="h-[300px] border rounded-md p-4">
-        {searchResults.map((result, index) => (
-          <div key={index} className="py-2 border-b last:border-0">
-            <div className="flex items-start justify-between">
-              <div>
-                <h4 className="font-medium">{result.code || result.generic_name}</h4>
-                <p className="text-sm text-muted-foreground">
-                  {result.description || result.medication_class}
-                </p>
-                {result.recommendations && (
-                  <div className="mt-2">
-                    <p className="text-sm font-medium">Common complementary medications:</p>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {result.recommendations.map((rec: any, i: number) => (
-                        <Badge key={i} variant="outline" className="cursor-pointer hover:bg-primary/10"
-                          onClick={() => handleAddMedication(rec)}>
-                          {rec.generic_name}
-                        </Badge>
-                      ))}
+      {searchResults.length > 0 && (
+        <Card className="p-4 border shadow-sm">
+          <ScrollArea className="h-[300px]">
+            <div className="space-y-3">
+              {searchResults.map((result, index) => (
+                <div 
+                  key={index} 
+                  className="p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium text-sm">
+                          {result.code || result.generic_name}
+                        </h4>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 hover:bg-gray-100"
+                          onClick={() => result.generic_name ? handleAddMedication(result) : onHistoryAdd(result)}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {result.description || result.medication_class}
+                      </p>
+                      {result.recommendations && (
+                        <div className="mt-2">
+                          <p className="text-xs font-medium text-muted-foreground">Common complementary medications:</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {result.recommendations.map((rec: any, i: number) => (
+                              <Badge 
+                                key={i} 
+                                variant="outline" 
+                                className="text-xs cursor-pointer hover:bg-primary/10"
+                                onClick={() => handleAddMedication(rec)}
+                              >
+                                {rec.generic_name}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => result.generic_name ? handleAddMedication(result) : onHistoryAdd(result)}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+                </div>
+              ))}
             </div>
-          </div>
-        ))}
-      </ScrollArea>
+          </ScrollArea>
+        </Card>
+      )}
     </div>
   )
 }
