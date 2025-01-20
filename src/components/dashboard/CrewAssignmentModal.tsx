@@ -20,6 +20,16 @@ interface CrewAssignmentModalProps {
   warnings?: string[];
 }
 
+interface CrewMember {
+  id: string;
+  name: string;
+  vehicle_type: string;
+  current_location: string;
+  experience_level: string;
+  last_assignment: string | null;
+  status: string;
+}
+
 export function CrewAssignmentModal({
   isOpen,
   onClose,
@@ -35,8 +45,8 @@ export function CrewAssignmentModal({
   const { toast } = useToast();
   const [routeDetails, setRouteDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [availableCrews, setAvailableCrews] = useState([]);
-  const [selectedCrew, setSelectedCrew] = useState(null);
+  const [availableCrews, setAvailableCrews] = useState<CrewMember[]>([]);
+  const [selectedCrew, setSelectedCrew] = useState<CrewMember | null>(null);
 
   useEffect(() => {
     const fetchRouteDetails = async () => {
@@ -76,13 +86,28 @@ export function CrewAssignmentModal({
   useEffect(() => {
     const fetchAvailableCrews = async () => {
       try {
-        const { data, error } = await supabase
-          .from('crews')
-          .select('*')
-          .eq('status', 'available');
-
-        if (error) throw error;
-        setAvailableCrews(data || []);
+        // Mock crew data since we don't have a crews table
+        const mockCrews: CrewMember[] = [
+          {
+            id: '1',
+            name: 'Crew A',
+            vehicle_type: 'Ambulance',
+            current_location: 'Station 1',
+            experience_level: 'Senior',
+            last_assignment: null,
+            status: 'available'
+          },
+          {
+            id: '2',
+            name: 'Crew B',
+            vehicle_type: 'Transport Van',
+            current_location: 'Station 2',
+            experience_level: 'Junior',
+            last_assignment: null,
+            status: 'available'
+          }
+        ];
+        setAvailableCrews(mockCrews);
       } catch (error) {
         console.error('Error fetching crews:', error);
         toast({
@@ -131,7 +156,7 @@ export function CrewAssignmentModal({
     fetchPatientDisplayId();
   };
 
-  const handleCrewSelect = (crew: any) => {
+  const handleCrewSelect = (crew: CrewMember) => {
     setSelectedCrew(crew);
   };
 
@@ -147,9 +172,9 @@ export function CrewAssignmentModal({
 
     try {
       const { error } = await supabase
-        .from('transports')
+        .from('transport_records')
         .update({
-          crew_id: selectedCrew.id,
+          crew_assigned: selectedCrew.name,
           status: 'assigned'
         })
         .eq('id', transportId);

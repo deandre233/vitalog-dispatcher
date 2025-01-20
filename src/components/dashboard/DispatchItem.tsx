@@ -359,10 +359,13 @@ export function DispatchItem({
       <CrewAssignmentModal
         isOpen={isAssignModalOpen}
         onClose={closeAssignModal}
-        dispatchId={id}
-        serviceType={serviceType}
-        origin={{ lat: 33.7490, lng: -84.3880 }}
-        onAssign={closeAssignModal}
+        transportId={id}
+        patientName={patient.name}
+        patientId={patient.id}
+        pickupLocation={origin}
+        dropoffLocation={destination}
+        scheduledTime={activationTime}
+        warnings={warnings ? [warnings] : []}
       />
     </div>
   );
