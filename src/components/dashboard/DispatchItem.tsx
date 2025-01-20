@@ -170,31 +170,6 @@ export function DispatchItem({
     toast.success(`Status updated to ${newStatus}`);
   };
 
-  const handlePatientClick = async () => {
-    try {
-      const { data: patientData, error } = await supabase
-        .from('patients')
-        .select('*')
-        .eq('legacy_display_id', patient.id)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching patient:', error);
-        toast.error('Error loading patient data');
-        return;
-      }
-
-      if (patientData) {
-        navigate(`/patient/${patientData.legacy_display_id}`);
-      } else {
-        toast.error('Patient not found');
-      }
-    } catch (err) {
-      console.error('Error in handlePatientClick:', err);
-      toast.error('Failed to load patient profile');
-    }
-  };
-
   const currentProgress = getProgressForStatus(currentStatus);
   const timeElapsed = formatDistanceToNow(new Date(activationTime));
 
@@ -259,12 +234,12 @@ export function DispatchItem({
       <div className="mt-2 grid grid-cols-2 gap-4">
         <div className="flex items-center gap-2">
           <User className="h-4 w-4 text-gray-500" />
-          <button 
-            onClick={handlePatientClick}
-            className="text-sm hover:text-blue-600 transition-colors underline"
+          <Link 
+            to={`/patient/${patient.id}`}
+            className="text-sm hover:text-blue-600 transition-colors"
           >
             {patient.name}
-          </button>
+          </Link>
         </div>
         <div className="flex items-center gap-2 justify-end">
           <MapPin className="h-4 w-4 text-gray-500" />
