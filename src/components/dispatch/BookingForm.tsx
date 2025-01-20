@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { DispatchFormData } from "@/types/dispatch";
 import { supabase } from "@/integrations/supabase/client";
-import { Bot } from "lucide-react";
+import { Bot, MapPin } from "lucide-react";
 
 const mockCalls = [
   {
@@ -125,158 +125,213 @@ export function BookingForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <div className="flex justify-end gap-4 mb-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-[1200px] mx-auto bg-white rounded-lg shadow-sm p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-semibold text-medical-primary">Book a New Dispatch</h1>
         <Button 
           type="button" 
           variant="outline" 
           onClick={loadMockCall}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 bg-medical-accent text-medical-primary hover:bg-medical-highlight"
         >
           Load Mock Call
         </Button>
       </div>
 
-      {/* Caller Information */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Caller Information</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="caller_name">Caller Name</Label>
-            <Input
-              id="caller_name"
-              {...register("caller_name", { required: true })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="caller_phone">Caller Phone</Label>
-            <Input
-              id="caller_phone"
-              {...register("caller_phone", { required: true })}
-            />
-          </div>
-        </div>
-      </Card>
-
-      {/* Patient Information */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Patient Information</h3>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Patient Search</Label>
-            <Input placeholder="Search patients..." />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Patient Name</Label>
-              <Input {...register("patient_name")} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Caller Information */}
+        <Card className="p-6 border-l-4 border-l-medical-secondary">
+          <h3 className="text-lg font-semibold mb-4 text-medical-primary">Caller Information</h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="caller_name">Caller Name</Label>
+                <Input
+                  id="caller_name"
+                  className="border-medical-secondary/30 focus:border-medical-secondary"
+                  {...register("caller_name", { required: true })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="caller_phone">Phone</Label>
+                <Input
+                  id="caller_phone"
+                  className="border-medical-secondary/30 focus:border-medical-secondary"
+                  placeholder="###-###-####"
+                  {...register("caller_phone", { required: true })}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
 
-      {/* Location Information */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Location Information</h3>
-        <div className="grid gap-6">
-          <div className="space-y-2">
-            <Label>Pickup Location</Label>
-            <Input {...register("pickup_location", { required: true })} />
-            <Input placeholder="Floor/Room" {...register("origin_floor_room")} />
-            <Input placeholder="Address" {...register("origin_address")} />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Dropoff Location</Label>
-            <Input {...register("dropoff_location", { required: true })} />
-            <Input placeholder="Floor/Room" {...register("destination_floor_room")} />
-            <Input placeholder="Address" {...register("destination_address")} />
-            <Input placeholder="Reason" {...register("reason_for_destination")} />
-          </div>
-        </div>
-      </Card>
-
-      {/* Service Details */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Service Details</h3>
-        <div className="grid gap-6">
-          <div className="space-y-2">
-            <Label>Service Type</Label>
-            <Select onValueChange={(value) => register("service_type").onChange({ target: { value } })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select service type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="WC">Wheelchair</SelectItem>
-                <SelectItem value="BLS">Basic Life Support</SelectItem>
-                <SelectItem value="ALS">Advanced Life Support</SelectItem>
-                <SelectItem value="MICU">Mobile ICU</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Priority Level</Label>
-            <Select onValueChange={(value) => register("priority_level").onChange({ target: { value } })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Critical">Critical</SelectItem>
-                <SelectItem value="Emergency">Emergency</SelectItem>
-                <SelectItem value="Lower acuity">Lower Acuity</SelectItem>
-                <SelectItem value="Scheduled">Scheduled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Trip Type</Label>
-            <RadioGroup onValueChange={(value) => register("trip_type").onChange({ target: { value } })}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="One way" id="one-way" />
-                <Label htmlFor="one-way">One Way</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Wait-and-return" id="wait-return" />
-                <Label htmlFor="wait-return">Wait and Return</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Round trip" id="round-trip" />
-                <Label htmlFor="round-trip">Round Trip</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Transport Date & Time</Label>
-            <Input type="datetime-local" {...register("transport_date", { required: true })} />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Recurrence</Label>
-            <Select onValueChange={(value) => register("recurrence_type").onChange({ target: { value } })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select recurrence" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Disabled">No Recurrence</SelectItem>
-                <SelectItem value="Daily">Daily</SelectItem>
-                <SelectItem value="Weekly">Weekly</SelectItem>
-                <SelectItem value="Monthly">Monthly</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </Card>
-
-      {/* Requirements */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Requirements</h3>
-        <div className="grid gap-6">
-          <div className="space-y-2">
-            <Label>Special Requirements</Label>
+        {/* Origin Location */}
+        <Card className="p-6 border-l-4 border-l-medical-secondary">
+          <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
+            <MapPin className="w-5 h-5" />
+            Origin Location
+          </h3>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Location Name</Label>
+              <Input 
+                {...register("pickup_location")} 
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Floor/Room</Label>
+                <Input 
+                  {...register("origin_floor_room")}
+                  className="border-medical-secondary/30 focus:border-medical-secondary"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select onValueChange={(value) => register("origin_type").onChange({ target: { value } })}>
+                  <SelectTrigger className="border-medical-secondary/30">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hospital">Hospital</SelectItem>
+                    <SelectItem value="nursing_home">Nursing Home</SelectItem>
+                    <SelectItem value="residence">Residence</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Address</Label>
+              <Input 
+                {...register("origin_address")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+          </div>
+        </Card>
+
+        {/* Destination Location */}
+        <Card className="p-6 border-l-4 border-l-medical-secondary">
+          <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
+            <MapPin className="w-5 h-5" />
+            Destination Location
+          </h3>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Location Name</Label>
+              <Input 
+                {...register("dropoff_location")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Floor/Room</Label>
+                <Input 
+                  {...register("destination_floor_room")}
+                  className="border-medical-secondary/30 focus:border-medical-secondary"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select onValueChange={(value) => register("destination_type").onChange({ target: { value } })}>
+                  <SelectTrigger className="border-medical-secondary/30">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hospital">Hospital</SelectItem>
+                    <SelectItem value="nursing_home">Nursing Home</SelectItem>
+                    <SelectItem value="residence">Residence</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Address</Label>
+              <Input 
+                {...register("destination_address")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+          </div>
+        </Card>
+
+        {/* Service Details */}
+        <Card className="p-6 border-l-4 border-l-medical-secondary">
+          <h3 className="text-lg font-semibold mb-4 text-medical-primary">Service Details</h3>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Service Type</Label>
+              <Select onValueChange={(value) => register("service_type").onChange({ target: { value } })}>
+                <SelectTrigger className="border-medical-secondary/30">
+                  <SelectValue placeholder="Select service type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="WC">Wheelchair</SelectItem>
+                  <SelectItem value="BLS">Basic Life Support</SelectItem>
+                  <SelectItem value="ALS">Advanced Life Support</SelectItem>
+                  <SelectItem value="MICU">Mobile ICU</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Priority Level</Label>
+              <RadioGroup 
+                className="flex gap-4" 
+                onValueChange={(value) => register("priority_level").onChange({ target: { value } })}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Critical" id="critical" />
+                  <Label htmlFor="critical" className="text-red-500">Critical</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Emergency" id="emergency" />
+                  <Label htmlFor="emergency" className="text-orange-500">Emergency</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Lower acuity" id="lower-acuity" />
+                  <Label htmlFor="lower-acuity" className="text-yellow-600">Lower Acuity</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Scheduled" id="scheduled" />
+                  <Label htmlFor="scheduled" className="text-green-600">Scheduled</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Trip Type</Label>
+              <RadioGroup 
+                className="flex gap-4"
+                onValueChange={(value) => register("trip_type").onChange({ target: { value } })}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="One way" id="one-way" />
+                  <Label htmlFor="one-way">One Way</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Wait-and-return" id="wait-return" />
+                  <Label htmlFor="wait-return">Wait and Return</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Round trip" id="round-trip" />
+                  <Label htmlFor="round-trip">Round Trip</Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Requirements Section */}
+      <Card className="p-6 border-l-4 border-l-medical-secondary">
+        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Requirements & Warnings</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-4">
+            <h4 className="font-medium text-medical-primary">Special Requirements</h4>
+            <div className="grid grid-cols-1 gap-2">
               <div className="flex items-center space-x-2">
                 <Checkbox {...register("requires_bcs")} id="bcs" />
                 <Label htmlFor="bcs">BCS</Label>
@@ -300,9 +355,9 @@ export function BookingForm() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Patient Conditions</Label>
-            <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
+            <h4 className="font-medium text-medical-primary">Patient Conditions</h4>
+            <div className="grid grid-cols-1 gap-2">
               <div className="flex items-center space-x-2">
                 <Checkbox {...register("breathing_problem")} id="breathing" />
                 <Label htmlFor="breathing">Breathing Problem</Label>
@@ -319,6 +374,12 @@ export function BookingForm() {
                 <Checkbox {...register("unstable_impaired")} id="unstable" />
                 <Label htmlFor="unstable">Unstable/Impaired</Label>
               </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="font-medium text-medical-primary">Additional Warnings</h4>
+            <div className="grid grid-cols-1 gap-2">
               <div className="flex items-center space-x-2">
                 <Checkbox {...register("physically_impaired")} id="physical" />
                 <Label htmlFor="physical">Physically Impaired</Label>
@@ -335,45 +396,41 @@ export function BookingForm() {
                 <Checkbox {...register("speech_impaired")} id="speech" />
                 <Label htmlFor="speech">Speech Impaired</Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox {...register("dnr_order")} id="dnr" />
-                <Label htmlFor="dnr">DNR Order</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox {...register("language_barrier")} id="language" />
-                <Label htmlFor="language">Language Barrier</Label>
-              </div>
             </div>
           </div>
         </div>
       </Card>
 
-      {/* Notes */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Notes</h3>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Billing Notes</Label>
-            <Textarea {...register("billing_notes")} />
-          </div>
+      {/* Notes Section */}
+      <Card className="p-6 border-l-4 border-l-medical-secondary">
+        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Notes</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label>Dispatcher Notes</Label>
-            <Textarea {...register("dispatcher_notes")} />
+            <Textarea 
+              {...register("dispatcher_notes")}
+              className="min-h-[100px] border-medical-secondary/30 focus:border-medical-secondary"
+              placeholder="Notes for dispatch team..."
+            />
           </div>
           <div className="space-y-2">
-            <Label>Prior Authorization Number</Label>
-            <Input {...register("prior_auth_number")} />
+            <Label>Billing Notes</Label>
+            <Textarea 
+              {...register("billing_notes")}
+              className="min-h-[100px] border-medical-secondary/30 focus:border-medical-secondary"
+              placeholder="Notes for billing department..."
+            />
           </div>
         </div>
       </Card>
 
       {/* AI Recommendations */}
-      <Card className="p-6 bg-blue-50">
+      <Card className="p-6 bg-medical-highlight border-l-4 border-l-medical-secondary">
         <div className="flex items-center gap-2 mb-4">
-          <Bot className="w-5 h-5 text-blue-500" />
-          <h3 className="text-lg font-semibold text-blue-700">AI Recommendations</h3>
+          <Bot className="w-5 h-5 text-medical-secondary" />
+          <h3 className="text-lg font-semibold text-medical-primary">AI Recommendations</h3>
         </div>
-        <div className="space-y-2 text-blue-600">
+        <div className="space-y-2 text-medical-primary/80">
           <p className="text-sm">Based on the provided information, our AI suggests:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Recommended crew type will be shown after submission</li>
@@ -383,9 +440,19 @@ export function BookingForm() {
         </div>
       </Card>
 
-      <div className="flex justify-end space-x-4">
-        <Button variant="outline" type="button">Cancel</Button>
-        <Button type="submit" disabled={isSubmitting}>
+      <div className="flex justify-end space-x-4 pt-4">
+        <Button 
+          variant="outline" 
+          type="button"
+          className="bg-gray-50 hover:bg-gray-100"
+        >
+          Cancel
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={isSubmitting}
+          className="bg-medical-secondary hover:bg-medical-secondary/90 text-white"
+        >
           {isSubmitting ? "Creating..." : "Create Dispatch"}
         </Button>
       </div>
