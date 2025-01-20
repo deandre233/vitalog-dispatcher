@@ -190,6 +190,95 @@ const PatientRecord = () => {
     fetchPatientData();
   }, [patientId, navigate, toast]);
 
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase
+        .from('patients')
+        .update({
+          first_name: patientData.firstName,
+          last_name: patientData.lastName,
+          phone: patientData.phone,
+          email: patientData.email,
+          address: patientData.address,
+          city: patientData.city,
+          state: patientData.state,
+          zip: patientData.zip,
+          dob: patientData.dob,
+          gender: patientData.gender,
+          medical_conditions: patientData.medicalConditions,
+          allergies: patientData.allergies,
+          medications: patientData.medications,
+          emergency_contact_name: patientData.emergencyContactName,
+          emergency_contact_phone: patientData.emergencyContactPhone,
+        })
+        .eq('id', patientId);
+
+      if (error) {
+        console.error('Error updating patient:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save patient data",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Patient data saved successfully",
+      });
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Error in handleSave:', err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while saving",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target;
+    
+    // Handle nested objects (like warnings and barriersToEMS)
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setPatientData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+        }
+      }));
+      return;
+    }
+
+    // Handle arrays (like medicalConditions, allergies, medications)
+    if (['medicalConditions', 'allergies', 'medications'].includes(name)) {
+      setPatientData(prev => ({
+        ...prev,
+        [name]: value.split(',').map(item => item.trim())
+      }));
+      return;
+    }
+
+    // Handle regular inputs
+    setPatientData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }));
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
