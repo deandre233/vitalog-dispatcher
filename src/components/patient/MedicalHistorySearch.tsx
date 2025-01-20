@@ -129,12 +129,31 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
     }
 
     try {
+      // First, check if this condition already exists for the patient
+      const { data: existingConditions } = await supabase
+        .from('medical_history')
+        .select('description')
+        .eq('patient_id', patientId)
+        .eq('type', 'condition')
+        .eq('description', `${history.code}`)
+
+      if (existingConditions && existingConditions.length > 0) {
+        toast({
+          title: "Already Added",
+          description: "This condition is already in the patient's medical history.",
+          variant: "default",
+        })
+        return
+      }
+
+      // If not exists, insert the new condition
       const { error } = await supabase
         .from('medical_history')
         .insert({
           patient_id: patientId,
           type: 'condition',
-          description: `${history.code} - ${history.description}`
+          description: history.code,
+          notes: history.description !== history.code ? history.description : null
         })
 
       if (error) throw error
@@ -142,8 +161,12 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
       onHistoryAdd(history)
       toast({
         title: "Success",
-        description: "Medical history has been added to the patient's record.",
+        description: "Medical condition has been added to the patient's record.",
       })
+
+      // Clear the search after successful addition
+      setSearchTerm('')
+      setSearchResults([])
     } catch (error) {
       console.error('Error adding medical history:', error)
       toast({
