@@ -45,7 +45,7 @@ import { BillingTabContent } from "@/components/patient/BillingTabContent";
 import { MedicalTabContent } from "@/components/patient/MedicalTabContent";
 
 export function PatientRecord() {
-  const { patientName } = useParams();
+  const { patientId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -117,30 +117,20 @@ export function PatientRecord() {
       try {
         setIsLoading(true);
         
-        if (!patientName) {
+        if (!patientId) {
           toast({
             title: "Error",
-            description: "Invalid patient ID format",
+            description: "Invalid patient ID",
             variant: "destructive",
           });
           return;
         }
 
-        // First try to find by legacy_display_id
-        let { data, error } = await supabase
+        const { data, error } = await supabase
           .from('patients')
           .select('*')
-          .eq('legacy_display_id', patientName)
+          .eq('id', patientId)
           .maybeSingle();
-
-        // If not found by legacy_display_id and the ID looks like a UUID, try UUID
-        if (!data && !error && patientName.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-          ({ data, error } = await supabase
-            .from('patients')
-            .select('*')
-            .eq('id', patientName)
-            .maybeSingle());
-        }
 
         if (error) {
           console.error('Error fetching patient:', error);
@@ -150,12 +140,13 @@ export function PatientRecord() {
         if (!data) {
           toast({
             title: "Patient Not Found",
-            description: `No patient record found for ID ${patientName}`,
+            description: `No patient record found for ID ${patientId}`,
             variant: "destructive",
           });
           return;
         }
 
+        // Update document title with patient name
         document.title = `Patient Record - ${data.first_name} ${data.last_name}`;
 
         setPatientData(prev => ({
@@ -190,7 +181,7 @@ export function PatientRecord() {
     };
 
     fetchPatientData();
-  }, [patientName, toast]);
+  }, [patientId, toast]);
 
   const handleEdit = () => {
     setIsEditing(!isEditing);
