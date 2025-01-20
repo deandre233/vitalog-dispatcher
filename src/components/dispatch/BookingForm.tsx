@@ -90,6 +90,15 @@ export function BookingForm() {
       destination_zip: '',
       destination_county: '',
       destination_phone: '',
+      is_billable: false,
+      requires_pcs: false,
+      bill_to_insurance: false,
+      bill_to_facility: false,
+      bill_to_affiliate: false,
+      bill_to_patient: false,
+      cash_upfront: false,
+      price_quote: '',
+      service_complaint: '',
     }
   });
 
@@ -510,6 +519,71 @@ export function BookingForm() {
                 <Label htmlFor="round-trip">Round Trip</Label>
               </div>
             </RadioGroup>
+          </div>
+        </div>
+      </Card>
+
+      {/* Enhanced Service Details */}
+      <Card className="p-6 border-l-4 border-l-medical-secondary">
+        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Enhanced Service Details</h3>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Service Complaint</Label>
+                <Textarea 
+                  {...register("service_complaint")}
+                  className="min-h-[100px] border-medical-secondary/30 focus:border-medical-secondary"
+                  placeholder="Enter service complaint details..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Price Quote</Label>
+                <Input 
+                  {...register("price_quote")}
+                  className="border-medical-secondary/30 focus:border-medical-secondary"
+                  placeholder="Enter price quote"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Checkbox {...register("is_billable")} id="billable" />
+                <Label htmlFor="billable">Service is Billable</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox {...register("requires_pcs")} id="pcs" />
+                <Label htmlFor="pcs">PCS Documentation Required</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox {...register("bill_to_insurance")} id="bill-insurance" />
+                <Label htmlFor="bill-insurance">Bill to Insurance</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox {...register("bill_to_facility")} id="bill-facility" />
+                <Label htmlFor="bill-facility">Bill to Facility</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox {...register("bill_to_affiliate")} id="bill-affiliate" />
+                <Label htmlFor="bill-affiliate">Bill to Affiliate</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox {...register("bill_to_patient")} id="bill-patient" />
+                <Label htmlFor="bill-patient">Bill to Patient</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox {...register("cash_upfront")} id="cash-upfront" />
+                <Label htmlFor="cash-upfront">Cash Payment Required Upfront</Label>
+              </div>
+            </div>
           </div>
         </div>
       </Card>

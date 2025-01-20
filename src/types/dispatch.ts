@@ -7,7 +7,6 @@ export type PriorityLevel = 'Critical' | 'Emergency' | 'Lower acuity' | 'Schedul
 export type TripType = 'One way' | 'Wait-and-return' | 'Round trip';
 export type RecurrenceType = 'Disabled' | 'Daily' | 'Weekly' | 'Monthly';
 
-// Update DispatchFormData to include location fields
 export type DispatchFormData = Omit<TransportRecord, 'id' | 'created_at' | 'dispatch_id' | 'status'> & {
   caller_name?: string;
   caller_phone?: string;
@@ -19,7 +18,7 @@ export type DispatchFormData = Omit<TransportRecord, 'id' | 'created_at' | 'disp
   priority_level: PriorityLevel;
   trip_type: TripType;
   recurrence_type: RecurrenceType;
-  // Add new location fields
+  // Location fields
   origin_city?: string;
   origin_state?: string;
   origin_zip?: string;
@@ -30,4 +29,14 @@ export type DispatchFormData = Omit<TransportRecord, 'id' | 'created_at' | 'disp
   destination_zip?: string;
   destination_county?: string;
   destination_phone?: string;
+  // New billing fields
+  is_billable?: boolean;
+  requires_pcs?: boolean;
+  bill_to_insurance?: boolean;
+  bill_to_facility?: boolean;
+  bill_to_affiliate?: boolean;
+  bill_to_patient?: boolean;
+  cash_upfront?: boolean;
+  price_quote?: string;
+  service_complaint?: string;
 };
