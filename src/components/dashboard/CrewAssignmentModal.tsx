@@ -124,18 +124,20 @@ export function CrewAssignmentModal({
   }, [isOpen, toast]);
 
   const handlePatientClick = () => {
-    const fetchPatientDisplayId = async () => {
+    const fetchPatientId = async () => {
       try {
         const { data, error } = await supabase
           .from('patients')
-          .select('display_id')
+          .select('legacy_display_id, id')
           .eq('id', patientId)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
 
-        if (data?.display_id) {
-          navigate(`/patient/${data.display_id.toLowerCase()}`);
+        if (data?.legacy_display_id) {
+          navigate(`/patient/${data.legacy_display_id.toLowerCase()}`);
+        } else if (data?.id) {
+          navigate(`/patient/${data.id}`);
         } else {
           toast({
             title: "Error",
@@ -153,7 +155,7 @@ export function CrewAssignmentModal({
       }
     };
 
-    fetchPatientDisplayId();
+    fetchPatientId();
   };
 
   const handleCrewSelect = (crew: CrewMember) => {

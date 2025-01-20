@@ -133,8 +133,8 @@ export function PatientRecord() {
           .eq('legacy_display_id', patientName)
           .maybeSingle();
 
-        // If not found by legacy_display_id, try UUID
-        if (!data && !error) {
+        // If not found by legacy_display_id and the ID looks like a UUID, try UUID
+        if (!data && !error && patientName.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
           ({ data, error } = await supabase
             .from('patients')
             .select('*')
