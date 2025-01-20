@@ -182,11 +182,10 @@ export function CrewAssignmentModal({
             routeLine.current.setMap(null);
           }
 
-          // Fix: Properly access the overview_polyline points from the DirectionsResult
-          const path = routeDetails.route.routes[0].overview_polyline?.points;
-          if (path) {
+          const polyline = routeDetails.route.routes[0].overview_polyline as { points: string };
+          if (polyline && polyline.points) {
             routeLine.current = new google.maps.Polyline({
-              path: google.maps.geometry.encoding.decodePath(path),
+              path: google.maps.geometry.encoding.decodePath(polyline.points),
               geodesic: true,
               strokeColor: '#3b82f6',
               strokeOpacity: 1.0,
