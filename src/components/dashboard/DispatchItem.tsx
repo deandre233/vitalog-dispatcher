@@ -175,7 +175,7 @@ export function DispatchItem({
       const { data: patientData, error } = await supabase
         .from('patients')
         .select('*')
-        .eq('id', patient.id)
+        .eq('legacy_display_id', patient.id)
         .maybeSingle();
 
       if (error) {
@@ -185,7 +185,7 @@ export function DispatchItem({
       }
 
       if (patientData) {
-        navigate(`/patient/${patientData.id}`);
+        navigate(`/patient/${patientData.legacy_display_id}`);
       } else {
         toast.error('Patient not found');
       }

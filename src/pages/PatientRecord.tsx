@@ -129,7 +129,7 @@ export function PatientRecord() {
         const { data, error } = await supabase
           .from('patients')
           .select('*')
-          .eq('id', patientId)
+          .eq('legacy_display_id', patientId)
           .maybeSingle();
 
         if (error) {
@@ -151,7 +151,7 @@ export function PatientRecord() {
 
         setPatientData(prev => ({
           ...prev,
-          id: data.id,
+          id: data.legacy_display_id,
           firstName: data.first_name,
           lastName: data.last_name,
           phone: data.phone || prev.phone,
