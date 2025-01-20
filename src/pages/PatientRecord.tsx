@@ -114,105 +114,22 @@ const PatientRecord = () => {
     additionalWarnings: ""
   });
 
-  const handleEdit = () => {
-    setIsEditing(!isEditing);
-  };
-
-  const handleSave = async () => {
-    try {
-      const { error } = await supabase
-        .from('patients')
-        .update({
-          first_name: patientData.firstName,
-          last_name: patientData.lastName,
-          phone: patientData.phone,
-          email: patientData.email,
-          address: patientData.address,
-          city: patientData.city,
-          state: patientData.state,
-          zip: patientData.zip,
-          dob: patientData.dob,
-          gender: patientData.gender,
-          medical_conditions: patientData.medicalConditions,
-          allergies: patientData.allergies,
-          medications: patientData.medications,
-          emergency_contact_name: patientData.emergencyContactName,
-          emergency_contact_phone: patientData.emergencyContactPhone,
-        })
-        .eq('id', patientId);
-
-      if (error) throw error;
-
-      setIsEditing(false);
-      toast({
-        title: "Success",
-        description: "Patient information updated successfully",
-      });
-    } catch (error) {
-      console.error('Error updating patient:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update patient information",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const { validateField, handleZipCodeChange, isValidating } = useAIDemographics(patientData);
-
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    const target = e.target as HTMLInputElement;
-    
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setPatientData(prev => {
-        const parentObj = prev[parent as keyof typeof prev];
-        if (typeof parentObj === 'object' && parentObj !== null) {
-          return {
-            ...prev,
-            [parent]: {
-              ...parentObj,
-              [child]: target.type === 'checkbox' ? target.checked : value
-            }
-          };
-        }
-        return prev;
-      });
-    } else {
-      setPatientData(prev => ({
-        ...prev,
-        [name]: target.type === 'checkbox' ? target.checked : value
-      }));
-
-      if (['phone', 'email', 'zip'].includes(name)) {
-        await validateField(name, value);
-      }
-
-      if (name === 'zip') {
-        const locationData = await handleZipCodeChange(value);
-        if (locationData) {
-          setPatientData(prev => ({
-            ...prev,
-            city: locationData.city,
-            state: locationData.state,
-            county: locationData.county
-          }));
-        }
-      }
-    }
-  };
-
   useEffect(() => {
     const fetchPatientData = async () => {
+      if (!patientId) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
+        console.log('Fetching patient data for ID:', patientId);
         
         const { data: patient, error } = await supabase
           .from('patients')
           .select('*')
           .eq('id', patientId)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching patient:', error);
@@ -221,10 +138,12 @@ const PatientRecord = () => {
             description: "Failed to fetch patient data",
             variant: "destructive",
           });
+          setIsLoading(false);
           return;
         }
 
         if (!patient) {
+          console.log('No patient found with ID:', patientId);
           toast({
             title: "Patient Not Found",
             description: `No patient record found with ID ${patientId}`,
@@ -234,7 +153,7 @@ const PatientRecord = () => {
           return;
         }
 
-        // Update document title with patient name
+        console.log('Patient data fetched successfully:', patient);
         document.title = `Patient Record - ${patient.first_name} ${patient.last_name}`;
 
         setPatientData(prev => ({
@@ -268,9 +187,7 @@ const PatientRecord = () => {
       }
     };
 
-    if (patientId) {
-      fetchPatientData();
-    }
+    fetchPatientData();
   }, [patientId, navigate, toast]);
 
   if (isLoading) {
@@ -287,9 +204,7 @@ const PatientRecord = () => {
                   <Card className="w-full p-8">
                     <div className="flex flex-col items-center justify-center space-y-4">
                       <div className="w-16 h-16 relative">
-                        <div className="absolute top-0 left-0 w-full h-full">
-                          <Loader2 className="w-16 h-16 animate-spin text-primary" />
-                        </div>
+                        <Loader2 className="w-16 h-16 animate-spin text-primary" />
                       </div>
                       <div className="space-y-2 text-center">
                         <h3 className="text-lg font-medium">Loading Patient Record</h3>
@@ -297,7 +212,7 @@ const PatientRecord = () => {
                           Please wait while we fetch the patient information...
                         </p>
                       </div>
-                      <Progress className="w-64" value={undefined} />
+                      <Progress className="w-64" value={30} />
                     </div>
                   </Card>
                 </div>
