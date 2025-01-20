@@ -43,6 +43,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BillingTabContent } from "@/components/patient/BillingTabContent";
 import { MedicalTabContent } from "@/components/patient/MedicalTabContent";
+import { PatientInsights } from "@/components/patient/PatientInsights";
 
 export function PatientRecord() {
   const { patientName } = useParams();
@@ -340,6 +341,89 @@ export function PatientRecord() {
                       </TabsTrigger>
                     </TabsList>
 
+                    <TabsContent value="demographics" className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <Card className="p-4">
+                          <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <UserRound className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Name:</span>
+                              <span className="text-sm">{`${patientData.firstName} ${patientData.lastName}`}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Date of Birth:</span>
+                              <span className="text-sm">{patientData.dob || 'Not provided'}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Heart className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Gender:</span>
+                              <span className="text-sm capitalize">{patientData.gender || 'Not provided'}</span>
+                            </div>
+                          </div>
+                        </Card>
+
+                        <Card className="p-4">
+                          <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <Phone className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Phone:</span>
+                              <span className="text-sm">{patientData.phone || 'Not provided'}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Mail className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Email:</span>
+                              <span className="text-sm">{patientData.email || 'Not provided'}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Address:</span>
+                              <span className="text-sm">
+                                {patientData.address ? 
+                                  `${patientData.address}, ${patientData.city || ''} ${patientData.state || ''} ${patientData.zip || ''}` 
+                                  : 'Not provided'}
+                              </span>
+                            </div>
+                          </div>
+                        </Card>
+
+                        <Card className="p-4">
+                          <h3 className="text-lg font-semibold mb-4">Emergency Contact</h3>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <Contact className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Name:</span>
+                              <span className="text-sm">{patientData.emergencyContactName || 'Not provided'}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Phone className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Phone:</span>
+                              <span className="text-sm">{patientData.emergencyContactPhone || 'Not provided'}</span>
+                            </div>
+                          </div>
+                        </Card>
+
+                        <Card className="p-4">
+                          <h3 className="text-lg font-semibold mb-4">Additional Information</h3>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <Building2 className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Occupation:</span>
+                              <span className="text-sm">{patientData.occupation || 'Not provided'}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Ambulance className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Usual Transport:</span>
+                              <span className="text-sm">{patientData.usualTransportMode || 'Not provided'}</span>
+                            </div>
+                          </div>
+                        </Card>
+                      </div>
+                      <PatientInsights patientId={patientData.id} />
+                    </TabsContent>
+
                     <TabsContent value="billing">
                       <BillingTabContent patientId={patientData.id} />
                     </TabsContent>
@@ -347,6 +431,7 @@ export function PatientRecord() {
                     <TabsContent value="medical">
                       <MedicalTabContent patientId={patientData.id} />
                     </TabsContent>
+
                   </Tabs>
                 </Card>
               </div>
