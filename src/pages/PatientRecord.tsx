@@ -50,6 +50,8 @@ const PatientRecord = () => {
   const { toast } = useToast();
   const [patientData, setPatientData] = useState({
     id: '', // Add this line
+    firstName: '',
+    lastName: '',
     phone: "(678) 875-9912",
     email: "angela.turner@email.com",
     address: "855 Fayetteville Rd Se",
@@ -77,10 +79,8 @@ const PatientRecord = () => {
     usualTransportMode: "stretcher",
     status: "active",
     warnings: {
-      bariatric: false,
-      dnrOrder: false,
       requiresOxygen: true,
-      requiresIsolation: false
+      dnrOrder: false,
     },
     barriersToEMS: {
       culturalReligious: false,
@@ -180,11 +180,10 @@ const PatientRecord = () => {
   };
 
   useEffect(() => {
-    // Fetch patient data when component mounts
     const fetchPatientData = async () => {
       try {
-        const lastName = decodedName.split(',')[0].trim();
-        const firstName = decodedName.split(',')[1].trim();
+        // Split the decoded name into last name and first name
+        const [lastName, firstName] = decodedName.split(',').map(part => part.trim());
 
         const { data, error } = await supabase
           .from('patients')
@@ -212,15 +211,22 @@ const PatientRecord = () => {
           return;
         }
 
+        // Update document title with patient name
+        document.title = `Patient Record - ${firstName} ${lastName}`;
+
         setPatientData(prev => ({
           ...prev,
           id: data.id,
+          firstName: data.first_name,
+          lastName: data.last_name,
           phone: data.phone || prev.phone,
           email: data.email || prev.email,
           address: data.address || prev.address,
           city: data.city || prev.city,
           state: data.state || prev.state,
           zip: data.zip || prev.zip,
+          dob: data.dob || prev.dob,
+          gender: data.gender || prev.gender,
           medicalConditions: data.medical_conditions || prev.medicalConditions,
           allergies: data.allergies || prev.allergies,
           medications: data.medications || prev.medications,
@@ -261,7 +267,7 @@ const PatientRecord = () => {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                      <BreadcrumbPage>{decodedName}</BreadcrumbPage>
+                      <BreadcrumbPage>{`${patientData.firstName || ''} ${patientData.lastName || ''}`}</BreadcrumbPage>
                     </BreadcrumbItem>
                   </BreadcrumbList>
                 </Breadcrumb>
@@ -270,17 +276,21 @@ const PatientRecord = () => {
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex gap-4">
                       <Avatar className="h-20 w-20">
-                        <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${decodedName}`} />
-                        <AvatarFallback>{decodedName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${patientData.firstName} ${patientData.lastName}`} />
+                        <AvatarFallback>{`${patientData.firstName?.[0] || ''}${patientData.lastName?.[0] || ''}`}</AvatarFallback>
                       </Avatar>
                       <div>
                         <div className="flex items-center gap-2">
                           <UserRound className="h-5 w-5 text-gray-500" />
-                          <h1 className="text-2xl font-bold">{decodedName}</h1>
+                          <h1 className="text-2xl font-bold">{`${patientData.firstName || ''} ${patientData.lastName || ''}`}</h1>
                         </div>
                         <div className="mt-2 space-y-1">
-                          <Badge variant="outline" className="mr-2">Requires oxygen</Badge>
-                          <Badge variant="outline">DNR order</Badge>
+                          {patientData.warnings.requiresOxygen && (
+                            <Badge variant="outline" className="mr-2">Requires oxygen</Badge>
+                          )}
+                          {patientData.warnings.dnrOrder && (
+                            <Badge variant="outline">DNR order</Badge>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -956,4 +966,3 @@ const PatientRecord = () => {
 };
 
 export default PatientRecord;
-
