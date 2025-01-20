@@ -80,6 +80,16 @@ export function BookingForm() {
       patient_last_name: '',
       patient_first_name: '',
       patient_dob: '',
+      origin_city: '',
+      origin_state: '',
+      origin_zip: '',
+      origin_county: '',
+      origin_phone: '',
+      destination_city: '',
+      destination_state: '',
+      destination_zip: '',
+      destination_county: '',
+      destination_phone: '',
     }
   });
 
