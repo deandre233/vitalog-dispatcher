@@ -14,11 +14,19 @@ interface MedicalHistorySearchProps {
   onMedicationAdd?: (medication: any) => void;
 }
 
+interface SearchResult {
+  code?: string;
+  description?: string;
+  generic_name?: string;
+  medication_class?: string;
+  recommendations?: Array<any>;
+}
+
 export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd }: MedicalHistorySearchProps) {
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
-  const [searchResults, setSearchResults] = useState<Array<any>>([])
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [searchTimeout, setSearchTimeout] = useState<number | null>(null)
 
   const handleSearch = async (term: string) => {
@@ -35,13 +43,27 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
 
       if (error) throw error
 
-      console.log('Search results:', data.results) // Add this for debugging
-      setSearchResults(data.results || [])
+      console.log('Search results:', data.results)
       
-      if (data.results?.length > 0) {
+      // Transform string results into proper objects
+      const formattedResults = data.results.map((result: string | SearchResult) => {
+        if (typeof result === 'string') {
+          // Remove numbering if present (e.g., "1. Diabetes" -> "Diabetes")
+          const cleanedResult = result.replace(/^\d+\.\s*/, '')
+          return {
+            code: cleanedResult,
+            description: cleanedResult
+          }
+        }
+        return result
+      })
+
+      setSearchResults(formattedResults)
+      
+      if (formattedResults.length > 0) {
         toast({
           title: "Search Results",
-          description: `Found ${data.results.length} matching conditions`,
+          description: `Found ${formattedResults.length} matching conditions`,
         })
       }
     } catch (error) {
@@ -157,7 +179,7 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
         )}
       </div>
 
-      {searchResults && searchResults.length > 0 && (
+      {searchResults.length > 0 && (
         <Card className="p-4 border shadow-sm">
           <ScrollArea className="h-[300px]">
             <div className="space-y-3">
@@ -176,7 +198,13 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
                           variant="ghost"
                           size="sm"
                           className="h-6 hover:bg-gray-100"
-                          onClick={() => result.generic_name ? handleAddMedication(result) : handleAddHistory(result)}
+                          onClick={() => result.generic_name 
+                            ? handleAddMedication(result)
+                            : handleAddHistory({
+                                code: result.code || '',
+                                description: result.description || ''
+                              })
+                          }
                         >
                           <Plus className="h-3 w-3" />
                         </Button>
