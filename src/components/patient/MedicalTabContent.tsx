@@ -23,16 +23,18 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [documentType, setDocumentType] = useState("facesheet");
 
-  // Mock data - replace with actual data from your backend
+  // Medical conditions database with ICD-10 codes
   const medicalConditions = [
-    { code: "299.2", description: "Dialysis - renal, status" },
-    { code: "E71.314", description: "Muscle, muscular - carnitine deficiency" },
-    { code: "R53.1", description: "Weak, weakening, weakness" },
-    { code: "R57.9", description: "Failure, failed - circulation, circulatory" },
-    { code: "E11.9", description: "Diabetes, diabetic" },
-    { code: "M54.9", description: "Pain - back" },
-    { code: "E66.01", description: "Obesity - morbid" },
-    { code: "R06.89", description: "Respiration - insufficient, or poor" }
+    { code: "I10", description: "Essential (primary) hypertension" },
+    { code: "E11.9", description: "Type 2 diabetes mellitus without complications" },
+    { code: "E78.5", description: "Dyslipidemia" },
+    { code: "J44.9", description: "Chronic obstructive pulmonary disease, unspecified" },
+    { code: "M54.5", description: "Low back pain" },
+    { code: "F41.1", description: "Generalized anxiety disorder" },
+    { code: "F32.9", description: "Major depressive disorder, unspecified" },
+    { code: "E66.01", description: "Morbid (severe) obesity due to excess calories" },
+    { code: "I25.10", description: "Atherosclerotic heart disease of native coronary artery" },
+    { code: "N18.9", description: "Chronic kidney disease, unspecified" }
   ];
 
   const handleSearch = () => {
