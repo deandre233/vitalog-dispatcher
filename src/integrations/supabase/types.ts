@@ -9,6 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_analysis_results: {
+        Row: {
+          analysis_type: string
+          confidence_score: number | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          patient_id: string | null
+          suggestions: string[] | null
+          transport_id: string | null
+        }
+        Insert: {
+          analysis_type: string
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          patient_id?: string | null
+          suggestions?: string[] | null
+          transport_id?: string | null
+        }
+        Update: {
+          analysis_type?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          patient_id?: string | null
+          suggestions?: string[] | null
+          transport_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_analysis_results_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_analysis_results_transport_id_fkey"
+            columns: ["transport_id"]
+            isOneToOne: false
+            referencedRelation: "transport_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       billing_settings: {
         Row: {
           created_at: string | null
@@ -58,6 +106,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      dispatch_patterns: {
+        Row: {
+          confidence_score: number | null
+          created_at: string | null
+          frequency: number | null
+          id: string
+          last_updated: string | null
+          location_data: Json | null
+          pattern_type: string
+          time_patterns: Json | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string | null
+          frequency?: number | null
+          id?: string
+          last_updated?: string | null
+          location_data?: Json | null
+          pattern_type: string
+          time_patterns?: Json | null
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string | null
+          frequency?: number | null
+          id?: string
+          last_updated?: string | null
+          location_data?: Json | null
+          pattern_type?: string
+          time_patterns?: Json | null
+        }
+        Relationships: []
       }
       insurance_carriers: {
         Row: {
