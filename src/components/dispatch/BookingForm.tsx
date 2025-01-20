@@ -128,6 +128,33 @@ export function BookingForm() {
     return data as string;
   };
 
+  const handleSaveFacility = async (type: 'origin' | 'destination') => {
+    try {
+      const facilityData = {
+        name: type === 'origin' ? watch('pickup_location') : watch('dropoff_location'),
+        floor_room: type === 'origin' ? watch('origin_floor_room') : watch('destination_floor_room'),
+        location_type: type === 'origin' ? watch('origin_type') : watch('destination_type'),
+        address: type === 'origin' ? watch('origin_address') : watch('destination_address'),
+        city: type === 'origin' ? watch('origin_city') : watch('destination_city'),
+        state: type === 'origin' ? watch('origin_state') : watch('destination_state'),
+        zip: type === 'origin' ? watch('origin_zip') : watch('destination_zip'),
+        county: type === 'origin' ? watch('origin_county') : watch('destination_county'),
+        telephone: type === 'origin' ? watch('origin_phone') : watch('destination_phone'),
+      };
+
+      const { error } = await supabase
+        .from('dispatch_locations')
+        .insert(facilityData);
+
+      if (error) throw error;
+
+      toast.success(`${type === 'origin' ? 'Origin' : 'Destination'} location saved successfully!`);
+    } catch (error) {
+      console.error('Error saving facility:', error);
+      toast.error(`Failed to save ${type === 'origin' ? 'origin' : 'destination'} location`);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-[1200px] mx-auto bg-white rounded-lg shadow-sm p-6">
       <div className="flex justify-between items-center mb-6">
@@ -269,6 +296,52 @@ export function BookingForm() {
               className="border-medical-secondary/30 focus:border-medical-secondary"
             />
           </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label>City</Label>
+              <Input 
+                {...register("origin_city")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>State</Label>
+              <Input 
+                {...register("origin_state")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>ZIP</Label>
+              <Input 
+                {...register("origin_zip")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>County</Label>
+              <Input 
+                {...register("origin_county")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Phone Number</Label>
+            <Input 
+              {...register("origin_phone")}
+              className="border-medical-secondary/30 focus:border-medical-secondary"
+              placeholder="(XXX) XXX-XXXX"
+            />
+          </div>
+          <Button 
+            type="button"
+            variant="outline"
+            onClick={() => handleSaveFacility('origin')}
+            className="w-full mt-4 bg-medical-highlight text-medical-primary hover:bg-medical-highlight/90"
+          >
+            Save as New Facility
+          </Button>
         </div>
       </Card>
 
@@ -315,6 +388,52 @@ export function BookingForm() {
               className="border-medical-secondary/30 focus:border-medical-secondary"
             />
           </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label>City</Label>
+              <Input 
+                {...register("destination_city")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>State</Label>
+              <Input 
+                {...register("destination_state")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>ZIP</Label>
+              <Input 
+                {...register("destination_zip")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>County</Label>
+              <Input 
+                {...register("destination_county")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Phone Number</Label>
+            <Input 
+              {...register("destination_phone")}
+              className="border-medical-secondary/30 focus:border-medical-secondary"
+              placeholder="(XXX) XXX-XXXX"
+            />
+          </div>
+          <Button 
+            type="button"
+            variant="outline"
+            onClick={() => handleSaveFacility('destination')}
+            className="w-full mt-4 bg-medical-highlight text-medical-primary hover:bg-medical-highlight/90"
+          >
+            Save as New Facility
+          </Button>
         </div>
       </Card>
 
