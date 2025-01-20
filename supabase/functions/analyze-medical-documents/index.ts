@@ -10,7 +10,11 @@ serve(async (req) => {
   }
 
   try {
-    const { fileContent } = await req.json()
+    const { fileContent, documentType } = await req.json()
+
+    const systemPrompt = documentType === 'facesheet' 
+      ? `You are a medical document analyzer specialized in facesheets. Extract medical conditions, medications, allergies, and vital information from the facesheet.`
+      : `You are a medical document analyzer. Extract relevant medical information from ${documentType}.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -23,12 +27,21 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a medical document analyzer. Extract medical conditions, medications, and allergies from the provided text. 
+            content: `${systemPrompt}
                      Format the response as JSON with the following structure:
                      {
                        "medicalConditions": string[],
                        "medications": string[],
                        "allergies": string[],
+                       "vitalSigns": {
+                         "height": string?,
+                         "weight": string?,
+                         "bloodPressure": string?,
+                         "pulse": string?,
+                         "temperature": string?,
+                         "respiratoryRate": string?
+                       },
+                       "additionalNotes": string[],
                        "confidence": number
                      }`
           },
@@ -41,8 +54,9 @@ serve(async (req) => {
     })
 
     const data = await response.json()
+    console.log('AI Analysis Response:', data)
+    
     const analysis = JSON.parse(data.choices[0].message.content)
-
     return new Response(JSON.stringify(analysis), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })

@@ -21,6 +21,7 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("known");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [documentType, setDocumentType] = useState("facesheet");
 
   // Mock data - replace with actual data from your backend
   const medicalConditions = [
@@ -59,12 +60,12 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
         const fileContent = e.target?.result as string;
         
         toast({
-          title: "Processing medical factsheet",
+          title: `Processing ${documentType}`,
           description: "AI is analyzing the document...",
         });
 
-        const { data, error } = await supabase.functions.invoke('analyze-medical-factsheet', {
-          body: { fileContent }
+        const { data, error } = await supabase.functions.invoke('analyze-medical-documents', {
+          body: { fileContent, documentType }
         });
 
         if (error) throw error;
@@ -85,6 +86,20 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
           title: "Analysis complete",
           description: `Found ${data.medicalConditions.length} conditions, ${data.medications.length} medications, and ${data.allergies.length} allergies.`,
         });
+
+        if (data.vitalSigns && Object.keys(data.vitalSigns).some(key => data.vitalSigns[key])) {
+          toast({
+            title: "Vital Signs Extracted",
+            description: "Vital signs information has been extracted from the document.",
+          });
+        }
+
+        if (data.additionalNotes?.length > 0) {
+          toast({
+            title: "Additional Information",
+            description: "Additional medical notes have been extracted and saved.",
+          });
+        }
       };
 
       reader.readAsText(file);
@@ -92,7 +107,7 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
       console.error('Error processing document:', error);
       toast({
         title: "Error",
-        description: "Failed to process the medical factsheet. Please try again.",
+        description: "Failed to process the medical document. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -143,17 +158,32 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
               <Plus className="h-4 w-4 mr-2" />
               Add
             </Button>
-            <div className="relative">
+            <div className="relative flex gap-2">
+              <Select
+                value={documentType}
+                onValueChange={setDocumentType}
+              >
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Document Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="facesheet">Facesheet</SelectItem>
+                  <SelectItem value="discharge">Discharge Summary</SelectItem>
+                  <SelectItem value="progress">Progress Notes</SelectItem>
+                  <SelectItem value="consultation">Consultation Notes</SelectItem>
+                  <SelectItem value="lab">Lab Results</SelectItem>
+                </SelectContent>
+              </Select>
               <Input
                 type="file"
                 className="hidden"
-                id="factsheet-upload"
+                id="medical-doc-upload"
                 accept=".txt,.pdf,.doc,.docx"
                 onChange={handleFileUpload}
               />
               <Button
                 variant="outline"
-                onClick={() => document.getElementById('factsheet-upload')?.click()}
+                onClick={() => document.getElementById('medical-doc-upload')?.click()}
                 disabled={isProcessing}
               >
                 {isProcessing ? (
@@ -161,7 +191,7 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
                 ) : (
                   <Upload className="h-4 w-4 mr-2" />
                 )}
-                Scan Factsheet
+                Scan Document
               </Button>
             </div>
           </div>
