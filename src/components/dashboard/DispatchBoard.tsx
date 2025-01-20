@@ -131,8 +131,8 @@ export function DispatchBoard() {
           eta: '15 mins',
           comments: record.notes,
           warnings: record.warnings?.join(', '),
-          progress: record.dispatch_status === 'completed' ? 100 : 
-                   record.dispatch_status === 'en_route' ? 50 : 0,
+          progress: record.dispatch_status === 'Completed' ? 100 : 
+                   record.dispatch_status === 'In Progress' ? 50 : 0,
           elapsedTime: 'will call'
         }));
 
@@ -180,6 +180,14 @@ export function DispatchBoard() {
     let progress = Number(dispatch.progress || 0);
     if (dispatch.assignedTo !== "Unassigned") {
       progress = Math.min(100, progress + Math.random() * 5);
+    }
+
+    // Update status check to use correct capitalization
+    let status = dispatch.status;
+    if (progress === 100) {
+      status = "Completed";
+    } else if (progress > 0) {
+      status = "In Progress";
     }
 
     const analytics = {
@@ -269,7 +277,7 @@ export function DispatchBoard() {
       serviceType: String(dispatch.serviceType),
       origin: String(dispatch.origin),
       destination: String(dispatch.destination),
-      status: String(dispatch.status),
+      status,
       priority: String(dispatch.priority),
       assignedTo: String(dispatch.assignedTo),
       progress: Number(progress),
@@ -353,33 +361,7 @@ export function DispatchBoard() {
 
   const assignedDispatches = useMemo(() => {
     const assignedRegularDispatches = filterDispatches(dispatches, "assigned");
-    const scheduledTransportsAssigned = assignedScheduledTransports
-      .filter(t => t.status === "Assigned")
-      .map(t => ({
-        id: t.id,
-        activationTime: t.scheduledTime,
-        patient: {
-          id: "pat-" + Math.random().toString(36).substr(2, 9),
-          name: t.patient,
-          condition: t.warnings?.join(", ")
-        },
-        serviceType: t.serviceType,
-        origin: t.origin,
-        destination: t.destination,
-        status: "En Route",
-        priority: "medium",
-        assignedTo: t.unitAssigned || "Unassigned",
-        aiRecommendations: {
-          route: `Recommended Route: ${t.origin} to ${t.destination}`,
-          crew: `Recommended Crew: ${t.unitAssigned || 'TBD'}`,
-          billing: "Insurance: TBD"
-        },
-        eta: "TBD",
-        progress: t.progress,
-        elapsedTime: "In Progress"
-      }));
-
-    return [...assignedRegularDispatches, ...scheduledTransportsAssigned];
+    return assignedRegularDispatches;
   }, [dispatches]);
 
   useEffect(() => {
