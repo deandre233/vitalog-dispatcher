@@ -23,64 +23,8 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [documentType, setDocumentType] = useState("facesheet");
   const [medicationSearchTerm, setMedicationSearchTerm] = useState("");
-
-  // Medical conditions database with ICD-10 codes
-  const medicalConditions = [
-    { code: "I10", description: "Essential (primary) hypertension" },
-    { code: "E11.9", description: "Type 2 diabetes mellitus without complications" },
-    { code: "E78.5", description: "Dyslipidemia" },
-    { code: "J44.9", description: "Chronic obstructive pulmonary disease, unspecified" },
-    { code: "M54.5", description: "Low back pain" },
-    { code: "F41.1", description: "Generalized anxiety disorder" },
-    { code: "F32.9", description: "Major depressive disorder, unspecified" },
-    { code: "E66.01", description: "Morbid (severe) obesity due to excess calories" },
-    { code: "I25.10", description: "Atherosclerotic heart disease of native coronary artery" },
-    { code: "N18.9", description: "Chronic kidney disease, unspecified" }
-  ];
-
-  // Medications database with common prescriptions
-  const medications = [
-    { 
-      name: "Lisinopril",
-      genericName: "Lisinopril",
-      class: "ACE Inhibitor",
-      commonDosages: ["10mg", "20mg", "40mg"],
-      frequency: ["once daily", "twice daily"],
-      commonIndications: ["hypertension", "heart failure"]
-    },
-    {
-      name: "Metformin",
-      genericName: "Metformin HCl",
-      class: "Biguanide",
-      commonDosages: ["500mg", "850mg", "1000mg"],
-      frequency: ["once daily", "twice daily"],
-      commonIndications: ["type 2 diabetes"]
-    },
-    {
-      name: "Atorvastatin",
-      genericName: "Atorvastatin Calcium",
-      class: "Statin",
-      commonDosages: ["10mg", "20mg", "40mg", "80mg"],
-      frequency: ["once daily"],
-      commonIndications: ["high cholesterol", "cardiovascular disease prevention"]
-    },
-    {
-      name: "Omeprazole",
-      genericName: "Omeprazole",
-      class: "Proton Pump Inhibitor",
-      commonDosages: ["20mg", "40mg"],
-      frequency: ["once daily", "twice daily"],
-      commonIndications: ["GERD", "acid reflux", "stomach ulcers"]
-    },
-    {
-      name: "Sertraline",
-      genericName: "Sertraline HCl",
-      class: "SSRI",
-      commonDosages: ["25mg", "50mg", "100mg"],
-      frequency: ["once daily"],
-      commonIndications: ["depression", "anxiety"]
-    }
-  ];
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [selectedMedication, setSelectedMedication] = useState<any>(null);
 
   const handleSearch = async () => {
     setIsProcessing(true);
@@ -91,6 +35,7 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
 
       if (error) throw error;
 
+      setSearchResults(data.results);
       toast({
         title: "Search Results",
         description: `Found ${data.results.length} matching conditions`,
@@ -117,6 +62,7 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
 
       if (error) throw error;
 
+      setSearchResults(data.results);
       toast({
         title: "Medication Search Results",
         description: `Found ${data.results.length} matching medications`,
@@ -134,11 +80,40 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
     }
   };
 
-  const handleAddCondition = () => {
-    toast({
-      title: "Adding medical condition",
-      description: "New condition has been added to the patient's record.",
-    });
+  const handleAddCondition = async () => {
+    try {
+      const { data: patient, error: fetchError } = await supabase
+        .from('patients')
+        .select('medical_conditions')
+        .eq('id', patientId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const updatedConditions = [...(patient.medical_conditions || []), searchTerm];
+
+      const { error: updateError } = await supabase
+        .from('patients')
+        .update({ medical_conditions: updatedConditions })
+        .eq('id', patientId);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Success",
+        description: "Medical condition has been added to the patient's record.",
+      });
+
+      setSearchTerm("");
+      setSearchResults([]);
+    } catch (error) {
+      console.error('Error adding condition:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add medical condition",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,7 +137,6 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
 
         if (error) throw error;
 
-        // Update patient record with the extracted information
         const { error: updateError } = await supabase
           .from('patients')
           .update({
@@ -178,20 +152,6 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
           title: "Analysis complete",
           description: `Found ${data.medicalConditions.length} conditions, ${data.medications.length} medications, and ${data.allergies.length} allergies.`,
         });
-
-        if (data.vitalSigns && Object.keys(data.vitalSigns).some(key => data.vitalSigns[key])) {
-          toast({
-            title: "Vital Signs Extracted",
-            description: "Vital signs information has been extracted from the document.",
-          });
-        }
-
-        if (data.additionalNotes?.length > 0) {
-          toast({
-            title: "Additional Information",
-            description: "Additional medical notes have been extracted and saved.",
-          });
-        }
       };
 
       reader.readAsText(file);
@@ -199,7 +159,7 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
       console.error('Error processing document:', error);
       toast({
         title: "Error",
-        description: "Failed to process the medical document. Please try again.",
+        description: "Failed to process the medical document",
         variant: "destructive",
       });
     } finally {
@@ -255,28 +215,28 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
               )}
               Search
             </Button>
-            <Button>
+            <Button onClick={handleAddCondition}>
               <Plus className="h-4 w-4 mr-2" />
               Add
             </Button>
           </div>
           <ScrollArea className="h-[200px] border rounded-md p-4">
-            {medications.map((med, index) => (
+            {searchResults.map((med, index) => (
               <div key={index} className="py-2 border-b last:border-0">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="font-medium">{med.name}</h4>
+                    <h4 className="font-medium">{med.generic_name}</h4>
                     <p className="text-sm text-muted-foreground">
-                      {med.genericName} - {med.class}
+                      {med.brand_names?.join(", ")} - {med.medication_class}
                     </p>
                   </div>
                   <div className="text-sm">
-                    <p>Common dosages: {med.commonDosages.join(", ")}</p>
-                    <p>Frequency: {med.frequency.join(", ")}</p>
+                    <p>Common dosages: {med.common_dosages?.join(", ")}</p>
+                    <p>Frequency: {med.frequencies?.join(", ")}</p>
                   </div>
                 </div>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  {med.commonIndications.map((indication, i) => (
+                  {med.indications?.map((indication: string, i: number) => (
                     <Badge key={i} variant="outline" className="text-xs">
                       {indication}
                     </Badge>
@@ -290,17 +250,24 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
 
       <Card className="p-6">
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Medical Conditions</h3>
-          <ScrollArea className="h-[200px] border rounded-md p-4">
-            {medicalConditions.map((condition) => (
-              <div key={condition.code} className="flex items-start space-x-2 py-2 border-b last:border-0">
-                <Badge variant="outline" className="shrink-0">
-                  {condition.code}
-                </Badge>
-                <span className="text-sm">{condition.description}</span>
-              </div>
-            ))}
-          </ScrollArea>
+          <h3 className="text-lg font-semibold">Document Upload</h3>
+          <div className="space-y-4">
+            <Select value={documentType} onValueChange={setDocumentType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select document type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="facesheet">Face Sheet</SelectItem>
+                <SelectItem value="discharge">Discharge Summary</SelectItem>
+                <SelectItem value="history">Medical History</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              type="file"
+              onChange={handleFileUpload}
+              accept=".pdf,.doc,.docx,.txt"
+            />
+          </div>
         </div>
       </Card>
     </div>

@@ -272,6 +272,51 @@ export type Database = {
           },
         ]
       }
+      medications: {
+        Row: {
+          brand_names: string[] | null
+          common_dosages: string[] | null
+          contraindications: string[] | null
+          created_at: string | null
+          frequencies: string[] | null
+          generic_name: string
+          id: string
+          indications: string[] | null
+          interactions: string[] | null
+          medication_class: string | null
+          side_effects: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          brand_names?: string[] | null
+          common_dosages?: string[] | null
+          contraindications?: string[] | null
+          created_at?: string | null
+          frequencies?: string[] | null
+          generic_name: string
+          id?: string
+          indications?: string[] | null
+          interactions?: string[] | null
+          medication_class?: string | null
+          side_effects?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          brand_names?: string[] | null
+          common_dosages?: string[] | null
+          contraindications?: string[] | null
+          created_at?: string | null
+          frequencies?: string[] | null
+          generic_name?: string
+          id?: string
+          indications?: string[] | null
+          interactions?: string[] | null
+          medication_class?: string | null
+          side_effects?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       patients: {
         Row: {
           address: string | null
