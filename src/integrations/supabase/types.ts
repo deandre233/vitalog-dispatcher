@@ -59,13 +59,80 @@ export type Database = {
           },
         ]
       }
+      insurance_carriers: {
+        Row: {
+          carrier_name: string
+          carrier_type: string
+          claims_phone: string | null
+          claims_zip: string | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          carrier_name: string
+          carrier_type: string
+          claims_phone?: string | null
+          claims_zip?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          carrier_name?: string
+          carrier_type?: string
+          claims_phone?: string | null
+          claims_zip?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      insurance_groups: {
+        Row: {
+          carrier_id: string | null
+          created_at: string | null
+          group_name: string
+          group_number: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          carrier_id?: string | null
+          created_at?: string | null
+          group_name: string
+          group_number: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          carrier_id?: string | null
+          created_at?: string | null
+          group_name?: string
+          group_number?: string
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_groups_carrier_id_fkey"
+            columns: ["carrier_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_carriers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insurance_records: {
         Row: {
           activation_date: string | null
+          carrier_id: string | null
           carrier_name: string
           carrier_type: string
           claims_zip: string | null
           created_at: string | null
+          group_id: string | null
           group_name: string | null
           group_number: string | null
           id: string
@@ -76,6 +143,7 @@ export type Database = {
           phone: string | null
           policy_number: string
           policy_type: string | null
+          policy_type_id: string | null
           policyholder_dob: string | null
           policyholder_gender: string | null
           policyholder_name: string | null
@@ -85,10 +153,12 @@ export type Database = {
         }
         Insert: {
           activation_date?: string | null
+          carrier_id?: string | null
           carrier_name: string
           carrier_type: string
           claims_zip?: string | null
           created_at?: string | null
+          group_id?: string | null
           group_name?: string | null
           group_number?: string | null
           id?: string
@@ -99,6 +169,7 @@ export type Database = {
           phone?: string | null
           policy_number: string
           policy_type?: string | null
+          policy_type_id?: string | null
           policyholder_dob?: string | null
           policyholder_gender?: string | null
           policyholder_name?: string | null
@@ -108,10 +179,12 @@ export type Database = {
         }
         Update: {
           activation_date?: string | null
+          carrier_id?: string | null
           carrier_name?: string
           carrier_type?: string
           claims_zip?: string | null
           created_at?: string | null
+          group_id?: string | null
           group_name?: string | null
           group_number?: string | null
           id?: string
@@ -122,6 +195,7 @@ export type Database = {
           phone?: string | null
           policy_number?: string
           policy_type?: string | null
+          policy_type_id?: string | null
           policyholder_dob?: string | null
           policyholder_gender?: string | null
           policyholder_name?: string | null
@@ -131,10 +205,31 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "insurance_records_carrier_id_fkey"
+            columns: ["carrier_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_carriers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_records_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_groups"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "insurance_records_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_records_policy_type_id_fkey"
+            columns: ["policy_type_id"]
+            isOneToOne: false
+            referencedRelation: "policy_types"
             referencedColumns: ["id"]
           },
         ]
@@ -276,6 +371,30 @@ export type Database = {
           last_verified?: string | null
           payer_id?: string
           policy_type?: string
+        }
+        Relationships: []
+      }
+      policy_types: {
+        Row: {
+          code: string
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }

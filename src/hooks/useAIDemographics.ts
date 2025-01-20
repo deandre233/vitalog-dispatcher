@@ -73,6 +73,55 @@ export const useAIDemographics = (patientData: any) => {
     return null;
   };
 
+  const handleNameChange = async (name: string, field: string) => {
+    if (name.length > 1) {
+      return await validateField(field, name);
+    }
+    return null;
+  };
+
+  const handleAddressChange = async (address: string) => {
+    if (address.length > 5) {
+      return await validateField('address', address);
+    }
+    return null;
+  };
+
+  const handleGenderChange = async (gender: string) => {
+    if (gender) {
+      return await validateField('gender', gender);
+    }
+    return null;
+  };
+
+  const handleMedicalConditionChange = async (conditions: string[]) => {
+    if (conditions.length > 0) {
+      return await validateField('medicalConditions', conditions.join(','));
+    }
+    return null;
+  };
+
+  const handleAllergiesChange = async (allergies: string[]) => {
+    if (allergies.length > 0) {
+      return await validateField('allergies', allergies.join(','));
+    }
+    return null;
+  };
+
+  const handleMedicationsChange = async (medications: string[]) => {
+    if (medications.length > 0) {
+      return await validateField('medications', medications.join(','));
+    }
+    return null;
+  };
+
+  const handleEmergencyContactChange = async (contact: { name: string; phone: string; relation: string }) => {
+    if (contact.name && contact.phone) {
+      return await validateField('emergencyContact', JSON.stringify(contact));
+    }
+    return null;
+  };
+
   return {
     isValidating,
     validateField,
@@ -80,5 +129,12 @@ export const useAIDemographics = (patientData: any) => {
     handlePhoneChange,
     handleEmailChange,
     handleDateChange,
+    handleNameChange,
+    handleAddressChange,
+    handleGenderChange,
+    handleMedicalConditionChange,
+    handleAllergiesChange,
+    handleMedicationsChange,
+    handleEmergencyContactChange,
   };
 };

@@ -19,8 +19,8 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Check for duplicates
-    if (field === 'phone' || field === 'email') {
+    // Check for duplicates in relevant fields
+    if (['phone', 'email'].includes(field)) {
       const { data: duplicates } = await supabase
         .from('patients')
         .select('id, first_name, last_name')
@@ -114,6 +114,88 @@ serve(async (req) => {
           JSON.stringify({
             type: 'error',
             message: 'Date of birth cannot be in the future'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // Validate name fields
+    if (field === 'firstName' || field === 'lastName') {
+      if (value.length < 2) {
+        return new Response(
+          JSON.stringify({
+            type: 'error',
+            message: `${field} must be at least 2 characters long`
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // Validate address
+    if (field === 'address') {
+      if (value.length < 5) {
+        return new Response(
+          JSON.stringify({
+            type: 'error',
+            message: 'Address must be at least 5 characters long'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // Validate medical conditions
+    if (field === 'medicalConditions') {
+      const conditions = value.split(',')
+      if (conditions.some(condition => condition.length < 2)) {
+        return new Response(
+          JSON.stringify({
+            type: 'warning',
+            message: 'Some medical conditions appear to be too short'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // Validate allergies
+    if (field === 'allergies') {
+      const allergies = value.split(',')
+      if (allergies.some(allergy => allergy.length < 2)) {
+        return new Response(
+          JSON.stringify({
+            type: 'warning',
+            message: 'Some allergies appear to be too short'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // Validate medications
+    if (field === 'medications') {
+      const medications = value.split(',')
+      if (medications.some(medication => medication.length < 2)) {
+        return new Response(
+          JSON.stringify({
+            type: 'warning',
+            message: 'Some medications appear to be too short'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // Validate emergency contact
+    if (field === 'emergencyContact') {
+      const contact = JSON.parse(value)
+      if (!contact.name || !contact.phone || !contact.relation) {
+        return new Response(
+          JSON.stringify({
+            type: 'error',
+            message: 'Emergency contact must include name, phone, and relation'
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
