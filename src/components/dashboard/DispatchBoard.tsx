@@ -19,7 +19,7 @@ import {
 } from "@/utils/aiLearningUtils";
 
 interface Patient {
-  id: string;  // Added id as required
+  id: string;
   name: string;
   dob?: string;
   condition?: string;
@@ -55,6 +55,20 @@ interface Dispatch {
   elapsedTime?: string;
   lastUpdated?: string;
   efficiency?: number;
+}
+
+interface ScheduledTransportProps {
+  id: string;
+  scheduledTime: string;
+  patient: string;
+  serviceType: string;
+  origin: string;
+  destination: string;
+  status: "Scheduled" | "Assigned" | "Completed" | "Canceled";
+  warnings?: string[];
+  unitAssigned?: string;
+  progress?: number;
+  recurrence?: string;
 }
 
 const mockDispatches: Dispatch[] = [
