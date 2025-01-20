@@ -411,7 +411,6 @@ export type Database = {
           blood_type: string | null
           city: string | null
           created_at: string | null
-          display_id: string | null
           dob: string | null
           email: string | null
           emergency_contact_name: string | null
@@ -422,6 +421,7 @@ export type Database = {
           id: string
           last_name: string
           last_physical: string | null
+          legacy_display_id: string | null
           marital_status: string | null
           medical_conditions: string[] | null
           medications: string[] | null
@@ -443,7 +443,6 @@ export type Database = {
           blood_type?: string | null
           city?: string | null
           created_at?: string | null
-          display_id?: string | null
           dob?: string | null
           email?: string | null
           emergency_contact_name?: string | null
@@ -454,6 +453,7 @@ export type Database = {
           id?: string
           last_name: string
           last_physical?: string | null
+          legacy_display_id?: string | null
           marital_status?: string | null
           medical_conditions?: string[] | null
           medications?: string[] | null
@@ -475,7 +475,6 @@ export type Database = {
           blood_type?: string | null
           city?: string | null
           created_at?: string | null
-          display_id?: string | null
           dob?: string | null
           email?: string | null
           emergency_contact_name?: string | null
@@ -486,6 +485,7 @@ export type Database = {
           id?: string
           last_name?: string
           last_physical?: string | null
+          legacy_display_id?: string | null
           marital_status?: string | null
           medical_conditions?: string[] | null
           medications?: string[] | null
@@ -673,10 +673,6 @@ export type Database = {
           payer_id: string
         }
         Returns: Json
-      }
-      generate_display_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
       }
       generate_patient_id: {
         Args: Record<PropertyKey, never>

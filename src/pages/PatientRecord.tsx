@@ -126,12 +126,21 @@ export function PatientRecord() {
           return;
         }
 
-        // Use maybeSingle() instead of single() to handle cases where no patient is found
-        const { data, error } = await supabase
+        // First try to find by legacy_display_id
+        let { data, error } = await supabase
           .from('patients')
           .select('*')
-          .eq('display_id', patientName)
+          .eq('legacy_display_id', patientName)
           .maybeSingle();
+
+        // If not found by legacy_display_id, try UUID
+        if (!data && !error) {
+          ({ data, error } = await supabase
+            .from('patients')
+            .select('*')
+            .eq('id', patientName)
+            .maybeSingle());
+        }
 
         if (error) {
           console.error('Error fetching patient:', error);
