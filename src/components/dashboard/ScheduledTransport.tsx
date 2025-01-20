@@ -24,73 +24,57 @@ interface ScheduledTransportProps {
   recurrence?: string;
 }
 
-// Enhanced mock data with more realistic scenarios
 const scheduledTransports: ScheduledTransportProps[] = [
   {
-    id: "ST-7685",
+    id: "DISP-00004",
     scheduledTime: "2024-02-20T14:30:00",
-    patient: "Martin, Helen",
+    patient: "Anderson, Emily (PAT-00004)",
     serviceType: "BLS",
-    origin: "Neurology/Emory Brain Health Center",
-    destination: "Parkside at Budd Terrace, 508A",
-    status: "Scheduled",
-    warnings: ["Patient requires oxygen support", "Limited mobility assistance needed"],
-    recurrence: "Every week on Mon"
-  },
-  {
-    id: "ST-7602",
-    scheduledTime: "2024-02-20T16:30:00",
-    patient: "Schaebick, Michael",
-    serviceType: "BLS",
-    origin: "Emory University Hospital Midtown",
-    destination: "Parkside at Budd Terrace, 613",
-    status: "Assigned",
-    unitAssigned: "MED-1",
-    progress: 45,
-    warnings: ["Dialysis patient", "Wheelchair required"],
-    recurrence: "Every week on Mon"
-  },
-  {
-    id: "ST-8038",
-    scheduledTime: "2024-02-20T13:40:00",
-    patient: "Pattaway, Floyd",
-    serviceType: "BLS",
-    origin: "Emory Dialysis At North Decatur",
-    destination: "Parkside at Budd Terrace, 613",
-    status: "Completed",
-    recurrence: "Every week on Mon"
-  },
-  {
-    id: "ST-8086",
-    scheduledTime: "2024-02-20T15:28:00",
-    patient: "Pratt, Edmond",
-    serviceType: "BLS",
-    origin: "Emory Dialysis At Northside",
-    destination: "Parkside at Budd Terrace, 731",
-    status: "Canceled",
-    warnings: ["Limited mobility", "Requires oxygen support"],
-    recurrence: "Every week on Mon"
-  },
-  {
-    id: "ST-8087",
-    scheduledTime: "2024-02-21T09:00:00",
-    patient: "Johnson, Sarah",
-    serviceType: "ALS",
     origin: "Emory Saint Joseph's Hospital",
-    destination: "Wesley Woods Geriatric Hospital",
+    destination: "Atlanta Rehabilitation Center",
     status: "Scheduled",
-    warnings: ["Critical care patient", "Continuous monitoring required"],
-    recurrence: "Every day"
+    warnings: ["Limited mobility", "Oxygen support required"],
+    recurrence: "Every Tuesday"
   },
   {
-    id: "ST-8088",
-    scheduledTime: "2024-02-21T10:30:00",
-    patient: "Williams, Robert",
+    id: "DISP-00005",
+    scheduledTime: "2024-02-20T16:30:00",
+    patient: "Chen, David (PAT-00005)",
     serviceType: "BLS",
-    origin: "Emory Johns Creek Hospital",
-    destination: "Emory Rehabilitation Hospital",
-    status: "Scheduled",
-    warnings: ["Post-surgery transport", "Pain management required"],
+    origin: "Piedmont Atlanta Hospital",
+    destination: "Home Care Facility",
+    status: "Assigned",
+    unitAssigned: "MED-2",
+    progress: 25,
+    warnings: ["Wheelchair required", "Dietary restrictions"],
+    recurrence: "One-time transport"
+  },
+  {
+    id: "DISP-00006",
+    scheduledTime: "2024-02-20T13:40:00",
+    patient: "Martinez, Sofia (PAT-00006)",
+    serviceType: "ALS",
+    origin: "Wellstar Kennestone Hospital",
+    destination: "Emory University Hospital",
+    status: "Completed",
+    recurrence: "Every week on Wed"
+  }
+];
+
+// Move assignedScheduledTransports before it's used
+const assignedScheduledTransports: ScheduledTransportProps[] = [
+  {
+    id: "DISP-00007",
+    scheduledTime: "2024-02-20T15:30:00",
+    patient: "Brown, Michael (PAT-00007)",
+    serviceType: "BLS",
+    origin: "Atlanta Medical Center",
+    destination: "Peachtree Rehabilitation",
+    status: "Assigned",
+    unitAssigned: "MED-3",
+    progress: 50,
+    warnings: ["Fall risk", "Memory care patient"],
+    recurrence: "Every Thursday"
   }
 ];
 

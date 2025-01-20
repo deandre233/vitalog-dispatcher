@@ -59,55 +59,77 @@ interface Dispatch {
 
 const mockDispatches: Dispatch[] = [
   {
-    id: "7684",
+    id: "DISP-00001",
     activationTime: "2024-02-20T10:30:00",
     patient: {
-      id: "pat-001",
-      name: "Turner, Angela",
-      condition: "Breathing problem: Req oxygen"
+      id: "PAT-00001",
+      name: "Thompson, Robert",
+      condition: "Chest pain, shortness of breath"
+    },
+    serviceType: "ALS",
+    origin: "Emory University Hospital",
+    destination: "Grady Memorial Hospital",
+    status: "Pending",
+    priority: "high",
+    assignedTo: "Unassigned",
+    aiRecommendations: {
+      route: "Recommended Route: Clifton Rd to Peachtree St",
+      crew: "Recommended Crew: ALS-1",
+      billing: "Insurance: Medicare"
+    },
+    eta: "15 mins",
+    comments: "Patient requires continuous monitoring",
+    elapsedTime: "will call"
+  },
+  {
+    id: "DISP-00002",
+    activationTime: "2024-02-20T09:15:00",
+    patient: {
+      id: "PAT-00002",
+      name: "Garcia, Maria",
+      condition: "Scheduled dialysis transport"
     },
     serviceType: "BLS",
-    origin: "Emory Dialysis At North Decatur",
-    destination: "Emory University Hospital Midtown",
+    origin: "Patient Residence",
+    destination: "Emory Dialysis Center",
     status: "Pending",
     priority: "medium",
     assignedTo: "Unassigned",
     aiRecommendations: {
-      route: "Recommended Route: I-85 S",
-      crew: "Recommended Crew: Team A",
-      billing: "Insurance: Medicare"
+      route: "Recommended Route: Ponce de Leon Ave",
+      crew: "Recommended Crew: BLS-2",
+      billing: "Insurance: Medicaid"
     },
-    eta: "25 mins",
-    comments: "Breathing problem: Req oxygen",
+    eta: "20 mins",
+    comments: "Regular dialysis appointment",
     elapsedTime: "will call"
   },
   {
-    id: "7601",
-    activationTime: "2024-02-20T09:15:00",
+    id: "DISP-00003",
+    activationTime: "2024-02-20T08:45:00",
     patient: {
-      id: "pat-002",
-      name: "Smith, John",
-      condition: "Impaired movement"
+      id: "PAT-00003",
+      name: "Williams, James",
+      condition: "Post-surgery transport"
     },
     serviceType: "BLS",
-    origin: "Emory Dialysis At Candler",
-    destination: "CROSSING AT EASTLAKE",
+    origin: "Northside Hospital",
+    destination: "Skilled Nursing Facility",
     status: "En Route",
     priority: "medium",
-    assignedTo: "MED 1",
+    assignedTo: "MED-1",
     aiRecommendations: {
-      route: "Recommended Route: Candler Rd",
-      crew: "Recommended Crew: MED 1",
+      route: "Recommended Route: I-285 E",
+      crew: "Recommended Crew: MED-1",
       billing: "Insurance: Private"
     },
-    eta: "15 mins",
-    comments: "Impaired movement",
-    progress: 45,
-    elapsedTime: "00:45:00"
+    eta: "10 mins",
+    comments: "Stable condition",
+    progress: 75,
+    elapsedTime: "00:30:00"
   }
 ];
 
-// Import the scheduledTransports type and data
 interface ScheduledTransportProps {
   id: string;
   scheduledTime: string;
@@ -122,20 +144,19 @@ interface ScheduledTransportProps {
   recurrence?: string;
 }
 
-// Move assignedScheduledTransports before it's used
 const assignedScheduledTransports: ScheduledTransportProps[] = [
   {
-    id: "ST-7602",
-    scheduledTime: "2024-02-20T16:30:00",
-    patient: "Schaebick, Michael",
+    id: "DISP-00007",
+    scheduledTime: "2024-02-20T15:30:00",
+    patient: "Brown, Michael (PAT-00007)",
     serviceType: "BLS",
-    origin: "Emory University Hospital Midtown",
-    destination: "Parkside at Budd Terrace, 613",
+    origin: "Atlanta Medical Center",
+    destination: "Peachtree Rehabilitation",
     status: "Assigned",
-    unitAssigned: "MED-1",
-    progress: 45,
-    warnings: ["Dialysis patient", "Wheelchair required"],
-    recurrence: "Every week on Mon"
+    unitAssigned: "MED-3",
+    progress: 50,
+    warnings: ["Fall risk", "Memory care patient"],
+    recurrence: "Every Thursday"
   }
 ];
 
@@ -156,7 +177,6 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     progress = Math.min(100, progress + Math.random() * 5);
   }
 
-  // Initialize analytics with serializable defaults
   const analytics = {
     efficiency: 0,
     performanceMetrics: {
@@ -187,7 +207,6 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     console.error('Error analyzing dispatch efficiency:', error);
   }
 
-  // Monitor dispatch progress with serializable data
   try {
     monitorDispatchProgress(
       String(dispatch.status || '').toLowerCase(), 
@@ -198,7 +217,6 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     console.error('Error monitoring dispatch progress:', error);
   }
 
-  // Generate AI insights with serializable data
   let aiInsights: string[] = [];
   try {
     const rawInsights = generateAIInsights(analytics);
@@ -212,7 +230,6 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     aiInsights = ['Unable to generate insights'];
   }
 
-  // Initialize traffic info with serializable defaults
   const trafficInfo = {
     congestionLevel: 'low' as "low" | "medium" | "high",
     delayMinutes: 0,
@@ -234,7 +251,6 @@ const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> =>
     console.error('Error getting traffic info:', error);
   }
 
-  // Return a fully serializable object
   return {
     ...dispatch,
     id: String(dispatch.id),
@@ -278,7 +294,6 @@ export function DispatchBoard() {
     JSON.parse(JSON.stringify(mockDispatches))
   );
 
-  // Add new state for AI predictions
   const [aiPredictions, setAiPredictions] = useState<{
     maintenance: MaintenancePrediction[];
     staffing: StaffingPrediction;
@@ -292,7 +307,6 @@ export function DispatchBoard() {
     }
   });
 
-  // Simulate real-time updates
   useEffect(() => {
     const interval = setInterval(async () => {
       const updatedDispatches = await Promise.all(
@@ -304,9 +318,7 @@ export function DispatchBoard() {
     return () => clearInterval(interval);
   }, [dispatches]);
 
-  // Effect for AI learning and predictions
   useEffect(() => {
-    // Analyze historical data
     const { patterns, recommendations } = analyzeHistoricalData(
       dispatches.map(d => ({
         efficiency: d.efficiency || 0,
@@ -321,12 +333,10 @@ export function DispatchBoard() {
       "day"
     );
 
-    // Get maintenance predictions for each vehicle
     const maintenancePredictions = dispatches
       .filter(d => d.assignedTo !== "Unassigned")
       .map(d => predictMaintenance(d.assignedTo));
 
-    // Get staffing predictions
     const staffingPrediction = predictStaffingNeeds(
       new Date(),
       { lat: 33.7490, lng: -84.3880 }
@@ -337,7 +347,6 @@ export function DispatchBoard() {
       staffing: staffingPrediction
     });
 
-    // Show AI insights as toasts
     if (recommendations.length > 0) {
       toast.info("New AI Insights Available", {
         description: recommendations[0]
@@ -387,9 +396,7 @@ export function DispatchBoard() {
     return [...assignedRegularDispatches, ...scheduledTransportsAssigned];
   }, [dispatches]);
 
-  // AI Insights notifications
   useEffect(() => {
-    // Check for high priority dispatches
     if (unassignedDispatches.length > 0) {
       const highPriorityDispatches = unassignedDispatches.filter(d => d.priority === "high");
       if (highPriorityDispatches.length > 0) {
@@ -399,7 +406,6 @@ export function DispatchBoard() {
       }
     }
 
-    // Check for traffic-related issues
     const dispatchesWithTrafficIssues = dispatches.filter(
       d => d.aiRecommendations.trafficStatus?.congestionLevel === "high"
     );

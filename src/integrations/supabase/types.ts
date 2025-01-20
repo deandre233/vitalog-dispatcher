@@ -674,6 +674,10 @@ export type Database = {
         }
         Returns: Json
       }
+      generate_dispatch_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       generate_patient_id: {
         Args: Record<PropertyKey, never>
         Returns: string
