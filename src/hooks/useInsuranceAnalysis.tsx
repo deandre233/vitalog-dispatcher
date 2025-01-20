@@ -48,10 +48,13 @@ export const useInsuranceAnalysis = (patientId: string) => {
       } else if (analysisResponse.coverage_gaps.length > 0) {
         toast({
           title: "Coverage Gaps Detected",
-          description: analysisResponse.coverage_gaps[0],
+          description: (
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+              <span>{analysisResponse.coverage_gaps[0]}</span>
+            </div>
+          ),
           variant: "default",
-          // Add warning icon to indicate it's a warning despite using default variant
-          icon: <AlertTriangle className="h-4 w-4 text-yellow-500" />
         });
       } else if (analysisResponse.optimization.recommendations.length > 0) {
         toast({
