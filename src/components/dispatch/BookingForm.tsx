@@ -49,9 +49,16 @@ export function BookingForm() {
   const onSubmit = async (data: DispatchFormData) => {
     setIsSubmitting(true);
     try {
+      // Add required fields for the database
+      const transportRecord = {
+        ...data,
+        status: 'pending', // Required field
+        dispatch_id: await generateDispatchId(), // We'll create this function
+      };
+
       const { error } = await supabase
         .from('transport_records')
-        .insert([data]);
+        .insert(transportRecord); // Now passing a single object
 
       if (error) throw error;
 
@@ -62,6 +69,19 @@ export function BookingForm() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Helper function to generate a dispatch ID
+  const generateDispatchId = async (): Promise<string> => {
+    const { data, error } = await supabase
+      .rpc('generate_dispatch_id');
+    
+    if (error) {
+      console.error('Error generating dispatch ID:', error);
+      throw error;
+    }
+    
+    return data as string;
   };
 
   return (
