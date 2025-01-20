@@ -69,7 +69,12 @@ const serviceComplaints = [
   "Heat / Cold exposure",
   "Industrial accident / Entrapments",
   "Intercept",
-  "Headache"
+  "Headache",
+  "Traumatic injury",
+  "Unconscious / Fainting",
+  "Unknown problem / Person down",
+  "Vomiting",
+  "Well-person check"
 ];
 
 export function BookingForm() {
