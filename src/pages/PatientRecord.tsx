@@ -49,6 +49,7 @@ const PatientRecord = () => {
   const decodedName = decodeURIComponent(patientName || "");
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [patientData, setPatientData] = useState({
     id: '', // Add this line
     firstName: 'Angela',
@@ -117,16 +118,37 @@ const PatientRecord = () => {
 
   const handleSave = async () => {
     try {
-      // Here we would update the patient data in Supabase
+      const { error } = await supabase
+        .from('patients')
+        .update({
+          first_name: patientData.firstName,
+          last_name: patientData.lastName,
+          phone: patientData.phone,
+          email: patientData.email,
+          address: patientData.address,
+          city: patientData.city,
+          state: patientData.state,
+          zip: patientData.zip,
+          medical_conditions: patientData.medicalConditions,
+          allergies: patientData.allergies,
+          medications: patientData.medications,
+          emergency_contact_name: patientData.emergencyContactName,
+          emergency_contact_phone: patientData.emergencyContactPhone,
+        })
+        .eq('id', patientData.id);
+
+      if (error) throw error;
+
       setIsEditing(false);
       toast({
         title: "Success",
         description: "Patient information updated successfully",
       });
     } catch (error) {
+      console.error('Error updating patient:', error);
       toast({
         title: "Error",
-        description: "Failed to update patient information",
+        description: error.message || "Failed to update patient information",
         variant: "destructive",
       });
     }
@@ -183,8 +205,17 @@ const PatientRecord = () => {
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
+        setIsLoading(true);
+        console.log('Fetching patient data for:', decodedName);
+        
         // Split the decoded name into last name and first name
         const [lastName, firstName] = decodedName.split(',').map(part => part.trim());
+        
+        console.log('Parsed name:', { firstName, lastName });
+
+        if (!firstName || !lastName) {
+          throw new Error('Invalid patient name format. Expected "LastName, FirstName"');
+        }
 
         const { data, error } = await supabase
           .from('patients')
@@ -193,14 +224,10 @@ const PatientRecord = () => {
           .eq('first_name', firstName)
           .maybeSingle();
 
+        console.log('Supabase response:', { data, error });
+
         if (error) {
-          console.error('Error fetching patient:', error);
-          toast({
-            title: "Error",
-            description: "Failed to fetch patient data",
-            variant: "destructive",
-          });
-          return;
+          throw error;
         }
 
         if (!data) {
@@ -238,14 +265,30 @@ const PatientRecord = () => {
         console.error('Error in fetchPatientData:', err);
         toast({
           title: "Error",
-          description: "An unexpected error occurred while fetching patient data",
+          description: err.message || "An unexpected error occurred while fetching patient data",
           variant: "destructive",
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchPatientData();
   }, [decodedName, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex justify-center items-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading patient data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
