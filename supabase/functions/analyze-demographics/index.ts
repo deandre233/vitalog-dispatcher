@@ -40,13 +40,27 @@ serve(async (req) => {
     }
 
     // Validate phone number format
-    if (field === 'phone') {
+    if (field === 'phone' || field === 'emergencyContactPhone') {
       const phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/
       if (!phoneRegex.test(value)) {
         return new Response(
           JSON.stringify({
             type: 'error',
             message: 'Phone number should be in format (XXX) XXX-XXXX'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // Validate email format
+    if (field === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(value)) {
+        return new Response(
+          JSON.stringify({
+            type: 'error',
+            message: 'Invalid email format'
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
@@ -66,7 +80,7 @@ serve(async (req) => {
         )
       }
 
-      // Here you could integrate with a ZIP code API to get city/state
+      // Here you would integrate with a ZIP code API to get city/state
       // For now, returning mock data
       return new Response(
         JSON.stringify({
@@ -79,6 +93,31 @@ serve(async (req) => {
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
+    }
+
+    // Validate date formats
+    if (field === 'dob') {
+      const date = new Date(value)
+      if (isNaN(date.getTime())) {
+        return new Response(
+          JSON.stringify({
+            type: 'error',
+            message: 'Invalid date format'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // Check if date is in the future
+      if (date > new Date()) {
+        return new Response(
+          JSON.stringify({
+            type: 'error',
+            message: 'Date of birth cannot be in the future'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
     }
 
     // Check for missing critical information

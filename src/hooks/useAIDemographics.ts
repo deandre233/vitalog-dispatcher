@@ -19,7 +19,7 @@ export const useAIDemographics = (patientData: any) => {
         toast({
           title: "Warning",
           description: data.message,
-          variant: "default", // Changed from "warning" to "default"
+          variant: "default",
         });
       } else if (data.type === 'error') {
         toast({
@@ -52,9 +52,33 @@ export const useAIDemographics = (patientData: any) => {
     return null;
   };
 
+  const handlePhoneChange = async (phone: string, field: string = 'phone') => {
+    if (phone.length === 14) { // (XXX) XXX-XXXX
+      return await validateField(field, phone);
+    }
+    return null;
+  };
+
+  const handleEmailChange = async (email: string) => {
+    if (email.includes('@')) {
+      return await validateField('email', email);
+    }
+    return null;
+  };
+
+  const handleDateChange = async (date: string, field: string = 'dob') => {
+    if (date) {
+      return await validateField(field, date);
+    }
+    return null;
+  };
+
   return {
     isValidating,
     validateField,
     handleZipCodeChange,
+    handlePhoneChange,
+    handleEmailChange,
+    handleDateChange,
   };
 };
