@@ -42,6 +42,7 @@ import {
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BillingTabContent } from "@/components/patient/BillingTabContent";
+import { MedicalTabContent } from "@/components/patient/MedicalTabContent"; // Import the new MedicalTabContent
 
 const PatientRecord = () => {
   const { patientName } = useParams();
@@ -884,15 +885,7 @@ const PatientRecord = () => {
                     </TabsContent>
 
                     <TabsContent value="medical">
-                      <Card className="p-4">
-                        <h3 className="font-semibold mb-4 flex items-center gap-2">
-                          <Stethoscope className="h-4 w-4" />
-                          Medical Information
-                        </h3>
-                        <div className="space-y-4">
-                          <p className="text-gray-500">Medical information will be displayed here</p>
-                        </div>
-                      </Card>
+                      <MedicalTabContent patientId={patientData.id} />
                     </TabsContent>
 
                     <TabsContent value="history">
