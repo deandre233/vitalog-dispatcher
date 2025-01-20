@@ -203,11 +203,13 @@ export function BookingForm() {
   };
 
   const handlePatientSearch = async () => {
+    setIsSearchingPatient(true);
     const lastName = watch('patient_last_name');
     const firstName = watch('patient_first_name');
     
     if (!lastName && !firstName) {
       toast.error("Please enter at least a first or last name to search");
+      setIsSearchingPatient(false);
       return;
     }
 
@@ -240,6 +242,8 @@ export function BookingForm() {
     } catch (error) {
       console.error('Error searching patient:', error);
       toast.error("Failed to search for patient records");
+    } finally {
+      setIsSearchingPatient(false);
     }
   };
 
@@ -271,17 +275,8 @@ export function BookingForm() {
                 <Input
                   id="patient_last_name"
                   {...register("patient_last_name")}
-                  className="border-medical-secondary/30 focus:border-medical-secondary pr-20"
+                  className="border-medical-secondary/30 focus:border-medical-secondary"
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 -translate-y-1/2"
-                  onClick={handlePatientSearch}
-                >
-                  <Search className="w-4 h-4 text-medical-secondary" />
-                </Button>
               </div>
             </div>
             <div className="space-y-2">
@@ -292,6 +287,17 @@ export function BookingForm() {
                 className="border-medical-secondary/30 focus:border-medical-secondary"
               />
             </div>
+          </div>
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              onClick={handlePatientSearch}
+              disabled={isSearchingPatient}
+              className="flex items-center gap-2 bg-medical-secondary text-white hover:bg-medical-secondary/90"
+            >
+              <Search className="w-4 h-4" />
+              {isSearchingPatient ? "Searching..." : "Search Patient"}
+            </Button>
           </div>
           <div className="space-y-2">
             <Label htmlFor="patient_dob">Date of Birth</Label>
