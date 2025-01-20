@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, AlertTriangle } from "lucide-react";
+import { Search, Plus, AlertTriangle, Upload, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MedicalTabContentProps {
   patientId: string;
@@ -19,6 +20,7 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("known");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Mock data - replace with actual data from your backend
   const medicalConditions = [
@@ -33,7 +35,6 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   ];
 
   const handleSearch = () => {
-    // Implement AI-powered search functionality
     toast({
       title: "Searching medical conditions",
       description: "AI is analyzing your search query...",
@@ -41,11 +42,62 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
   };
 
   const handleAddCondition = () => {
-    // Implement condition adding logic
     toast({
       title: "Adding medical condition",
       description: "New condition has been added to the patient's record.",
     });
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsProcessing(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const fileContent = e.target?.result as string;
+        
+        toast({
+          title: "Processing medical factsheet",
+          description: "AI is analyzing the document...",
+        });
+
+        const { data, error } = await supabase.functions.invoke('analyze-medical-factsheet', {
+          body: { fileContent }
+        });
+
+        if (error) throw error;
+
+        // Update patient record with the extracted information
+        const { error: updateError } = await supabase
+          .from('patients')
+          .update({
+            medical_conditions: data.medicalConditions,
+            medications: data.medications,
+            allergies: data.allergies
+          })
+          .eq('id', patientId);
+
+        if (updateError) throw updateError;
+
+        toast({
+          title: "Analysis complete",
+          description: `Found ${data.medicalConditions.length} conditions, ${data.medications.length} medications, and ${data.allergies.length} allergies.`,
+        });
+      };
+
+      reader.readAsText(file);
+    } catch (error) {
+      console.error('Error processing document:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process the medical factsheet. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -91,6 +143,27 @@ export const MedicalTabContent = ({ patientId }: MedicalTabContentProps) => {
               <Plus className="h-4 w-4 mr-2" />
               Add
             </Button>
+            <div className="relative">
+              <Input
+                type="file"
+                className="hidden"
+                id="factsheet-upload"
+                accept=".txt,.pdf,.doc,.docx"
+                onChange={handleFileUpload}
+              />
+              <Button
+                variant="outline"
+                onClick={() => document.getElementById('factsheet-upload')?.click()}
+                disabled={isProcessing}
+              >
+                {isProcessing ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4 mr-2" />
+                )}
+                Scan Factsheet
+              </Button>
+            </div>
           </div>
 
           <ScrollArea className="h-[300px] border rounded-md p-4">
