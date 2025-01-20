@@ -77,6 +77,22 @@ const serviceComplaints = [
   "Well-person check"
 ];
 
+const facilities = [
+  "Memorial Hospital",
+  "City Medical Center",
+  "Sunset Nursing Home",
+  "General Hospital",
+  "Community Health Center"
+];
+
+const affiliates = [
+  "Vitas Hospice",
+  "Kindred Healthcare",
+  "Amedisys",
+  "LHC Group",
+  "AccentCare"
+];
+
 export function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedMockCall, setSelectedMockCall] = useState(0);
@@ -631,14 +647,48 @@ export function BookingForm() {
                 <Label htmlFor="bill-insurance">Bill to Insurance</Label>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox {...register("bill_to_facility")} id="bill-facility" />
-                <Label htmlFor="bill-facility">Bill to Facility</Label>
+              <div className="flex items-center justify-between space-x-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox {...register("bill_to_facility")} id="bill-facility" />
+                  <Label htmlFor="bill-facility">Bill to Facility</Label>
+                </div>
+                <Select 
+                  onValueChange={(value) => setValue('billing_facility', value)}
+                  disabled={!watch('bill_to_facility')}
+                >
+                  <SelectTrigger className="w-[200px] border-medical-secondary/30">
+                    <SelectValue placeholder="Select facility" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {facilities.map((facility) => (
+                      <SelectItem key={facility} value={facility}>
+                        {facility}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox {...register("bill_to_affiliate")} id="bill-affiliate" />
-                <Label htmlFor="bill-affiliate">Bill to Affiliate</Label>
+              <div className="flex items-center justify-between space-x-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox {...register("bill_to_affiliate")} id="bill-affiliate" />
+                  <Label htmlFor="bill-affiliate">Bill to Affiliate</Label>
+                </div>
+                <Select 
+                  onValueChange={(value) => setValue('billing_affiliate', value)}
+                  disabled={!watch('bill_to_affiliate')}
+                >
+                  <SelectTrigger className="w-[200px] border-medical-secondary/30">
+                    <SelectValue placeholder="Select affiliate" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {affiliates.map((affiliate) => (
+                      <SelectItem key={affiliate} value={affiliate}>
+                        {affiliate}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex items-center space-x-2">
