@@ -207,11 +207,7 @@ export function BookingForm() {
     const firstName = watch('patient_first_name');
     
     if (!lastName && !firstName) {
-      toast({
-        title: "Search Error",
-        description: "Please enter at least a first or last name to search",
-        variant: "destructive",
-      });
+      toast.error("Please enter at least a first or last name to search");
       return;
     }
 
@@ -237,23 +233,13 @@ export function BookingForm() {
         setValue('patient_first_name', patient.first_name);
         setValue('patient_dob', patient.dob);
         
-        toast({
-          title: "Patient Found",
-          description: `Found patient record for ${patient.first_name} ${patient.last_name}`,
-        });
+        toast.success(`Found patient record for ${patient.first_name} ${patient.last_name}`);
       } else {
-        toast({
-          title: "No Results",
-          description: "No matching patient records found",
-        });
+        toast.error("No matching patient records found");
       }
     } catch (error) {
       console.error('Error searching patient:', error);
-      toast({
-        title: "Search Error",
-        description: "Failed to search for patient records",
-        variant: "destructive",
-      });
+      toast.error("Failed to search for patient records");
     }
   };
 
