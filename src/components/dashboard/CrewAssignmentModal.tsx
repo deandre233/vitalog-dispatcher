@@ -187,10 +187,10 @@ export function CrewAssignmentModal({
 
           const polylinePoints = route.overview_polyline;
           
-          // Type guard to ensure polylinePoints has the points property
+          // Add null check and type guard for polylinePoints
           if (
-            typeof polylinePoints === 'object' && 
-            polylinePoints !== null &&
+            polylinePoints &&
+            typeof polylinePoints === 'object' &&
             'points' in polylinePoints &&
             typeof polylinePoints.points === 'string'
           ) {

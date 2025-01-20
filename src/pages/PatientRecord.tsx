@@ -118,8 +118,8 @@ export function PatientRecord() {
       try {
         setIsLoading(true);
         
-        // Extract the patient ID from the URL parameter
-        const patientId = patientName?.startsWith('pat-') ? patientName : null;
+        // Extract the numeric part from the pat-XXX format
+        const patientId = patientName?.replace('pat-', '');
         
         if (!patientId) {
           toast({
@@ -136,7 +136,10 @@ export function PatientRecord() {
           .eq('id', patientId)
           .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching patient:', error);
+          throw error;
+        }
 
         if (!data) {
           toast({
@@ -173,7 +176,7 @@ export function PatientRecord() {
         console.error('Error in fetchPatientData:', err);
         toast({
           title: "Error",
-          description: err.message || "An unexpected error occurred while fetching patient data",
+          description: "An unexpected error occurred while fetching patient data",
           variant: "destructive",
         });
       } finally {
@@ -352,4 +355,3 @@ export function PatientRecord() {
 }
 
 export default PatientRecord;
-
