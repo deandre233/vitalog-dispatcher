@@ -73,10 +73,10 @@ interface ScheduledTransportProps {
 
 const mockDispatches: Dispatch[] = [
   {
-    id: "d290f1ee-6c54-4b01-90e6-d701748f0851",
+    id: "D-0220-001",
     activationTime: "2024-02-20T10:30:00",
     patient: {
-      id: "67c6b9c3-7f45-4d3b-9097-765d6c713195",
+      id: "PAT-00001",
       name: "Thompson, Robert",
       condition: "Chest pain, shortness of breath"
     },
@@ -97,10 +97,10 @@ const mockDispatches: Dispatch[] = [
     elapsedTime: "will call"
   },
   {
-    id: "7d793b67-d42e-4a89-af25-a1234b567c89",
+    id: "D-0220-002",
     activationTime: "2024-02-20T09:15:00",
     patient: {
-      id: "89d45e12-c678-4f23-b345-d789e123f456",
+      id: "PAT-00002",
       name: "Garcia, Maria",
       condition: "Scheduled dialysis transport"
     },
@@ -121,10 +121,10 @@ const mockDispatches: Dispatch[] = [
     elapsedTime: "will call"
   },
   {
-    id: "9e123f45-6789-4abc-def0-123456789abc",
+    id: "D-0220-003",
     activationTime: "2024-02-20T08:45:00",
     patient: {
-      id: "34567890-abcd-efgh-ijkl-mnopqrstuvwx",
+      id: "PAT-00003",
       name: "Williams, James",
       condition: "Post-surgery transport"
     },
@@ -149,9 +149,9 @@ const mockDispatches: Dispatch[] = [
 
 const assignedScheduledTransports: ScheduledTransportProps[] = [
   {
-    id: "bc123d45-6789-4def-abc1-234567890def",
+    id: "D-0220-004",
     scheduledTime: "2024-02-20T15:30:00",
-    patient: "Brown, Michael (34a12b56-789c-4def-abc1-234567890def)",
+    patient: "Brown, Michael (PAT-00004)",
     serviceType: "BLS",
     origin: "Atlanta Medical Center",
     destination: "Peachtree Rehabilitation",
