@@ -145,7 +145,7 @@ export function PatientRecord() {
           .from('patients')
           .select('*')
           .eq('legacy_display_id', legacyId)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching patient:', error);
