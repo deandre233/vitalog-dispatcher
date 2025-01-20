@@ -276,11 +276,33 @@ const PatientRecord = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <div className="flex-1 flex justify-center items-center">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-            <p className="text-gray-500">Loading patient data...</p>
-          </div>
+        <div className="flex-1 flex">
+          <SidebarProvider defaultOpen={true}>
+            <div className="min-h-screen flex w-full">
+              <AppSidebar />
+              <SidebarRail />
+              <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+                <div className="p-6">
+                  <Card className="w-full p-8">
+                    <div className="flex flex-col items-center justify-center space-y-4">
+                      <div className="w-16 h-16 relative">
+                        <div className="absolute top-0 left-0 w-full h-full">
+                          <Loader2 className="w-16 h-16 animate-spin text-primary" />
+                        </div>
+                      </div>
+                      <div className="space-y-2 text-center">
+                        <h3 className="text-lg font-medium">Loading Patient Record</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Please wait while we fetch the patient information...
+                        </p>
+                      </div>
+                      <Progress className="w-64" value={undefined} />
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </SidebarProvider>
         </div>
       </div>
     );
