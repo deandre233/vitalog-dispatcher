@@ -35,8 +35,10 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
 
       if (error) throw error
 
-      setSearchResults(data.results)
-      if (data.results.length > 0) {
+      console.log('Search results:', data.results) // Add this for debugging
+      setSearchResults(data.results || [])
+      
+      if (data.results?.length > 0) {
         toast({
           title: "Search Results",
           description: `Found ${data.results.length} matching conditions`,
@@ -67,6 +69,8 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
         handleSearch(value)
       }, 300)
       setSearchTimeout(timeout as unknown as number)
+    } else {
+      setSearchResults([])
     }
   }
 
@@ -153,7 +157,7 @@ export function MedicalHistorySearch({ patientId, onHistoryAdd, onMedicationAdd 
         )}
       </div>
 
-      {searchResults.length > 0 && (
+      {searchResults && searchResults.length > 0 && (
         <Card className="p-4 border shadow-sm">
           <ScrollArea className="h-[300px]">
             <div className="space-y-3">
