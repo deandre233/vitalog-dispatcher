@@ -14,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { optimizeRoute, type RouteRecommendation } from "@/utils/aiDispatchOptimization";
 
 interface CrewAssignmentModalProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ export function CrewAssignmentModal({
   const [recommendedCrew, setRecommendedCrew] = useState<CrewWithRoute | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [manualOverride, setManualOverride] = useState(false);
+  const [routeOptimization, setRouteOptimization] = useState<RouteRecommendation | null>(null);
 
   const handleAssignCrew = (crewId: number) => {
     const crew = crewMembers.find(c => c.id === crewId);
@@ -170,6 +172,18 @@ export function CrewAssignmentModal({
     };
   }, [isOpen, origin, recommendedCrew]);
 
+  useEffect(() => {
+    if (!isOpen || !recommendedCrew) return;
+
+    // Get AI route optimization
+    const optimization = optimizeRoute(
+      origin,
+      recommendedCrew.location,
+      new Date()
+    );
+    setRouteOptimization(optimization);
+  }, [isOpen, origin, recommendedCrew]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[800px]">
@@ -183,6 +197,18 @@ export function CrewAssignmentModal({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div ref={mapContainer} className="h-[300px] rounded-lg mb-4" />
+            
+            {routeOptimization && (
+              <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                <h3 className="font-medium text-blue-900 mb-2">AI Route Insights</h3>
+                <div className="space-y-2 text-sm text-blue-800">
+                  <p>Traffic Level: {routeOptimization.trafficPrediction.congestionLevel}</p>
+                  <p>Expected Delay: {routeOptimization.trafficPrediction.predictedDelayMinutes} minutes</p>
+                  <p>Route Confidence: {Math.round(routeOptimization.trafficPrediction.confidence * 100)}%</p>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2 text-sm mb-4">
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded-full bg-red-500" /> Dispatch Location
