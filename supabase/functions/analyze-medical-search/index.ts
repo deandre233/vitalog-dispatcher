@@ -8,7 +8,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -24,6 +23,14 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
+
+    // Only proceed if search term is at least 2 characters
+    if (searchTerm.length < 2) {
+      return new Response(
+        JSON.stringify({ results: [] }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      )
+    }
 
     // Get existing medications from the database
     const { data: medications, error: dbError } = await supabase
@@ -47,7 +54,7 @@ serve(async (req) => {
           {
             role: 'system',
             content: type === 'medication' 
-              ? 'You are a medical assistant helping to find relevant medications based on search terms. Return only medication names that match the search criteria.'
+              ? 'You are a medical assistant helping to find relevant medications and suggesting common complementary medications. Return only medication names that match the search criteria along with recommended complementary medications.'
               : 'You are a medical assistant helping to find relevant medical conditions based on search terms. Return only condition names that match the search criteria.'
           },
           {
@@ -67,15 +74,47 @@ serve(async (req) => {
       .map(s => s.trim())
       .filter(s => s.length > 0)
 
-    // If searching for medications, get full details for suggested medications
+    // If searching for medications, get full details and recommendations
     let results = []
     if (type === 'medication') {
-      results = medications.filter(med => 
+      const matchedMeds = medications.filter(med => 
         suggestions.some(s => 
           med.generic_name.toLowerCase().includes(s.toLowerCase()) ||
           (med.brand_names || []).some(b => b.toLowerCase().includes(s.toLowerCase()))
         )
       )
+
+      // For each matched medication, get recommendations
+      const recommendationsResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a medical assistant. For each medication, suggest common complementary medications based on the condition being treated.'
+            },
+            {
+              role: 'user',
+              content: `For these medications: ${matchedMeds.map(m => m.generic_name).join(', ')}, suggest common complementary medications from this list: ${medications.map(m => m.generic_name).join(', ')}`
+            }
+          ],
+        }),
+      })
+
+      const recommendationsData = await recommendationsResponse.json()
+      const recommendations = recommendationsData.choices[0].message.content
+
+      results = matchedMeds.map(med => ({
+        ...med,
+        recommendations: medications.filter(m => 
+          recommendations.toLowerCase().includes(m.generic_name.toLowerCase())
+        )
+      }))
     } else {
       results = suggestions
     }
