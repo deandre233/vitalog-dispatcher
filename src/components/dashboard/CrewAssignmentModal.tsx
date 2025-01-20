@@ -182,19 +182,21 @@ export function CrewAssignmentModal({
             routeLine.current.setMap(null);
           }
 
-          const polylinePoints = routeDetails.route.routes[0].overview_polyline;
-          if (polylinePoints && typeof polylinePoints === 'object' && 'points' in polylinePoints) {
-            const points = polylinePoints.points;
-            if (points) {
-              routeLine.current = new google.maps.Polyline({
-                path: google.maps.geometry.encoding.decodePath(points),
-                geodesic: true,
-                strokeColor: '#3b82f6',
-                strokeOpacity: 1.0,
-                strokeWeight: 4,
-                map: googleMap.current
-              });
-            }
+          const polylinePoints = routeDetails.route.routes[0]?.overview_polyline;
+          
+          // Add type guard and null check for polylinePoints
+          if (polylinePoints && 
+              typeof polylinePoints === 'object' && 
+              'points' in polylinePoints && 
+              polylinePoints.points) {
+            routeLine.current = new google.maps.Polyline({
+              path: google.maps.geometry.encoding.decodePath(polylinePoints.points),
+              geodesic: true,
+              strokeColor: '#3b82f6',
+              strokeOpacity: 1.0,
+              strokeWeight: 4,
+              map: googleMap.current
+            });
           }
         } catch (error) {
           console.error('Error drawing route:', error);
