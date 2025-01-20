@@ -184,27 +184,27 @@ export function CrewAssignmentModal({
 
           // Safely access the overview_polyline with optional chaining and type checking
           const route = routeDetails.route.routes[0];
-          if (route && route.overview_polyline) {
-            const polylinePoints = route.overview_polyline;
-            
-            // Type guard to ensure polylinePoints has the points property
-            if (
-              polylinePoints && 
-              typeof polylinePoints === 'object' && 
-              'points' in polylinePoints && 
-              typeof polylinePoints.points === 'string'
-            ) {
-              const decodedPath = google.maps.geometry.encoding.decodePath(polylinePoints.points);
-              if (decodedPath) {
-                routeLine.current = new google.maps.Polyline({
-                  path: decodedPath,
-                  geodesic: true,
-                  strokeColor: '#3b82f6',
-                  strokeOpacity: 1.0,
-                  strokeWeight: 4,
-                  map: googleMap.current
-                });
-              }
+          if (!route?.overview_polyline) return;
+
+          const polylinePoints = route.overview_polyline;
+          
+          // Type guard to ensure polylinePoints has the points property
+          if (
+            typeof polylinePoints === 'object' && 
+            polylinePoints !== null &&
+            'points' in polylinePoints && 
+            typeof polylinePoints.points === 'string'
+          ) {
+            const decodedPath = google.maps.geometry.encoding.decodePath(polylinePoints.points);
+            if (decodedPath) {
+              routeLine.current = new google.maps.Polyline({
+                path: decodedPath,
+                geodesic: true,
+                strokeColor: '#3b82f6',
+                strokeOpacity: 1.0,
+                strokeWeight: 4,
+                map: googleMap.current
+              });
             }
           }
         } catch (error) {
