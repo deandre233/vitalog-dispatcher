@@ -19,29 +19,60 @@ export interface TrafficInfo {
 }
 
 let googleMapsApiKey: string | null = null;
+let isInitializing = false;
+let initPromise: Promise<boolean> | null = null;
 
 export const initGoogleMaps = async () => {
-  try {
-    const { data: { GOOGLE_MAPS_API_KEY }, error } = await supabase
-      .functions.invoke('get-google-maps-key');
-    
-    if (error) throw error;
-    
-    googleMapsApiKey = GOOGLE_MAPS_API_KEY;
-    
-    // Load Google Maps script
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places,directions`;
-    script.async = true;
-    document.head.appendChild(script);
-    
-    return new Promise((resolve) => {
-      script.onload = () => resolve(true);
-    });
-  } catch (error) {
-    console.error('Error initializing Google Maps:', error);
-    return Promise.reject(error);
-  }
+  // If already initialized, return existing promise
+  if (initPromise) return initPromise;
+  
+  // If currently initializing, return the existing promise
+  if (isInitializing) return initPromise;
+  
+  isInitializing = true;
+  
+  initPromise = new Promise(async (resolve, reject) => {
+    try {
+      // Check if script is already loaded
+      if (document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]')) {
+        isInitializing = false;
+        resolve(true);
+        return;
+      }
+
+      const { data: { GOOGLE_MAPS_API_KEY }, error } = await supabase
+        .functions.invoke('get-google-maps-key');
+      
+      if (error) throw error;
+      
+      googleMapsApiKey = GOOGLE_MAPS_API_KEY;
+      
+      // Load Google Maps script
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places,directions,geometry`;
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        isInitializing = false;
+        resolve(true);
+      };
+      
+      script.onerror = (error) => {
+        isInitializing = false;
+        reject(error);
+      };
+      
+      document.head.appendChild(script);
+      
+    } catch (error) {
+      isInitializing = false;
+      console.error('Error initializing Google Maps:', error);
+      reject(error);
+    }
+  });
+  
+  return initPromise;
 };
 
 export const geocodeAddress = async (address: string): Promise<Location> => {
