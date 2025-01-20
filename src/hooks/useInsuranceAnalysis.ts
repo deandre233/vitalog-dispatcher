@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { AlertTriangle } from 'lucide-react';
 
 export interface InsuranceAnalysis {
   validation: {
@@ -48,12 +49,15 @@ export const useInsuranceAnalysis = (patientId: string) => {
         toast({
           title: "Coverage Gaps Detected",
           description: analysisResponse.coverage_gaps[0],
-          variant: "warning",
+          variant: "default",
+          // Add warning icon to indicate it's a warning despite using default variant
+          icon: <AlertTriangle className="h-4 w-4 text-yellow-500" />
         });
       } else if (analysisResponse.optimization.recommendations.length > 0) {
         toast({
           title: "Optimization Available",
           description: analysisResponse.optimization.recommendations[0],
+          variant: "default",
         });
       }
 
