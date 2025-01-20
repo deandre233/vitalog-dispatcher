@@ -50,8 +50,8 @@ const PatientRecord = () => {
   const { toast } = useToast();
   const [patientData, setPatientData] = useState({
     id: '', // Add this line
-    firstName: '',
-    lastName: '',
+    firstName: 'Angela',
+    lastName: 'Turner',
     phone: "(678) 875-9912",
     email: "angela.turner@email.com",
     address: "855 Fayetteville Rd Se",
