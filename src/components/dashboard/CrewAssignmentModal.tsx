@@ -191,11 +191,10 @@ export function CrewAssignmentModal({
           if (
             typeof polylinePoints === 'object' && 
             polylinePoints !== null &&
-            'points' in polylinePoints
+            'points' in polylinePoints &&
+            typeof polylinePoints.points === 'string'
           ) {
-            // Use type assertion after we've verified polylinePoints is valid
-            const points = polylinePoints!.points;
-            const decodedPath = google.maps.geometry.encoding.decodePath(points);
+            const decodedPath = google.maps.geometry.encoding.decodePath(polylinePoints.points);
             
             if (decodedPath) {
               routeLine.current = new google.maps.Polyline({
