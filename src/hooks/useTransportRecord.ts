@@ -25,6 +25,10 @@ export interface TransportRecord {
   scheduled_time: string | null;
   dispatch_status: 'Pending' | 'In Progress' | 'Completed' | null;
   trip_type: 'One way' | 'Wait-and-return' | 'Round trip' | null;
+  // Add new fields for return trip
+  return_activation_time: string | null;
+  return_pickup_time: string | null;
+  return_precise_pickup: boolean | null;
 }
 
 export function useTransportRecord(id: string | undefined) {
