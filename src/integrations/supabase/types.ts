@@ -350,6 +350,53 @@ export type Database = {
           },
         ]
       }
+      insurance_policies: {
+        Row: {
+          coverage_type: string
+          created_at: string | null
+          end_date: string | null
+          id: string
+          patient_id: string | null
+          policy_number: string
+          provider: string
+          start_date: string
+          status: Database["public"]["Enums"]["insurance_status"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          coverage_type: string
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          patient_id?: string | null
+          policy_number: string
+          provider: string
+          start_date: string
+          status?: Database["public"]["Enums"]["insurance_status"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          coverage_type?: string
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          patient_id?: string | null
+          policy_number?: string
+          provider?: string
+          start_date?: string
+          status?: Database["public"]["Enums"]["insurance_status"] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_policies_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insurance_records: {
         Row: {
           activation_date: string | null
@@ -535,6 +582,56 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "medical_history_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medical_records: {
+        Row: {
+          created_at: string | null
+          diagnosis: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          patient_id: string | null
+          provider: string | null
+          record_date: string | null
+          record_type: string
+          treatment: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          diagnosis?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          patient_id?: string | null
+          provider?: string | null
+          record_date?: string | null
+          record_type: string
+          treatment?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          diagnosis?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          patient_id?: string | null
+          provider?: string | null
+          record_date?: string | null
+          record_type?: string
+          treatment?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_records_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
@@ -1027,6 +1124,7 @@ export type Database = {
       }
     }
     Enums: {
+      appointment_status: "scheduled" | "completed" | "cancelled" | "no_show"
       claim_status_type:
         | "pending"
         | "approved"
@@ -1040,6 +1138,7 @@ export type Database = {
         | "non_binary"
         | "other"
         | "prefer_not_to_say"
+      insurance_status: "active" | "inactive" | "pending_verification"
       invoice_status_type:
         | "paid"
         | "unpaid"
@@ -1060,6 +1159,7 @@ export type Database = {
         | "insurance"
         | "check"
         | "other"
+      payment_status: "pending" | "completed" | "failed" | "refunded"
       priority_level: "Critical" | "Emergency" | "Lower acuity" | "Scheduled"
       recurrence_type: "Disabled" | "Daily" | "Weekly" | "Monthly"
       service_type: "WC" | "BLS" | "ALS" | "MICU"
