@@ -137,7 +137,7 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </RadioGroup>
           </div>
 
-          {/* Return Trip Section */}
+          {/* Return Trip Section - Only show when Round trip is selected */}
           {transportRecord?.trip_type === 'Round trip' && (
             <div className="space-y-4 mt-4 p-4 bg-medical-accent rounded-lg">
               <div className="flex items-center gap-2">
@@ -150,6 +150,7 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
                 <Input
                   type="datetime-local"
                   className="border-medical-secondary/30 focus:border-medical-secondary"
+                  onChange={(e) => onUpdate({ return_activation_time: e.target.value })}
                 />
               </div>
               
@@ -159,10 +160,12 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
                   <Input
                     type="time"
                     className="border-medical-secondary/30 focus:border-medical-secondary"
+                    onChange={(e) => onUpdate({ return_pickup_time: e.target.value })}
                   />
                   <Checkbox
                     id="precise-return"
                     className="border-medical-secondary/30"
+                    onCheckedChange={(checked) => onUpdate({ return_precise_pickup: checked })}
                   />
                   <Label htmlFor="precise-return" className="text-sm">Precise</Label>
                 </div>
