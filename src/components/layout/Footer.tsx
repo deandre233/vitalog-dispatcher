@@ -1,13 +1,14 @@
 export function Footer() {
   return (
-    <footer className="bg-blue-700 text-white border-t border-blue-800 mt-auto">
+    <footer className="bg-gradient-to-r from-[#ea384c] to-[#ff6b81] text-white border-t border-red-600/20 mt-auto backdrop-blur-sm">
       <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
         <p className="text-center text-sm">
           <button 
             onClick={() => window.open('mailto:support@loveable.ai')} 
-            className="text-white hover:text-blue-200 transition-colors"
+            className="text-white hover:text-red-200 transition-colors relative group"
           >
             Contact Support
+            <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>
           </button>
         </p>
       </div>
