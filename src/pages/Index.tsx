@@ -1,68 +1,80 @@
-import { SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
-import { DashboardHeader, ViewType } from "@/components/dashboard/DashboardHeader";
-import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
-import { DispatchBoard } from "@/components/dashboard/DispatchBoard";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
-import { ScheduledTransport } from "@/components/dashboard/ScheduledTransport";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Brain } from "lucide-react";
-import { useState } from "react";
-import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
-import { useAIRecommendations } from "@/hooks/useAIRecommendations";
-import { useTransportRecords } from "@/hooks/useTransportRecords";
+import { Card } from "@/components/ui/card";
+import { 
+  Ambulance, 
+  DollarSign, 
+  ClipboardList, 
+  Users, 
+  Settings, 
+  Database, 
+  ShieldCheck, 
+  HeadsetHelp 
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+const menuItems = [
+  {
+    title: "Dispatch",
+    icon: Ambulance,
+    description: "Manage active dispatches and transport requests",
+    path: "/dispatch",
+    color: "text-blue-600"
+  },
+  {
+    title: "Billing",
+    icon: DollarSign,
+    description: "Handle invoices and payment processing",
+    path: "/billing",
+    color: "text-green-600"
+  },
+  {
+    title: "Supervision",
+    icon: ClipboardList,
+    description: "Monitor operations and staff performance",
+    path: "/performance",
+    color: "text-purple-600"
+  },
+  {
+    title: "HR",
+    icon: Users,
+    description: "Manage staff and crew assignments",
+    path: "/crew",
+    color: "text-orange-600"
+  },
+  {
+    title: "Settings",
+    icon: Settings,
+    description: "Configure system preferences and alerts",
+    path: "/alerts",
+    color: "text-gray-600"
+  },
+  {
+    title: "Data Hub",
+    icon: Database,
+    description: "Access and analyze transport data",
+    path: "/routes",
+    color: "text-indigo-600"
+  },
+  {
+    title: "Authorization",
+    icon: ShieldCheck,
+    description: "Manage access and permissions",
+    path: "/settings",
+    color: "text-red-600"
+  },
+  {
+    title: "Support",
+    icon: HeadsetHelp,
+    description: "Get help and access resources",
+    path: "/support",
+    color: "text-teal-600"
+  }
+];
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<ViewType>('active');
-  
-  // Initialize real-time updates
-  useRealtimeUpdates();
-  
-  // Fetch AI recommendations
-  const { data: aiRecommendations, isLoading: isLoadingAI } = useAIRecommendations();
-  const { transportRecords, isLoading: isLoadingTransports } = useTransportRecords();
-
-  // Show AI insights when relevant
-  const showAIInsights = aiRecommendations?.length > 0;
-
-  const renderContent = () => {
-    switch (currentView) {
-      case 'active':
-        return (
-          <>
-            <WelcomeBanner />
-            {showAIInsights && (
-              <Alert className="mb-4 bg-medical-highlight border-medical-secondary/20">
-                <Brain className="h-4 w-4 text-medical-secondary" />
-                <AlertDescription className="text-medical-primary">
-                  {aiRecommendations[0].recommendation || aiRecommendations[0].suggestions?.[0] || "No AI recommendations available"}
-                </AlertDescription>
-              </Alert>
-            )}
-            <div className="mt-4">
-              <DashboardMetrics />
-            </div>
-            <div className="mt-4">
-              <DispatchBoard />
-            </div>
-          </>
-        );
-      case 'schedule':
-        return <ScheduledTransport />;
-      case 'calendar':
-        return (
-          <div className="p-4">
-            <h2 className="text-2xl font-semibold mb-4">Calendar View</h2>
-            <p className="text-gray-500">Calendar view coming soon...</p>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -70,11 +82,34 @@ const Index = () => {
         <SidebarProvider defaultOpen={true}>
           <div className="min-h-screen flex w-full">
             <AppSidebar />
-            <SidebarRail />
-            <div className="flex-1 bg-[#f4f7fc] overflow-auto">
-              <DashboardHeader onViewChange={setCurrentView} defaultView={currentView} />
-              <main className="p-4">
-                {renderContent()}
+            <div className="flex-1 bg-medical-accent overflow-auto">
+              <main className="p-6 md:p-8 max-w-7xl mx-auto">
+                <h1 className="text-3xl font-bold text-medical-primary mb-8">
+                  Welcome to Dispatch Control
+                </h1>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {menuItems.map((item) => (
+                    <Link 
+                      key={item.title} 
+                      to={item.path}
+                      className="block transition-transform hover:scale-105"
+                    >
+                      <Card className="h-full futuristic-card p-6 cursor-pointer">
+                        <div className="flex flex-col items-center text-center space-y-4">
+                          <div className={`p-3 rounded-full bg-medical-highlight ${item.color}`}>
+                            <item.icon className="w-8 h-8" />
+                          </div>
+                          <h2 className="text-xl font-semibold text-medical-primary">
+                            {item.title}
+                          </h2>
+                          <p className="text-sm text-medical-primary/70">
+                            {item.description}
+                          </p>
+                        </div>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
               </main>
             </div>
           </div>
@@ -83,6 +118,6 @@ const Index = () => {
       <Footer />
     </div>
   );
-}
+};
 
 export default Index;
