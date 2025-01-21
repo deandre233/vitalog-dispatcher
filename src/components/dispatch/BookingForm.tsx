@@ -614,27 +614,6 @@ export function BookingForm() {
                   </div>
                 </RadioGroup>
               </div>
-
-              <div className="space-y-2">
-                <Label>Trip Type</Label>
-                <RadioGroup 
-                  className="flex gap-4"
-                  onValueChange={(value) => register("trip_type").onChange({ target: { value } })}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="One way" id="one-way" />
-                    <Label htmlFor="one-way">One Way</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Wait-and-return" id="wait-return" />
-                    <Label htmlFor="wait-return">Wait and Return</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Round trip" id="round-trip" />
-                    <Label htmlFor="round-trip">Round Trip</Label>
-                  </div>
-                </RadioGroup>
-              </div>
             </div>
 
             <div className="space-y-3">
