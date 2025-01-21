@@ -63,6 +63,72 @@ const affiliates = [
   "AccentCare"
 ];
 
+// Add mock calls data
+const mockCalls = [
+  {
+    caller_name: "John Smith",
+    caller_phone: "555-0123",
+    patient_first_name: "Jane",
+    patient_last_name: "Doe",
+    patient_dob: "1960-05-15",
+    pickup_location: "Memorial Hospital",
+    dropoff_location: "Sunset Nursing Home",
+    service_type: "BLS",
+    priority_level: "Scheduled",
+    trip_type: "One way",
+    origin_floor_room: "Room 302",
+    origin_type: "hospital",
+    origin_address: "123 Main St",
+    origin_city: "Springfield",
+    origin_state: "IL",
+    origin_zip: "62701",
+    origin_county: "Sangamon",
+    origin_phone: "555-0100",
+    destination_floor_room: "Room 205",
+    destination_type: "nursing_home",
+    destination_address: "456 Oak Ave",
+    destination_city: "Springfield",
+    destination_state: "IL",
+    destination_zip: "62702",
+    destination_county: "Sangamon",
+    destination_phone: "555-0200",
+    service_complaint: "Transfer / Palliative care",
+    requires_o2: true,
+    confined_to_bed: true
+  },
+  {
+    caller_name: "Mary Johnson",
+    caller_phone: "555-0456",
+    patient_first_name: "Robert",
+    patient_last_name: "Williams",
+    patient_dob: "1955-08-22",
+    pickup_location: "City Medical Center",
+    dropoff_location: "General Hospital",
+    service_type: "ALS",
+    priority_level: "Emergency",
+    trip_type: "One way",
+    origin_floor_room: "ER Bay 4",
+    origin_type: "hospital",
+    origin_address: "789 Hospital Drive",
+    origin_city: "Springfield",
+    origin_state: "IL",
+    origin_zip: "62701",
+    origin_county: "Sangamon",
+    origin_phone: "555-0300",
+    destination_floor_room: "ICU Wing",
+    destination_type: "hospital",
+    destination_address: "321 Medical Parkway",
+    destination_city: "Springfield",
+    destination_state: "IL",
+    destination_zip: "62703",
+    destination_county: "Sangamon",
+    destination_phone: "555-0400",
+    service_complaint: "Heart problems / AICD",
+    requires_ekg: true,
+    requires_ventilator: true
+  }
+];
+
 export function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedMockCall, setSelectedMockCall] = useState(0);
