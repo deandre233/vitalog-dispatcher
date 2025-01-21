@@ -389,7 +389,7 @@ export function DispatchBoard() {
     : "";
 
   return (
-    <Card className="p-6 m-6">
+    <Card className="p-6 m-6 bg-gradient-to-br from-medical-accent to-white border-medical-secondary/20 shadow-lg transition-all hover:shadow-xl">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-semibold text-medical-primary">
@@ -399,12 +399,14 @@ export function DispatchBoard() {
             <Button
               variant={activeView === "active" ? "default" : "outline"}
               onClick={() => setActiveView("active")}
+              className="bg-medical-secondary text-white hover:bg-medical-secondary/90"
             >
               Active Dispatches
             </Button>
             <Button
               variant={activeView === "scheduled" ? "default" : "outline"}
               onClick={() => setActiveView("scheduled")}
+              className="border-medical-secondary text-medical-secondary hover:bg-medical-secondary/10"
             >
               Scheduled Transport
             </Button>
@@ -413,9 +415,9 @@ export function DispatchBoard() {
         <DispatchFilters />
       </div>
 
-      <Alert className="mb-4">
-        <Brain className="h-4 w-4" />
-        <AlertDescription>
+      <Alert className="mb-4 bg-medical-highlight border-medical-secondary/20">
+        <Brain className="h-4 w-4 text-medical-secondary" />
+        <AlertDescription className="text-medical-primary">
           AI Insight: {unassignedDispatches.length} dispatches waiting for assignment. 
           {assignedDispatches.length > 0 && ` ${assignedDispatches.length} active transports progressing normally.`}
           {aiPredictions.staffing.recommendedStaffCount > 0 && 
@@ -424,8 +426,8 @@ export function DispatchBoard() {
       </Alert>
 
       {aiPredictions.maintenance.some(p => p.maintenanceType === "urgent") && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertDescription>
+        <Alert variant="destructive" className="mb-4 border-red-200 bg-red-50">
+          <AlertDescription className="text-red-800">
             Urgent maintenance required for some vehicles. Check maintenance dashboard for details.
           </AlertDescription>
         </Alert>
@@ -433,14 +435,19 @@ export function DispatchBoard() {
 
       {activeView === "active" ? (
         <Tabs defaultValue="unassigned" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 bg-medical-accent">
             <TabsTrigger 
               value="unassigned"
-              className={unassignedTabStyle}
+              className={`${unassignedDispatches.length > 0 
+                ? "data-[state=active]:bg-red-100 data-[state=active]:text-red-700" 
+                : "data-[state=active]:bg-medical-secondary data-[state=active]:text-white"}`}
             >
               Unassigned ({unassignedDispatches.length})
             </TabsTrigger>
-            <TabsTrigger value="assigned">
+            <TabsTrigger 
+              value="assigned"
+              className="data-[state=active]:bg-medical-secondary data-[state=active]:text-white"
+            >
               Assigned ({assignedDispatches.length})
             </TabsTrigger>
           </TabsList>
