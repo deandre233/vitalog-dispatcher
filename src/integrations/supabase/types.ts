@@ -835,6 +835,9 @@ export type Database = {
           requires_isolation_type: string | null
           requires_o2: boolean | null
           requires_ventilator: boolean | null
+          return_activation_time: string | null
+          return_pickup_time: string | null
+          return_precise_pickup: boolean | null
           return_trip_id: string | null
           scheduled_time: string | null
           service_type: Database["public"]["Enums"]["service_type"] | null
@@ -897,6 +900,9 @@ export type Database = {
           requires_isolation_type?: string | null
           requires_o2?: boolean | null
           requires_ventilator?: boolean | null
+          return_activation_time?: string | null
+          return_pickup_time?: string | null
+          return_precise_pickup?: boolean | null
           return_trip_id?: string | null
           scheduled_time?: string | null
           service_type?: Database["public"]["Enums"]["service_type"] | null
@@ -959,6 +965,9 @@ export type Database = {
           requires_isolation_type?: string | null
           requires_o2?: boolean | null
           requires_ventilator?: boolean | null
+          return_activation_time?: string | null
+          return_pickup_time?: string | null
+          return_precise_pickup?: boolean | null
           return_trip_id?: string | null
           scheduled_time?: string | null
           service_type?: Database["public"]["Enums"]["service_type"] | null

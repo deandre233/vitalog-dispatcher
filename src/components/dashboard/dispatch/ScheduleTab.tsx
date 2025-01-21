@@ -151,6 +151,7 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
                   type="datetime-local"
                   className="border-medical-secondary/30 focus:border-medical-secondary"
                   onChange={(e) => onUpdate({ return_activation_time: e.target.value })}
+                  value={transportRecord?.return_activation_time || ''}
                 />
               </div>
               
@@ -161,11 +162,13 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
                     type="time"
                     className="border-medical-secondary/30 focus:border-medical-secondary"
                     onChange={(e) => onUpdate({ return_pickup_time: e.target.value })}
+                    value={transportRecord?.return_pickup_time || ''}
                   />
                   <Checkbox
                     id="precise-return"
                     className="border-medical-secondary/30"
-                    onCheckedChange={(checked) => onUpdate({ return_precise_pickup: checked })}
+                    checked={transportRecord?.return_precise_pickup || false}
+                    onCheckedChange={(checked: boolean) => onUpdate({ return_precise_pickup: checked })}
                   />
                   <Label htmlFor="precise-return" className="text-sm">Precise</Label>
                 </div>
