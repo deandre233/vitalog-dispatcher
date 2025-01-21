@@ -18,6 +18,7 @@ import {
 import { DispatchFormData } from "@/types/dispatch";
 import { supabase } from "@/integrations/supabase/client";
 import { Bot, MapPin, Search, UserCircle2, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const serviceComplaints = [
   "Transfer / Palliative care",
@@ -134,6 +135,7 @@ export function BookingForm() {
   const [selectedMockCall, setSelectedMockCall] = useState(0);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
   const [isSearchingPatient, setIsSearchingPatient] = useState(false);
+  const [foundPatient, setFoundPatient] = useState<{ id: string; first_name: string; last_name: string } | null>(null);
   
   const { register, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm<DispatchFormData>({
     defaultValues: {
@@ -220,6 +222,11 @@ export function BookingForm() {
       if (error) throw error;
 
       setValue('patient_id', newPatient.id);
+      setFoundPatient({
+        id: newPatient.id,
+        first_name: newPatient.first_name,
+        last_name: newPatient.last_name
+      });
 
       toast.success(`Patient record created for ${newPatient.first_name} ${newPatient.last_name}`);
       
@@ -228,6 +235,59 @@ export function BookingForm() {
       console.error('Error creating patient:', error);
       toast.error("Failed to create patient record");
       throw error;
+    }
+  };
+
+  const handlePatientSearch = async () => {
+    setIsSearchingPatient(true);
+    const lastName = watch('patient_last_name');
+    const firstName = watch('patient_first_name');
+    
+    if (!lastName && !firstName) {
+      toast.error("Please enter at least a first or last name to search");
+      setIsSearchingPatient(false);
+      return;
+    }
+
+    try {
+      let query = supabase
+        .from('patients')
+        .select('*');
+      
+      if (lastName) {
+        query = query.ilike('last_name', `${lastName}%`);
+      }
+      if (firstName) {
+        query = query.ilike('first_name', `${firstName}%`);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const patient = data[0]; // Using first match for now
+        setValue('patient_last_name', patient.last_name);
+        setValue('patient_first_name', patient.first_name);
+        setValue('patient_dob', patient.dob);
+        setValue('patient_id', patient.id);
+        
+        setFoundPatient({
+          id: patient.id,
+          first_name: patient.first_name,
+          last_name: patient.last_name
+        });
+        
+        toast.success(`Found patient record for ${patient.first_name} ${patient.last_name}`);
+      } else {
+        setFoundPatient(null);
+        toast.error("No matching patient records found");
+      }
+    } catch (error) {
+      console.error('Error searching patient:', error);
+      toast.error("Failed to search for patient records");
+    } finally {
+      setIsSearchingPatient(false);
     }
   };
 
@@ -333,51 +393,6 @@ export function BookingForm() {
     } catch (error) {
       console.error('Error saving facility:', error);
       toast.error(`Failed to save ${type === 'origin' ? 'origin' : 'destination'} location`);
-    }
-  };
-
-  const handlePatientSearch = async () => {
-    setIsSearchingPatient(true);
-    const lastName = watch('patient_last_name');
-    const firstName = watch('patient_first_name');
-    
-    if (!lastName && !firstName) {
-      toast.error("Please enter at least a first or last name to search");
-      setIsSearchingPatient(false);
-      return;
-    }
-
-    try {
-      let query = supabase
-        .from('patients')
-        .select('*');
-      
-      if (lastName) {
-        query = query.ilike('last_name', `${lastName}%`);
-      }
-      if (firstName) {
-        query = query.ilike('first_name', `${firstName}%`);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        const patient = data[0]; // Using first match for now
-        setValue('patient_last_name', patient.last_name);
-        setValue('patient_first_name', patient.first_name);
-        setValue('patient_dob', patient.dob);
-        
-        toast.success(`Found patient record for ${patient.first_name} ${patient.last_name}`);
-      } else {
-        toast.error("No matching patient records found");
-      }
-    } catch (error) {
-      console.error('Error searching patient:', error);
-      toast.error("Failed to search for patient records");
-    } finally {
-      setIsSearchingPatient(false);
     }
   };
 
@@ -500,7 +515,18 @@ export function BookingForm() {
               />
             </div>
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-between items-center">
+            <div className="flex-1">
+              {foundPatient && (
+                <Link 
+                  to={`/patient/${encodeURIComponent(`${foundPatient.last_name}, ${foundPatient.first_name} (PAT-${foundPatient.id.slice(0, 5)})`)}` }
+                  className="text-medical-secondary hover:text-medical-secondary/80 font-medium flex items-center gap-2"
+                >
+                  <UserCircle2 className="w-4 h-4" />
+                  View {foundPatient.first_name} {foundPatient.last_name}'s Profile
+                </Link>
+              )}
+            </div>
             <Button
               type="button"
               onClick={handlePatientSearch}
@@ -520,16 +546,21 @@ export function BookingForm() {
               className="border-medical-secondary/30 focus:border-medical-secondary"
             />
           </div>
-          <p className="text-sm text-gray-500 italic">
-            A new patient record will be created when you save this dispatch.
-          </p>
-          <Button
-            type="button"
-            variant="secondary"
-            className="w-full bg-medical-highlight text-medical-primary hover:bg-medical-highlight/90"
-          >
-            Create Patient Record Now
-          </Button>
+          {!foundPatient && (
+            <>
+              <p className="text-sm text-gray-500 italic">
+                A new patient record will be created when you save this dispatch.
+              </p>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleCreatePatient}
+                className="w-full bg-medical-highlight text-medical-primary hover:bg-medical-highlight/90"
+              >
+                Create Patient Record Now
+              </Button>
+            </>
+          )}
         </div>
       </Card>
 
