@@ -15,6 +15,17 @@ import {
   History,
   User,
   Archive,
+  Map,
+  CheckSquare,
+  Calendar,
+  PhoneCall,
+  Building2,
+  BookOpen,
+  Tags,
+  Clock,
+  ExternalLink,
+  Upload,
+  Library
 } from "lucide-react";
 
 const routes = [
@@ -24,29 +35,99 @@ const routes = [
     href: "/",
   },
   {
-    label: "Patient Profile",
-    icon: User,
-    href: "/patient-profile",
+    label: "Employees List",
+    icon: Users,
+    href: "/employees",
   },
   {
-    label: "Medical Records",
-    icon: FileText,
-    href: "/medical-records",
+    label: "Live Map",
+    icon: Map,
+    href: "/live-map",
   },
   {
-    label: "Transport History",
-    icon: History,
-    href: "/transport-history",
+    label: "Ended Shifts & Checklists",
+    icon: CheckSquare,
+    href: "/shifts",
   },
   {
-    label: "Active Dispatches",
+    label: "Vertex AI Route Planner",
+    icon: MapPin,
+    href: "/route-planner",
+  },
+  {
+    label: "Confirmation Queue",
     icon: ClipboardList,
-    href: "/dispatch",
+    href: "/confirmation-queue",
+  },
+  {
+    label: "Calendar of Upcoming",
+    icon: Calendar,
+    href: "/calendar",
   },
   {
     label: "Closed Dispatches",
     icon: Archive,
     href: "/closed-dispatches",
+  },
+  {
+    label: "Request Queue",
+    icon: PhoneCall,
+    href: "/request-queue",
+  },
+  {
+    label: "Prior Authorization Queue",
+    icon: Clock,
+    href: "/prior-auth-queue",
+  },
+  {
+    label: "Prior Auths On File",
+    icon: FileText,
+    href: "/prior-auths",
+  },
+  {
+    label: "Facilities List",
+    icon: Building2,
+    href: "/facilities",
+  },
+  {
+    label: "Affiliates List",
+    icon: Users,
+    href: "/affiliates",
+  },
+  {
+    label: "Patients List",
+    icon: User,
+    href: "/patients",
+  },
+  {
+    label: "Patient Document Upload",
+    icon: Upload,
+    href: "/document-upload",
+  },
+  {
+    label: "Librarian",
+    icon: Library,
+    href: "/librarian",
+  },
+  {
+    label: "Tags List",
+    icon: Tags,
+    href: "/tags",
+  },
+  {
+    label: "Book a Back-Dated Dispatch",
+    icon: History,
+    href: "/backdated-dispatch",
+  },
+  {
+    label: "Custom Link 1",
+    icon: ExternalLink,
+    href: "/custom-link-1",
+  },
+  {
+    label: "Active Dispatches",
+    icon: ClipboardList,
+    href: "/dispatch",
   },
   {
     label: "Create Dispatch",
