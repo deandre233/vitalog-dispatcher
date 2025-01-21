@@ -11,7 +11,7 @@ import {
   Settings, 
   Database, 
   ShieldCheck, 
-  HeadsetHelp 
+  Headphones 
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -67,7 +67,7 @@ const menuItems = [
   },
   {
     title: "Support",
-    icon: HeadsetHelp,
+    icon: Headphones,
     description: "Get help and access resources",
     path: "/support",
     color: "text-teal-600"
