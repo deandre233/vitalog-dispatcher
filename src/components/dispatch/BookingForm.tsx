@@ -148,7 +148,6 @@ export function BookingForm() {
     }
   });
 
-  // Watch the checkbox values to control dropdown states
   const billToFacility = watch('bill_to_facility');
   const billToAffiliate = watch('bill_to_affiliate');
 
@@ -712,7 +711,7 @@ export function BookingForm() {
             <div className="flex items-center gap-4">
               <RadioGroup
                 value={watch('activation_type') || 'now'}
-                onValueChange={(value) => setValue('activation_type', value)}
+                onValueChange={(value: "now" | "later") => setValue('activation_type', value)}
                 className="flex items-center space-x-4"
               >
                 <div className="flex items-center space-x-2">
@@ -740,7 +739,7 @@ export function BookingForm() {
             <div className="flex items-center gap-4">
               <RadioGroup
                 value={watch('pickup_type') || 'asap'}
-                onValueChange={(value) => setValue('pickup_type', value)}
+                onValueChange={(value: "asap" | "scheduled") => setValue('pickup_type', value)}
                 className="flex items-center space-x-4"
               >
                 <div className="flex items-center space-x-2">
@@ -776,7 +775,7 @@ export function BookingForm() {
             <div className="flex items-center gap-4">
               <RadioGroup
                 value={watch('dropoff_type') || 'asap'}
-                onValueChange={(value) => setValue('dropoff_type', value)}
+                onValueChange={(value: "asap" | "scheduled") => setValue('dropoff_type', value)}
                 className="flex items-center space-x-4"
               >
                 <div className="flex items-center space-x-2">
@@ -803,7 +802,7 @@ export function BookingForm() {
             <Label>Trip Type</Label>
             <RadioGroup
               value={watch('trip_type') || 'One way'}
-              onValueChange={(value) => setValue('trip_type', value)}
+              onValueChange={(value: "One way" | "Wait-and-return" | "Round trip") => setValue('trip_type', value)}
               className="flex items-center space-x-4"
             >
               <div className="flex items-center space-x-2">
