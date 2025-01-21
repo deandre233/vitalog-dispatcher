@@ -28,7 +28,18 @@ export interface TransportRecord {
   return_activation_time: string | null;
   return_pickup_time: string | null;
   return_precise_pickup: boolean | null;
-  precise_pickup?: boolean | null;  // Made this optional with ?
+  precise_pickup?: boolean | null;
+  ai_recommendations?: {
+    suggested_crew?: string;
+    estimated_duration?: string;
+    priority_score?: number;
+    insights?: string[];
+    traffic_status?: {
+      congestion_level: 'low' | 'medium' | 'high';
+      estimated_delay: number;
+      alternate_route_available: boolean;
+    };
+  };
 }
 
 export function useTransportRecord(id: string | undefined) {

@@ -7,10 +7,25 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
 import { ScheduledTransport } from "@/components/dashboard/ScheduledTransport";
-import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Brain } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
+import { useAIRecommendations } from "@/hooks/useAIRecommendations";
+import { useTransportRecords } from "@/hooks/useTransportRecords";
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<ViewType>('active');
+  
+  // Initialize real-time updates
+  useRealtimeUpdates();
+  
+  // Fetch AI recommendations
+  const { data: aiRecommendations, isLoading: isLoadingAI } = useAIRecommendations();
+  const { transportRecords, isLoading: isLoadingTransports } = useTransportRecords();
+
+  // Show AI insights when relevant
+  const showAIInsights = aiRecommendations?.length > 0;
 
   const renderContent = () => {
     switch (currentView) {
@@ -18,6 +33,14 @@ const Index = () => {
         return (
           <>
             <WelcomeBanner />
+            {showAIInsights && (
+              <Alert className="mb-4 bg-medical-highlight border-medical-secondary/20">
+                <Brain className="h-4 w-4 text-medical-secondary" />
+                <AlertDescription className="text-medical-primary">
+                  {aiRecommendations[0].suggestion}
+                </AlertDescription>
+              </Alert>
+            )}
             <div className="mt-4">
               <DashboardMetrics />
             </div>
