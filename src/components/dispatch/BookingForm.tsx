@@ -489,22 +489,27 @@ export function BookingForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-[1200px] mx-auto bg-white rounded-lg shadow-sm p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-medical-primary">Book a New Dispatch</h1>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-[1200px] mx-auto">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-semibold text-medical-primary bg-gradient-to-r from-medical-primary to-medical-secondary bg-clip-text text-transparent">
+          Book a New Dispatch
+        </h1>
         <Button 
           type="button" 
           variant="outline" 
           onClick={loadMockCall}
-          className="flex items-center gap-2 bg-medical-accent text-medical-primary hover:bg-medical-highlight"
+          className="flex items-center gap-2 bg-gradient-to-r from-medical-accent to-medical-highlight hover:from-medical-highlight hover:to-medical-accent text-medical-primary transition-all duration-300"
         >
           Load Mock Call
         </Button>
       </div>
 
-      {/* Caller Information - Moved to top */}
-      <Card className="p-6 border-l-4 border-l-medical-secondary">
-        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Caller Information</h3>
+      {/* Caller Information */}
+      <Card className="p-6 border-l-4 border-l-[#9b87f5] bg-gradient-to-br from-white to-[#F1F0FB] shadow-lg hover:shadow-xl transition-all duration-300">
+        <h3 className="text-lg font-semibold mb-4 text-[#7E69AB] flex items-center gap-2">
+          <UserCircle2 className="w-5 h-5" />
+          Caller Information
+        </h3>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -529,8 +534,8 @@ export function BookingForm() {
       </Card>
 
       {/* Patient/Customer Section */}
-      <Card className="p-6 border-l-4 border-l-medical-secondary">
-        <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
+      <Card className="p-6 border-l-4 border-l-[#D946EF] bg-gradient-to-br from-white to-[#FFDEE2] shadow-lg hover:shadow-xl transition-all duration-300">
+        <h3 className="text-lg font-semibold mb-4 text-[#D946EF] flex items-center gap-2">
           <UserCircle2 className="w-5 h-5" />
           Patient / Customer Information
         </h3>
@@ -605,8 +610,8 @@ export function BookingForm() {
       </Card>
 
       {/* Origin Location */}
-      <Card className="p-6 border-l-4 border-l-medical-secondary">
-        <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
+      <Card className="p-6 border-l-4 border-l-[#0EA5E9] bg-gradient-to-br from-white to-[#D3E4FD] shadow-lg hover:shadow-xl transition-all duration-300">
+        <h3 className="text-lg font-semibold mb-4 text-[#0EA5E9] flex items-center gap-2">
           <MapPin className="w-5 h-5" />
           Origin Location
         </h3>
@@ -697,8 +702,8 @@ export function BookingForm() {
       </Card>
 
       {/* Destination Location */}
-      <Card className="p-6 border-l-4 border-l-medical-secondary">
-        <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
+      <Card className="p-6 border-l-4 border-l-[#F97316] bg-gradient-to-br from-white to-[#FEC6A1] shadow-lg hover:shadow-xl transition-all duration-300">
+        <h3 className="text-lg font-semibold mb-4 text-[#F97316] flex items-center gap-2">
           <MapPin className="w-5 h-5" />
           Destination Location
         </h3>
@@ -789,8 +794,8 @@ export function BookingForm() {
       </Card>
 
       {/* Service Details */}
-      <Card className="p-6 border-l-4 border-l-medical-secondary">
-        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Service Details</h3>
+      <Card className="p-6 border-l-4 border-l-[#8B5CF6] bg-gradient-to-br from-white to-[#E5DEFF] shadow-lg hover:shadow-xl transition-all duration-300">
+        <h3 className="text-lg font-semibold mb-4 text-[#8B5CF6]">Service Details</h3>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
@@ -935,8 +940,8 @@ export function BookingForm() {
       </Card>
 
       {/* Scheduling Panel */}
-      <Card className="p-6 border-l-4 border-l-medical-secondary">
-        <h3 className="text-lg font-semibold mb-4 text-medical-primary flex items-center gap-2">
+      <Card className="p-6 border-l-4 border-l-[#0FA0CE] bg-gradient-to-br from-white to-[#D3E4FD] shadow-lg hover:shadow-xl transition-all duration-300">
+        <h3 className="text-lg font-semibold mb-4 text-[#0FA0CE] flex items-center gap-2">
           <Clock className="w-5 h-5" />
           Schedule Details
         </h3>
@@ -1062,8 +1067,8 @@ export function BookingForm() {
       </Card>
 
       {/* Requirements Section */}
-      <Card className="p-6 border-l-4 border-l-medical-secondary">
-        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Requirements & Warnings</h3>
+      <Card className="p-6 border-l-4 border-l-[#33C3F0] bg-gradient-to-br from-white to-[#F2FCE2] shadow-lg hover:shadow-xl transition-all duration-300">
+        <h3 className="text-lg font-semibold mb-4 text-[#33C3F0]">Requirements & Warnings</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-4">
             <h4 className="font-medium text-medical-primary">Special Requirements</h4>
@@ -1138,8 +1143,8 @@ export function BookingForm() {
       </Card>
 
       {/* Notes Section */}
-      <Card className="p-6 border-l-4 border-l-medical-secondary">
-        <h3 className="text-lg font-semibold mb-4 text-medical-primary">Notes</h3>
+      <Card className="p-6 border-l-4 border-l-[#6E59A5] bg-gradient-to-br from-white to-[#F1F0FB] shadow-lg hover:shadow-xl transition-all duration-300">
+        <h3 className="text-lg font-semibold mb-4 text-[#6E59A5]">Notes</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label>Dispatcher Notes</Label>
@@ -1161,10 +1166,10 @@ export function BookingForm() {
       </Card>
 
       {/* AI Recommendations */}
-      <Card className="p-6 bg-medical-highlight border-l-4 border-l-medical-secondary">
+      <Card className="p-6 bg-gradient-to-br from-[#F1F0FB] to-[#E5DEFF] border-l-4 border-l-[#9b87f5] shadow-lg hover:shadow-xl transition-all duration-300">
         <div className="flex items-center gap-2 mb-4">
-          <Bot className="w-5 h-5 text-medical-secondary" />
-          <h3 className="text-lg font-semibold text-medical-primary">AI Recommendations</h3>
+          <Bot className="w-5 h-5 text-[#9b87f5]" />
+          <h3 className="text-lg font-semibold text-[#7E69AB]">AI Recommendations</h3>
         </div>
         <div className="space-y-2 text-medical-primary/80">
           <p className="text-sm">Based on the provided information, our AI suggests:</p>
@@ -1180,14 +1185,14 @@ export function BookingForm() {
         <Button 
           variant="outline" 
           type="button"
-          className="bg-gray-50 hover:bg-gray-100"
+          className="bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-all duration-300"
         >
           Cancel
         </Button>
         <Button 
           type="submit" 
           disabled={isSubmitting}
-          className="bg-medical-secondary hover:bg-medical-secondary/90 text-white"
+          className="bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] hover:from-[#7E69AB] hover:to-[#9b87f5] text-white transition-all duration-300"
         >
           {isSubmitting ? "Creating..." : "Create Dispatch"}
         </Button>
