@@ -145,6 +145,7 @@ export function BookingForm() {
       cash_upfront: false,
       price_quote: '',
       service_complaint: '',
+      patient_id: '' // Add this new field
     }
   });
 
@@ -160,11 +161,50 @@ export function BookingForm() {
     toast.success("Mock call data loaded");
   };
 
+  const handleCreatePatient = async () => {
+    try {
+      const patientData = {
+        first_name: watch('patient_first_name'),
+        last_name: watch('patient_last_name'),
+        dob: watch('patient_dob'),
+        // Add any additional patient fields you want to save
+      };
+
+      const { data: newPatient, error } = await supabase
+        .from('patients')
+        .insert(patientData)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Set the patient_id in the form
+      setValue('patient_id', newPatient.id);
+
+      toast.success(`Patient record created for ${newPatient.first_name} ${newPatient.last_name}`);
+      
+      return newPatient;
+    } catch (error) {
+      console.error('Error creating patient:', error);
+      toast.error("Failed to create patient record");
+      throw error;
+    }
+  };
+
   const onSubmit = async (data: DispatchFormData) => {
     setIsSubmitting(true);
     try {
+      // First, create or get patient record
+      let patientId = data.patient_id;
+      
+      if (!patientId) {
+        const newPatient = await handleCreatePatient();
+        patientId = newPatient.id;
+      }
+
       const transportRecord = {
         ...data,
+        patient_id: patientId,
         status: 'pending',
         dispatch_id: await generateDispatchId(),
       };
@@ -1011,3 +1051,4 @@ export function BookingForm() {
     </form>
   );
 }
+
