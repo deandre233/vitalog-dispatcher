@@ -43,7 +43,7 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
               
               <Input
                 type="datetime-local"
-                value={format(new Date(transportRecord?.transport_date || ''), "yyyy-MM-dd'T'HH:mm")}
+                value={transportRecord?.transport_date ? format(new Date(transportRecord.transport_date), "yyyy-MM-dd'T'HH:mm") : ''}
                 onChange={(e) => onUpdate({ transport_date: e.target.value })}
                 className="flex-1 border-medical-secondary/30 focus:border-medical-secondary bg-white"
               />
@@ -72,16 +72,16 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
               <div className="flex items-center gap-2 flex-1">
                 <Input
                   type="time"
+                  value={transportRecord?.scheduled_time || ''}
                   className="border-medical-secondary/30 focus:border-medical-secondary bg-white"
                   onChange={(e) => onUpdate({ scheduled_time: e.target.value })}
                 />
                 <Checkbox
                   id="precise-pickup"
+                  checked={transportRecord?.precise_pickup || false}
                   className="border-medical-secondary/30"
                   onCheckedChange={(checked) => {
-                    if (typeof checked === 'boolean') {
-                      onUpdate({ precise_pickup: checked });
-                    }
+                    onUpdate({ precise_pickup: checked === true });
                   }}
                 />
                 <Label htmlFor="precise-pickup" className="text-sm">Precise</Label>

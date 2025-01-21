@@ -25,10 +25,10 @@ export interface TransportRecord {
   scheduled_time: string | null;
   dispatch_status: 'Pending' | 'In Progress' | 'Completed' | null;
   trip_type: 'One way' | 'Wait-and-return' | 'Round trip' | null;
-  // Add new fields for return trip
   return_activation_time: string | null;
   return_pickup_time: string | null;
   return_precise_pickup: boolean | null;
+  precise_pickup: boolean | null;  // Added this field
 }
 
 export function useTransportRecord(id: string | undefined) {
@@ -41,13 +41,19 @@ export function useTransportRecord(id: string | undefined) {
         .eq('dispatch_id', id)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        toast.error("Failed to fetch transport record");
+        throw error;
+      }
+      
       if (!data) {
-        toast.error("Transport record not found");
         return null;
       }
+
       return data as TransportRecord;
     },
+    retry: 1,
+    enabled: !!id
   });
 }
 
@@ -59,13 +65,15 @@ export function useUpdateTransport(id: string | undefined) {
         .update(updates)
         .eq('dispatch_id', id);
 
-      if (error) throw error;
+      if (error) {
+        toast.error("Failed to update transport record");
+        throw error;
+      }
     },
     onSuccess: () => {
       toast.success("Transport record updated successfully");
     },
     onError: (error) => {
-      toast.error("Failed to update transport record");
       console.error("Update error:", error);
     },
   });
