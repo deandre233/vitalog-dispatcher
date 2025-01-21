@@ -9,7 +9,7 @@ import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
 import { ScheduledTransport } from "@/components/dashboard/ScheduledTransport";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Brain } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import { useTransportRecords } from "@/hooks/useTransportRecords";
@@ -37,7 +37,7 @@ const Index = () => {
               <Alert className="mb-4 bg-medical-highlight border-medical-secondary/20">
                 <Brain className="h-4 w-4 text-medical-secondary" />
                 <AlertDescription className="text-medical-primary">
-                  {aiRecommendations[0].suggestion}
+                  {aiRecommendations[0].recommendation || aiRecommendations[0].suggestions?.[0] || "No AI recommendations available"}
                 </AlertDescription>
               </Alert>
             )}
