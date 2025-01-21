@@ -28,7 +28,7 @@ export interface TransportRecord {
   return_activation_time: string | null;
   return_pickup_time: string | null;
   return_precise_pickup: boolean | null;
-  precise_pickup: boolean | null;  // Added this field
+  precise_pickup?: boolean | null;  // Made this optional with ?
 }
 
 export function useTransportRecord(id: string | undefined) {
