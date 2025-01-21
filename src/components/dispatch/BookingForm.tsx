@@ -105,7 +105,7 @@ export function BookingForm() {
       priority_level: 'Scheduled',
       trip_type: 'One way',
       recurrence_type: 'Disabled',
-      requires_bcs: false,
+      requires_ekg: false,
       requires_o2: false,
       requires_ventilator: false,
       requires_isolation: false,
@@ -885,8 +885,8 @@ export function BookingForm() {
             <h4 className="font-medium text-medical-primary">Special Requirements</h4>
             <div className="grid grid-cols-1 gap-2">
               <div className="flex items-center space-x-2">
-                <Checkbox {...register("requires_bcs")} id="bcs" />
-                <Label htmlFor="bcs">BCS</Label>
+                <Checkbox {...register("requires_ekg")} id="ekg" />
+                <Label htmlFor="ekg">EKG</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox {...register("requires_o2")} id="o2" />
