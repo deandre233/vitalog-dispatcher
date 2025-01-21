@@ -301,6 +301,7 @@ export function BookingForm() {
         patientId = newPatient.id;
       }
 
+      // Create the initial transport record
       const transportRecord = {
         patient_id: patientId,
         status: 'pending',
@@ -341,13 +342,52 @@ export function BookingForm() {
         billing_notes: data.billing_notes
       };
 
-      const { error } = await supabase
+      // Insert the initial transport record
+      const { error: initialError } = await supabase
         .from('transport_records')
         .insert(transportRecord);
 
-      if (error) throw error;
+      if (initialError) throw initialError;
 
-      toast.success("Dispatch created successfully!");
+      // If this is a round trip, create the return trip with reversed locations
+      if (data.trip_type === 'Round trip') {
+        const returnTripId = await generateDispatchId();
+        const returnTransportRecord = {
+          ...transportRecord,
+          dispatch_id: returnTripId,
+          // Swap origin and destination details
+          pickup_location: data.dropoff_location,
+          dropoff_location: data.pickup_location,
+          origin_floor_room: data.destination_floor_room,
+          origin_type: data.destination_type,
+          origin_address: data.destination_address,
+          destination_floor_room: data.origin_floor_room,
+          destination_type: data.origin_type,
+          destination_address: data.origin_address,
+          // Link the trips together
+          return_trip_id: transportRecord.dispatch_id,
+          dispatcher_notes: `Return trip for dispatch ${transportRecord.dispatch_id}\n${data.dispatcher_notes || ''}`
+        };
+
+        const { error: returnError } = await supabase
+          .from('transport_records')
+          .insert(returnTransportRecord);
+
+        if (returnError) throw returnError;
+
+        // Update the original transport record with the return trip ID
+        const { error: updateError } = await supabase
+          .from('transport_records')
+          .update({ return_trip_id: returnTripId })
+          .eq('dispatch_id', transportRecord.dispatch_id);
+
+        if (updateError) throw updateError;
+
+        toast.success("Round trip dispatches created successfully!");
+      } else {
+        toast.success("Dispatch created successfully!");
+      }
+
       reset();
     } catch (error) {
       console.error('Error creating dispatch:', error);
