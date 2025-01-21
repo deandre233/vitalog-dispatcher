@@ -1,9 +1,8 @@
-import { Clock, Calendar, ArrowRight } from "lucide-react";
+import { Clock, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TransportRecord } from "@/hooks/useTransportRecord";
 import { Card } from "@/components/ui/card";
@@ -168,7 +167,11 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
                     id="precise-return"
                     className="border-medical-secondary/30"
                     checked={transportRecord?.return_precise_pickup || false}
-                    onCheckedChange={(checked: boolean) => onUpdate({ return_precise_pickup: checked })}
+                    onCheckedChange={(checked) => {
+                      if (typeof checked === 'boolean') {
+                        onUpdate({ return_precise_pickup: checked });
+                      }
+                    }}
                   />
                   <Label htmlFor="precise-return" className="text-sm">Precise</Label>
                 </div>
@@ -176,7 +179,6 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </div>
           )}
 
-          {/* Time Slot Visualization */}
           <div className="mt-6">
             <div className="h-8 bg-gray-100 rounded-lg flex">
               {Array.from({ length: 24 }).map((_, i) => (
