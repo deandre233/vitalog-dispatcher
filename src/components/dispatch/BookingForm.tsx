@@ -17,37 +17,7 @@ import {
 } from "@/components/ui/select";
 import { DispatchFormData } from "@/types/dispatch";
 import { supabase } from "@/integrations/supabase/client";
-import { Bot, MapPin, Search, UserCircle2, Clock, Calendar } from "lucide-react";
-
-const mockCalls = [
-  {
-    caller_name: "John Smith",
-    caller_phone: "(555) 123-4567",
-    patient_name: "Alice Johnson",
-    pickup_location: "Memorial Hospital",
-    dropoff_location: "123 Home Street",
-    service_type: "BLS",
-    priority_level: "Scheduled",
-  },
-  {
-    caller_name: "Mary Wilson",
-    caller_phone: "(555) 987-6543",
-    patient_name: "Bob Anderson",
-    pickup_location: "456 Oak Avenue",
-    dropoff_location: "City Medical Center",
-    service_type: "ALS",
-    priority_level: "Emergency",
-  },
-  {
-    caller_name: "David Brown",
-    caller_phone: "(555) 246-8135",
-    patient_name: "Carol Martinez",
-    pickup_location: "Sunset Nursing Home",
-    dropoff_location: "General Hospital",
-    service_type: "MICU",
-    priority_level: "Critical",
-  }
-];
+import { Bot, MapPin, Search, UserCircle2, Clock } from "lucide-react";
 
 const serviceComplaints = [
   "Transfer / Palliative care",
@@ -105,6 +75,9 @@ export function BookingForm() {
       priority_level: 'Scheduled',
       trip_type: 'One way',
       recurrence_type: 'Disabled',
+      activation_type: 'now',
+      pickup_type: 'asap',
+      dropoff_type: 'asap',
       requires_ekg: false,
       requires_o2: false,
       requires_ventilator: false,
@@ -121,6 +94,7 @@ export function BookingForm() {
       dnr_order: false,
       language_barrier: false,
       fresh_prepared: false,
+      precise_pickup: false,
       patient_last_name: '',
       patient_first_name: '',
       patient_dob: '',
@@ -145,7 +119,9 @@ export function BookingForm() {
       cash_upfront: false,
       price_quote: '',
       service_complaint: '',
-      patient_id: '' // Add this new field
+      patient_id: '',
+      dispatcher_notes: '',
+      billing_notes: ''
     }
   });
 
@@ -167,7 +143,6 @@ export function BookingForm() {
         first_name: watch('patient_first_name'),
         last_name: watch('patient_last_name'),
         dob: watch('patient_dob'),
-        // Add any additional patient fields you want to save
       };
 
       const { data: newPatient, error } = await supabase
@@ -178,7 +153,6 @@ export function BookingForm() {
 
       if (error) throw error;
 
-      // Set the patient_id in the form
       setValue('patient_id', newPatient.id);
 
       toast.success(`Patient record created for ${newPatient.first_name} ${newPatient.last_name}`);
@@ -194,7 +168,6 @@ export function BookingForm() {
   const onSubmit = async (data: DispatchFormData) => {
     setIsSubmitting(true);
     try {
-      // First, create or get patient record
       let patientId = data.patient_id;
       
       if (!patientId) {
@@ -203,10 +176,43 @@ export function BookingForm() {
       }
 
       const transportRecord = {
-        ...data,
         patient_id: patientId,
         status: 'pending',
         dispatch_id: await generateDispatchId(),
+        caller_name: data.caller_name,
+        caller_phone: data.caller_phone,
+        pickup_location: data.pickup_location,
+        dropoff_location: data.dropoff_location,
+        service_type: data.service_type,
+        priority_level: data.priority_level,
+        trip_type: data.trip_type,
+        origin_floor_room: data.origin_floor_room,
+        origin_type: data.origin_type,
+        origin_address: data.origin_address,
+        destination_floor_room: data.destination_floor_room,
+        destination_type: data.destination_type,
+        destination_address: data.destination_address,
+        scheduled_time: data.activation_type === 'later' ? data.activation_datetime : null,
+        pickup_type: data.pickup_type,
+        dropoff_type: data.dropoff_type,
+        requires_ekg: data.requires_ekg,
+        requires_o2: data.requires_o2,
+        requires_ventilator: data.requires_ventilator,
+        requires_isolation: data.requires_isolation,
+        requires_bariatric: data.requires_bariatric,
+        breathing_problem: data.breathing_problem,
+        confined_to_bed: data.confined_to_bed,
+        behavioral_illness: data.behavioral_illness,
+        unstable_impaired: data.unstable_impaired,
+        physically_impaired: data.physically_impaired,
+        hearing_impaired: data.hearing_impaired,
+        sight_impaired: data.sight_impaired,
+        speech_impaired: data.speech_impaired,
+        dnr_order: data.dnr_order,
+        language_barrier: data.language_barrier,
+        fresh_prepared: data.fresh_prepared,
+        dispatcher_notes: data.dispatcher_notes,
+        billing_notes: data.billing_notes
       };
 
       const { error } = await supabase
@@ -216,6 +222,7 @@ export function BookingForm() {
       if (error) throw error;
 
       toast.success("Dispatch created successfully!");
+      reset();
     } catch (error) {
       console.error('Error creating dispatch:', error);
       toast.error("Failed to create dispatch");
@@ -1051,4 +1058,3 @@ export function BookingForm() {
     </form>
   );
 }
-
