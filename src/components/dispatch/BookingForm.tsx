@@ -268,6 +268,58 @@ export function BookingForm() {
     }
   };
 
+  const renderTimeSlot = () => {
+    const currentHour = new Date().getHours();
+    const slots = Array.from({ length: 24 }).map((_, i) => ({
+      hour: i,
+      isCurrentHour: i === currentHour,
+      isPeak: i >= 8 && i <= 18, // Peak hours between 8 AM and 6 PM
+    }));
+
+    return (
+      <div className="mt-6 space-y-2">
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-gray-500">Time Availability</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-medical-secondary/20 rounded-full"></div>
+              <span className="text-xs text-gray-500">Off-Peak</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-medical-secondary rounded-full"></div>
+              <span className="text-xs text-gray-500">Peak Hours</span>
+            </div>
+          </div>
+        </div>
+        <div className="h-12 bg-gray-50 rounded-lg flex overflow-hidden">
+          {slots.map(({ hour, isCurrentHour, isPeak }) => (
+            <div
+              key={hour}
+              className={`flex-1 flex flex-col justify-between relative ${
+                isPeak ? 'bg-medical-secondary/20' : 'bg-medical-secondary/10'
+              } ${isCurrentHour ? 'border-b-2 border-medical-secondary' : ''}`}
+              title={`${hour}:00`}
+            >
+              {hour % 3 === 0 && (
+                <>
+                  <div className="text-[10px] text-gray-500 text-center absolute top-1 w-full">
+                    {hour.toString().padStart(2, '0')}:00
+                  </div>
+                  <div className="w-px h-2 bg-gray-300 absolute bottom-0 left-1/2"></div>
+                </>
+              )}
+              {isCurrentHour && (
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                  <div className="w-1 h-1 bg-medical-secondary rounded-full"></div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-[1200px] mx-auto bg-white rounded-lg shadow-sm p-6">
       <div className="flex justify-between items-center mb-6">
@@ -820,60 +872,8 @@ export function BookingForm() {
             </RadioGroup>
           </div>
 
-          {/* Return Trip Section - Only show if Round Trip is selected */}
-          {watch('trip_type') === 'Round trip' && (
-            <div className="space-y-4 mt-4 p-4 bg-medical-accent rounded-lg">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-medical-secondary" />
-                <Label className="text-medical-primary font-medium">Return Trip</Label>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Activate at</Label>
-                <Input
-                  type="datetime-local"
-                  className="border-medical-secondary/30 focus:border-medical-secondary"
-                  {...register('return_activation_datetime')}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Pick back up at</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="time"
-                    className="flex-1 border-medical-secondary/30 focus:border-medical-secondary"
-                    {...register('return_pickup_time')}
-                  />
-                  <Checkbox
-                    id="precise-return"
-                    className="border-medical-secondary/30"
-                    {...register('precise_return')}
-                  />
-                  <Label htmlFor="precise-return" className="text-sm">Precise</Label>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Time Slot Visualization */}
-          <div className="mt-6">
-            <div className="h-8 bg-gray-100 rounded-lg flex">
-              {Array.from({ length: 24 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="flex-1 border-r border-gray-200 last:border-r-0"
-                  title={`${i}:00`}
-                >
-                  {i % 3 === 0 && (
-                    <div className="text-[10px] text-gray-500 text-center">
-                      {i}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Improved Time Slot Visualization */}
+          {renderTimeSlot()}
         </div>
       </Card>
 
