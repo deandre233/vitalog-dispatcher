@@ -20,11 +20,11 @@ export function MetricCard({ title, value, icon: Icon, change, aiInsight }: Metr
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Card className="p-6 cursor-help transition-all hover:shadow-lg bg-gradient-to-br from-medical-accent to-white border-medical-secondary/20">
+          <Card className="futuristic-card p-6 cursor-help group">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-medical-primary/80">{title}</p>
-                <h3 className="text-2xl font-bold text-medical-primary mt-2">
+                <h3 className="text-2xl font-bold text-medical-primary mt-2 group-hover:text-medical-secondary transition-colors">
                   {value}
                 </h3>
                 <p className="text-sm mt-2">
@@ -36,7 +36,9 @@ export function MetricCard({ title, value, icon: Icon, change, aiInsight }: Metr
                   <span className="text-medical-primary/60">from last hour</span>
                 </p>
               </div>
-              <Icon className="w-8 h-8 text-medical-secondary" />
+              <div className="p-2 rounded-full bg-medical-accent group-hover:bg-medical-highlight transition-colors">
+                <Icon className="w-8 h-8 text-medical-secondary" />
+              </div>
             </div>
           </Card>
         </TooltipTrigger>
