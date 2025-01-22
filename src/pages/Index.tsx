@@ -70,6 +70,14 @@ const menuItems = [
     path: "/settings",
     color: "text-rose-500",
     gradient: "from-rose-400 to-pink-500"
+  },
+  {
+    title: "Support",
+    icon: Headphones,
+    description: "Get help and access resources",
+    path: "/support",
+    color: "text-violet-500",
+    gradient: "from-violet-400 to-purple-500"
   }
 ];
 
@@ -86,7 +94,9 @@ const Index = () => {
             Select a module to get started
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <PerformancePanel />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
             {menuItems.map((item) => (
               <Link 
                 key={item.title} 
@@ -130,43 +140,6 @@ const Index = () => {
                 </Card>
               </Link>
             ))}
-            <div className="xl:col-span-2">
-              <PerformancePanel />
-            </div>
-            <Link 
-              to="/support"
-              className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1"
-            >
-              <Card className={`
-                h-full relative overflow-hidden
-                bg-gradient-to-br from-violet-400 to-purple-500
-                border-0 shadow-lg hover:shadow-xl
-                group transition-all duration-300
-                before:absolute before:inset-0
-                before:bg-white before:z-10 before:opacity-95
-                before:transition-opacity before:duration-300
-                hover:before:opacity-90
-                after:absolute after:inset-0 after:-z-10
-                after:bg-gradient-to-br from-violet-400 to-purple-500
-                after:opacity-0 hover:after:opacity-100
-                after:transition-opacity after:duration-300
-                backdrop-blur-sm
-              `}>
-                <div className="relative z-20 p-6">
-                  <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="p-3 rounded-xl text-violet-500 bg-white/80 shadow-lg group-hover:scale-110 group-hover:shadow-xl transform transition-all duration-300 backdrop-blur-sm">
-                      <Headphones className="w-8 h-8" />
-                    </div>
-                    <h2 className="text-xl font-semibold text-medical-primary">
-                      Support
-                    </h2>
-                    <p className="text-sm text-medical-primary/70">
-                      Get help and access resources
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </Link>
           </div>
         </main>
       </div>
