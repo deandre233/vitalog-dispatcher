@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
+import { PerformancePanel } from "@/components/dashboard/PerformancePanel";
 import { 
   Ambulance, 
   DollarSign, 
@@ -92,7 +93,10 @@ const Index = () => {
           <p className="text-medical-primary/60 mb-8">
             Select a module to get started
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          
+          <PerformancePanel />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
             {menuItems.map((item) => (
               <Link 
                 key={item.title} 
