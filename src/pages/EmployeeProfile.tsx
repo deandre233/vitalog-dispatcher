@@ -45,7 +45,8 @@ import {
   Camera,
   Upload,
   Key,
-  CheckCircle
+  CheckCircle,
+  Signal
 } from "lucide-react";
 
 const EmployeeProfile = () => {
@@ -272,7 +273,8 @@ const EmployeeProfile = () => {
                     { value: "certs", label: "Certifications", icon: BadgeCheck },
                     { value: "achievements", label: "Achievements", icon: Award },
                     { value: "damage", label: "Damage Reports", icon: ClipboardList },
-                    { value: "announcements", label: "Announcements", icon: Bell },
+                    { value: "notifications", label: "Notifications", icon: Bell },
+                    { value: "beacon", label: "Beacon", icon: Signal },
                     { value: "immunizations", label: "Immunizations", icon: Syringe },
                     { value: "performance", label: "Performance", icon: Star }
                   ].map(({ value, label, icon: Icon }) => (
@@ -287,306 +289,314 @@ const EmployeeProfile = () => {
                   ))}
                 </TabsList>
 
-                <div className="mt-8 space-y-6">
-                  <TabsContent value="demographics" className="space-y-6 animate-fade-in">
-                    <Card className="p-6 backdrop-blur-sm bg-white/90 border-medical-secondary/20 transition-all duration-300 hover:shadow-glow">
-                      <div className="flex justify-between items-center mb-6">
-                        <div className="flex items-center gap-2">
-                          <User className="h-5 w-5 text-medical-secondary" />
-                          <span className="font-medium text-lg">Identity & Contact Information</span>
-                        </div>
-                        {editMode === 'demographics' ? (
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleSave('demographics')}
-                              className="bg-medical-secondary/10 hover:bg-medical-secondary hover:text-white transition-colors duration-300"
-                            >
-                              <Save className="h-4 w-4 mr-1" />
-                              Save
-                            </Button>
-                            <Button 
-                              size="sm"
-                              variant="outline"
-                              onClick={handleCancel}
-                              className="hover:bg-red-500 hover:text-white transition-colors duration-300"
-                            >
-                              <X className="h-4 w-4 mr-1" />
-                              Cancel
-                            </Button>
-                          </div>
-                        ) : (
+                <TabsContent value="demographics" className="space-y-6 animate-fade-in">
+                  <Card className="p-6 backdrop-blur-sm bg-white/90 border-medical-secondary/20 transition-all duration-300 hover:shadow-glow">
+                    <div className="flex justify-between items-center mb-6">
+                      <div className="flex items-center gap-2">
+                        <User className="h-5 w-5 text-medical-secondary" />
+                        <span className="font-medium text-lg">Identity & Contact Information</span>
+                      </div>
+                      {editMode === 'demographics' ? (
+                        <div className="flex gap-2">
                           <Button 
                             size="sm"
                             variant="outline"
-                            onClick={() => handleEdit('demographics')}
-                            className="hover:bg-medical-secondary hover:text-white transition-colors duration-300"
+                            onClick={() => handleSave('demographics')}
+                            className="bg-medical-secondary/10 hover:bg-medical-secondary hover:text-white transition-colors duration-300"
                           >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
+                            <Save className="h-4 w-4 mr-1" />
+                            Save
                           </Button>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-6">
-                          <div className="space-y-2">
-                            <Label className="text-medical-primary font-medium">NEMSIS UUID</Label>
-                            {editMode === 'demographics' ? (
-                              <Input
-                                value={editData.nemsis_uuid || ''}
-                                onChange={(e) => setEditData({ ...editData, nemsis_uuid: e.target.value })}
-                                className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
-                              />
-                            ) : (
-                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
-                                <FileText className="h-4 w-4 text-medical-secondary" />
-                                <span>{employee?.nemsis_uuid || 'Not assigned'}</span>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label className="text-medical-primary font-medium">Phone</Label>
-                            {editMode === 'demographics' ? (
-                              <Input
-                                value={editData.mobile || ''}
-                                onChange={(e) => setEditData({ ...editData, mobile: e.target.value })}
-                                className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
-                              />
-                            ) : (
-                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
-                                <Phone className="h-4 w-4 text-medical-secondary" />
-                                <span>{employee?.mobile || 'Not provided'}</span>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label className="text-medical-primary font-medium">Login Name</Label>
-                            {editMode === 'demographics' ? (
-                              <Input
-                                value={editData.login_name || ''}
-                                onChange={(e) => setEditData({ ...editData, login_name: e.target.value })}
-                                className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
-                              />
-                            ) : (
-                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
-                                <User className="h-4 w-4 text-medical-secondary" />
-                                <span>{employee?.login_name || 'Not set'}</span>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label className="text-medical-primary font-medium">Beacon App Token</Label>
-                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
-                              <Key className="h-4 w-4 text-medical-secondary" />
-                              <span className="font-mono text-sm">{employee?.beacon_token || 'Not generated'}</span>
-                            </div>
-                          </div>
+                          <Button 
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancel}
+                            className="hover:bg-red-500 hover:text-white transition-colors duration-300"
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Cancel
+                          </Button>
                         </div>
-
-                        <div className="space-y-6">
-                          <div>
-                            <Label className="text-medical-primary font-medium mb-4 block">Messaging Preferences</Label>
-                            <Card className="p-4 bg-white/50 backdrop-blur-sm border-medical-secondary/10">
-                              <div className="space-y-4">
-                                <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
-                                  <Label className="cursor-pointer">SMS Notifications</Label>
-                                  <Switch
-                                    checked={editData.sms_notifications}
-                                    onCheckedChange={(checked) => 
-                                      setEditData({ ...editData, sms_notifications: checked })
-                                    }
-                                    disabled={!editMode}
-                                  />
-                                </div>
-                                <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
-                                  <Label className="cursor-pointer">Email Notifications</Label>
-                                  <Switch
-                                    checked={editData.email_notifications}
-                                    onCheckedChange={(checked) => 
-                                      setEditData({ ...editData, email_notifications: checked })
-                                    }
-                                    disabled={!editMode}
-                                  />
-                                </div>
-                                <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
-                                  <Label className="cursor-pointer">Two-factor Authentication</Label>
-                                  <Switch
-                                    checked={editData.two_factor_auth}
-                                    onCheckedChange={(checked) => 
-                                      setEditData({ ...editData, two_factor_auth: checked })
-                                    }
-                                    disabled={!editMode}
-                                  />
-                                </div>
-                              </div>
-                            </Card>
-                          </div>
-
-                          <div className="space-y-4">
-                            <Label className="text-medical-primary font-medium block">Last Login</Label>
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
-                                <Clock className="h-4 w-4 text-medical-secondary" />
-                                <span>Last attempt: {employee?.last_login_attempt || 'Never'}</span>
-                              </div>
-                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
-                                <CheckCircle className="h-4 w-4 text-medical-secondary" />
-                                <span>Last success: {employee?.last_login_success || 'Never'}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </TabsContent>
-
-                  <TabsContent value="payroll" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="h-4 w-4 text-medical-secondary" />
-                          <span className="font-medium">Payroll Information</span>
-                        </div>
-                        <Button onClick={() => setIsPayrollModalOpen(true)}>
-                          Update Payroll
+                      ) : (
+                        <Button 
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEdit('demographics')}
+                          className="hover:bg-medical-secondary hover:text-white transition-colors duration-300"
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
                         </Button>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label>Pay Type</Label>
-                          <p>{employee.pay_type || 'Not set'}</p>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <Label className="text-medical-primary font-medium">NEMSIS UUID</Label>
+                          {editMode === 'demographics' ? (
+                            <Input
+                              value={editData.nemsis_uuid || ''}
+                              onChange={(e) => setEditData({ ...editData, nemsis_uuid: e.target.value })}
+                              className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                              <FileText className="h-4 w-4 text-medical-secondary" />
+                              <span>{employee?.nemsis_uuid || 'Not assigned'}</span>
+                            </div>
+                          )}
                         </div>
-                        <div>
-                          <Label>Pay Rate</Label>
-                          <p>${employee.pay_rate || '0.00'}/hr</p>
+
+                        <div className="space-y-2">
+                          <Label className="text-medical-primary font-medium">Phone</Label>
+                          {editMode === 'demographics' ? (
+                            <Input
+                              value={editData.mobile || ''}
+                              onChange={(e) => setEditData({ ...editData, mobile: e.target.value })}
+                              className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                              <Phone className="h-4 w-4 text-medical-secondary" />
+                              <span>{employee?.mobile || 'Not provided'}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-medical-primary font-medium">Login Name</Label>
+                          {editMode === 'demographics' ? (
+                            <Input
+                              value={editData.login_name || ''}
+                              onChange={(e) => setEditData({ ...editData, login_name: e.target.value })}
+                              className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                              <User className="h-4 w-4 text-medical-secondary" />
+                              <span>{employee?.login_name || 'Not set'}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </Card>
-                  </TabsContent>
+                    </div>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="roles" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <UserCog className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Roles</span>
+                <TabsContent value="notifications" className="space-y-4 mt-6">
+                  <Card className="p-6 backdrop-blur-sm bg-white/90 border-medical-secondary/20 transition-all duration-300 hover:shadow-glow">
+                    <div className="flex items-center gap-2 mb-6">
+                      <Bell className="h-5 w-5 text-medical-secondary" />
+                      <span className="font-medium text-lg">Messaging & Notification Preferences</span>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10 hover:bg-medical-accent/20 transition-colors duration-200">
+                        <Label className="cursor-pointer">SMS Notifications</Label>
+                        <Switch
+                          checked={editData.sms_notifications}
+                          onCheckedChange={(checked) => 
+                            setEditData({ ...editData, sms_notifications: checked })
+                          }
+                          disabled={!editMode}
+                        />
                       </div>
-                      <ul className="mt-2">
-                        {employee.employee_roles?.map((role: any) => (
-                          <li key={role.id} className="text-gray-600">{role.name}</li>
-                        )) || <li className="text-gray-600">No roles assigned</li>}
-                      </ul>
-                    </Card>
-                  </TabsContent>
+                      <div className="flex items-center justify-between p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10 hover:bg-medical-accent/20 transition-colors duration-200">
+                        <Label className="cursor-pointer">Email Notifications</Label>
+                        <Switch
+                          checked={editData.email_notifications}
+                          onCheckedChange={(checked) => 
+                            setEditData({ ...editData, email_notifications: checked })
+                          }
+                          disabled={!editMode}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10 hover:bg-medical-accent/20 transition-colors duration-200">
+                        <Label className="cursor-pointer">Two-factor Authentication</Label>
+                        <Switch
+                          checked={editData.two_factor_auth}
+                          onCheckedChange={(checked) => 
+                            setEditData({ ...editData, two_factor_auth: checked })
+                          }
+                          disabled={!editMode}
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="privileges" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Privileges</span>
+                <TabsContent value="beacon" className="space-y-4 mt-6">
+                  <Card className="p-6 backdrop-blur-sm bg-white/90 border-medical-secondary/20 transition-all duration-300 hover:shadow-glow">
+                    <div className="flex items-center gap-2 mb-6">
+                      <Signal className="h-5 w-5 text-medical-secondary" />
+                      <span className="font-medium text-lg">Beacon App Configuration</span>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="p-4 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                        <Label className="text-medical-primary font-medium block mb-2">Beacon App Token</Label>
+                        <div className="flex items-center gap-2 p-3 bg-white/50 rounded-md border border-medical-secondary/20">
+                          <Key className="h-4 w-4 text-medical-secondary" />
+                          <code className="font-mono text-sm flex-1">{employee?.beacon_token || 'Not generated'}</code>
+                        </div>
                       </div>
-                      <ul className="mt-2">
-                        {employee.employee_privileges?.map((privilege: any) => (
-                          <li key={privilege.id} className="text-gray-600">{privilege.name}</li>
-                        )) || <li className="text-gray-600">No privileges assigned</li>}
-                      </ul>
-                    </Card>
-                  </TabsContent>
+                      <div className="p-4 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                        <Label className="text-medical-primary font-medium block mb-2">Last Login Activity</Label>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 p-3 bg-white/50 rounded-md border border-medical-secondary/20">
+                            <Clock className="h-4 w-4 text-medical-secondary" />
+                            <span>Last attempt: {employee?.last_login_attempt || 'Never'}</span>
+                          </div>
+                          <div className="flex items-center gap-2 p-3 bg-white/50 rounded-md border border-medical-secondary/20">
+                            <CheckCircle className="h-4 w-4 text-medical-secondary" />
+                            <span>Last success: {employee?.last_login_success || 'Never'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="incidents" className="space-y-4 mt-6">
-                    <Card className="p-4">
+                <TabsContent value="payroll" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Incidents</span>
+                        <DollarSign className="h-4 w-4 text-medical-secondary" />
+                        <span className="font-medium">Payroll Information</span>
                       </div>
-                      <p className="mt-2">No incidents reported for this employee.</p>
-                    </Card>
-                  </TabsContent>
+                      <Button onClick={() => setIsPayrollModalOpen(true)}>
+                        Update Payroll
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Pay Type</Label>
+                        <p>{employee.pay_type || 'Not set'}</p>
+                      </div>
+                      <div>
+                        <Label>Pay Rate</Label>
+                        <p>${employee.pay_rate || '0.00'}/hr</p>
+                      </div>
+                    </div>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="documents" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Documents</span>
-                      </div>
-                      <p className="mt-2">No documents available for this employee.</p>
-                    </Card>
-                  </TabsContent>
+                <TabsContent value="roles" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <UserCog className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Roles</span>
+                    </div>
+                    <ul className="mt-2">
+                      {employee.employee_roles?.map((role: any) => (
+                        <li key={role.id} className="text-gray-600">{role.name}</li>
+                      )) || <li className="text-gray-600">No roles assigned</li>}
+                    </ul>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="stats" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Stats</span>
-                      </div>
-                      <p className="mt-2">No stats available for this employee.</p>
-                    </Card>
-                  </TabsContent>
+                <TabsContent value="privileges" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Privileges</span>
+                    </div>
+                    <ul className="mt-2">
+                      {employee.employee_privileges?.map((privilege: any) => (
+                        <li key={privilege.id} className="text-gray-600">{privilege.name}</li>
+                      )) || <li className="text-gray-600">No privileges assigned</li>}
+                    </ul>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="certs" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <BadgeCheck className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Certifications</span>
-                      </div>
-                      <p className="mt-2">No certifications available for this employee.</p>
-                    </Card>
-                  </TabsContent>
+                <TabsContent value="incidents" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Incidents</span>
+                    </div>
+                    <p className="mt-2">No incidents reported for this employee.</p>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="achievements" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Award className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Achievements</span>
-                      </div>
-                      <p className="mt-2">No achievements available for this employee.</p>
-                    </Card>
-                  </TabsContent>
+                <TabsContent value="documents" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Documents</span>
+                    </div>
+                    <p className="mt-2">No documents available for this employee.</p>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="damage" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <ClipboardList className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Damage Reports</span>
-                      </div>
-                      <p className="mt-2">No damage reports available for this employee.</p>
-                    </Card>
-                  </TabsContent>
+                <TabsContent value="stats" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Stats</span>
+                    </div>
+                    <p className="mt-2">No stats available for this employee.</p>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="announcements" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Bell className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Announcements</span>
-                      </div>
-                      <p className="mt-2">No announcements available for this employee.</p>
-                    </Card>
-                  </TabsContent>
+                <TabsContent value="certs" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <BadgeCheck className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Certifications</span>
+                    </div>
+                    <p className="mt-2">No certifications available for this employee.</p>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="immunizations" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Syringe className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Immunizations</span>
-                      </div>
-                      <p className="mt-2">No immunizations available for this employee.</p>
-                    </Card>
-                  </TabsContent>
+                <TabsContent value="achievements" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <Award className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Achievements</span>
+                    </div>
+                    <p className="mt-2">No achievements available for this employee.</p>
+                  </Card>
+                </TabsContent>
 
-                  <TabsContent value="performance" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Star className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Performance</span>
-                      </div>
-                      <p className="mt-2">No performance data available for this employee.</p>
-                    </Card>
-                  </TabsContent>
-                </div>
+                <TabsContent value="damage" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <ClipboardList className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Damage Reports</span>
+                    </div>
+                    <p className="mt-2">No damage reports available for this employee.</p>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="announcements" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Announcements</span>
+                    </div>
+                    <p className="mt-2">No announcements available for this employee.</p>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="immunizations" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <Syringe className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Immunizations</span>
+                    </div>
+                    <p className="mt-2">No immunizations available for this employee.</p>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="performance" className="space-y-4 mt-6">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-medical-secondary" />
+                      <span className="font-medium">Performance</span>
+                    </div>
+                    <p className="mt-2">No performance data available for this employee.</p>
+                  </Card>
+                </TabsContent>
               </Tabs>
             </Card>
           </div>
