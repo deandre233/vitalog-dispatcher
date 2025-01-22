@@ -203,17 +203,17 @@ const EmployeeProfile = () => {
         <div className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             <Card className="p-6 backdrop-blur-sm bg-white/80 border-medical-secondary/20 shadow-glow transition-all duration-300">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-4">
+              <div className="flex justify-between items-start mb-8">
+                <div className="flex items-center gap-6">
                   <div className="relative group">
                     <Avatar className="h-24 w-24 ring-2 ring-medical-secondary/30 transition-all duration-300 group-hover:ring-medical-secondary">
                       <AvatarImage 
-                        src={employee.photo_url} 
-                        alt={`${employee.first_name} ${employee.last_name}`}
+                        src={employee?.photo_url} 
+                        alt={`${employee?.first_name} ${employee?.last_name}`}
                         className="object-cover"
                       />
                       <AvatarFallback className="text-2xl bg-gradient-to-br from-medical-gradient-start to-medical-gradient-end text-white">
-                        {employee.first_name?.[0]}{employee.last_name?.[0]}
+                        {employee?.first_name?.[0]}{employee?.last_name?.[0]}
                       </AvatarFallback>
                     </Avatar>
                     <Button
@@ -239,22 +239,23 @@ const EmployeeProfile = () => {
                   </div>
                   <div>
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-medical-primary to-medical-secondary bg-clip-text text-transparent">
-                      {employee.first_name} {employee.last_name}
+                      {employee?.first_name} {employee?.last_name}
                     </h1>
-                    <p className="text-medical-secondary mt-1 font-medium">
-                      ID: {employee.readable_id}
+                    <p className="text-medical-secondary mt-1 font-medium flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      ID: {employee?.readable_id}
                     </p>
                   </div>
                 </div>
                 <Badge 
                   variant="secondary"
                   className={`${
-                    employee.status?.toLowerCase() === 'active' 
+                    employee?.status?.toLowerCase() === 'active' 
                       ? 'bg-green-100 text-green-800 border-green-200' 
                       : 'bg-red-100 text-red-800 border-red-200'
                   } backdrop-blur-sm animate-fade-in`}
                 >
-                  {employee.status || 'Unknown'}
+                  {employee?.status || 'Unknown'}
                 </Badge>
               </div>
 
@@ -287,11 +288,11 @@ const EmployeeProfile = () => {
                 </TabsList>
 
                 <TabsContent value="demographics" className="space-y-4 mt-6 animate-fade-in">
-                  <Card className="p-4 backdrop-blur-sm bg-white/80 border-medical-secondary/20 transition-all duration-300 hover:shadow-glow">
-                    <div className="flex justify-between items-center mb-4">
+                  <Card className="p-6 backdrop-blur-sm bg-white/80 border-medical-secondary/20 transition-all duration-300 hover:shadow-glow">
+                    <div className="flex justify-between items-center mb-6">
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Identity & Contact Information</span>
+                        <User className="h-5 w-5 text-medical-secondary" />
+                        <span className="font-medium text-lg">Identity & Contact Information</span>
                       </div>
                       {editMode === 'demographics' ? (
                         <div className="flex gap-2">
@@ -326,10 +327,11 @@ const EmployeeProfile = () => {
                         </Button>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <div>
-                          <Label className="text-medical-primary">NEMSIS UUID</Label>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <Label className="text-medical-primary font-medium">NEMSIS UUID</Label>
                           {editMode === 'demographics' ? (
                             <Input
                               value={editData.nemsis_uuid || ''}
@@ -337,15 +339,15 @@ const EmployeeProfile = () => {
                               className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
                             />
                           ) : (
-                            <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
                               <FileText className="h-4 w-4 text-medical-secondary" />
-                              <span>{employee.nemsis_uuid || 'Not assigned'}</span>
+                              <span>{employee?.nemsis_uuid || 'Not assigned'}</span>
                             </div>
                           )}
                         </div>
 
-                        <div>
-                          <Label className="text-medical-primary">Phone</Label>
+                        <div className="space-y-2">
+                          <Label className="text-medical-primary font-medium">Phone</Label>
                           {editMode === 'demographics' ? (
                             <Input
                               value={editData.mobile || ''}
@@ -353,15 +355,15 @@ const EmployeeProfile = () => {
                               className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
                             />
                           ) : (
-                            <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
                               <Phone className="h-4 w-4 text-medical-secondary" />
-                              <span>{employee.mobile || 'Not provided'}</span>
+                              <span>{employee?.mobile || 'Not provided'}</span>
                             </div>
                           )}
                         </div>
 
-                        <div>
-                          <Label className="text-medical-primary">Login Name</Label>
+                        <div className="space-y-2">
+                          <Label className="text-medical-primary font-medium">Login Name</Label>
                           {editMode === 'demographics' ? (
                             <Input
                               value={editData.login_name || ''}
@@ -369,28 +371,29 @@ const EmployeeProfile = () => {
                               className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
                             />
                           ) : (
-                            <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
                               <User className="h-4 w-4 text-medical-secondary" />
-                              <span>{employee.login_name || 'Not set'}</span>
+                              <span>{employee?.login_name || 'Not set'}</span>
                             </div>
                           )}
                         </div>
 
-                        <div>
-                          <Label className="text-medical-primary">Beacon App Token</Label>
-                          <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                        <div className="space-y-2">
+                          <Label className="text-medical-primary font-medium">Beacon App Token</Label>
+                          <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
                             <Key className="h-4 w-4 text-medical-secondary" />
-                            <span className="font-mono text-sm">{employee.beacon_token || 'Not generated'}</span>
+                            <span className="font-mono text-sm">{employee?.beacon_token || 'Not generated'}</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         <div>
-                          <Label className="text-medical-primary">Messaging Preferences</Label>
-                          <Card className="p-4 bg-white/50 backdrop-blur-sm">
+                          <Label className="text-medical-primary font-medium mb-4 block">Messaging Preferences</Label>
+                          <Card className="p-4 bg-white/50 backdrop-blur-sm border-medical-secondary/10">
                             <div className="space-y-4">
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
+                                <Label className="cursor-pointer">SMS Notifications</Label>
                                 <Switch
                                   checked={editData.sms_notifications}
                                   onCheckedChange={(checked) => 
@@ -398,9 +401,9 @@ const EmployeeProfile = () => {
                                   }
                                   disabled={!editMode}
                                 />
-                                <Label>SMS Notifications</Label>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
+                                <Label className="cursor-pointer">Email Notifications</Label>
                                 <Switch
                                   checked={editData.email_notifications}
                                   onCheckedChange={(checked) => 
@@ -408,9 +411,9 @@ const EmployeeProfile = () => {
                                   }
                                   disabled={!editMode}
                                 />
-                                <Label>Email Notifications</Label>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
+                                <Label className="cursor-pointer">Two-factor Authentication</Label>
                                 <Switch
                                   checked={editData.two_factor_auth}
                                   onCheckedChange={(checked) => 
@@ -418,22 +421,21 @@ const EmployeeProfile = () => {
                                   }
                                   disabled={!editMode}
                                 />
-                                <Label>Two-factor Authentication</Label>
                               </div>
                             </div>
                           </Card>
                         </div>
 
-                        <div>
-                          <Label className="text-medical-primary">Last Login</Label>
+                        <div className="space-y-4">
+                          <Label className="text-medical-primary font-medium block">Last Login</Label>
                           <div className="space-y-2">
-                            <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
                               <Clock className="h-4 w-4 text-medical-secondary" />
-                              <span>Last attempt: {employee.last_login_attempt || 'Never'}</span>
+                              <span>Last attempt: {employee?.last_login_attempt || 'Never'}</span>
                             </div>
-                            <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
                               <CheckCircle className="h-4 w-4 text-medical-secondary" />
-                              <span>Last success: {employee.last_login_success || 'Never'}</span>
+                              <span>Last success: {employee?.last_login_success || 'Never'}</span>
                             </div>
                           </div>
                         </div>
