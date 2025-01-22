@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { CorrectiveActionDocuments } from "@/components/employee/CorrectiveActionDocuments";
+import { generateCorrectiveAction } from "@/utils/correctiveActionAI";
 
 interface Employee {
   id: string;
@@ -123,6 +125,7 @@ export function EmployeeProfile() {
     monthly: 0,
     annually: 0
   });
+  const [correctiveActions, setCorrectiveActions] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -250,6 +253,32 @@ export function EmployeeProfile() {
 
     if (id) {
       fetchPayrollHistory();
+    }
+  }, [id, toast]);
+
+  useEffect(() => {
+    const fetchCorrectiveActions = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('corrective_actions')
+          .select('*')
+          .eq('employee_id', id);
+
+        if (error) throw error;
+
+        setCorrectiveActions(data || []);
+      } catch (error) {
+        console.error('Error fetching corrective actions:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load corrective actions",
+          variant: "destructive",
+        });
+      }
+    };
+
+    if (id) {
+      fetchCorrectiveActions();
     }
   }, [id, toast]);
 
@@ -477,6 +506,7 @@ export function EmployeeProfile() {
                         <TabsTrigger value="notifications" className="data-[state=active]:bg-white">Notifications</TabsTrigger>
                         <TabsTrigger value="security" className="data-[state=active]:bg-white">Security</TabsTrigger>
                         <TabsTrigger value="system" className="data-[state=active]:bg-white">System</TabsTrigger>
+                        <TabsTrigger value="corrective-actions" className="data-[state=active]:bg-white">Corrective Actions</TabsTrigger>
                       </TabsList>
 
                       <TabsContent value="identity" className="p-6 space-y-6">
@@ -1340,6 +1370,102 @@ export function EmployeeProfile() {
                             </div>
                             <div className="text-center text-gray-500">
                               <p>No documents uploaded</p>
+                            </div>
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="corrective-actions" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <AlertTriangle className="h-6 w-6 text-medical-secondary" />
+                                <h3 className="text-lg font-semibold">Corrective Actions</h3>
+                              </div>
+                              {(roles.isHR || roles.isAdministrator || roles.isSupervisor) && (
+                                <Button
+                                  onClick={async () => {
+                                    try {
+                                      const suggestion = await generateCorrectiveAction(
+                                        employee.id,
+                                        "Performance concerns",
+                                        "medium"
+                                      );
+                                      
+                                      const { error } = await supabase
+                                        .from('corrective_actions')
+                                        .insert({
+                                          employee_id: employee.id,
+                                          action_type: suggestion.actionType,
+                                          description: suggestion.description,
+                                          improvement_plan: suggestion.improvementPlan,
+                                          follow_up_date: suggestion.followUpDate.toISOString(),
+                                          status: 'pending'
+                                        });
+
+                                      if (error) throw error;
+
+                                      toast({
+                                        title: "Success",
+                                        description: "Corrective action generated and saved",
+                                      });
+                                    } catch (error) {
+                                      console.error('Error:', error);
+                                      toast({
+                                        title: "Error",
+                                        description: "Failed to generate corrective action",
+                                        variant: "destructive",
+                                      });
+                                    }
+                                  }}
+                                  className="gap-2"
+                                >
+                                  <FileText className="h-4 w-4" />
+                                  Generate Action
+                                </Button>
+                              )}
+                            </div>
+
+                            {/* Display existing corrective actions */}
+                            {correctiveActions.map((action) => (
+                              <div key={action.id} className="border rounded-lg p-4 space-y-4">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <h4 className="font-medium">{action.action_type}</h4>
+                                    <p className="text-sm text-gray-600">{action.description}</p>
+                                  </div>
+                                  <Badge>{action.status}</Badge>
+                                </div>
+                                
+                                <div className="text-sm">
+                                  <p><strong>Improvement Plan:</strong> {action.improvement_plan}</p>
+                                  <p><strong>Follow-up Date:</strong> {new Date(action.follow_up_date).toLocaleDateString()}</p>
+                                </div>
+
+                                {/* Document upload section */}
+                                <div className="mt-4 border-t pt-4">
+                                  <h5 className="font-medium mb-4">Supporting Documents</h5>
+                                  <CorrectiveActionDocuments
+                                    actionId={action.id}
+                                    employeeId={employee.id}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="stats" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <CircuitBoard className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Statistics</h3>
+                            </div>
+                            <div className="text-center text-gray-500">
+                              <p>No statistics available</p>
                             </div>
                           </div>
                         </Card>

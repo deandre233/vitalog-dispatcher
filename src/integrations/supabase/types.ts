@@ -240,6 +240,54 @@ export type Database = {
           },
         ]
       }
+      corrective_action_documents: {
+        Row: {
+          corrective_action_id: string | null
+          description: string | null
+          file_name: string
+          file_path: string
+          file_type: string | null
+          id: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          corrective_action_id?: string | null
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_type?: string | null
+          id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          corrective_action_id?: string | null
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_type?: string | null
+          id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corrective_action_documents_corrective_action_id_fkey"
+            columns: ["corrective_action_id"]
+            isOneToOne: false
+            referencedRelation: "corrective_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corrective_action_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       corrective_actions: {
         Row: {
           acknowledgment_date: string | null
