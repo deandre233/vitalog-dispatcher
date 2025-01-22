@@ -3,7 +3,7 @@ import { TransportRecord } from "@/hooks/useTransportRecord";
 import { useToast } from "@/components/ui/use-toast";
 
 interface BillingTabProps {
-  transportRecord: TransportRecord;
+  transportRecord: TransportRecord | null;
 }
 
 export function BillingTab({ transportRecord }: BillingTabProps) {

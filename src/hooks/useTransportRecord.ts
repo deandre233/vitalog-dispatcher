@@ -12,6 +12,7 @@ export interface TransportRecord {
   status: string;
   crew_assigned: string | null;
   notes: string | null;
+  billing_notes: string | null;
   created_at: string | null;
   recurrence_type: string | null;
   recurrence_day: string | null;
