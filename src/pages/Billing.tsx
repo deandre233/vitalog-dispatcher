@@ -5,6 +5,9 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useAIBillingAnalysis } from "@/hooks/useAIBillingAnalysis";
+import { useToast } from "@/hooks/use-toast";
 import { 
   ClipboardList, 
   Users, 
@@ -17,10 +20,31 @@ import {
   Send,
   AlertTriangle,
   Building,
-  UserSquare
+  UserSquare,
+  Brain,
+  Loader2
 } from "lucide-react";
 
 const Billing = () => {
+  const { toast } = useToast();
+
+  const metrics = {
+    priorAuth: { value: 10, change: "+2" },
+    missingDemographics: { value: 43, change: "+5" },
+    qaReview: { value: 124, change: "-12" },
+    masterQueue: { value: 239, change: "+15" },
+    reviewQueue: { value: 65, change: "-3" },
+    filingQueue: { value: 136, change: "+24" },
+    transmissionQueue: { value: 4527, change: "+204" },
+    exceptionQueue: { value: 1, change: "0" },
+    facilityInvoicing: { value: 1, change: "0" },
+    affiliateInvoicing: { value: 0, change: "0" },
+    patientInvoicing: { value: 36, change: "+12" },
+    openInvoices: { value: 363, change: "+25" }
+  };
+
+  const { data: aiAnalysis, isLoading: isAnalyzing } = useAIBillingAnalysis(metrics);
+
   return (
     <div className="min-h-screen flex flex-col bg-medical-accent">
       <Header />
@@ -43,6 +67,24 @@ const Billing = () => {
                   </Button>
                 </div>
               </div>
+
+              {/* AI Analysis Card */}
+              <Card className="p-6 bg-gradient-to-br from-medical-card-start to-medical-card-end">
+                <div className="flex items-center gap-2 mb-4">
+                  <Brain className="w-6 h-6 text-medical-secondary" />
+                  <h3 className="text-lg font-semibold text-medical-primary">AI Billing Analysis</h3>
+                </div>
+                {isAnalyzing ? (
+                  <div className="flex items-center gap-2 text-medical-primary/80">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Analyzing billing metrics...
+                  </div>
+                ) : (
+                  <p className="text-medical-primary/80 whitespace-pre-line">
+                    {aiAnalysis?.insights || "No analysis available"}
+                  </p>
+                )}
+              </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <MetricCard
