@@ -1,5 +1,3 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
@@ -86,67 +84,60 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="flex-1 flex">
-        <SidebarProvider defaultOpen={true}>
-          <div className="min-h-screen flex w-full">
-            <AppSidebar />
-            <div className="flex-1 bg-gradient-to-br from-medical-accent to-white overflow-auto">
-              <main className="p-6 md:p-8 max-w-7xl mx-auto">
-                <h1 className="text-3xl font-bold text-medical-primary mb-2">
-                  Welcome to Dispatch Control
-                </h1>
-                <p className="text-medical-primary/60 mb-8">
-                  Select a module to get started
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {menuItems.map((item) => (
-                    <Link 
-                      key={item.title} 
-                      to={item.path}
-                      className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1"
-                    >
-                      <Card className={`
-                        h-full relative overflow-hidden
-                        bg-gradient-to-br ${item.gradient}
-                        border-0 shadow-lg hover:shadow-xl
-                        group transition-all duration-300
-                        before:absolute before:inset-0
-                        before:bg-white before:z-10 before:opacity-95
-                        before:transition-opacity before:duration-300
-                        hover:before:opacity-90
-                        after:absolute after:inset-0 after:-z-10
-                        after:bg-gradient-to-br ${item.gradient}
-                        after:opacity-0 hover:after:opacity-100
-                        after:transition-opacity after:duration-300
+      <div className="flex-1 bg-gradient-to-br from-medical-accent to-white overflow-auto">
+        <main className="p-6 md:p-8 max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold text-medical-primary mb-2">
+            Welcome to Dispatch Control
+          </h1>
+          <p className="text-medical-primary/60 mb-8">
+            Select a module to get started
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {menuItems.map((item) => (
+              <Link 
+                key={item.title} 
+                to={item.path}
+                className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1"
+              >
+                <Card className={`
+                  h-full relative overflow-hidden
+                  bg-gradient-to-br ${item.gradient}
+                  border-0 shadow-lg hover:shadow-xl
+                  group transition-all duration-300
+                  before:absolute before:inset-0
+                  before:bg-white before:z-10 before:opacity-95
+                  before:transition-opacity before:duration-300
+                  hover:before:opacity-90
+                  after:absolute after:inset-0 after:-z-10
+                  after:bg-gradient-to-br ${item.gradient}
+                  after:opacity-0 hover:after:opacity-100
+                  after:transition-opacity after:duration-300
+                  backdrop-blur-sm
+                `}>
+                  <div className="relative z-20 p-6">
+                    <div className="flex flex-col items-center text-center space-y-4">
+                      <div className={`
+                        p-3 rounded-xl ${item.color}
+                        bg-white/80 shadow-lg
+                        group-hover:scale-110 group-hover:shadow-xl
+                        transform transition-all duration-300
                         backdrop-blur-sm
                       `}>
-                        <div className="relative z-20 p-6">
-                          <div className="flex flex-col items-center text-center space-y-4">
-                            <div className={`
-                              p-3 rounded-xl ${item.color}
-                              bg-white/80 shadow-lg
-                              group-hover:scale-110 group-hover:shadow-xl
-                              transform transition-all duration-300
-                              backdrop-blur-sm
-                            `}>
-                              <item.icon className="w-8 h-8" />
-                            </div>
-                            <h2 className="text-xl font-semibold text-medical-primary">
-                              {item.title}
-                            </h2>
-                            <p className="text-sm text-medical-primary/70">
-                              {item.description}
-                            </p>
-                          </div>
-                        </div>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </main>
-            </div>
+                        <item.icon className="w-8 h-8" />
+                      </div>
+                      <h2 className="text-xl font-semibold text-medical-primary">
+                        {item.title}
+                      </h2>
+                      <p className="text-sm text-medical-primary/70">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
           </div>
-        </SidebarProvider>
+        </main>
       </div>
       <Footer />
     </div>
