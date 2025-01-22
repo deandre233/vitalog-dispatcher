@@ -259,7 +259,7 @@ const EmployeeProfile = () => {
                 </Badge>
               </div>
 
-              <Tabs defaultValue="demographics" className="mt-6">
+              <Tabs defaultValue="demographics" className="mt-24">
                 <TabsList className="grid grid-cols-4 lg:grid-cols-7 gap-2 p-1 bg-medical-accent/50 backdrop-blur-sm rounded-lg">
                   {[
                     { value: "demographics", label: "Demographics", icon: User },
