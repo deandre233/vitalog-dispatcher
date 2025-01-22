@@ -33,7 +33,8 @@ import {
   AlertOctagon,
   Lightbulb,
   BarChart3,
-  ChevronRight
+  ChevronRight,
+  DollarSign
 } from "lucide-react";
 
 const Billing = () => {
@@ -56,7 +57,14 @@ const Billing = () => {
 
   const { data: aiAnalysis, isLoading: isAnalyzing } = useAIBillingAnalysis(metrics);
 
-  const renderAIInsight = (title: string, icon: React.ReactNode, content: string, details: string) => (
+  const renderAIInsight = (
+    title: string, 
+    icon: React.ReactNode, 
+    content: string, 
+    metrics: any, 
+    benchmarks: any, 
+    recommendations: string[]
+  ) => (
     <Popover>
       <PopoverTrigger asChild>
         <div className="space-y-2 cursor-pointer hover:bg-medical-card-start/5 p-4 rounded-lg transition-colors group">
@@ -68,22 +76,75 @@ const Billing = () => {
           <p className="text-medical-primary/80 pl-6">{content}</p>
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-80 bg-medical-card-start/95 backdrop-blur-sm border-medical-secondary/20">
-        <div className="space-y-2 p-2">
-          <div className="flex items-center gap-2 text-medical-secondary font-semibold">
+      <PopoverContent className="w-96 bg-medical-card-start/95 backdrop-blur-sm border-medical-secondary/20">
+        <div className="space-y-4 p-4">
+          <div className="flex items-center gap-2 text-medical-secondary font-semibold border-b border-medical-secondary/10 pb-2">
             {icon}
-            <h4 className="text-sm">{title}</h4>
+            <h4>{title}</h4>
           </div>
-          <div className="space-y-2">
-            <p className="text-sm text-medical-primary/90">{content}</p>
+          
+          <div className="space-y-4">
+            <div>
+              <h5 className="text-sm font-medium text-medical-secondary mb-2">Current Metrics</h5>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.entries(metrics).map(([key, value]) => (
+                  <div key={key} className="text-xs">
+                    <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
+                    <span className="text-medical-primary font-medium">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h5 className="text-sm font-medium text-medical-secondary mb-2">Industry Benchmarks</h5>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.entries(benchmarks).map(([key, value]) => (
+                  <div key={key} className="text-xs">
+                    <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
+                    <span className="text-medical-primary font-medium">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h5 className="text-sm font-medium text-medical-secondary mb-2">Recommendations</h5>
+              <ul className="space-y-1">
+                {recommendations.map((rec, index) => (
+                  <li key={index} className="text-xs text-medical-primary/90 flex items-start gap-2">
+                    <div className="w-1 h-1 rounded-full bg-medical-secondary mt-1.5" />
+                    {rec}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             <div className="border-t border-medical-secondary/10 pt-2 mt-2">
-              <p className="text-xs text-medical-primary/70">{details}</p>
+              <p className="text-xs text-medical-primary/70">{content}</p>
             </div>
           </div>
         </div>
       </PopoverContent>
     </Popover>
   );
+
+  const getIconForSection = (title: string) => {
+    switch (title) {
+      case 'Key Performance Indicators':
+        return <BarChart3 className="w-5 h-5 text-blue-500" />;
+      case 'Workflow Efficiency Analysis':
+        return <TrendingUp className="w-5 h-5 text-green-500" />;
+      case 'Revenue Cycle Insights':
+        return <DollarSign className="w-5 h-5 text-yellow-500" />;
+      case 'Risk Alerts':
+        return <AlertOctagon className="w-5 h-5 text-red-500" />;
+      case 'Optimization Recommendations':
+        return <Lightbulb className="w-5 h-5 text-purple-500" />;
+      default:
+        return <Brain className="w-5 h-5 text-gray-500" />;
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-medical-accent">
@@ -125,36 +186,16 @@ const Billing = () => {
                   ) : aiAnalysis ? (
                     <ScrollArea className="h-[300px] pr-4">
                       <div className="space-y-2">
-                        {renderAIInsight(
-                          "Key Performance Indicators",
-                          <BarChart3 className="w-5 h-5 text-blue-500" />,
-                          aiAnalysis.sections?.[0] || "",
-                          "Detailed analysis of your billing KPIs including trends, benchmarks, and actionable metrics."
-                        )}
-                        {renderAIInsight(
-                          "Workflow Efficiency",
-                          <TrendingUp className="w-5 h-5 text-green-500" />,
-                          aiAnalysis.sections?.[1] || "",
-                          "In-depth workflow analysis highlighting bottlenecks, optimization opportunities, and efficiency metrics."
-                        )}
-                        {renderAIInsight(
-                          "Revenue Cycle Insights",
-                          <Lightbulb className="w-5 h-5 text-yellow-500" />,
-                          aiAnalysis.sections?.[2] || "",
-                          "Comprehensive revenue cycle analysis with focus on payment velocity, collection rates, and revenue optimization."
-                        )}
-                        {renderAIInsight(
-                          "Risk Alerts",
-                          <AlertOctagon className="w-5 h-5 text-red-500" />,
-                          aiAnalysis.sections?.[3] || "",
-                          "Detailed risk assessment including compliance issues, payment delays, and potential revenue impact."
-                        )}
-                        {renderAIInsight(
-                          "Optimization Recommendations",
-                          <Brain className="w-5 h-5 text-purple-500" />,
-                          aiAnalysis.sections?.[4] || "",
-                          "AI-powered recommendations for improving billing processes, reducing denials, and maximizing revenue."
-                        )}
+                        {aiAnalysis.sections.map((section: any, index: number) => (
+                          renderAIInsight(
+                            section.title,
+                            getIconForSection(section.title),
+                            section.content,
+                            section.metrics,
+                            section.benchmarks,
+                            section.recommendations
+                          )
+                        ))}
                       </div>
                     </ScrollArea>
                   ) : (
