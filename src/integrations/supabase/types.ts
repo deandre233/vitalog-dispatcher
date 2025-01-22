@@ -318,6 +318,45 @@ export type Database = {
         }
         Relationships: []
       }
+      employees: {
+        Row: {
+          certification_level: string | null
+          created_at: string | null
+          employee_type: string | null
+          first_name: string
+          id: string
+          last_name: string
+          mobile: string | null
+          station: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          certification_level?: string | null
+          created_at?: string | null
+          employee_type?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          mobile?: string | null
+          station?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          certification_level?: string | null
+          created_at?: string | null
+          employee_type?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          mobile?: string | null
+          station?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       insurance_carriers: {
         Row: {
           carrier_name: string

@@ -1,56 +1,70 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
-import { initGoogleMaps } from "./utils/googleMapsService";
-import { toast } from "sonner";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Index from "./pages/Index";
 import ActiveDispatches from "./pages/ActiveDispatches";
+import ClosedDispatches from "./pages/ClosedDispatches";
 import CreateDispatch from "./pages/CreateDispatch";
 import CrewAssignment from "./pages/CrewAssignment";
 import ManageRoutes from "./pages/ManageRoutes";
-import Billing from "./pages/Billing";
 import Performance from "./pages/Performance";
-import { DispatchDetailView } from "./components/dashboard/DispatchDetailView";
-import { UnitDetailView } from "./components/dashboard/UnitDetailView";
-import PatientRecord from "./pages/PatientRecord";
 import AlertsConfig from "./pages/AlertsConfig";
+import Billing from "./pages/Billing";
+import { EmployeeDirectory } from "./pages/EmployeeDirectory";
+import { EmployeeProfile } from "./pages/EmployeeProfile";
+import { PatientRecord } from "./pages/PatientRecord";
 
-const queryClient = new QueryClient();
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Index />,
+  },
+  {
+    path: "/dispatch",
+    element: <ActiveDispatches />,
+  },
+  {
+    path: "/closed",
+    element: <ClosedDispatches />,
+  },
+  {
+    path: "/create",
+    element: <CreateDispatch />,
+  },
+  {
+    path: "/crew",
+    element: <CrewAssignment />,
+  },
+  {
+    path: "/routes",
+    element: <ManageRoutes />,
+  },
+  {
+    path: "/performance",
+    element: <Performance />,
+  },
+  {
+    path: "/alerts",
+    element: <AlertsConfig />,
+  },
+  {
+    path: "/billing",
+    element: <Billing />,
+  },
+  {
+    path: "/employees",
+    element: <EmployeeDirectory />,
+  },
+  {
+    path: "/employee/:id",
+    element: <EmployeeProfile />,
+  },
+  {
+    path: "/patient/:patientName",
+    element: <PatientRecord />,
+  }
+]);
 
-const App = () => {
-  useEffect(() => {
-    initGoogleMaps().catch((error) => {
-      console.error('Failed to initialize Google Maps:', error);
-      toast.error('Failed to initialize mapping services');
-    });
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/dispatch" element={<ActiveDispatches />} />
-            <Route path="/dispatch/:id" element={<DispatchDetailView />} />
-            <Route path="/unit/:unitId" element={<UnitDetailView />} />
-            <Route path="/dispatch/new" element={<CreateDispatch />} />
-            <Route path="/crew" element={<CrewAssignment />} />
-            <Route path="/routes" element={<ManageRoutes />} />
-            <Route path="/billing" element={<Billing />} />
-            <Route path="/performance" element={<Performance />} />
-            <Route path="/patient/:patientName" element={<PatientRecord />} />
-            <Route path="/alerts" element={<AlertsConfig />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-};
+function App() {
+  return <RouterProvider router={router} />;
+}
 
 export default App;
