@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
-  CircuitBoard, Atom, Network, Signal, Terminal, Cpu, 
-  ClipboardCheck, FileSearch, FilePlus2, Send, AlertTriangle, Scale,
-  Car, Clock, FileText, Building2, Users, User, Upload, FileUp,
-  DollarSign, List, CircleDollarSign, ChevronLeft, ChevronRight
+  CircuitBoard, ClipboardCheck, FileSearch, FilePlus2, Send, 
+  AlertTriangle, Scale, Car, Clock, FileText, Building2, 
+  Users, User, Upload, FileUp, DollarSign, List, 
+  CircleDollarSign, ChevronLeft, ChevronRight
 } from "lucide-react";
 
 const routes = [
