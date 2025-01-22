@@ -51,6 +51,7 @@ export function EmployeeProfile() {
   const { toast } = useToast();
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
   const [smsNotifications, setSmsNotifications] = useState({
     dispatch: true,
     schedule: true,
@@ -138,26 +139,7 @@ export function EmployeeProfile() {
         if (error) throw error;
 
         if (data) {
-          setRoles({
-            isCrew: data.is_crew_member,
-            isSupervisor: data.is_supervisor,
-            supervisorRole: data.supervisor_role || '',
-            isBiller: data.is_biller,
-            isDispatcher: data.is_dispatcher,
-            isQAReviewer: data.is_qa_reviewer,
-            isHR: data.is_hr,
-            isMechanic: data.is_mechanic,
-            isSalesperson: data.is_salesperson,
-            isMedicalDirector: data.is_medical_director,
-            isOnlooker: data.is_onlooker,
-            onlookerFacility: data.onlooker_facility || '',
-            onlookerCity: data.onlooker_city || '',
-            onlookerCounty: data.onlooker_county || '',
-            canSeeNonEmergent: data.can_see_non_emergent,
-            isAdministrator: data.is_administrator,
-            isPrincipal: data.is_principal,
-            isProvisional: data.is_provisional
-          });
+          setRoles(data);
         } else {
           // Initialize with default values if no roles exist
           console.log('No roles found for employee, using defaults');
@@ -1456,3 +1438,4 @@ export function EmployeeProfile() {
 }
 
 export default EmployeeProfile;
+
