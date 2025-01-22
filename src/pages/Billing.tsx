@@ -46,385 +46,184 @@ const Billing = () => {
 
   const { data: aiAnalysis, isLoading: isAnalyzing } = useAIBillingAnalysis(metrics);
 
-  const metricAnalysis: Record<string, MetricAnalysis> = {
-    priorAuth: {
+  const analysisCards = [
+    {
+      title: "Key Performance Indicators",
+      icon: Signal,
+      metrics: {
+        "Prior Auths": "10 (+2)",
+        "Missing Demographics": "43 (+5)",
+        "QA Reviews": "124 (-12)",
+        "Master Queue": "239 (+15)"
+      },
       insights: [
-        "2 new prior authorizations require immediate attention",
-        "20% increase in prior auth requests this week",
-        "Average processing time: 48 hours"
+        "Prior authorizations show increasing trend (+2)",
+        "Missing demographics rising significantly (+5)",
+        "QA reviews decreasing (-12), potential efficiency gain",
+        "Growing master queue backlog (+15)"
       ],
       recommendations: [
-        "Implement automated prior auth tracking",
-        "Set up alerts for aging requests",
-        "Review payer-specific requirements"
-      ],
-      impact: "Delayed prior auths can result in claim denials and delayed payments",
-      trends: [
-        "Upward trend in prior auth volume",
-        "Consistent approval rate of 85%"
+        "Implement automated demographic verification",
+        "Increase QA review capacity",
+        "Optimize prior auth workflow"
       ]
     },
-    missingDemographics: {
+    {
+      title: "Workflow Efficiency",
+      icon: Cpu,
+      metrics: {
+        "Review Queue": "65 (-3)",
+        "Filing Queue": "136 (+24)",
+        "Processing Time": "48hrs",
+        "Automation Rate": "65%"
+      },
       insights: [
-        "43 patient records need demographic updates",
-        "Most common missing fields: insurance ID, DOB",
-        "15% increase in incomplete records"
+        "Filing queue showing significant increase",
+        "Review queue slightly improved",
+        "Processing time within target range",
+        "Automation opportunities identified"
       ],
       recommendations: [
-        "Implement mandatory field validation",
-        "Schedule patient information update campaign",
-        "Train staff on data collection protocols"
-      ],
-      impact: "Missing demographics lead to claim rejections and delayed reimbursement",
-      trends: [
-        "Rising trend in incomplete records",
-        "Data quality score decreased by 5%"
+        "Streamline filing process",
+        "Implement automated claim scrubbing",
+        "Enhance workflow monitoring"
       ]
     },
-    qaReview: {
+    {
+      title: "Revenue Cycle",
+      icon: DollarSign,
+      metrics: {
+        "Open Invoices": "363 (+25)",
+        "Days in AR": "32",
+        "Collection Rate": "92%",
+        "Clean Claim Rate": "95%"
+      },
       insights: [
-        "124 items in QA review, down by 12",
-        "Average review time: 72 hours",
-        "Focus on reducing backlog"
+        "Open invoices increasing (+25)",
+        "Days in AR above target",
+        "Collection rate needs improvement",
+        "Clean claim rate meeting target"
       ],
       recommendations: [
-        "Increase QA staffing during peak times",
-        "Implement a triage system for urgent reviews",
-        "Provide additional training for QA staff"
-      ],
-      impact: "Delays in QA can affect overall billing cycle",
-      trends: [
-        "Consistent increase in QA items",
-        "Need for improved review processes"
+        "Enhance collection strategies",
+        "Reduce days in AR",
+        "Improve payment posting efficiency"
       ]
     },
-    masterQueue: {
+    {
+      title: "Risk Assessment",
+      icon: AlertOctagon,
+      metrics: {
+        "Compliance Score": "98%",
+        "Risk Level": "Medium",
+        "Missing Docs": "43",
+        "Deadline Alerts": "12"
+      },
       insights: [
-        "239 items in the master queue, up by 15",
-        "Average age of items: 5 days",
-        "Focus on reducing aging items"
+        "Missing documentation increasing",
+        "Compliance score maintained",
+        "Medium risk level identified",
+        "Multiple deadline alerts active"
       ],
       recommendations: [
-        "Prioritize items older than 7 days",
-        "Implement daily review meetings",
-        "Enhance communication with billing staff"
-      ],
-      impact: "Aging items can lead to delayed payments",
-      trends: [
-        "Increasing trend in master queue size",
-        "Need for better item management"
+        "Address missing documentation",
+        "Monitor compliance requirements",
+        "Implement proactive risk assessment"
       ]
     },
-    reviewQueue: {
+    {
+      title: "Optimization Opportunities",
+      icon: Sparkles,
+      metrics: {
+        "Potential Savings": "$25,000",
+        "Revenue Opportunity": "$50,000",
+        "Efficiency Gain": "15%",
+        "ROI Estimate": "3.2x"
+      },
       insights: [
-        "65 items ready for review, down by 3",
-        "Average review time: 48 hours",
-        "Focus on timely reviews"
+        "Significant revenue opportunity identified",
+        "Efficiency improvements possible",
+        "Strong ROI potential",
+        "Cost reduction areas found"
       ],
       recommendations: [
-        "Streamline review processes",
-        "Implement automated reminders for reviewers",
-        "Provide feedback to staff on review times"
-      ],
-      impact: "Timely reviews are critical for cash flow",
-      trends: [
-        "Stable review queue size",
-        "Need for continuous improvement"
-      ]
-    },
-    filingQueue: {
-      insights: [
-        "136 claims prepared for submission, up by 24",
-        "Focus on timely filing to avoid denials",
-        "Monitor submission success rates"
-      ],
-      recommendations: [
-        "Implement a filing checklist",
-        "Train staff on common filing errors",
-        "Review payer requirements regularly"
-      ],
-      impact: "Delays in filing can lead to lost revenue",
-      trends: [
-        "Increasing trend in filing volume",
-        "Need for improved filing accuracy"
-      ]
-    },
-    transmissionQueue: {
-      insights: [
-        "4,527 claims pending electronic transmission, up by 204",
-        "Monitor transmission success rates",
-        "Focus on reducing transmission errors"
-      ],
-      recommendations: [
-        "Implement automated transmission tracking",
-        "Review transmission logs regularly",
-        "Train staff on transmission processes"
-      ],
-      impact: "Transmission errors can delay payments",
-      trends: [
-        "Stable transmission queue size",
-        "Need for better tracking"
-      ]
-    },
-    exceptionQueue: {
-      insights: [
-        "1 critical exception requiring attention",
-        "Focus on resolving exceptions quickly",
-        "Monitor exception trends"
-      ],
-      recommendations: [
-        "Implement a dedicated exception handling team",
-        "Review exception causes regularly",
-        "Enhance communication with payers"
-      ],
-      impact: "Unresolved exceptions can lead to significant revenue loss",
-      trends: [
-        "Stable exception queue size",
-        "Need for proactive exception management"
-      ]
-    },
-    facilityInvoicing: {
-      insights: [
-        "1 facility invoice pending review",
-        "Focus on timely invoicing to avoid delays",
-        "Monitor facility payment trends"
-      ],
-      recommendations: [
-        "Implement a facility invoicing checklist",
-        "Train staff on facility billing processes",
-        "Review facility contracts regularly"
-      ],
-      impact: "Delays in facility invoicing can affect cash flow",
-      trends: [
-        "Stable facility invoicing volume",
-        "Need for improved invoicing accuracy"
-      ]
-    },
-    affiliateInvoicing: {
-      insights: [
-        "0 pending affiliate invoices",
-        "Focus on maintaining strong affiliate relationships",
-        "Monitor affiliate payment trends"
-      ],
-      recommendations: [
-        "Regularly review affiliate contracts",
-        "Enhance communication with affiliates",
-        "Implement a feedback loop for affiliate invoicing"
-      ],
-      impact: "Strong affiliate relationships are critical for revenue",
-      trends: [
-        "Stable affiliate invoicing volume",
-        "Need for proactive affiliate management"
-      ]
-    },
-    patientInvoicing: {
-      insights: [
-        "36 new patient invoices ready for processing, up by 12",
-        "Focus on timely patient invoicing to improve cash flow",
-        "Monitor patient payment trends"
-      ],
-      recommendations: [
-        "Implement a patient invoicing checklist",
-        "Train staff on patient billing processes",
-        "Review patient contracts regularly"
-      ],
-      impact: "Timely patient invoicing is critical for revenue",
-      trends: [
-        "Increasing trend in patient invoicing volume",
-        "Need for improved patient communication"
-      ]
-    },
-    openInvoices: {
-      insights: [
-        "363 total outstanding invoices pending payment, up by 25",
-        "Focus on reducing outstanding invoices",
-        "Monitor payment trends"
-      ],
-      recommendations: [
-        "Implement a collections strategy",
-        "Train staff on collections processes",
-        "Review outstanding invoices regularly"
-      ],
-      impact: "Outstanding invoices can significantly affect cash flow",
-      trends: [
-        "Increasing trend in outstanding invoices",
-        "Need for proactive collections management"
+        "Implement suggested automations",
+        "Optimize resource allocation",
+        "Enhance staff training"
       ]
     }
-  };
+  ];
 
-  const renderAIInsight = (
-    title: string, 
-    icon: React.ReactNode, 
-    content: string, 
-    metrics: Record<string, string | number> = {}, 
-    benchmarks: Record<string, string | number> = {}, 
-    recommendations: string[] = []
-  ) => (
-    <Popover key={title}>
-      <PopoverTrigger asChild>
-        <div className="space-y-2 cursor-pointer hover:bg-medical-card-start/5 p-4 rounded-lg transition-colors group">
-          <div className="flex items-center gap-2 text-medical-secondary font-semibold">
-            {icon}
-            <h4>{title}</h4>
-            <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-          </div>
-          <p className="text-medical-primary/80 pl-6">{content}</p>
-        </div>
-      </PopoverTrigger>
-      <PopoverContent className="w-96 bg-medical-card-start/95 backdrop-blur-sm border-medical-secondary/20">
-        <div className="space-y-4 p-4">
-          <div className="flex items-center gap-2 text-medical-secondary font-semibold border-b border-medical-secondary/10 pb-2">
-            {icon}
-            <h4>{title}</h4>
-          </div>
-          
-          <div className="space-y-4">
-            {Object.keys(metrics).length > 0 && (
-              <div>
-                <h5 className="text-sm font-medium text-medical-secondary mb-2">Current Metrics</h5>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(metrics).map(([key, value]) => (
-                    <div key={key} className="text-xs">
-                      <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
-                      <span className="text-medical-primary font-medium">{String(value)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {Object.keys(benchmarks).length > 0 && (
-              <div>
-                <h5 className="text-sm font-medium text-medical-secondary mb-2">Industry Benchmarks</h5>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(benchmarks).map(([key, value]) => (
-                    <div key={key} className="text-xs">
-                      <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
-                      <span className="text-medical-primary font-medium">{String(value)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {recommendations && recommendations.length > 0 && (
-              <div>
-                <h5 className="text-sm font-medium mb-2">Recommendations</h5>
-                <ul className="space-y-1">
-                  {recommendations.map((rec, index) => (
-                    <li key={index} className="text-xs text-medical-primary/90 flex items-start gap-2">
-                      <div className="w-1 h-1 rounded-full bg-medical-secondary mt-1.5" />
-                      {rec}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="border-t border-medical-secondary/10 pt-2 mt-2">
-              <p className="text-xs text-medical-primary/70">{content}</p>
-            </div>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-
-  const MetricCardWithAnalysis = ({ 
+  const AnalysisCard = ({ 
     title, 
-    value, 
     icon: Icon, 
-    change, 
-    aiInsight 
+    metrics = {}, 
+    insights = [], 
+    recommendations = [] 
   }: { 
-    title: string; 
-    value: string; 
-    icon: any; 
-    change: string; 
-    aiInsight: string; 
+    title: string;
+    icon: any;
+    metrics?: Record<string, string | number>;
+    insights?: string[];
+    recommendations?: string[];
   }) => {
-    const analysis = metricAnalysis[title.toLowerCase().replace(/\s+/g, '')] || null;
-
     return (
-      <div className="relative">
-        <MetricCard
-          title={title}
-          value={value}
-          icon={Icon}
-          change={change}
-          aiInsight={aiInsight}
-        />
-        {analysis && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-2 right-2 h-6 w-6"
-              >
-                <Info className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="space-y-4">
-                <div className="border-b pb-2">
-                  <h4 className="font-medium">{title} Analysis</h4>
-                </div>
-                
-                {analysis.insights.length > 0 && (
-                  <div>
-                    <h5 className="text-sm font-medium mb-2">Key Insights</h5>
-                    <ul className="space-y-1">
-                      {analysis.insights.map((insight, index) => (
-                        <li key={index} className="text-sm flex items-start gap-2">
-                          <div className="w-1 h-1 rounded-full bg-blue-500 mt-2" />
-                          {insight}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+      <Card className="p-4 bg-gradient-to-br from-medical-card-start to-medical-card-end relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+        <div className="absolute inset-0 bg-gradient-to-r from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end opacity-5" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),rgba(255,255,255,0))]" />
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="relative">
+              <div className="absolute -inset-1 bg-medical-secondary/20 rounded-full blur-sm group-hover:animate-pulse" />
+              <Icon className="w-6 h-6 text-medical-secondary relative" />
+            </div>
+            <h3 className="text-lg font-semibold text-medical-primary">{title}</h3>
+          </div>
 
-                {analysis.recommendations.length > 0 && (
-                  <div>
-                    <h5 className="text-sm font-medium mb-2">Recommendations</h5>
-                    <ul className="space-y-1">
-                      {analysis.recommendations.map((rec, index) => (
-                        <li key={index} className="text-sm flex items-start gap-2">
-                          <div className="w-1 h-1 rounded-full bg-green-500 mt-2" />
-                          {rec}
-                        </li>
-                      ))}
-                    </ul>
+          {Object.keys(metrics).length > 0 && (
+            <div className="mb-4 space-y-2">
+              <h4 className="text-sm font-medium text-medical-secondary">Key Metrics</h4>
+              <div className="grid grid-cols-2 gap-2 bg-white/5 rounded-lg p-3">
+                {Object.entries(metrics).map(([key, value]) => (
+                  <div key={key} className="text-sm">
+                    <span className="text-medical-primary/60">{key.replace(/_/g, ' ')}: </span>
+                    <span className="text-medical-primary font-medium">{value}</span>
                   </div>
-                )}
-
-                {analysis.impact && (
-                  <div>
-                    <h5 className="text-sm font-medium mb-2">Business Impact</h5>
-                    <p className="text-sm text-gray-600">{analysis.impact}</p>
-                  </div>
-                )}
-
-                {analysis.trends.length > 0 && (
-                  <div>
-                    <h5 className="text-sm font-medium mb-2">Trends</h5>
-                    <ul className="space-y-1">
-                      {analysis.trends.map((trend, index) => (
-                        <li key={index} className="text-sm flex items-start gap-2">
-                          <div className="w-1 h-1 rounded-full bg-purple-500 mt-2" />
-                          {trend}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                ))}
               </div>
-            </PopoverContent>
-          </Popover>
-        )}
-      </div>
+            </div>
+          )}
+
+          {insights.length > 0 && (
+            <div className="mb-4 space-y-2">
+              <h4 className="text-sm font-medium text-medical-secondary">Insights</h4>
+              <div className="space-y-2">
+                {insights.map((insight, index) => (
+                  <div key={index} className="flex items-start gap-2 text-sm text-medical-primary/80">
+                    <div className="w-1.5 h-1.5 rounded-full bg-medical-secondary mt-1.5" />
+                    <p>{insight}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {recommendations.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-medical-secondary">Recommendations</h4>
+              <div className="space-y-2">
+                {recommendations.map((rec, index) => (
+                  <div key={index} className="flex items-start gap-2 text-sm text-medical-primary/80">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5" />
+                    <p>{rec}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </Card>
     );
   };
 
@@ -454,8 +253,6 @@ const Billing = () => {
               <Card className="p-6 bg-gradient-to-br from-medical-card-start to-medical-card-end relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end opacity-5" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),rgba(255,255,255,0))]" />
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-medical-secondary/50 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-medical-secondary/50 to-transparent" />
                 
                 <div className="relative z-10">
                   <div className="flex items-center gap-3 mb-6">
@@ -467,137 +264,45 @@ const Billing = () => {
                       AI Billing Analysis
                     </h3>
                   </div>
-                  
+
                   {isAnalyzing ? (
                     <div className="flex items-center gap-3 text-medical-primary/80 justify-center py-8">
-                      <div className="relative">
-                        <div className="absolute -inset-1 bg-medical-secondary/20 rounded-full blur-sm animate-pulse" />
-                        <Cpu className="w-6 h-6 animate-spin text-medical-secondary" />
-                      </div>
+                      <Loader2 className="w-6 h-6 animate-spin text-medical-secondary" />
                       <p className="animate-pulse">Processing billing metrics...</p>
                     </div>
-                  ) : aiAnalysis?.sections ? (
-                    <ScrollArea className="h-[300px] pr-4">
-                      <div className="space-y-2">
-                        {aiAnalysis.sections.map((section: AIAnalysisSection) => (
-                          <Popover key={section.title}>
-                            <PopoverTrigger asChild>
-                              <div className="space-y-2 cursor-pointer hover:bg-medical-card-start/5 p-4 rounded-lg transition-all duration-300 group backdrop-blur-sm border border-transparent hover:border-medical-secondary/20 hover:shadow-lg hover:shadow-medical-secondary/5">
-                                <div className="flex items-center gap-3 text-medical-secondary font-semibold">
-                                  <div className="relative">
-                                    <div className="absolute -inset-1 bg-medical-secondary/10 rounded-full blur-sm group-hover:animate-pulse" />
-                                    {getIconForSection(section.title)}
-                                  </div>
-                                  <h4 className="group-hover:text-medical-secondary transition-colors">
-                                    {section.title}
-                                  </h4>
-                                  <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1" />
-                                </div>
-                                <p className="text-medical-primary/80 pl-10 group-hover:text-medical-primary transition-colors">
-                                  {section.content}
-                                </p>
-                              </div>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-96 bg-medical-card-start/95 backdrop-blur-sm border-medical-secondary/20">
-                              <div className="space-y-4 p-4">
-                                <div className="flex items-center gap-2 text-medical-secondary font-semibold border-b border-medical-secondary/10 pb-2">
-                                  {getIconForSection(section.title)}
-                                  <h4>{section.title}</h4>
-                                </div>
-                                
-                                <div className="space-y-4">
-                                  {section.metrics && Object.keys(section.metrics).length > 0 && (
-                                    <div className="space-y-2">
-                                      <h5 className="text-sm font-medium text-medical-secondary flex items-center gap-2">
-                                        <Signal className="w-4 h-4" />
-                                        Current Metrics
-                                      </h5>
-                                      <div className="grid grid-cols-2 gap-2 bg-medical-secondary/5 p-3 rounded-lg">
-                                        {Object.entries(section.metrics).map(([key, value]) => (
-                                          <div key={key} className="text-xs">
-                                            <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
-                                            <span className="text-medical-primary font-medium">{String(value)}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {section.benchmarks && Object.keys(section.benchmarks).length > 0 && (
-                                    <div className="space-y-2">
-                                      <h5 className="text-sm font-medium text-medical-secondary flex items-center gap-2">
-                                        <Database className="w-4 h-4" />
-                                        Industry Benchmarks
-                                      </h5>
-                                      <div className="grid grid-cols-2 gap-2 bg-medical-secondary/5 p-3 rounded-lg">
-                                        {Object.entries(section.benchmarks).map(([key, value]) => (
-                                          <div key={key} className="text-xs">
-                                            <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
-                                            <span className="text-medical-primary font-medium">{String(value)}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {section.recommendations && section.recommendations.length > 0 && (
-                                    <div className="space-y-2">
-                                      <h5 className="text-sm font-medium text-medical-secondary flex items-center gap-2">
-                                        <Sparkles className="w-4 h-4" />
-                                        Recommendations
-                                      </h5>
-                                      <div className="space-y-2 bg-medical-secondary/5 p-3 rounded-lg">
-                                        {section.recommendations.map((rec, index) => (
-                                          <div key={index} className="text-xs text-medical-primary/90 flex items-start gap-2">
-                                            <div className="w-1 h-1 rounded-full bg-medical-secondary mt-1.5 animate-pulse" />
-                                            {rec}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  <div className="border-t border-medical-secondary/10 pt-2 mt-2">
-                                    <p className="text-xs text-medical-primary/70">{section.content}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        ))}
-                      </div>
-                    </ScrollArea>
                   ) : (
-                    <p className="text-medical-primary/80 text-center py-8">
-                      No analysis available
-                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {analysisCards.map((card, index) => (
+                        <AnalysisCard key={index} {...card} />
+                      ))}
+                    </div>
                   )}
                 </div>
               </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Prior Auth Queue"
                   value="10"
                   icon={ClipboardList}
                   change="+2"
                   aiInsight="2 new prior authorizations require immediate attention"
                 />
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Missing Demographics"
                   value="43"
                   icon={Users}
                   change="+5"
                   aiInsight="Patient information needs to be updated for billing"
                 />
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="QA Review Queue"
                   value="124"
                   icon={FileCheck}
                   change="-12"
                   aiInsight="Quality assurance review backlog reduced by 12 since yesterday"
                 />
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Master Queue"
                   value="239"
                   icon={AlertCircle}
@@ -607,28 +312,28 @@ const Billing = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Review Queue"
                   value="65"
                   icon={FileText}
                   change="-3"
                   aiInsight="Claims ready for review"
                 />
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Filing Queue"
                   value="136"
                   icon={Send}
                   change="+24"
                   aiInsight="Claims prepared for submission"
                 />
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Transmission Queue"
                   value="4,527"
                   icon={Upload}
                   change="+204"
                   aiInsight="Claims pending electronic transmission"
                 />
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Exception Queue"
                   value="1"
                   icon={AlertTriangle}
@@ -638,28 +343,28 @@ const Billing = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Facility Invoicing"
                   value="1"
                   icon={Building}
                   change="0"
                   aiInsight="Facility invoices pending review"
                 />
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Affiliate Invoicing"
                   value="0"
                   icon={Building2}
                   change="0"
                   aiInsight="No pending affiliate invoices"
                 />
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Patient Invoicing"
                   value="36"
                   icon={UserSquare}
                   change="+12"
                   aiInsight="New patient invoices ready for processing"
                 />
-                <MetricCardWithAnalysis
+                <MetricCard
                   title="Open Invoices"
                   value="363"
                   icon={FileText}
@@ -683,23 +388,6 @@ const Billing = () => {
       <Footer />
     </div>
   );
-};
-
-const getIconForSection = (title: string) => {
-  switch (title) {
-    case 'Key Performance Indicators':
-      return <Signal className="w-5 h-5 text-blue-500" />;
-    case 'Workflow Efficiency Analysis':
-      return <Cpu className="w-5 h-5 text-green-500" />;
-    case 'Revenue Cycle Insights':
-      return <Zap className="w-5 h-5 text-yellow-500" />;
-    case 'Risk Alerts':
-      return <Radio className="w-5 h-5 text-red-500" />;
-    case 'Optimization Recommendations':
-      return <Rocket className="w-5 h-5 text-purple-500" />;
-    default:
-      return <Network className="w-5 h-5 text-gray-500" />;
-  }
 };
 
 export default Billing;
