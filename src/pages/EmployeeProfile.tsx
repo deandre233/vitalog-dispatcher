@@ -15,7 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   User, Phone, MapPin, Shield, Clock, ArrowLeft, Calendar, Mail,
   Building2, AlertCircle, FileText, Award, AlertTriangle, Bell,
-  Syringe, CircuitBoard, Signal, Key, Camera, HelpCircle, Fingerprint
+  Syringe, CircuitBoard, Signal, Key, Camera, HelpCircle, Fingerprint,
+  Calculator
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -131,7 +132,6 @@ export function EmployeeProfile() {
               </div>
 
               <div className="grid grid-cols-4 gap-6">
-                {/* Profile Summary Card */}
                 <Card className="col-span-1 futuristic-card p-6 space-y-4">
                   <div className="flex flex-col items-center space-y-4">
                     <div className="relative">
@@ -172,12 +172,24 @@ export function EmployeeProfile() {
                   </div>
                 </Card>
 
-                {/* Main Content Area */}
                 <div className="col-span-3 space-y-6">
                   <Card className="futuristic-card">
                     <Tabs defaultValue="identity" className="w-full">
-                      <TabsList className="w-full justify-start bg-medical-accent/50 p-1">
+                      <TabsList className="w-full justify-start bg-medical-accent/50 p-1 flex-wrap h-auto">
                         <TabsTrigger value="identity" className="data-[state=active]:bg-white">Identity</TabsTrigger>
+                        <TabsTrigger value="demographics" className="data-[state=active]:bg-white">Demographics</TabsTrigger>
+                        <TabsTrigger value="roles" className="data-[state=active]:bg-white">Roles</TabsTrigger>
+                        <TabsTrigger value="privileges" className="data-[state=active]:bg-white">Privileges</TabsTrigger>
+                        <TabsTrigger value="payroll" className="data-[state=active]:bg-white">Payroll</TabsTrigger>
+                        <TabsTrigger value="incidents" className="data-[state=active]:bg-white">Incidents</TabsTrigger>
+                        <TabsTrigger value="documents" className="data-[state=active]:bg-white">Documents</TabsTrigger>
+                        <TabsTrigger value="stats" className="data-[state=active]:bg-white">Stats</TabsTrigger>
+                        <TabsTrigger value="certs" className="data-[state=active]:bg-white">Certifications</TabsTrigger>
+                        <TabsTrigger value="achievements" className="data-[state=active]:bg-white">Achievements</TabsTrigger>
+                        <TabsTrigger value="damage" className="data-[state=active]:bg-white">Damage Reports</TabsTrigger>
+                        <TabsTrigger value="announcements" className="data-[state=active]:bg-white">Announcements</TabsTrigger>
+                        <TabsTrigger value="immunizations" className="data-[state=active]:bg-white">Immunizations</TabsTrigger>
+                        <TabsTrigger value="performance" className="data-[state=active]:bg-white">Performance</TabsTrigger>
                         <TabsTrigger value="notifications" className="data-[state=active]:bg-white">Notifications</TabsTrigger>
                         <TabsTrigger value="security" className="data-[state=active]:bg-white">Security</TabsTrigger>
                         <TabsTrigger value="system" className="data-[state=active]:bg-white">System</TabsTrigger>
@@ -260,61 +272,31 @@ export function EmployeeProfile() {
                         </div>
                       </TabsContent>
 
-                      <TabsContent value="security" className="p-6">
+                      <TabsContent value="demographics" className="p-6">
                         <Card className="futuristic-card p-6">
                           <div className="space-y-6">
                             <div className="flex items-center gap-4">
-                              <Key className="h-6 w-6 text-medical-secondary" />
-                              <h3 className="text-lg font-semibold">Login Credentials</h3>
+                              <User className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Demographics</h3>
                             </div>
-                            
                             <div className="grid grid-cols-2 gap-6">
                               <div className="space-y-4">
                                 <div className="space-y-2">
-                                  <Label>Login Username</Label>
-                                  <Input 
-                                    value={employee.login_name || ''} 
-                                    className="bg-medical-accent/10"
-                                    readOnly
-                                  />
+                                  <Label>Date of Birth</Label>
+                                  <Input type="date" className="bg-medical-accent/10" />
                                 </div>
-                                
                                 <div className="space-y-2">
-                                  <Label>Password</Label>
-                                  <div className="flex gap-2">
-                                    <Input 
-                                      type="password" 
-                                      value="••••••••"
-                                      className="bg-medical-accent/10"
-                                      readOnly
-                                    />
-                                    <Button onClick={generateRandomPassword}>
-                                      Generate New
-                                    </Button>
-                                  </div>
-                                  <p className="text-sm text-muted-foreground">
-                                    User must change password at next login
-                                  </p>
-                                </div>
-                              </div>
-                              
-                              <div className="space-y-4">
-                                <div className="space-y-2">
-                                  <Label>Last Login Attempt</Label>
-                                  <Input 
-                                    value={employee.last_login_attempt || 'Never'} 
-                                    className="bg-medical-accent/10"
-                                    readOnly
-                                  />
-                                </div>
-                                
-                                <div className="space-y-2">
-                                  <Label>Last Successful Login</Label>
-                                  <Input 
-                                    value={employee.last_login_success || 'Never'} 
-                                    className="bg-medical-accent/10"
-                                    readOnly
-                                  />
+                                  <Label>Gender</Label>
+                                  <Select>
+                                    <SelectTrigger className="bg-medical-accent/10">
+                                      <SelectValue placeholder="Select gender" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="male">Male</SelectItem>
+                                      <SelectItem value="female">Female</SelectItem>
+                                      <SelectItem value="other">Other</SelectItem>
+                                    </SelectContent>
+                                  </Select>
                                 </div>
                               </div>
                             </div>
@@ -322,38 +304,109 @@ export function EmployeeProfile() {
                         </Card>
                       </TabsContent>
 
-                      <TabsContent value="system" className="p-6">
+                      <TabsContent value="roles" className="p-6">
                         <Card className="futuristic-card p-6">
                           <div className="space-y-6">
                             <div className="flex items-center gap-4">
-                              <Fingerprint className="h-6 w-6 text-medical-secondary" />
-                              <h3 className="text-lg font-semibold">System Integration</h3>
+                              <Shield className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Roles & Permissions</h3>
                             </div>
-                            
                             <div className="space-y-4">
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <Label>Beacon App Token</Label>
-                                  <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id="role-admin" />
+                                <label htmlFor="role-admin" className="text-sm font-medium">Administrator</label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id="role-supervisor" />
+                                <label htmlFor="role-supervisor" className="text-sm font-medium">Supervisor</label>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="payroll" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <Calculator className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Payroll Information</h3>
+                            </div>
+                            <div className="grid grid-cols-2 gap-6">
+                              <div className="space-y-4">
+                                <div className="space-y-2">
+                                  <Label>Pay Rate</Label>
+                                  <Input type="number" className="bg-medical-accent/10" placeholder="Hourly rate" />
                                 </div>
-                                <div className="flex gap-2">
-                                  <Input 
-                                    value={employee.beacon_token || ''} 
-                                    className="bg-medical-accent/10 font-mono"
-                                    readOnly
-                                  />
-                                  <Button>Issue New Token</Button>
+                                <div className="space-y-2">
+                                  <Label>Pay Type</Label>
+                                  <Select>
+                                    <SelectTrigger className="bg-medical-accent/10">
+                                      <SelectValue placeholder="Select pay type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="hourly">Hourly</SelectItem>
+                                      <SelectItem value="salary">Salary</SelectItem>
+                                    </SelectContent>
+                                  </Select>
                                 </div>
                               </div>
-                              
-                              <div className="space-y-2">
-                                <Label>Latest Ping</Label>
-                                <Input 
-                                  value={employee.latest_ping || 'Never'} 
-                                  className="bg-medical-accent/10"
-                                  readOnly
-                                />
-                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="incidents" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <AlertTriangle className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Incident Reports</h3>
+                            </div>
+                            <div className="text-center text-gray-500">
+                              <p>No incidents reported</p>
+                            </div>
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="documents" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <FileText className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Documents</h3>
+                            </div>
+                            <div className="text-center text-gray-500">
+                              <p>No documents uploaded</p>
+                            </div>
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="certs" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <Award className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Certifications</h3>
+                            </div>
+                            <div className="text-center text-gray-500">
+                              <p>No certifications found</p>
+                            </div>
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="immunizations" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <Syringe className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Immunization Records</h3>
+                            </div>
+                            <div className="text-center text-gray-500">
+                              <p>No immunization records found</p>
                             </div>
                           </div>
                         </Card>
@@ -451,6 +504,105 @@ export function EmployeeProfile() {
                               <Button className="w-full">
                                 Save Notification Preferences
                               </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="security" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <Key className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Login Credentials</h3>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-6">
+                              <div className="space-y-4">
+                                <div className="space-y-2">
+                                  <Label>Login Username</Label>
+                                  <Input 
+                                    value={employee.login_name || ''} 
+                                    className="bg-medical-accent/10"
+                                    readOnly
+                                  />
+                                </div>
+                                
+                                <div className="space-y-2">
+                                  <Label>Password</Label>
+                                  <div className="flex gap-2">
+                                    <Input 
+                                      type="password" 
+                                      value="••••••••"
+                                      className="bg-medical-accent/10"
+                                      readOnly
+                                    />
+                                    <Button onClick={generateRandomPassword}>
+                                      Generate New
+                                    </Button>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    User must change password at next login
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-4">
+                                <div className="space-y-2">
+                                  <Label>Last Login Attempt</Label>
+                                  <Input 
+                                    value={employee.last_login_attempt || 'Never'} 
+                                    className="bg-medical-accent/10"
+                                    readOnly
+                                  />
+                                </div>
+                                
+                                <div className="space-y-2">
+                                  <Label>Last Successful Login</Label>
+                                  <Input 
+                                    value={employee.last_login_success || 'Never'} 
+                                    className="bg-medical-accent/10"
+                                    readOnly
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="system" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <Fingerprint className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">System Integration</h3>
+                            </div>
+                            
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Label>Beacon App Token</Label>
+                                  <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                                <div className="flex gap-2">
+                                  <Input 
+                                    value={employee.beacon_token || ''} 
+                                    className="bg-medical-accent/10 font-mono"
+                                    readOnly
+                                  />
+                                  <Button>Issue New Token</Button>
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <Label>Latest Ping</Label>
+                                <Input 
+                                  value={employee.latest_ping || 'Never'} 
+                                  className="bg-medical-accent/10"
+                                  readOnly
+                                />
+                              </div>
                             </div>
                           </div>
                         </Card>
