@@ -22,7 +22,7 @@ function App() {
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/dispatch" element={<CreateDispatch />} />
+        <Route path="/dispatch" element={<ActiveDispatches />} />
         <Route path="/book-dispatch" element={<BookDispatch />} />
         <Route path="/dispatch/active" element={<ActiveDispatches />} />
         <Route path="/dispatch/closed" element={<ClosedDispatches />} />

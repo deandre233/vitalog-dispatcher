@@ -1,27 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { Plus, Ambulance, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Plus, Ambulance, ClipboardList } from "lucide-react";
 
 export function WelcomeBanner() {
   const navigate = useNavigate();
-  const currentTime = new Date();
-  const hour = currentTime.getHours();
-
+  const currentHour = new Date().getHours();
+  
   const getGreeting = () => {
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
+    if (currentHour < 12) return "Good morning";
+    if (currentHour < 18) return "Good afternoon";
     return "Good evening";
   };
 
   return (
-    <div className="futuristic-panel p-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold text-medical-primary">
+    <div className="relative">
+      <div className="px-6 py-8 sm:px-8 sm:py-12 bg-gradient-to-br from-medical-accent/30 via-white to-medical-highlight/20 rounded-lg border border-medical-secondary/20 shadow-sm">
+        <div className="space-y-2 mb-6">
+          <h1 className="text-2xl font-semibold text-medical-primary sm:text-3xl">
             {getGreeting()}, Dispatcher
           </h1>
-          <p className="text-medical-primary/80">
-            You have 12 active dispatches and 3 pending assignments
+          <p className="text-medical-secondary/80">
+            Here's what's happening with your dispatches today.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -36,7 +35,7 @@ export function WelcomeBanner() {
           <Button
             variant="outline"
             onClick={() => navigate("/dispatch")}
-            className="border-medical-secondary text-medical-secondary hover:bg-medical-secondary/10 transition-all duration-300"
+            className="border-medical-secondary text-medical-secondary hover:bg-medical-secondary/10"
             size="sm"
           >
             <Ambulance className="mr-2 h-4 w-4" />
@@ -44,12 +43,12 @@ export function WelcomeBanner() {
           </Button>
           <Button
             variant="outline"
-            onClick={() => navigate("/routes")}
-            className="border-medical-secondary text-medical-secondary hover:bg-medical-secondary/10 transition-all duration-300"
+            onClick={() => navigate("/dispatch/closed")}
+            className="border-medical-secondary text-medical-secondary hover:bg-medical-secondary/10"
             size="sm"
           >
-            <MapPin className="mr-2 h-4 w-4" />
-            Manage Routes
+            <ClipboardList className="mr-2 h-4 w-4" />
+            View Closed
           </Button>
         </div>
       </div>
