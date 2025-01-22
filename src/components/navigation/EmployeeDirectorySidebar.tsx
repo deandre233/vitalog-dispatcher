@@ -35,7 +35,7 @@ export function EmployeeDirectorySidebar() {
   return (
     <div className="w-64 bg-[#2B4B8C] min-h-screen flex flex-col text-white">
       <div className="p-4 border-b border-white/10">
-        <h2 className="text-lg font-semibold">HR Management</h2>
+        <h2 className="text-lg font-semibold">Employee Directory</h2>
       </div>
       <nav className="flex-1">
         {menuItems.map((item, index) => (
