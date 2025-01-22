@@ -240,6 +240,66 @@ export type Database = {
           },
         ]
       }
+      corrective_actions: {
+        Row: {
+          acknowledgment_date: string | null
+          action_type: string
+          created_at: string | null
+          description: string
+          employee_id: string | null
+          follow_up_date: string | null
+          id: string
+          improvement_plan: string | null
+          issue_date: string | null
+          issued_by: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          acknowledgment_date?: string | null
+          action_type: string
+          created_at?: string | null
+          description: string
+          employee_id?: string | null
+          follow_up_date?: string | null
+          id?: string
+          improvement_plan?: string | null
+          issue_date?: string | null
+          issued_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          acknowledgment_date?: string | null
+          action_type?: string
+          created_at?: string | null
+          description?: string
+          employee_id?: string | null
+          follow_up_date?: string | null
+          id?: string
+          improvement_plan?: string | null
+          issue_date?: string | null
+          issued_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corrective_actions_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corrective_actions_issued_by_fkey"
+            columns: ["issued_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dispatch_locations: {
         Row: {
           address: string | null
