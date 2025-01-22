@@ -56,9 +56,9 @@ const routes = [
     href: "/calendar",
   },
   {
-    label: "Completed Operations",
+    label: "Dispatch Page",
     icon: FileText,
-    href: "/closed-dispatches",
+    href: "/dispatch",
   },
   {
     label: "Service Queue",
