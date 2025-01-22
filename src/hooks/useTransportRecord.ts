@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TransportRecord } from '@/types/dispatch';
 
+export type { TransportRecord };
+
 export function useTransportRecord(id?: string) {
   const queryClient = useQueryClient();
 

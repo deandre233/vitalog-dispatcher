@@ -60,14 +60,34 @@ export interface TransportRecord {
   return_activation_time?: string;
   return_pickup_time?: string;
   return_precise_pickup?: boolean;
+  origin_city?: string;
+  origin_state?: string;
+  origin_zip?: string;
+  origin_county?: string;
+  origin_phone?: string;
+  destination_city?: string;
+  destination_state?: string;
+  destination_zip?: string;
+  destination_county?: string;
+  destination_phone?: string;
+  activation_type?: string;
+  activation_datetime?: string;
+  pickup_time?: string;
+  dropoff_time?: string;
+  precise_pickup?: boolean;
+  service_complaint?: string;
+  is_billable?: boolean;
+  requires_pcs?: boolean;
+  bill_to_insurance?: boolean;
+  bill_to_facility?: boolean;
+  billing_facility?: string;
+  bill_to_affiliate?: boolean;
+  billing_affiliate?: string;
+  bill_to_patient?: boolean;
+  cash_upfront?: boolean;
+  price_quote?: string;
 }
 
-export interface DispatchFormData {
-  pickup_location: string;
-  dropoff_location: string;
-  transport_date: string;
-  scheduled_time?: string;
-  service_type?: 'MICU' | 'ALS' | 'BLS';
-  priority_level?: 'Critical' | 'Emergency' | 'Lower acuity' | 'Scheduled';
-  notes?: string;
+export interface DispatchFormData extends TransportRecord {
+  // Add any additional form-specific fields here
 }
