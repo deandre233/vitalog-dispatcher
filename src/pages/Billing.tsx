@@ -9,32 +9,13 @@ import { Card } from "@/components/ui/card";
 import { useAIBillingAnalysis } from "@/hooks/useAIBillingAnalysis";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { AIAnalysisSection } from "@/types/billing";
 import { 
-  ClipboardList, 
-  Users, 
-  FileText, 
-  Building2, 
-  Clock, 
-  AlertCircle,
-  Upload,
-  FileCheck,
-  Send,
-  AlertTriangle,
-  Building,
-  UserSquare,
-  Brain,
-  Loader2,
-  TrendingUp,
-  AlertOctagon,
-  Lightbulb,
-  BarChart3,
-  ChevronRight,
-  DollarSign
+  ClipboardList, Users, FileText, Building2, Clock, AlertCircle,
+  Upload, FileCheck, Send, AlertTriangle, Building, UserSquare,
+  Brain, Loader2, TrendingUp, AlertOctagon, Lightbulb, BarChart3,
+  ChevronRight, DollarSign
 } from "lucide-react";
 
 const Billing = () => {
@@ -61,8 +42,8 @@ const Billing = () => {
     title: string, 
     icon: React.ReactNode, 
     content: string, 
-    metrics: any, 
-    benchmarks: any, 
+    metrics: Record<string, string | number>, 
+    benchmarks: Record<string, string | number>, 
     recommendations: string[]
   ) => (
     <Popover>
@@ -186,7 +167,7 @@ const Billing = () => {
                   ) : aiAnalysis ? (
                     <ScrollArea className="h-[300px] pr-4">
                       <div className="space-y-2">
-                        {aiAnalysis.sections.map((section: any, index: number) => (
+                        {aiAnalysis.sections.map((section: AIAnalysisSection) => (
                           renderAIInsight(
                             section.title,
                             getIconForSection(section.title),

@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { AIAnalysisResponse } from '@/types/billing';
 
 export function useAIBillingAnalysis(metrics: any) {
-  return useQuery({
+  return useQuery<AIAnalysisResponse>({
     queryKey: ['billing-analysis', metrics],
     queryFn: async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('analyze-billing', {
+        const { data, error } = await supabase.functions.invoke<AIAnalysisResponse>('analyze-billing', {
           body: { metrics }
         });
         
