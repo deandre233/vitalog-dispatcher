@@ -86,8 +86,18 @@ export interface TransportRecord {
   bill_to_patient?: boolean;
   cash_upfront?: boolean;
   price_quote?: string;
+  requires_ekg?: boolean;
+  incidents?: Array<{
+    timestamp: string;
+    description: string;
+    analysis?: {
+      recommendation: string;
+    };
+  }>;
 }
 
 export interface DispatchFormData extends TransportRecord {
-  // Add any additional form-specific fields here
+  patient_first_name?: string;
+  patient_last_name?: string;
+  patient_dob?: string;
 }
