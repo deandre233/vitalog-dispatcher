@@ -15,7 +15,8 @@ import {
   ClipboardList, Users, FileText, Building2, Clock, AlertCircle,
   Upload, FileCheck, Send, AlertTriangle, Building, UserSquare,
   Brain, Loader2, TrendingUp, AlertOctagon, Lightbulb, BarChart3,
-  ChevronRight, DollarSign, Info
+  ChevronRight, DollarSign, Info, Circuit, Cpu, Database, Network, 
+  Radio, Rocket, Signal, Sparkles, Zap
 } from "lucide-react";
 
 interface MetricAnalysis {
@@ -452,29 +453,117 @@ const Billing = () => {
 
               <Card className="p-6 bg-gradient-to-br from-medical-card-start to-medical-card-end relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end opacity-5" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),rgba(255,255,255,0))]" />
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-medical-secondary/50 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-medical-secondary/50 to-transparent" />
+                
                 <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-6">
-                    <Brain className="w-6 h-6 text-medical-secondary animate-pulse" />
-                    <h3 className="text-lg font-semibold text-medical-primary">AI Billing Analysis</h3>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="relative">
+                      <div className="absolute -inset-1 bg-medical-secondary/20 rounded-full blur-sm animate-pulse" />
+                      <Brain className="w-7 h-7 text-medical-secondary relative animate-pulse" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-medical-primary bg-clip-text text-transparent bg-gradient-to-r from-medical-primary to-medical-secondary">
+                      AI Billing Analysis
+                    </h3>
                   </div>
                   
                   {isAnalyzing ? (
-                    <div className="flex items-center gap-2 text-medical-primary/80 justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-medical-secondary" />
-                      <p>Processing billing metrics...</p>
+                    <div className="flex items-center gap-3 text-medical-primary/80 justify-center py-8">
+                      <div className="relative">
+                        <div className="absolute -inset-1 bg-medical-secondary/20 rounded-full blur-sm animate-pulse" />
+                        <Circuit className="w-6 h-6 animate-spin text-medical-secondary" />
+                      </div>
+                      <p className="animate-pulse">Processing billing metrics...</p>
                     </div>
                   ) : aiAnalysis?.sections ? (
                     <ScrollArea className="h-[300px] pr-4">
                       <div className="space-y-2">
                         {aiAnalysis.sections.map((section: AIAnalysisSection) => (
-                          renderAIInsight(
-                            section.title,
-                            getIconForSection(section.title),
-                            section.content,
-                            section.metrics || {},
-                            section.benchmarks || {},
-                            section.recommendations || []
-                          )
+                          <Popover key={section.title}>
+                            <PopoverTrigger asChild>
+                              <div className="space-y-2 cursor-pointer hover:bg-medical-card-start/5 p-4 rounded-lg transition-all duration-300 group backdrop-blur-sm border border-transparent hover:border-medical-secondary/20 hover:shadow-lg hover:shadow-medical-secondary/5">
+                                <div className="flex items-center gap-3 text-medical-secondary font-semibold">
+                                  <div className="relative">
+                                    <div className="absolute -inset-1 bg-medical-secondary/10 rounded-full blur-sm group-hover:animate-pulse" />
+                                    {getIconForSection(section.title)}
+                                  </div>
+                                  <h4 className="group-hover:text-medical-secondary transition-colors">
+                                    {section.title}
+                                  </h4>
+                                  <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1" />
+                                </div>
+                                <p className="text-medical-primary/80 pl-10 group-hover:text-medical-primary transition-colors">
+                                  {section.content}
+                                </p>
+                              </div>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-96 bg-medical-card-start/95 backdrop-blur-sm border-medical-secondary/20">
+                              <div className="space-y-4 p-4">
+                                <div className="flex items-center gap-2 text-medical-secondary font-semibold border-b border-medical-secondary/10 pb-2">
+                                  {getIconForSection(section.title)}
+                                  <h4>{section.title}</h4>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                  {section.metrics && Object.keys(section.metrics).length > 0 && (
+                                    <div className="space-y-2">
+                                      <h5 className="text-sm font-medium text-medical-secondary flex items-center gap-2">
+                                        <Signal className="w-4 h-4" />
+                                        Current Metrics
+                                      </h5>
+                                      <div className="grid grid-cols-2 gap-2 bg-medical-secondary/5 p-3 rounded-lg">
+                                        {Object.entries(section.metrics).map(([key, value]) => (
+                                          <div key={key} className="text-xs">
+                                            <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
+                                            <span className="text-medical-primary font-medium">{String(value)}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {section.benchmarks && Object.keys(section.benchmarks).length > 0 && (
+                                    <div className="space-y-2">
+                                      <h5 className="text-sm font-medium text-medical-secondary flex items-center gap-2">
+                                        <Database className="w-4 h-4" />
+                                        Industry Benchmarks
+                                      </h5>
+                                      <div className="grid grid-cols-2 gap-2 bg-medical-secondary/5 p-3 rounded-lg">
+                                        {Object.entries(section.benchmarks).map(([key, value]) => (
+                                          <div key={key} className="text-xs">
+                                            <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
+                                            <span className="text-medical-primary font-medium">{String(value)}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {section.recommendations && section.recommendations.length > 0 && (
+                                    <div className="space-y-2">
+                                      <h5 className="text-sm font-medium text-medical-secondary flex items-center gap-2">
+                                        <Sparkles className="w-4 h-4" />
+                                        Recommendations
+                                      </h5>
+                                      <div className="space-y-2 bg-medical-secondary/5 p-3 rounded-lg">
+                                        {section.recommendations.map((rec, index) => (
+                                          <div key={index} className="text-xs text-medical-primary/90 flex items-start gap-2">
+                                            <div className="w-1 h-1 rounded-full bg-medical-secondary mt-1.5 animate-pulse" />
+                                            {rec}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  <div className="border-t border-medical-secondary/10 pt-2 mt-2">
+                                    <p className="text-xs text-medical-primary/70">{section.content}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
                         ))}
                       </div>
                     </ScrollArea>
@@ -599,17 +688,17 @@ const Billing = () => {
 const getIconForSection = (title: string) => {
   switch (title) {
     case 'Key Performance Indicators':
-      return <BarChart3 className="w-5 h-5 text-blue-500" />;
+      return <Signal className="w-5 h-5 text-blue-500" />;
     case 'Workflow Efficiency Analysis':
-      return <TrendingUp className="w-5 h-5 text-green-500" />;
+      return <Cpu className="w-5 h-5 text-green-500" />;
     case 'Revenue Cycle Insights':
-      return <DollarSign className="w-5 h-5 text-yellow-500" />;
+      return <Zap className="w-5 h-5 text-yellow-500" />;
     case 'Risk Alerts':
-      return <AlertOctagon className="w-5 h-5 text-red-500" />;
+      return <Radio className="w-5 h-5 text-red-500" />;
     case 'Optimization Recommendations':
-      return <Lightbulb className="w-5 h-5 text-purple-500" />;
+      return <Rocket className="w-5 h-5 text-purple-500" />;
     default:
-      return <Brain className="w-5 h-5 text-gray-500" />;
+      return <Network className="w-5 h-5 text-gray-500" />;
   }
 };
 
