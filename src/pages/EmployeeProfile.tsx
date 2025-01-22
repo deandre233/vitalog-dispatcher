@@ -351,7 +351,7 @@ export function EmployeeProfile() {
           effective_date: new Date().toISOString(),
           employee_type: employee?.employee_type,
           pay_type: field === 'pay_type' ? value : employee?.pay_type,
-          pay_rate: field === 'pay_rate' ? historyValue : employee?.pay_rate,
+          pay_rate: field === 'pay_rate' ? Number(historyValue) : employee?.pay_rate,
           access_codes: employee?.access_codes,
           author: 'System',
           is_active: true
