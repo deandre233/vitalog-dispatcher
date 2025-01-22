@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAIBillingAnalysis } from "@/hooks/useAIBillingAnalysis";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   ClipboardList, 
   Users, 
@@ -22,7 +23,11 @@ import {
   Building,
   UserSquare,
   Brain,
-  Loader2
+  Loader2,
+  TrendingUp,
+  AlertOctagon,
+  Lightbulb,
+  BarChart3
 } from "lucide-react";
 
 const Billing = () => {
@@ -44,6 +49,16 @@ const Billing = () => {
   };
 
   const { data: aiAnalysis, isLoading: isAnalyzing } = useAIBillingAnalysis(metrics);
+
+  const renderAISection = (title: string, icon: React.ReactNode, content: string) => (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-medical-secondary font-semibold">
+        {icon}
+        <h4>{title}</h4>
+      </div>
+      <p className="text-medical-primary/80 pl-6">{content}</p>
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-medical-accent">
@@ -68,22 +83,56 @@ const Billing = () => {
                 </div>
               </div>
 
-              {/* AI Analysis Card */}
-              <Card className="p-6 bg-gradient-to-br from-medical-card-start to-medical-card-end">
-                <div className="flex items-center gap-2 mb-4">
-                  <Brain className="w-6 h-6 text-medical-secondary" />
-                  <h3 className="text-lg font-semibold text-medical-primary">AI Billing Analysis</h3>
-                </div>
-                {isAnalyzing ? (
-                  <div className="flex items-center gap-2 text-medical-primary/80">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Analyzing billing metrics...
+              {/* AI Analysis Card with futuristic design */}
+              <Card className="p-6 bg-gradient-to-br from-medical-card-start to-medical-card-end relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end opacity-5" />
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-6">
+                    <Brain className="w-6 h-6 text-medical-secondary animate-pulse" />
+                    <h3 className="text-lg font-semibold text-medical-primary">AI Billing Analysis</h3>
                   </div>
-                ) : (
-                  <p className="text-medical-primary/80 whitespace-pre-line">
-                    {aiAnalysis?.insights || "No analysis available"}
-                  </p>
-                )}
+                  
+                  {isAnalyzing ? (
+                    <div className="flex items-center gap-2 text-medical-primary/80 justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-medical-secondary" />
+                      <p>Processing billing metrics...</p>
+                    </div>
+                  ) : aiAnalysis ? (
+                    <ScrollArea className="h-[300px] pr-4">
+                      <div className="space-y-6">
+                        {renderAISection(
+                          "Key Performance Indicators",
+                          <BarChart3 className="w-5 h-5 text-blue-500" />,
+                          aiAnalysis.sections?.[0] || ""
+                        )}
+                        {renderAISection(
+                          "Workflow Efficiency",
+                          <TrendingUp className="w-5 h-5 text-green-500" />,
+                          aiAnalysis.sections?.[1] || ""
+                        )}
+                        {renderAISection(
+                          "Revenue Cycle Insights",
+                          <Lightbulb className="w-5 h-5 text-yellow-500" />,
+                          aiAnalysis.sections?.[2] || ""
+                        )}
+                        {renderAISection(
+                          "Risk Alerts",
+                          <AlertOctagon className="w-5 h-5 text-red-500" />,
+                          aiAnalysis.sections?.[3] || ""
+                        )}
+                        {renderAISection(
+                          "Optimization Recommendations",
+                          <Brain className="w-5 h-5 text-purple-500" />,
+                          aiAnalysis.sections?.[4] || ""
+                        )}
+                      </div>
+                    </ScrollArea>
+                  ) : (
+                    <p className="text-medical-primary/80 text-center py-8">
+                      No analysis available
+                    </p>
+                  )}
+                </div>
               </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

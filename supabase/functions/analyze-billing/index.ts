@@ -7,7 +7,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -19,7 +18,7 @@ serve(async (req) => {
     }
 
     const { metrics } = await req.json();
-    console.log('Received metrics:', metrics);
+    console.log('Analyzing metrics:', metrics);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -32,11 +31,18 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are an expert medical billing analyst. Analyze the billing metrics and provide concise, actionable insights focusing on key trends, potential issues, and recommendations."
+            content: `You are an advanced medical billing AI analyst. Analyze billing metrics and provide insights in this structured format:
+            1. Key Performance Indicators (KPIs)
+            2. Workflow Efficiency Analysis
+            3. Revenue Cycle Insights
+            4. Risk Alerts
+            5. Optimization Recommendations
+            
+            Keep insights concise and actionable. Focus on patterns, anomalies, and opportunities for improvement.`
           },
           {
             role: "user",
-            content: `Please analyze these billing metrics and provide key insights: ${JSON.stringify(metrics)}`
+            content: `Analyze these billing metrics and provide structured insights: ${JSON.stringify(metrics)}`
           }
         ],
         temperature: 0.3,
@@ -44,10 +50,17 @@ serve(async (req) => {
     });
 
     const data = await response.json();
-    console.log('OpenAI Response:', data);
+    console.log('AI Analysis Response:', data);
+
+    // Process the response to ensure it's properly structured
+    const insights = data.choices[0].message.content;
+    const sections = insights.split('\n\n').map(section => section.trim());
 
     return new Response(JSON.stringify({ 
-      insights: data.choices[0].message.content 
+      insights,
+      sections,
+      timestamp: new Date().toISOString(),
+      metrics_analyzed: Object.keys(metrics).length,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
