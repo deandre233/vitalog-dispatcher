@@ -77,6 +77,22 @@ export function EmployeeProfile() {
     isPrincipal: false,
     isProvisional: false
   });
+  const [privileges, setPrivileges] = useState({
+    canViewPatientInfo: false,
+    canEditPatientInfo: false,
+    canDeletePatientInfo: false,
+    canViewBillingInfo: false,
+    canEditBillingInfo: false,
+    canDeleteBillingInfo: false,
+    canViewDispatchInfo: false,
+    canEditDispatchInfo: false,
+    canDeleteDispatchInfo: false,
+    canViewReports: false,
+    canCreateReports: false,
+    canEditReports: false,
+    canDeleteReports: false,
+    canUseAIAssistance: false,
+  });
 
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -181,6 +197,36 @@ export function EmployeeProfile() {
       toast({
         title: "Error",
         description: "Failed to update role",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePrivilegeChange = async (field: string, value: boolean) => {
+    try {
+      const updates = {
+        employee_id: id,
+        [field]: value,
+      };
+
+      const { error } = await supabase
+        .from('employee_privileges')
+        .upsert(updates)
+        .eq('employee_id', id);
+
+      if (error) throw error;
+
+      setPrivileges(prev => ({ ...prev, [field]: value }));
+      
+      toast({
+        title: "Success",
+        description: "Privilege updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating privilege:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update privilege",
         variant: "destructive",
       });
     }
@@ -730,6 +776,211 @@ export function EmployeeProfile() {
                                   <label htmlFor="provisional" className="text-sm font-medium">
                                     Provisional
                                   </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="privileges" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <Shield className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Access Privileges</h3>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-6">
+                              <div className="space-y-4">
+                                <h4 className="font-medium text-sm text-muted-foreground">Patient Information</h4>
+                                <div className="space-y-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="view-patient"
+                                      checked={privileges.canViewPatientInfo}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canViewPatientInfo', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="view-patient" className="text-sm">
+                                      View patient information
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="edit-patient"
+                                      checked={privileges.canEditPatientInfo}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canEditPatientInfo', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="edit-patient" className="text-sm">
+                                      Edit patient information
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="delete-patient"
+                                      checked={privileges.canDeletePatientInfo}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canDeletePatientInfo', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="delete-patient" className="text-sm">
+                                      Delete patient information
+                                    </label>
+                                  </div>
+                                </div>
+
+                                <h4 className="font-medium text-sm text-muted-foreground mt-4">Billing Information</h4>
+                                <div className="space-y-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="view-billing"
+                                      checked={privileges.canViewBillingInfo}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canViewBillingInfo', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="view-billing" className="text-sm">
+                                      View billing information
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="edit-billing"
+                                      checked={privileges.canEditBillingInfo}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canEditBillingInfo', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="edit-billing" className="text-sm">
+                                      Edit billing information
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="delete-billing"
+                                      checked={privileges.canDeleteBillingInfo}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canDeleteBillingInfo', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="delete-billing" className="text-sm">
+                                      Delete billing information
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="space-y-4">
+                                <h4 className="font-medium text-sm text-muted-foreground">Dispatch Information</h4>
+                                <div className="space-y-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="view-dispatch"
+                                      checked={privileges.canViewDispatchInfo}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canViewDispatchInfo', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="view-dispatch" className="text-sm">
+                                      View dispatch information
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="edit-dispatch"
+                                      checked={privileges.canEditDispatchInfo}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canEditDispatchInfo', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="edit-dispatch" className="text-sm">
+                                      Edit dispatch information
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="delete-dispatch"
+                                      checked={privileges.canDeleteDispatchInfo}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canDeleteDispatchInfo', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="delete-dispatch" className="text-sm">
+                                      Delete dispatch information
+                                    </label>
+                                  </div>
+                                </div>
+
+                                <h4 className="font-medium text-sm text-muted-foreground mt-4">Reports</h4>
+                                <div className="space-y-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="view-reports"
+                                      checked={privileges.canViewReports}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canViewReports', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="view-reports" className="text-sm">
+                                      View reports
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="create-reports"
+                                      checked={privileges.canCreateReports}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canCreateReports', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="create-reports" className="text-sm">
+                                      Create reports
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="edit-reports"
+                                      checked={privileges.canEditReports}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canEditReports', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="edit-reports" className="text-sm">
+                                      Edit reports
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="delete-reports"
+                                      checked={privileges.canDeleteReports}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canDeleteReports', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="delete-reports" className="text-sm">
+                                      Delete reports
+                                    </label>
+                                  </div>
+                                </div>
+
+                                <h4 className="font-medium text-sm text-muted-foreground mt-4">AI Features</h4>
+                                <div className="space-y-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="ai-assistance"
+                                      checked={privileges.canUseAIAssistance}
+                                      onCheckedChange={(checked) => 
+                                        handlePrivilegeChange('canUseAIAssistance', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="ai-assistance" className="text-sm">
+                                      Use AI assistance features
+                                    </label>
+                                  </div>
                                 </div>
                               </div>
                             </div>
