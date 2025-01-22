@@ -46,21 +46,30 @@ export function EmployeeDirectory() {
       try {
         setIsLoading(true);
         setError(null);
-        console.log("Fetching employees...");
-        const { data, error } = await supabase
+        console.log("Starting to fetch employees...");
+        
+        const { data, error: supabaseError } = await supabase
           .from('employees')
           .select('*')
           .order('last_name', { ascending: true });
 
-        if (error) {
-          console.error('Supabase error:', error);
-          throw error;
+        console.log("Supabase response:", { data, error: supabaseError });
+
+        if (supabaseError) {
+          console.error('Supabase error:', supabaseError);
+          throw supabaseError;
         }
 
-        console.log("Fetched employees:", data);
-        setEmployees(data || []);
+        if (!data) {
+          console.log("No data returned from Supabase");
+          setEmployees([]);
+          return;
+        }
+
+        console.log("Successfully fetched employees:", data);
+        setEmployees(data);
       } catch (error) {
-        console.error('Error fetching employees:', error);
+        console.error('Error in fetchEmployees:', error);
         setError('Failed to load employees. Please try again later.');
         toast({
           title: "Error",
@@ -99,6 +108,10 @@ export function EmployeeDirectory() {
     const matchesStatus = hideInactive ? employee.status?.toLowerCase() === 'active' : true;
     return matchesSearch && matchesStatus;
   });
+
+  console.log("Filtered employees:", filteredEmployees);
+  console.log("Current search term:", searchTerm);
+  console.log("Hide inactive:", hideInactive);
 
   return (
     <div className="min-h-screen flex flex-col">
