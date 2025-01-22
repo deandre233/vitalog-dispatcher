@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Header } from "@/components/layout/Header";
 import { EmployeeDirectorySidebar } from "@/components/navigation/EmployeeDirectorySidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,7 +45,6 @@ import {
   Camera,
   Upload,
   Key,
-  Switch,
   CheckCircle
 } from "lucide-react";
 
