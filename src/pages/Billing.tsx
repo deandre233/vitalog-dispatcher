@@ -46,7 +46,7 @@ const Billing = () => {
     benchmarks: Record<string, string | number>, 
     recommendations: string[]
   ) => (
-    <Popover>
+    <Popover key={title}>
       <PopoverTrigger asChild>
         <div className="space-y-2 cursor-pointer hover:bg-medical-card-start/5 p-4 rounded-lg transition-colors group">
           <div className="flex items-center gap-2 text-medical-secondary font-semibold">
@@ -65,41 +65,47 @@ const Billing = () => {
           </div>
           
           <div className="space-y-4">
-            <div>
-              <h5 className="text-sm font-medium text-medical-secondary mb-2">Current Metrics</h5>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(metrics).map(([key, value]) => (
-                  <div key={key} className="text-xs">
-                    <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
-                    <span className="text-medical-primary font-medium">{value}</span>
-                  </div>
-                ))}
+            {metrics && Object.keys(metrics).length > 0 && (
+              <div>
+                <h5 className="text-sm font-medium text-medical-secondary mb-2">Current Metrics</h5>
+                <div className="grid grid-cols-2 gap-2">
+                  {Object.entries(metrics).map(([key, value]) => (
+                    <div key={key} className="text-xs">
+                      <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
+                      <span className="text-medical-primary font-medium">{String(value)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div>
-              <h5 className="text-sm font-medium text-medical-secondary mb-2">Industry Benchmarks</h5>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(benchmarks).map(([key, value]) => (
-                  <div key={key} className="text-xs">
-                    <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
-                    <span className="text-medical-primary font-medium">{value}</span>
-                  </div>
-                ))}
+            {benchmarks && Object.keys(benchmarks).length > 0 && (
+              <div>
+                <h5 className="text-sm font-medium text-medical-secondary mb-2">Industry Benchmarks</h5>
+                <div className="grid grid-cols-2 gap-2">
+                  {Object.entries(benchmarks).map(([key, value]) => (
+                    <div key={key} className="text-xs">
+                      <span className="text-medical-primary/60">{key.replace(/_/g, ' ').toUpperCase()}: </span>
+                      <span className="text-medical-primary font-medium">{String(value)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div>
-              <h5 className="text-sm font-medium text-medical-secondary mb-2">Recommendations</h5>
-              <ul className="space-y-1">
-                {recommendations.map((rec, index) => (
-                  <li key={index} className="text-xs text-medical-primary/90 flex items-start gap-2">
-                    <div className="w-1 h-1 rounded-full bg-medical-secondary mt-1.5" />
-                    {rec}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {recommendations && recommendations.length > 0 && (
+              <div>
+                <h5 className="text-sm font-medium text-medical-secondary mb-2">Recommendations</h5>
+                <ul className="space-y-1">
+                  {recommendations.map((rec, index) => (
+                    <li key={index} className="text-xs text-medical-primary/90 flex items-start gap-2">
+                      <div className="w-1 h-1 rounded-full bg-medical-secondary mt-1.5" />
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="border-t border-medical-secondary/10 pt-2 mt-2">
               <p className="text-xs text-medical-primary/70">{content}</p>
@@ -150,7 +156,6 @@ const Billing = () => {
                 </div>
               </div>
 
-              {/* AI Analysis Card with futuristic design */}
               <Card className="p-6 bg-gradient-to-br from-medical-card-start to-medical-card-end relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end opacity-5" />
                 <div className="relative z-10">
@@ -164,7 +169,7 @@ const Billing = () => {
                       <Loader2 className="w-6 h-6 animate-spin text-medical-secondary" />
                       <p>Processing billing metrics...</p>
                     </div>
-                  ) : aiAnalysis ? (
+                  ) : aiAnalysis?.sections ? (
                     <ScrollArea className="h-[300px] pr-4">
                       <div className="space-y-2">
                         {aiAnalysis.sections.map((section: AIAnalysisSection) => (
@@ -172,9 +177,9 @@ const Billing = () => {
                             section.title,
                             getIconForSection(section.title),
                             section.content,
-                            section.metrics,
-                            section.benchmarks,
-                            section.recommendations
+                            section.metrics || {},
+                            section.benchmarks || {},
+                            section.recommendations || []
                           )
                         ))}
                       </div>
