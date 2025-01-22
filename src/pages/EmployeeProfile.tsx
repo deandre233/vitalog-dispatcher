@@ -181,10 +181,10 @@ const EmployeeProfile = () => {
         <div className="flex-1 flex">
           <EmployeeDirectorySidebar />
           <div className="flex-1 p-6">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 bg-medical-secondary/20 rounded w-1/4"></div>
+              <div className="h-4 bg-medical-secondary/20 rounded w-1/2"></div>
+              <div className="h-4 bg-medical-secondary/20 rounded w-1/3"></div>
             </div>
           </div>
         </div>
@@ -193,26 +193,30 @@ const EmployeeProfile = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-medical-primary/5">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-primary/5 to-medical-secondary/5">
       <Header />
       <div className="flex-1 flex">
         <EmployeeDirectorySidebar />
         <div className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            <Card className="p-6 futuristic-panel">
+            <Card className="p-6 backdrop-blur-sm bg-white/80 border-medical-secondary/20 shadow-glow transition-all duration-300">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <Avatar className="h-24 w-24 border-2 border-medical-secondary">
-                      <AvatarImage src={employee.photo_url} alt={`${employee.first_name} ${employee.last_name}`} />
-                      <AvatarFallback className="text-2xl">
+                  <div className="relative group">
+                    <Avatar className="h-24 w-24 ring-2 ring-medical-secondary/30 transition-all duration-300 group-hover:ring-medical-secondary">
+                      <AvatarImage 
+                        src={employee.photo_url} 
+                        alt={`${employee.first_name} ${employee.last_name}`}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="text-2xl bg-gradient-to-br from-medical-gradient-start to-medical-gradient-end text-white">
                         {employee.first_name?.[0]}{employee.last_name?.[0]}
                       </AvatarFallback>
                     </Avatar>
                     <Button
                       size="icon"
                       variant="outline"
-                      className="absolute bottom-0 right-0 rounded-full bg-white hover:bg-gray-100"
+                      className="absolute bottom-0 right-0 rounded-full bg-white/80 backdrop-blur-sm hover:bg-medical-secondary hover:text-white transition-all duration-300"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
                     >
@@ -231,10 +235,10 @@ const EmployeeProfile = () => {
                     />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-medical-primary">
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-medical-primary to-medical-secondary bg-clip-text text-transparent">
                       {employee.first_name} {employee.last_name}
                     </h1>
-                    <p className="text-medical-secondary mt-1">
+                    <p className="text-medical-secondary mt-1 font-medium">
                       ID: {employee.readable_id}
                     </p>
                   </div>
@@ -243,33 +247,44 @@ const EmployeeProfile = () => {
                   variant="secondary"
                   className={`${
                     employee.status?.toLowerCase() === 'active' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}
+                      ? 'bg-green-100 text-green-800 border-green-200' 
+                      : 'bg-red-100 text-red-800 border-red-200'
+                  } backdrop-blur-sm animate-fade-in`}
                 >
                   {employee.status || 'Unknown'}
                 </Badge>
               </div>
 
               <Tabs defaultValue="demographics" className="mt-6">
-                <TabsList className="grid grid-cols-4 lg:grid-cols-7 gap-2">
-                  <TabsTrigger value="demographics">Demographics</TabsTrigger>
-                  <TabsTrigger value="payroll">Payroll</TabsTrigger>
-                  <TabsTrigger value="roles">Roles</TabsTrigger>
-                  <TabsTrigger value="privileges">Privileges</TabsTrigger>
-                  <TabsTrigger value="incidents">Incidents</TabsTrigger>
-                  <TabsTrigger value="documents">Documents</TabsTrigger>
-                  <TabsTrigger value="stats">Stats</TabsTrigger>
-                  <TabsTrigger value="certs">Certifications</TabsTrigger>
-                  <TabsTrigger value="achievements">Achievements</TabsTrigger>
-                  <TabsTrigger value="damage">Damage Reports</TabsTrigger>
-                  <TabsTrigger value="announcements">Announcements</TabsTrigger>
-                  <TabsTrigger value="immunizations">Immunizations</TabsTrigger>
-                  <TabsTrigger value="performance">Performance</TabsTrigger>
+                <TabsList className="grid grid-cols-4 lg:grid-cols-7 gap-2 p-1 bg-medical-accent/50 backdrop-blur-sm rounded-lg">
+                  {[
+                    { value: "demographics", label: "Demographics", icon: User },
+                    { value: "payroll", label: "Payroll", icon: DollarSign },
+                    { value: "roles", label: "Roles", icon: UserCog },
+                    { value: "privileges", label: "Privileges", icon: Shield },
+                    { value: "incidents", label: "Incidents", icon: AlertTriangle },
+                    { value: "documents", label: "Documents", icon: FileText },
+                    { value: "stats", label: "Stats", icon: TrendingUp },
+                    { value: "certs", label: "Certifications", icon: BadgeCheck },
+                    { value: "achievements", label: "Achievements", icon: Award },
+                    { value: "damage", label: "Damage Reports", icon: ClipboardList },
+                    { value: "announcements", label: "Announcements", icon: Bell },
+                    { value: "immunizations", label: "Immunizations", icon: Syringe },
+                    { value: "performance", label: "Performance", icon: Star }
+                  ].map(({ value, label, icon: Icon }) => (
+                    <TabsTrigger 
+                      key={value} 
+                      value={value}
+                      className="flex items-center gap-2 transition-all duration-300 data-[state=active]:bg-white data-[state=active]:text-medical-secondary data-[state=active]:shadow-glow"
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="hidden md:inline">{label}</span>
+                    </TabsTrigger>
+                  ))}
                 </TabsList>
 
-                <TabsContent value="demographics" className="space-y-4 mt-6">
-                  <Card className="p-4 futuristic-card">
+                <TabsContent value="demographics" className="space-y-4 mt-6 animate-fade-in">
+                  <Card className="p-4 backdrop-blur-sm bg-white/80 border-medical-secondary/20 transition-all duration-300 hover:shadow-glow">
                     <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-medical-secondary" />
@@ -281,6 +296,7 @@ const EmployeeProfile = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => handleSave('demographics')}
+                            className="bg-medical-secondary/10 hover:bg-medical-secondary hover:text-white transition-colors duration-300"
                           >
                             <Save className="h-4 w-4 mr-1" />
                             Save
@@ -289,6 +305,7 @@ const EmployeeProfile = () => {
                             size="sm"
                             variant="outline"
                             onClick={handleCancel}
+                            className="hover:bg-red-500 hover:text-white transition-colors duration-300"
                           >
                             <X className="h-4 w-4 mr-1" />
                             Cancel
@@ -299,6 +316,7 @@ const EmployeeProfile = () => {
                           size="sm"
                           variant="outline"
                           onClick={() => handleEdit('demographics')}
+                          className="hover:bg-medical-secondary hover:text-white transition-colors duration-300"
                         >
                           <Edit className="h-4 w-4 mr-1" />
                           Edit
@@ -306,32 +324,32 @@ const EmployeeProfile = () => {
                       )}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label>Phone</Label>
+                      <div className="space-y-2">
+                        <Label className="text-medical-primary">Phone</Label>
                         {editMode === 'demographics' ? (
                           <Input
                             value={editData.mobile || ''}
                             onChange={(e) => setEditData({ ...editData, mobile: e.target.value })}
-                            className="mt-1"
+                            className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
                           />
                         ) : (
-                          <div className="flex items-center gap-2 mt-1">
-                            <Phone className="h-4 w-4 text-gray-500" />
+                          <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                            <Phone className="h-4 w-4 text-medical-secondary" />
                             <span>{employee.mobile || 'Not provided'}</span>
                           </div>
                         )}
                       </div>
-                      <div>
-                        <Label>Station</Label>
+                      <div className="space-y-2">
+                        <Label className="text-medical-primary">Station</Label>
                         {editMode === 'demographics' ? (
                           <Input
                             value={editData.station || ''}
                             onChange={(e) => setEditData({ ...editData, station: e.target.value })}
-                            className="mt-1"
+                            className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
                           />
                         ) : (
-                          <div className="flex items-center gap-2 mt-1">
-                            <MapPin className="h-4 w-4 text-gray-500" />
+                          <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                            <MapPin className="h-4 w-4 text-medical-secondary" />
                             <span>{employee.station || 'Not assigned'}</span>
                           </div>
                         )}
