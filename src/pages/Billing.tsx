@@ -9,6 +9,11 @@ import { Card } from "@/components/ui/card";
 import { useAIBillingAnalysis } from "@/hooks/useAIBillingAnalysis";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { 
   ClipboardList, 
   Users, 
@@ -27,7 +32,8 @@ import {
   TrendingUp,
   AlertOctagon,
   Lightbulb,
-  BarChart3
+  BarChart3,
+  ChevronRight
 } from "lucide-react";
 
 const Billing = () => {
@@ -50,14 +56,33 @@ const Billing = () => {
 
   const { data: aiAnalysis, isLoading: isAnalyzing } = useAIBillingAnalysis(metrics);
 
-  const renderAISection = (title: string, icon: React.ReactNode, content: string) => (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2 text-medical-secondary font-semibold">
-        {icon}
-        <h4>{title}</h4>
-      </div>
-      <p className="text-medical-primary/80 pl-6">{content}</p>
-    </div>
+  const renderAIInsight = (title: string, icon: React.ReactNode, content: string, details: string) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <div className="space-y-2 cursor-pointer hover:bg-medical-card-start/5 p-4 rounded-lg transition-colors group">
+          <div className="flex items-center gap-2 text-medical-secondary font-semibold">
+            {icon}
+            <h4>{title}</h4>
+            <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+          <p className="text-medical-primary/80 pl-6">{content}</p>
+        </div>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 bg-medical-card-start/95 backdrop-blur-sm border-medical-secondary/20">
+        <div className="space-y-2 p-2">
+          <div className="flex items-center gap-2 text-medical-secondary font-semibold">
+            {icon}
+            <h4 className="text-sm">{title}</h4>
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm text-medical-primary/90">{content}</p>
+            <div className="border-t border-medical-secondary/10 pt-2 mt-2">
+              <p className="text-xs text-medical-primary/70">{details}</p>
+            </div>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 
   return (
@@ -99,31 +124,36 @@ const Billing = () => {
                     </div>
                   ) : aiAnalysis ? (
                     <ScrollArea className="h-[300px] pr-4">
-                      <div className="space-y-6">
-                        {renderAISection(
+                      <div className="space-y-2">
+                        {renderAIInsight(
                           "Key Performance Indicators",
                           <BarChart3 className="w-5 h-5 text-blue-500" />,
-                          aiAnalysis.sections?.[0] || ""
+                          aiAnalysis.sections?.[0] || "",
+                          "Detailed analysis of your billing KPIs including trends, benchmarks, and actionable metrics."
                         )}
-                        {renderAISection(
+                        {renderAIInsight(
                           "Workflow Efficiency",
                           <TrendingUp className="w-5 h-5 text-green-500" />,
-                          aiAnalysis.sections?.[1] || ""
+                          aiAnalysis.sections?.[1] || "",
+                          "In-depth workflow analysis highlighting bottlenecks, optimization opportunities, and efficiency metrics."
                         )}
-                        {renderAISection(
+                        {renderAIInsight(
                           "Revenue Cycle Insights",
                           <Lightbulb className="w-5 h-5 text-yellow-500" />,
-                          aiAnalysis.sections?.[2] || ""
+                          aiAnalysis.sections?.[2] || "",
+                          "Comprehensive revenue cycle analysis with focus on payment velocity, collection rates, and revenue optimization."
                         )}
-                        {renderAISection(
+                        {renderAIInsight(
                           "Risk Alerts",
                           <AlertOctagon className="w-5 h-5 text-red-500" />,
-                          aiAnalysis.sections?.[3] || ""
+                          aiAnalysis.sections?.[3] || "",
+                          "Detailed risk assessment including compliance issues, payment delays, and potential revenue impact."
                         )}
-                        {renderAISection(
+                        {renderAIInsight(
                           "Optimization Recommendations",
                           <Brain className="w-5 h-5 text-purple-500" />,
-                          aiAnalysis.sections?.[4] || ""
+                          aiAnalysis.sections?.[4] || "",
+                          "AI-powered recommendations for improving billing processes, reducing denials, and maximizing revenue."
                         )}
                       </div>
                     </ScrollArea>
