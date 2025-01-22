@@ -349,6 +349,165 @@ const EmployeeProfile = () => {
                           </div>
 
                           <div className="space-y-2">
+                            <Label className="text-medical-primary font-medium">Street Address</Label>
+                            {editMode === 'demographics' ? (
+                              <div className="space-y-2">
+                                <Input
+                                  placeholder="Address Line 1"
+                                  value={editData.address_line1 || ''}
+                                  onChange={(e) => setEditData({ ...editData, address_line1: e.target.value })}
+                                  className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                                />
+                                <Input
+                                  placeholder="Address Line 2"
+                                  value={editData.address_line2 || ''}
+                                  onChange={(e) => setEditData({ ...editData, address_line2: e.target.value })}
+                                  className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                                />
+                              </div>
+                            ) : (
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                  <MapPin className="h-4 w-4 text-medical-secondary" />
+                                  <span>{employee?.address_line1 || 'Not provided'}</span>
+                                </div>
+                                {employee?.address_line2 && (
+                                  <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                    <MapPin className="h-4 w-4 text-medical-secondary" />
+                                    <span>{employee.address_line2}</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label className="text-medical-primary font-medium">City</Label>
+                              {editMode === 'demographics' ? (
+                                <Input
+                                  value={editData.city || ''}
+                                  onChange={(e) => setEditData({ ...editData, city: e.target.value })}
+                                  className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                                />
+                              ) : (
+                                <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                  <Building className="h-4 w-4 text-medical-secondary" />
+                                  <span>{employee?.city || 'Not provided'}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label className="text-medical-primary font-medium">ZIP</Label>
+                              {editMode === 'demographics' ? (
+                                <Input
+                                  value={editData.zip || ''}
+                                  onChange={(e) => setEditData({ ...editData, zip: e.target.value })}
+                                  className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                                />
+                              ) : (
+                                <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                  <MapPin className="h-4 w-4 text-medical-secondary" />
+                                  <span>{employee?.zip || 'Not provided'}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label className="text-medical-primary font-medium">State</Label>
+                            {editMode === 'demographics' ? (
+                              <Select 
+                                value={editData.state || ''} 
+                                onValueChange={(value) => setEditData({ ...editData, state: value })}
+                              >
+                                <SelectTrigger className="bg-white/50 backdrop-blur-sm border-medical-secondary/20">
+                                  <SelectValue placeholder="Select state" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="GA">Georgia</SelectItem>
+                                  {/* Add other states as needed */}
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                <MapPin className="h-4 w-4 text-medical-secondary" />
+                                <span>{employee?.state || 'Not provided'}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label className="text-medical-primary font-medium">Date of Birth</Label>
+                            {editMode === 'demographics' ? (
+                              <Input
+                                type="date"
+                                value={editData.dob || ''}
+                                onChange={(e) => setEditData({ ...editData, dob: e.target.value })}
+                                className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                              />
+                            ) : (
+                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                <Calendar className="h-4 w-4 text-medical-secondary" />
+                                <span>{employee?.dob ? new Date(employee.dob).toLocaleDateString() : 'Not provided'}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label className="text-medical-primary font-medium">Gender</Label>
+                            {editMode === 'demographics' ? (
+                              <Select 
+                                value={editData.gender || ''} 
+                                onValueChange={(value) => setEditData({ ...editData, gender: value })}
+                              >
+                                <SelectTrigger className="bg-white/50 backdrop-blur-sm border-medical-secondary/20">
+                                  <SelectValue placeholder="Select gender" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="male">Male</SelectItem>
+                                  <SelectItem value="female">Female</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                <User className="h-4 w-4 text-medical-secondary" />
+                                <span>{employee?.gender || 'Not provided'}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label className="text-medical-primary font-medium">Race</Label>
+                            {editMode === 'demographics' ? (
+                              <Select 
+                                value={editData.race || ''} 
+                                onValueChange={(value) => setEditData({ ...editData, race: value })}
+                              >
+                                <SelectTrigger className="bg-white/50 backdrop-blur-sm border-medical-secondary/20">
+                                  <SelectValue placeholder="Select race" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="black">Black or African American</SelectItem>
+                                  <SelectItem value="white">White</SelectItem>
+                                  <SelectItem value="asian">Asian</SelectItem>
+                                  <SelectItem value="hispanic">Hispanic or Latino</SelectItem>
+                                  <SelectItem value="native">Native American</SelectItem>
+                                  <SelectItem value="pacific">Pacific Islander</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                <User className="h-4 w-4 text-medical-secondary" />
+                                <span>{employee?.race || 'Not recorded'}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
                             <Label className="text-medical-primary font-medium">Phone</Label>
                             {editMode === 'demographics' ? (
                               <Input
