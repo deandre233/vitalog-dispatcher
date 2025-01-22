@@ -31,12 +31,11 @@ export interface TransportRecord {
   destination_floor_room?: string;
   destination_type?: string;
   reason_for_destination?: string;
-  service_type?: string;
-  priority_level?: string;
-  trip_type?: string;
+  service_type?: 'MICU' | 'ALS' | 'BLS';
+  priority_level?: 'Critical' | 'Emergency' | 'Lower acuity' | 'Scheduled';
+  trip_type?: 'One way' | 'Round trip' | 'Wait-and-return';
   billing_notes?: string;
   dispatcher_notes?: string;
-  incidents?: any[];
   recurrence_end_date?: string;
   recurrence_times?: number;
   requires_bcs?: boolean;
@@ -61,4 +60,14 @@ export interface TransportRecord {
   return_activation_time?: string;
   return_pickup_time?: string;
   return_precise_pickup?: boolean;
+}
+
+export interface DispatchFormData {
+  pickup_location: string;
+  dropoff_location: string;
+  transport_date: string;
+  scheduled_time?: string;
+  service_type?: 'MICU' | 'ALS' | 'BLS';
+  priority_level?: 'Critical' | 'Emergency' | 'Lower acuity' | 'Scheduled';
+  notes?: string;
 }

@@ -1,14 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TransportRecord } from '@/types/dispatch';
-import { toast } from 'sonner';
 
-export function useTransportRecord(id: string) {
+export function useTransportRecord(id?: string) {
   const queryClient = useQueryClient();
 
   const { data: transport, isLoading, error } = useQuery({
     queryKey: ['transport', id],
     queryFn: async () => {
+      if (!id) throw new Error('No transport ID provided');
+      
       const { data, error } = await supabase
         .from('transport_records')
         .select('*')
@@ -17,11 +18,14 @@ export function useTransportRecord(id: string) {
 
       if (error) throw error;
       return data as TransportRecord;
-    }
+    },
+    enabled: !!id
   });
 
   const updateTransport = useMutation({
     mutationFn: async (updates: Partial<TransportRecord>) => {
+      if (!id) throw new Error('No transport ID provided');
+
       const { error } = await supabase
         .from('transport_records')
         .update(updates)
@@ -31,11 +35,6 @@ export function useTransportRecord(id: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transport', id] });
-      toast.success('Transport record updated successfully');
-    },
-    onError: (error) => {
-      console.error('Error updating transport:', error);
-      toast.error('Failed to update transport record');
     }
   });
 
@@ -45,4 +44,24 @@ export function useTransportRecord(id: string) {
     error,
     updateTransport
   };
+}
+
+export function useUpdateTransport(id?: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updates: Partial<TransportRecord>) => {
+      if (!id) throw new Error('No transport ID provided');
+
+      const { error } = await supabase
+        .from('transport_records')
+        .update(updates)
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transport', id] });
+    }
+  });
 }
