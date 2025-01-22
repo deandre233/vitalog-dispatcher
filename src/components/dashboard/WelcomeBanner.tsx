@@ -26,12 +26,12 @@ export function WelcomeBanner() {
         </div>
         <div className="flex flex-wrap gap-3">
           <Button
-            onClick={() => navigate("/dispatch/new")}
+            onClick={() => navigate("/book-dispatch")}
             className="bg-medical-secondary hover:bg-medical-secondary/90 text-white transition-all duration-300 hover:shadow-glow"
             size="sm"
           >
             <Plus className="mr-2 h-4 w-4" />
-            New Dispatch
+            Book New Dispatch
           </Button>
           <Button
             variant="outline"
@@ -40,7 +40,7 @@ export function WelcomeBanner() {
             size="sm"
           >
             <Ambulance className="mr-2 h-4 w-4" />
-            View Active
+            Dispatch Control
           </Button>
           <Button
             variant="outline"

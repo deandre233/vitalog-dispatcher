@@ -414,10 +414,10 @@ export function DispatchBoard() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Link to="/dispatch/new">
+          <Link to="/book-dispatch">
             <Button className="bg-medical-primary hover:bg-medical-primary/90 text-white flex items-center gap-2">
               <Plus className="w-4 h-4" />
-              New Dispatch
+              Book New Dispatch
             </Button>
           </Link>
           <DispatchFilters />
