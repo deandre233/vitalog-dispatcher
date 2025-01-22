@@ -108,75 +108,86 @@ const EmployeeProfile = () => {
       <Header />
       <div className="flex-1 flex">
         <EmployeeDirectorySidebar />
-        <div className="flex-1 bg-[#f4f7fc] p-6">
-          <Card className="p-6 mb-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <h1 className="text-2xl font-bold text-medical-primary">
-                  {employee.first_name} {employee.last_name}
-                </h1>
-                <p className="text-medical-secondary mt-1">
-                  ID: {employee.readable_id}
-                </p>
-              </div>
-              <Badge 
-                variant="secondary"
-                className={`${
-                  employee.status?.toLowerCase() === 'active' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}
-              >
-                {employee.status || 'Unknown'}
-              </Badge>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div className="space-y-4">
-                <div className="flex items-center text-medical-secondary">
-                  <Phone className="h-4 w-4 mr-2" />
-                  {employee.mobile || 'No phone number'}
+        <div className="flex-1 bg-medical-primary/5 p-6">
+          <div className="max-w-7xl mx-auto">
+            <Card className="futuristic-panel p-6 mb-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h1 className="text-2xl font-bold text-medical-primary">
+                    {employee.first_name} {employee.last_name}
+                  </h1>
+                  <p className="text-medical-secondary mt-1">
+                    ID: {employee.readable_id}
+                  </p>
                 </div>
-                <div className="flex items-center text-medical-secondary">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  {employee.station || 'No station assigned'}
-                </div>
-                <div className="flex items-center text-medical-secondary">
-                  <Shield className="h-4 w-4 mr-2" />
-                  {employee.certification_level || 'No certification'}
-                </div>
+                <Badge 
+                  variant="secondary"
+                  className={`${
+                    employee.status?.toLowerCase() === 'active' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}
+                >
+                  {employee.status || 'Unknown'}
+                </Badge>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center text-medical-secondary">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Hired: {employee.first_hired_date || 'Not specified'}
-                </div>
-                <div className="flex items-center text-medical-secondary">
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  Pay Type: {employee.pay_type || 'Not specified'}
-                </div>
-                <div className="flex items-center text-medical-secondary">
-                  <Clock className="h-4 w-4 mr-2" />
-                  Uses Timeclock: {employee.uses_timeclock ? 'Yes' : 'No'}
-                </div>
-              </div>
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <Card className="futuristic-card p-4 space-y-4">
+                  <h3 className="text-lg font-semibold text-medical-primary">Personal Information</h3>
+                  <div className="flex items-center gap-2 text-medical-secondary">
+                    <Phone className="h-4 w-4" />
+                    {employee.mobile || 'No phone number'}
+                  </div>
+                  <div className="flex items-center gap-2 text-medical-secondary">
+                    <MapPin className="h-4 w-4" />
+                    {employee.station || 'No station assigned'}
+                  </div>
+                  <div className="flex items-center gap-2 text-medical-secondary">
+                    <Shield className="h-4 w-4" />
+                    {employee.certification_level || 'No certification'}
+                  </div>
+                </Card>
 
-            <div className="mt-6 flex gap-3">
-              <Button onClick={() => setIsPayrollModalOpen(true)}>
-                Update Payroll
-              </Button>
-              <Button variant="outline" onClick={() => navigate('/employees')}>
-                Back to Directory
-              </Button>
-            </div>
-          </Card>
+                <Card className="futuristic-card p-4 space-y-4">
+                  <h3 className="text-lg font-semibold text-medical-primary">Employment Details</h3>
+                  <div className="flex items-center gap-2 text-medical-secondary">
+                    <Calendar className="h-4 w-4" />
+                    Hired: {employee.first_hired_date || 'Not specified'}
+                  </div>
+                  <div className="flex items-center gap-2 text-medical-secondary">
+                    <DollarSign className="h-4 w-4" />
+                    Pay Type: {employee.pay_type || 'Not specified'}
+                  </div>
+                  <div className="flex items-center gap-2 text-medical-secondary">
+                    <Clock className="h-4 w-4" />
+                    Uses Timeclock: {employee.uses_timeclock ? 'Yes' : 'No'}
+                  </div>
+                </Card>
+              </div>
+
+              <div className="mt-6 flex gap-3">
+                <Button 
+                  className="bg-medical-secondary hover:bg-medical-secondary/90 text-white"
+                  onClick={() => setIsPayrollModalOpen(true)}
+                >
+                  Update Payroll
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-medical-secondary text-medical-secondary hover:bg-medical-secondary/10"
+                  onClick={() => navigate('/employees')}
+                >
+                  Back to Directory
+                </Button>
+              </div>
+            </Card>
+          </div>
         </div>
       </div>
 
       <Dialog open={isPayrollModalOpen} onOpenChange={setIsPayrollModalOpen}>
-        <DialogContent>
+        <DialogContent className="glass-panel">
           <DialogHeader>
             <DialogTitle>Update Payroll Information</DialogTitle>
           </DialogHeader>
@@ -234,7 +245,12 @@ const EmployeeProfile = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsPayrollModalOpen(false)}>Cancel</Button>
-            <Button onClick={() => handlePayrollUpdate(payrollData)}>Save</Button>
+            <Button 
+              className="bg-medical-secondary hover:bg-medical-secondary/90 text-white"
+              onClick={() => handlePayrollUpdate(payrollData)}
+            >
+              Save
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
