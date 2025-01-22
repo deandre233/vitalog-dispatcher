@@ -11,6 +11,7 @@ import EmployeeDirectory from './pages/EmployeeDirectory';
 import EmployeeProfile from './pages/EmployeeProfile';
 import AlertsConfig from './pages/AlertsConfig';
 import PatientRecord from './pages/PatientRecord';
+import BookDispatch from './pages/BookDispatch';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
@@ -21,7 +22,8 @@ function App() {
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/dispatch" element={<CreateDispatch />} />
+        <Route path="/dispatch/new" element={<CreateDispatch />} />
+        <Route path="/book-dispatch" element={<BookDispatch />} />
         <Route path="/dispatch/active" element={<ActiveDispatches />} />
         <Route path="/dispatch/closed" element={<ClosedDispatches />} />
         <Route path="/dispatch/crew" element={<CrewAssignment />} />
