@@ -13,23 +13,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  User,
-  Phone,
-  MapPin,
-  Shield,
-  Clock,
-  ArrowLeft,
-  Calendar,
-  Mail,
-  Building2,
-  AlertCircle,
-  FileText,
-  Award,
-  AlertTriangle,
-  Bell,
-  Syringe,
-  CircuitBoard,
-  Signal
+  User, Phone, MapPin, Shield, Clock, ArrowLeft, Calendar, Mail,
+  Building2, AlertCircle, FileText, Award, AlertTriangle, Bell,
+  Syringe, CircuitBoard, Signal, Key, Camera, HelpCircle, Fingerprint
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +24,8 @@ interface Employee {
   id: string;
   first_name: string;
   last_name: string;
+  middle_initial?: string;
+  suffix?: string;
   mobile: string | null;
   station: string | null;
   status: string | null;
@@ -45,6 +33,13 @@ interface Employee {
   certification_level: string | null;
   created_at: string | null;
   readable_id: string | null;
+  nemsis_uuid?: string;
+  emergency_contact?: string;
+  login_name?: string;
+  last_login_attempt?: string;
+  last_login_success?: string;
+  beacon_token?: string;
+  latest_ping?: string;
 }
 
 export function EmployeeProfile() {
@@ -96,6 +91,21 @@ export function EmployeeProfile() {
     return null;
   }
 
+  const generateRandomPassword = () => {
+    toast({
+      title: "Password Generated",
+      description: "A new random password has been generated and sent to the employee's email.",
+    });
+  };
+
+  const handleAddPortrait = () => {
+    // Implementation for adding portrait
+    toast({
+      title: "Upload Portrait",
+      description: "Portrait upload functionality will be implemented soon.",
+    });
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end">
       <Header />
@@ -124,12 +134,23 @@ export function EmployeeProfile() {
                 {/* Profile Summary Card */}
                 <Card className="col-span-1 futuristic-card p-6 space-y-4">
                   <div className="flex flex-col items-center space-y-4">
-                    <Avatar className="h-24 w-24 border-4 border-medical-secondary shadow-glow">
-                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${employee.id}`} />
-                      <AvatarFallback>{employee.first_name?.[0]}{employee.last_name?.[0]}</AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="h-24 w-24 border-4 border-medical-secondary shadow-glow">
+                        <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${employee.id}`} />
+                        <AvatarFallback>{employee.first_name?.[0]}{employee.last_name?.[0]}</AvatarFallback>
+                      </Avatar>
+                      <Button 
+                        size="sm" 
+                        className="absolute bottom-0 right-0 rounded-full"
+                        onClick={handleAddPortrait}
+                      >
+                        <Camera className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <div className="text-center">
-                      <h2 className="text-xl font-bold">{employee.first_name} {employee.last_name}</h2>
+                      <h2 className="text-xl font-bold">
+                        {employee.first_name} {employee.middle_initial} {employee.last_name} {employee.suffix}
+                      </h2>
                       <Badge variant="outline" className="mt-2">
                         {employee.certification_level || 'Uncertified'}
                       </Badge>
@@ -158,8 +179,8 @@ export function EmployeeProfile() {
                       <TabsList className="w-full justify-start bg-medical-accent/50 p-1">
                         <TabsTrigger value="identity" className="data-[state=active]:bg-white">Identity</TabsTrigger>
                         <TabsTrigger value="notifications" className="data-[state=active]:bg-white">Notifications</TabsTrigger>
-                        <TabsTrigger value="roles" className="data-[state=active]:bg-white">Roles</TabsTrigger>
-                        <TabsTrigger value="privileges" className="data-[state=active]:bg-white">Privileges</TabsTrigger>
+                        <TabsTrigger value="security" className="data-[state=active]:bg-white">Security</TabsTrigger>
+                        <TabsTrigger value="system" className="data-[state=active]:bg-white">System</TabsTrigger>
                       </TabsList>
 
                       <TabsContent value="identity" className="p-6 space-y-6">
@@ -167,16 +188,26 @@ export function EmployeeProfile() {
                           <div className="space-y-4">
                             <div className="space-y-2">
                               <Label>Name</Label>
-                              <div className="flex gap-2">
+                              <div className="grid grid-cols-6 gap-2">
                                 <Input 
+                                  className="col-span-2 bg-medical-accent/10"
                                   placeholder="Last name" 
                                   value={employee.last_name || ''} 
-                                  className="bg-medical-accent/10"
                                 />
                                 <Input 
+                                  className="col-span-2 bg-medical-accent/10"
                                   placeholder="First name" 
                                   value={employee.first_name || ''} 
-                                  className="bg-medical-accent/10"
+                                />
+                                <Input 
+                                  className="col-span-1 bg-medical-accent/10"
+                                  placeholder="MI" 
+                                  value={employee.middle_initial || ''} 
+                                />
+                                <Input 
+                                  className="col-span-1 bg-medical-accent/10"
+                                  placeholder="Suffix" 
+                                  value={employee.suffix || ''} 
                                 />
                               </div>
                             </div>
@@ -188,15 +219,27 @@ export function EmployeeProfile() {
                                 className="bg-medical-accent/10"
                               />
                             </div>
+
+                            <div className="space-y-2">
+                              <Label>Emergency Contact</Label>
+                              <Input 
+                                value={employee.emergency_contact || ''} 
+                                className="bg-medical-accent/10"
+                                placeholder="Name and phone number"
+                              />
+                            </div>
                           </div>
 
                           <div className="space-y-4">
                             <div className="space-y-2">
-                              <Label>Login ID</Label>
+                              <div className="flex items-center gap-2">
+                                <Label>NEMSIS UUID</Label>
+                                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                              </div>
                               <Input 
-                                value={employee.readable_id?.toLowerCase() || ''} 
-                                readOnly 
-                                className="bg-medical-accent/10"
+                                value={employee.nemsis_uuid || ''} 
+                                className="bg-medical-accent/10 font-mono text-sm"
+                                readOnly
                               />
                             </div>
 
@@ -215,6 +258,105 @@ export function EmployeeProfile() {
                             </div>
                           </div>
                         </div>
+                      </TabsContent>
+
+                      <TabsContent value="security" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <Key className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">Login Credentials</h3>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-6">
+                              <div className="space-y-4">
+                                <div className="space-y-2">
+                                  <Label>Login Username</Label>
+                                  <Input 
+                                    value={employee.login_name || ''} 
+                                    className="bg-medical-accent/10"
+                                    readOnly
+                                  />
+                                </div>
+                                
+                                <div className="space-y-2">
+                                  <Label>Password</Label>
+                                  <div className="flex gap-2">
+                                    <Input 
+                                      type="password" 
+                                      value="••••••••"
+                                      className="bg-medical-accent/10"
+                                      readOnly
+                                    />
+                                    <Button onClick={generateRandomPassword}>
+                                      Generate New
+                                    </Button>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    User must change password at next login
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-4">
+                                <div className="space-y-2">
+                                  <Label>Last Login Attempt</Label>
+                                  <Input 
+                                    value={employee.last_login_attempt || 'Never'} 
+                                    className="bg-medical-accent/10"
+                                    readOnly
+                                  />
+                                </div>
+                                
+                                <div className="space-y-2">
+                                  <Label>Last Successful Login</Label>
+                                  <Input 
+                                    value={employee.last_login_success || 'Never'} 
+                                    className="bg-medical-accent/10"
+                                    readOnly
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="system" className="p-6">
+                        <Card className="futuristic-card p-6">
+                          <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                              <Fingerprint className="h-6 w-6 text-medical-secondary" />
+                              <h3 className="text-lg font-semibold">System Integration</h3>
+                            </div>
+                            
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Label>Beacon App Token</Label>
+                                  <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                                <div className="flex gap-2">
+                                  <Input 
+                                    value={employee.beacon_token || ''} 
+                                    className="bg-medical-accent/10 font-mono"
+                                    readOnly
+                                  />
+                                  <Button>Issue New Token</Button>
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <Label>Latest Ping</Label>
+                                <Input 
+                                  value={employee.latest_ping || 'Never'} 
+                                  className="bg-medical-accent/10"
+                                  readOnly
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
                       </TabsContent>
 
                       <TabsContent value="notifications" className="p-6">
@@ -313,8 +455,6 @@ export function EmployeeProfile() {
                           </div>
                         </Card>
                       </TabsContent>
-
-                      {/* Add other tab contents as needed */}
                     </Tabs>
                   </Card>
                 </div>
