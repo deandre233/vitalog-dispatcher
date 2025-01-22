@@ -228,7 +228,6 @@ const Billing = () => {
             <DashboardHeader />
             <main className="p-6 space-y-6">
               <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-semibold text-medical-primary">Dispatch Page</h2>
                 <div className="space-x-2">
                   <Button variant="outline">
                     <Clock className="w-4 h-4 mr-2" />
