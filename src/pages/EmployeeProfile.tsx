@@ -16,7 +16,8 @@ import {
   User, Phone, MapPin, Shield, Clock, ArrowLeft, Calendar, Mail,
   Building2, AlertCircle, FileText, Award, AlertTriangle, Bell,
   Syringe, CircuitBoard, Signal, Key, Camera, HelpCircle, Fingerprint,
-  Calculator
+  Calculator, DollarSign, Wallet, Receipt, CreditCard, BankNote,
+  Percent, Clock3, Landmark, FileSpreadsheet, CircleDollarSign, CalendarDays, BadgeDollarSign
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -992,15 +993,21 @@ export function EmployeeProfile() {
                         <Card className="futuristic-card p-6">
                           <div className="space-y-6">
                             <div className="flex items-center gap-4">
-                              <Calculator className="h-6 w-6 text-medical-secondary" />
+                              <DollarSign className="h-6 w-6 text-medical-secondary" />
                               <h3 className="text-lg font-semibold">Payroll Information</h3>
                             </div>
+                            
                             <div className="grid grid-cols-2 gap-6">
                               <div className="space-y-4">
                                 <div className="space-y-2">
-                                  <Label>Pay Rate</Label>
-                                  <Input type="number" className="bg-medical-accent/10" placeholder="Hourly rate" />
+                                  <Label>Base Pay Rate</Label>
+                                  <div className="flex items-center gap-2">
+                                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                                    <Input type="number" className="bg-medical-accent/10" placeholder="Hourly rate" />
+                                    <span className="text-sm text-muted-foreground">per hour</span>
+                                  </div>
                                 </div>
+
                                 <div className="space-y-2">
                                   <Label>Pay Type</Label>
                                   <Select>
@@ -1010,10 +1017,152 @@ export function EmployeeProfile() {
                                     <SelectContent>
                                       <SelectItem value="hourly">Hourly</SelectItem>
                                       <SelectItem value="salary">Salary</SelectItem>
+                                      <SelectItem value="commission">Commission</SelectItem>
+                                      <SelectItem value="contract">Contract</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
+
+                                <div className="space-y-2">
+                                  <Label>Pay Frequency</Label>
+                                  <Select>
+                                    <SelectTrigger className="bg-medical-accent/10">
+                                      <SelectValue placeholder="Select frequency" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="weekly">Weekly</SelectItem>
+                                      <SelectItem value="biweekly">Bi-weekly</SelectItem>
+                                      <SelectItem value="monthly">Monthly</SelectItem>
+                                      <SelectItem value="semimonthly">Semi-monthly</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>Overtime Rate</Label>
+                                  <div className="flex items-center gap-2">
+                                    <Percent className="h-4 w-4 text-muted-foreground" />
+                                    <Input type="number" className="bg-medical-accent/10" placeholder="150" />
+                                    <span className="text-sm text-muted-foreground">% of base rate</span>
+                                  </div>
+                                </div>
                               </div>
+
+                              <div className="space-y-4">
+                                <div className="space-y-2">
+                                  <Label>Payment Method</Label>
+                                  <Select>
+                                    <SelectTrigger className="bg-medical-accent/10">
+                                      <SelectValue placeholder="Select payment method" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="direct_deposit">Direct Deposit</SelectItem>
+                                      <SelectItem value="check">Check</SelectItem>
+                                      <SelectItem value="cash">Cash</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>Bank Information</Label>
+                                  <div className="space-y-2">
+                                    <Input className="bg-medical-accent/10" placeholder="Bank Name" />
+                                    <Input className="bg-medical-accent/10" placeholder="Account Number (Last 4)" type="password" />
+                                    <Input className="bg-medical-accent/10" placeholder="Routing Number (Last 4)" type="password" />
+                                  </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>Tax Information</Label>
+                                  <div className="space-y-2">
+                                    <Input className="bg-medical-accent/10" placeholder="W4 Status" />
+                                    <Input className="bg-medical-accent/10" placeholder="Allowances" />
+                                    <Input className="bg-medical-accent/10" placeholder="Additional Withholding" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <Separator className="my-6" />
+
+                            <div className="space-y-4">
+                              <h4 className="font-medium">Additional Benefits</h4>
+                              <div className="grid grid-cols-3 gap-4">
+                                <Card className="p-4 bg-medical-accent/5">
+                                  <div className="flex items-center gap-2">
+                                    <Building2 className="h-4 w-4 text-medical-secondary" />
+                                    <span className="font-medium">Health Insurance</span>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground mt-2">Premium Plan - Family Coverage</p>
+                                </Card>
+
+                                <Card className="p-4 bg-medical-accent/5">
+                                  <div className="flex items-center gap-2">
+                                    <Landmark className="h-4 w-4 text-medical-secondary" />
+                                    <span className="font-medium">401(k)</span>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground mt-2">6% Contribution with Match</p>
+                                </Card>
+
+                                <Card className="p-4 bg-medical-accent/5">
+                                  <div className="flex items-center gap-2">
+                                    <CalendarDays className="h-4 w-4 text-medical-secondary" />
+                                    <span className="font-medium">PTO</span>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground mt-2">15 Days Remaining</p>
+                                </Card>
+                              </div>
+                            </div>
+
+                            <Separator className="my-6" />
+
+                            <div className="space-y-4">
+                              <h4 className="font-medium">Recent Payroll Activity</h4>
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between p-2 bg-medical-accent/5 rounded">
+                                  <div className="flex items-center gap-2">
+                                    <Receipt className="h-4 w-4 text-medical-secondary" />
+                                    <span>Last Paycheck</span>
+                                  </div>
+                                  <div className="flex items-center gap-4">
+                                    <span>$2,450.00</span>
+                                    <span className="text-sm text-muted-foreground">Mar 15, 2024</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center justify-between p-2 bg-medical-accent/5 rounded">
+                                  <div className="flex items-center gap-2">
+                                    <Clock3 className="h-4 w-4 text-medical-secondary" />
+                                    <span>Overtime Hours</span>
+                                  </div>
+                                  <div className="flex items-center gap-4">
+                                    <span>12.5 hours</span>
+                                    <span className="text-sm text-muted-foreground">This Period</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center justify-between p-2 bg-medical-accent/5 rounded">
+                                  <div className="flex items-center gap-2">
+                                    <BadgeDollarSign className="h-4 w-4 text-medical-secondary" />
+                                    <span>YTD Earnings</span>
+                                  </div>
+                                  <div className="flex items-center gap-4">
+                                    <span>$18,750.00</span>
+                                    <span className="text-sm text-muted-foreground">2024</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-end gap-4 mt-6">
+                              <Button variant="outline" className="gap-2">
+                                <FileSpreadsheet className="h-4 w-4" />
+                                Export Pay History
+                              </Button>
+                              <Button className="gap-2">
+                                <CircleDollarSign className="h-4 w-4" />
+                                Update Pay Information
+                              </Button>
                             </div>
                           </div>
                         </Card>

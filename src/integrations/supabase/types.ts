@@ -318,6 +318,77 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_privileges: {
+        Row: {
+          can_create_reports: boolean | null
+          can_delete_billing_info: boolean | null
+          can_delete_dispatch_info: boolean | null
+          can_delete_patient_info: boolean | null
+          can_delete_reports: boolean | null
+          can_edit_billing_info: boolean | null
+          can_edit_dispatch_info: boolean | null
+          can_edit_patient_info: boolean | null
+          can_edit_reports: boolean | null
+          can_use_ai_assistance: boolean | null
+          can_view_billing_info: boolean | null
+          can_view_dispatch_info: boolean | null
+          can_view_patient_info: boolean | null
+          can_view_reports: boolean | null
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          can_create_reports?: boolean | null
+          can_delete_billing_info?: boolean | null
+          can_delete_dispatch_info?: boolean | null
+          can_delete_patient_info?: boolean | null
+          can_delete_reports?: boolean | null
+          can_edit_billing_info?: boolean | null
+          can_edit_dispatch_info?: boolean | null
+          can_edit_patient_info?: boolean | null
+          can_edit_reports?: boolean | null
+          can_use_ai_assistance?: boolean | null
+          can_view_billing_info?: boolean | null
+          can_view_dispatch_info?: boolean | null
+          can_view_patient_info?: boolean | null
+          can_view_reports?: boolean | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          can_create_reports?: boolean | null
+          can_delete_billing_info?: boolean | null
+          can_delete_dispatch_info?: boolean | null
+          can_delete_patient_info?: boolean | null
+          can_delete_reports?: boolean | null
+          can_edit_billing_info?: boolean | null
+          can_edit_dispatch_info?: boolean | null
+          can_edit_patient_info?: boolean | null
+          can_edit_reports?: boolean | null
+          can_use_ai_assistance?: boolean | null
+          can_view_billing_info?: boolean | null
+          can_view_dispatch_info?: boolean | null
+          can_view_patient_info?: boolean | null
+          can_view_reports?: boolean | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_privileges_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: true
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_roles: {
         Row: {
           can_see_non_emergent: boolean | null
