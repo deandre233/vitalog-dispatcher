@@ -56,7 +56,7 @@ const routes = [
     href: "/calendar",
   },
   {
-    label: "Closed Dispatches",
+    label: "Completed Operations",
     icon: FileText,
     href: "/closed-dispatches",
   },
@@ -132,7 +132,7 @@ export function AppSidebar() {
           {!isCollapsed && (
             <h2 className="text-lg font-semibold text-medical-primary flex items-center gap-2">
               <CircuitBoard className="h-5 w-5" />
-              Dispatch Page
+              Dispatch Control
             </h2>
           )}
           <Button
