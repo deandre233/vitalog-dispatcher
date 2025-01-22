@@ -531,6 +531,64 @@ const EmployeeProfile = () => {
                           </div>
 
                           <div className="space-y-2">
+                            <Label className="text-medical-primary font-medium">Emergency Contact</Label>
+                            {editMode === 'demographics' ? (
+                              <Input
+                                value={editData.emergency_contact || ''}
+                                onChange={(e) => setEditData({ ...editData, emergency_contact: e.target.value })}
+                                placeholder="Name and phone number"
+                                className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                              />
+                            ) : (
+                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                <Phone className="h-4 w-4 text-medical-secondary" />
+                                <span>{employee?.emergency_contact || 'Not provided'}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label className="text-medical-primary font-medium">NEMSIS UUID</Label>
+                            {editMode === 'demographics' ? (
+                              <Input
+                                value={editData.nemsis_uuid || ''}
+                                onChange={(e) => setEditData({ ...editData, nemsis_uuid: e.target.value })}
+                                className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300 font-mono"
+                              />
+                            ) : (
+                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                <FileText className="h-4 w-4 text-medical-secondary" />
+                                <span className="font-mono text-sm">{employee?.nemsis_uuid || 'Not assigned'}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label className="text-medical-primary font-medium">Assigned Station</Label>
+                            {editMode === 'demographics' ? (
+                              <Select 
+                                value={editData.station || ''} 
+                                onValueChange={(value) => setEditData({ ...editData, station: value })}
+                              >
+                                <SelectTrigger className="bg-white/50 backdrop-blur-sm border-medical-secondary/20">
+                                  <SelectValue placeholder="Select station" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="float">Float</SelectItem>
+                                  <SelectItem value="station1">Station 1</SelectItem>
+                                  <SelectItem value="station2">Station 2</SelectItem>
+                                  <SelectItem value="station3">Station 3</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                <Building className="h-4 w-4 text-medical-secondary" />
+                                <span>{employee?.station || 'Not assigned'}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
                             <Label className="text-medical-primary font-medium">Login Name</Label>
                             {editMode === 'demographics' ? (
                               <Input
@@ -542,6 +600,43 @@ const EmployeeProfile = () => {
                               <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
                                 <User className="h-4 w-4 text-medical-secondary" />
                                 <span>{employee?.login_name || 'Not set'}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label className="text-medical-primary font-medium">Password</Label>
+                            {editMode === 'demographics' ? (
+                              <div className="space-y-2">
+                                <Input
+                                  type="password"
+                                  value={editData.password || ''}
+                                  onChange={(e) => setEditData({ ...editData, password: e.target.value })}
+                                  className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                                />
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full text-xs"
+                                  onClick={() => {
+                                    const randomPassword = Math.random().toString(36).slice(-8);
+                                    setEditData({ ...editData, password: randomPassword });
+                                    toast({
+                                      title: "Password Generated",
+                                      description: "A new random password has been generated. Make sure to save the changes.",
+                                    });
+                                  }}
+                                >
+                                  Generate Random Password
+                                </Button>
+                                <p className="text-xs text-gray-500 italic">
+                                  If you change the password, the user must choose a new one at next login.
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                <Key className="h-4 w-4 text-medical-secondary" />
+                                <span>••••••••</span>
                               </div>
                             )}
                           </div>
