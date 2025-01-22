@@ -43,6 +43,22 @@ interface Employee {
   last_login_success?: string;
   beacon_token?: string;
   latest_ping?: string;
+  pay_rate?: number;
+  uses_timeclock?: boolean;
+  access_codes?: string;
+  first_hired_date?: string;
+}
+
+interface PayrollHistory {
+  id: string;
+  effective_date: string;
+  end_date: string | null;
+  author: string;
+  is_active: boolean;
+  employee_type: string;
+  pay_type: string;
+  pay_rate: number;
+  access_codes: string | null;
 }
 
 export function EmployeeProfile() {
@@ -95,6 +111,16 @@ export function EmployeeProfile() {
     canEditReports: false,
     canDeleteReports: false,
     canUseAIAssistance: false,
+  });
+
+  const [payrollHistory, setPayrollHistory] = useState<PayrollHistory[]>([]);
+  const [isLoadingPayroll, setIsLoadingPayroll] = useState(true);
+  const [laborCost, setLaborCost] = useState({
+    daily: 0,
+    weekly: 0,
+    biweekly: 0,
+    monthly: 0,
+    annually: 0
   });
 
   useEffect(() => {
@@ -160,7 +186,6 @@ export function EmployeeProfile() {
             isProvisional: data.is_provisional
           });
         } else {
-          // Initialize with default values if no roles exist
           console.log('No roles found for employee, using defaults');
           setRoles({
             isCrew: false,
@@ -197,6 +222,48 @@ export function EmployeeProfile() {
       fetchRoles();
     }
   }, [id, toast]);
+
+  useEffect(() => {
+    const fetchPayrollHistory = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('employee_payroll_history')
+          .select('*')
+          .eq('employee_id', id)
+          .order('effective_date', { ascending: false });
+
+        if (error) throw error;
+
+        setPayrollHistory(data || []);
+      } catch (error) {
+        console.error('Error fetching payroll history:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load payroll history",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingPayroll(false);
+      }
+    };
+
+    if (id) {
+      fetchPayrollHistory();
+    }
+  }, [id, toast]);
+
+  useEffect(() => {
+    if (employee?.pay_rate) {
+      const hourlyRate = Number(employee.pay_rate);
+      setLaborCost({
+        daily: hourlyRate * 8,
+        weekly: hourlyRate * 40,
+        biweekly: hourlyRate * 80,
+        monthly: hourlyRate * 166.7,
+        annually: hourlyRate * 2000
+      });
+    }
+  }, [employee?.pay_rate]);
 
   const handleRoleChange = async (field: string, value: boolean | string) => {
     try {
@@ -253,6 +320,50 @@ export function EmployeeProfile() {
       toast({
         title: "Error",
         description: "Failed to update privilege",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePayrollChange = async (field: string, value: string | number | boolean) => {
+    try {
+      const updates = {
+        [field]: value,
+      };
+
+      const { error } = await supabase
+        .from('employees')
+        .update(updates)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setEmployee(prev => prev ? { ...prev, [field]: value } : null);
+      
+      const { error: historyError } = await supabase
+        .from('employee_payroll_history')
+        .insert({
+          employee_id: id,
+          effective_date: new Date().toISOString(),
+          employee_type: employee?.employee_type,
+          pay_type: field === 'pay_type' ? value : employee?.pay_type,
+          pay_rate: field === 'pay_rate' ? value : employee?.pay_rate,
+          access_codes: employee?.access_codes,
+          author: 'System',
+          is_active: true
+        });
+
+      if (historyError) throw historyError;
+
+      toast({
+        title: "Success",
+        description: "Payroll information updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating payroll:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update payroll information",
         variant: "destructive",
       });
     }
@@ -1017,93 +1128,137 @@ export function EmployeeProfile() {
                       <TabsContent value="payroll" className="p-6">
                         <Card className="futuristic-card p-6">
                           <div className="space-y-6">
-                            <div className="flex items-center gap-4">
-                              <DollarSign className="h-6 w-6 text-medical-secondary" />
-                              <h3 className="text-lg font-semibold">Payroll Information</h3>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <DollarSign className="h-6 w-6 text-medical-secondary" />
+                                <h3 className="text-lg font-semibold">Payroll Information</h3>
+                              </div>
+                              <Button 
+                                variant="outline" 
+                                className="gap-2"
+                                onClick={() => {
+                                  toast({
+                                    title: "AI Analysis",
+                                    description: "Analyzing payroll patterns and generating recommendations...",
+                                  });
+                                }}
+                              >
+                                <Calculator className="h-4 w-4" />
+                                Analyze Payroll
+                              </Button>
                             </div>
                             
                             <div className="grid grid-cols-2 gap-6">
                               <div className="space-y-4">
                                 <div className="space-y-2">
-                                  <Label>Base Pay Rate</Label>
-                                  <div className="flex items-center gap-2">
-                                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                    <Input type="number" className="bg-medical-accent/10" placeholder="Hourly rate" />
-                                    <span className="text-sm text-muted-foreground">per hour</span>
-                                  </div>
+                                  <Label>Employee Type</Label>
+                                  <Select 
+                                    value={employee?.employee_type || ''} 
+                                    onValueChange={(value) => handlePayrollChange('employee_type', value)}
+                                  >
+                                    <SelectTrigger className="bg-medical-accent/10">
+                                      <SelectValue placeholder="Select employee type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="Full-time">Full-time</SelectItem>
+                                      <SelectItem value="Part-time">Part-time</SelectItem>
+                                      <SelectItem value="Contract">Contract</SelectItem>
+                                      <SelectItem value="Temporary">Temporary</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>First Hired Date</Label>
+                                  <Input 
+                                    type="date" 
+                                    value={employee?.first_hired_date || ''} 
+                                    onChange={(e) => handlePayrollChange('first_hired_date', e.target.value)}
+                                    className="bg-medical-accent/10"
+                                  />
                                 </div>
 
                                 <div className="space-y-2">
                                   <Label>Pay Type</Label>
-                                  <Select>
+                                  <Select 
+                                    value={employee?.pay_type || 'hourly'} 
+                                    onValueChange={(value) => handlePayrollChange('pay_type', value)}
+                                  >
                                     <SelectTrigger className="bg-medical-accent/10">
-                                      <SelectValue placeholder="Select pay type" />
+                                      <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="hourly">Hourly</SelectItem>
                                       <SelectItem value="salary">Salary</SelectItem>
                                       <SelectItem value="commission">Commission</SelectItem>
-                                      <SelectItem value="contract">Contract</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
 
                                 <div className="space-y-2">
-                                  <Label>Pay Frequency</Label>
-                                  <Select>
-                                    <SelectTrigger className="bg-medical-accent/10">
-                                      <SelectValue placeholder="Select frequency" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="weekly">Weekly</SelectItem>
-                                      <SelectItem value="biweekly">Bi-weekly</SelectItem>
-                                      <SelectItem value="monthly">Monthly</SelectItem>
-                                      <SelectItem value="semimonthly">Semi-monthly</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label>Overtime Rate</Label>
+                                  <Label>Pay Rate</Label>
                                   <div className="flex items-center gap-2">
-                                    <Percent className="h-4 w-4 text-muted-foreground" />
-                                    <Input type="number" className="bg-medical-accent/10" placeholder="150" />
-                                    <span className="text-sm text-muted-foreground">% of base rate</span>
+                                    <span className="text-sm">$</span>
+                                    <Input 
+                                      type="number" 
+                                      value={employee?.pay_rate || ''} 
+                                      onChange={(e) => handlePayrollChange('pay_rate', parseFloat(e.target.value))}
+                                      className="bg-medical-accent/10"
+                                      step="0.01"
+                                    />
+                                    <span className="text-sm">per hour</span>
                                   </div>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="uses-timeclock"
+                                    checked={employee?.uses_timeclock}
+                                    onCheckedChange={(checked) => 
+                                      handlePayrollChange('uses_timeclock', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="uses-timeclock" className="text-sm font-medium">
+                                    Uses timeclock
+                                  </label>
                                 </div>
                               </div>
 
                               <div className="space-y-4">
-                                <div className="space-y-2">
-                                  <Label>Payment Method</Label>
-                                  <Select>
-                                    <SelectTrigger className="bg-medical-accent/10">
-                                      <SelectValue placeholder="Select payment method" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="direct_deposit">Direct Deposit</SelectItem>
-                                      <SelectItem value="check">Check</SelectItem>
-                                      <SelectItem value="cash">Cash</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
+                                <Card className="p-4 bg-medical-accent/5">
+                                  <h4 className="font-medium mb-4">Labor Cost Estimates</h4>
+                                  <div className="space-y-2">
+                                    <div className="flex justify-between">
+                                      <span>Daily @ 8 hours</span>
+                                      <span>${laborCost.daily.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Weekly @ 40 hours</span>
+                                      <span>${laborCost.weekly.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Bi-weekly @ 80 hours</span>
+                                      <span>${laborCost.biweekly.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Monthly @ 166.7 hours</span>
+                                      <span>${laborCost.monthly.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between font-medium">
+                                      <span>Annually @ 2000 hours</span>
+                                      <span>${laborCost.annually.toFixed(2)}</span>
+                                    </div>
+                                  </div>
+                                </Card>
 
                                 <div className="space-y-2">
-                                  <Label>Bank Information</Label>
-                                  <div className="space-y-2">
-                                    <Input className="bg-medical-accent/10" placeholder="Bank Name" />
-                                    <Input className="bg-medical-accent/10" placeholder="Account Number (Last 4)" type="password" />
-                                    <Input className="bg-medical-accent/10" placeholder="Routing Number (Last 4)" type="password" />
-                                  </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label>Tax Information</Label>
-                                  <div className="space-y-2">
-                                    <Input className="bg-medical-accent/10" placeholder="W4 Status" />
-                                    <Input className="bg-medical-accent/10" placeholder="Allowances" />
-                                    <Input className="bg-medical-accent/10" placeholder="Additional Withholding" />
-                                  </div>
+                                  <Label>Access Codes</Label>
+                                  <Input 
+                                    placeholder="Optional" 
+                                    value={employee?.access_codes || ''} 
+                                    onChange={(e) => handlePayrollChange('access_codes', e.target.value)}
+                                    className="bg-medical-accent/10"
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -1111,83 +1266,48 @@ export function EmployeeProfile() {
                             <Separator className="my-6" />
 
                             <div className="space-y-4">
-                              <h4 className="font-medium">Additional Benefits</h4>
-                              <div className="grid grid-cols-3 gap-4">
-                                <Card className="p-4 bg-medical-accent/5">
-                                  <div className="flex items-center gap-2">
-                                    <Building2 className="h-4 w-4 text-medical-secondary" />
-                                    <span className="font-medium">Health Insurance</span>
-                                  </div>
-                                  <p className="text-sm text-muted-foreground mt-2">Premium Plan - Family Coverage</p>
-                                </Card>
-
-                                <Card className="p-4 bg-medical-accent/5">
-                                  <div className="flex items-center gap-2">
-                                    <Landmark className="h-4 w-4 text-medical-secondary" />
-                                    <span className="font-medium">401(k)</span>
-                                  </div>
-                                  <p className="text-sm text-muted-foreground mt-2">6% Contribution with Match</p>
-                                </Card>
-
-                                <Card className="p-4 bg-medical-accent/5">
-                                  <div className="flex items-center gap-2">
-                                    <CalendarDays className="h-4 w-4 text-medical-secondary" />
-                                    <span className="font-medium">PTO</span>
-                                  </div>
-                                  <p className="text-sm text-muted-foreground mt-2">15 Days Remaining</p>
-                                </Card>
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-medium">Payroll History</h4>
+                                <Button variant="outline" className="gap-2">
+                                  <FileSpreadsheet className="h-4 w-4" />
+                                  Export History
+                                </Button>
                               </div>
-                            </div>
-
-                            <Separator className="my-6" />
-
-                            <div className="space-y-4">
-                              <h4 className="font-medium">Recent Payroll Activity</h4>
-                              <div className="space-y-2">
-                                <div className="flex items-center justify-between p-2 bg-medical-accent/5 rounded">
-                                  <div className="flex items-center gap-2">
-                                    <Receipt className="h-4 w-4 text-medical-secondary" />
-                                    <span>Last Paycheck</span>
-                                  </div>
-                                  <div className="flex items-center gap-4">
-                                    <span>$2,450.00</span>
-                                    <span className="text-sm text-muted-foreground">Mar 15, 2024</span>
-                                  </div>
+                              
+                              {isLoadingPayroll ? (
+                                <div className="text-center py-4">Loading payroll history...</div>
+                              ) : payrollHistory.length > 0 ? (
+                                <div className="space-y-2">
+                                  {payrollHistory.map((record) => (
+                                    <div 
+                                      key={record.id} 
+                                      className="flex items-center justify-between p-2 bg-medical-accent/5 rounded"
+                                    >
+                                      <div className="space-y-1">
+                                        <div className="flex items-center gap-2">
+                                          <Clock3 className="h-4 w-4 text-medical-secondary" />
+                                          <span className="font-medium">
+                                            {new Date(record.effective_date).toLocaleDateString()}
+                                          </span>
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">
+                                          {record.author} - {record.employee_type} - {record.pay_type}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-4">
+                                        <span className="font-medium">${record.pay_rate}/hr</span>
+                                        <Badge variant={record.is_active ? "default" : "secondary"}>
+                                          {record.is_active ? "Active" : "Inactive"}
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
-
-                                <div className="flex items-center justify-between p-2 bg-medical-accent/5 rounded">
-                                  <div className="flex items-center gap-2">
-                                    <Clock3 className="h-4 w-4 text-medical-secondary" />
-                                    <span>Overtime Hours</span>
-                                  </div>
-                                  <div className="flex items-center gap-4">
-                                    <span>12.5 hours</span>
-                                    <span className="text-sm text-muted-foreground">This Period</span>
-                                  </div>
+                              ) : (
+                                <div className="text-center py-4 text-muted-foreground">
+                                  No payroll history available
                                 </div>
-
-                                <div className="flex items-center justify-between p-2 bg-medical-accent/5 rounded">
-                                  <div className="flex items-center gap-2">
-                                    <BadgeDollarSign className="h-4 w-4 text-medical-secondary" />
-                                    <span>YTD Earnings</span>
-                                  </div>
-                                  <div className="flex items-center gap-4">
-                                    <span>$18,750.00</span>
-                                    <span className="text-sm text-muted-foreground">2024</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex justify-end gap-4 mt-6">
-                              <Button variant="outline" className="gap-2">
-                                <FileSpreadsheet className="h-4 w-4" />
-                                Export Pay History
-                              </Button>
-                              <Button className="gap-2">
-                                <CircleDollarSign className="h-4 w-4" />
-                                Update Pay Information
-                              </Button>
+                              )}
                             </div>
                           </div>
                         </Card>
@@ -1457,4 +1577,3 @@ export function EmployeeProfile() {
 }
 
 export default EmployeeProfile;
-
