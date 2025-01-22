@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Header } from "@/components/layout/Header";
+import { EmployeeDirectorySidebar } from "@/components/navigation/EmployeeDirectorySidebar";
 import {
   Dialog,
   DialogContent,
@@ -13,9 +15,22 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { 
+  User, 
+  Phone, 
+  MapPin, 
+  Shield, 
+  Calendar,
+  DollarSign,
+  Clock,
+  BadgeCheck
+} from "lucide-react";
 
 const EmployeeProfile = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [employee, setEmployee] = useState<any>(null);
   const [isPayrollModalOpen, setIsPayrollModalOpen] = useState(false);
   const [payrollData, setPayrollData] = useState({
@@ -70,18 +85,95 @@ const EmployeeProfile = () => {
     }
   };
 
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">
-        {employee?.first_name} {employee?.last_name}
-      </h1>
-      <div className="mb-4">
-        <p className="text-gray-600">Employee ID: {employee?.readable_id}</p>
-        <p className="text-gray-600">Mobile: {employee?.mobile}</p>
-        <p className="text-gray-600">Station: {employee?.station}</p>
+  if (!employee) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex">
+          <EmployeeDirectorySidebar />
+          <div className="flex-1 p-6">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <Button onClick={() => setIsPayrollModalOpen(true)}>Update Payroll</Button>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="flex-1 flex">
+        <EmployeeDirectorySidebar />
+        <div className="flex-1 bg-[#f4f7fc] p-6">
+          <Card className="p-6 mb-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-2xl font-bold text-medical-primary">
+                  {employee.first_name} {employee.last_name}
+                </h1>
+                <p className="text-medical-secondary mt-1">
+                  ID: {employee.readable_id}
+                </p>
+              </div>
+              <Badge 
+                variant="secondary"
+                className={`${
+                  employee.status?.toLowerCase() === 'active' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}
+              >
+                {employee.status || 'Unknown'}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div className="space-y-4">
+                <div className="flex items-center text-medical-secondary">
+                  <Phone className="h-4 w-4 mr-2" />
+                  {employee.mobile || 'No phone number'}
+                </div>
+                <div className="flex items-center text-medical-secondary">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  {employee.station || 'No station assigned'}
+                </div>
+                <div className="flex items-center text-medical-secondary">
+                  <Shield className="h-4 w-4 mr-2" />
+                  {employee.certification_level || 'No certification'}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center text-medical-secondary">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Hired: {employee.first_hired_date || 'Not specified'}
+                </div>
+                <div className="flex items-center text-medical-secondary">
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  Pay Type: {employee.pay_type || 'Not specified'}
+                </div>
+                <div className="flex items-center text-medical-secondary">
+                  <Clock className="h-4 w-4 mr-2" />
+                  Uses Timeclock: {employee.uses_timeclock ? 'Yes' : 'No'}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex gap-3">
+              <Button onClick={() => setIsPayrollModalOpen(true)}>
+                Update Payroll
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/employees')}>
+                Back to Directory
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
 
       <Dialog open={isPayrollModalOpen} onOpenChange={setIsPayrollModalOpen}>
         <DialogContent>
