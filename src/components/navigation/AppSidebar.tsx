@@ -1,13 +1,27 @@
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 import {
-  CircuitBoard, Users, Map, CheckSquare, Zap,
-  Calendar, FileText, Phone, FileCheck, Building2,
-  Bookmark, User, Upload, BookOpen, Tag,
-  Clock, Link2, ChevronLeft, ChevronRight
+  ChevronLeft,
+  ChevronRight,
+  CircuitBoard,
+  Users,
+  Map,
+  CheckSquare,
+  Zap,
+  Calendar,
+  FileText,
+  Phone,
+  FileCheck,
+  Building2,
+  Bookmark,
+  User,
+  Upload,
+  BookOpen,
+  Tag,
+  Clock,
+  Link2
 } from "lucide-react";
 
 const routes = [
@@ -104,8 +118,8 @@ const routes = [
 ];
 
 export function AppSidebar() {
-  const pathname = useLocation().pathname;
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { pathname } = useLocation();
 
   return (
     <div className={cn(
@@ -130,34 +144,36 @@ export function AppSidebar() {
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
         </div>
-        <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
+        
+        <nav className="flex-1 overflow-y-auto">
+          <div className="space-y-1 p-2">
             {routes.map((route) => (
-              <Button
-                key={route.href}
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start relative overflow-hidden group",
-                  "hover:bg-medical-accent/10",
-                  "transition-all duration-200 ease-in-out",
-                  pathname === route.href && "bg-medical-accent/20",
-                  isCollapsed ? "px-2" : "px-4"
-                )}
-                asChild
-              >
-                <Link to={route.href} className="flex items-center">
-                  <route.icon className={cn(
-                    "h-4 w-4 text-medical-primary",
-                    !isCollapsed && "mr-2"
-                  )} />
-                  {!isCollapsed && (
-                    <span className="font-medium text-medical-primary">{route.label}</span>
+              <div key={route.href}>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start relative overflow-hidden group",
+                    "hover:bg-medical-accent/10",
+                    "transition-all duration-200 ease-in-out",
+                    pathname === route.href && "bg-medical-accent/20",
+                    isCollapsed ? "px-2" : "px-4"
                   )}
-                </Link>
-              </Button>
+                  asChild
+                >
+                  <Link to={route.href} className="flex items-center">
+                    <route.icon className={cn(
+                      "h-4 w-4 text-medical-primary",
+                      !isCollapsed && "mr-2"
+                    )} />
+                    {!isCollapsed && (
+                      <span className="font-medium text-medical-primary">{route.label}</span>
+                    )}
+                  </Link>
+                </Button>
+              </div>
             ))}
           </div>
-        </ScrollArea>
+        </nav>
       </div>
     </div>
   );
