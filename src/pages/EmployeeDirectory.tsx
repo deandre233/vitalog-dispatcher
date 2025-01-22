@@ -1,13 +1,11 @@
-import { SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { Header } from "@/components/layout/Header";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { EmployeeDirectorySidebar } from "@/components/navigation/EmployeeDirectorySidebar";
 import { 
   User,
   Phone,
@@ -94,62 +92,59 @@ export function EmployeeDirectory() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-accent to-white">
+    <div className="min-h-screen flex flex-col">
       <Header />
       <div className="flex-1 flex">
-        <SidebarProvider defaultOpen={true}>
-          <div className="min-h-screen flex w-full">
-            <AppSidebar />
-            <SidebarRail />
-            <div className="flex-1 overflow-auto">
-              <div className="p-6 space-y-6">
-                <div className="glass-panel p-6">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-medical-secondary/10">
-                        <CircuitBoard className="h-6 w-6 text-medical-secondary" />
-                      </div>
-                      <h1 className="text-2xl font-bold bg-gradient-to-r from-medical-primary to-medical-secondary bg-clip-text text-transparent">
-                        Employee Directory
-                      </h1>
-                    </div>
-                    <Button 
-                      onClick={() => navigate('/employee/new')}
-                      className="bg-gradient-to-r from-medical-gradient-start to-medical-gradient-end hover:shadow-lg transition-all duration-300 group"
-                    >
-                      <Plus className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
-                      Add Employee
-                    </Button>
+        <EmployeeDirectorySidebar />
+        <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+          <div className="p-6 space-y-6">
+            <div className="glass-panel p-6">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-medical-secondary/10">
+                    <CircuitBoard className="h-6 w-6 text-medical-secondary" />
                   </div>
-
-                  <div className="mt-6 flex flex-col sm:flex-row gap-4">
-                    <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-medical-secondary/50" />
-                      <input
-                        type="text"
-                        placeholder="Search employees..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-medical-secondary/20 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-medical-secondary/30 transition-all duration-300"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="hideInactive"
-                        checked={hideInactive}
-                        onChange={(e) => setHideInactive(e.target.checked)}
-                        className="rounded border-medical-secondary/20"
-                      />
-                      <label htmlFor="hideInactive" className="text-sm text-medical-primary">
-                        Hide inactive employees
-                      </label>
-                    </div>
-                  </div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-medical-primary to-medical-secondary bg-clip-text text-transparent">
+                    Employee Directory
+                  </h1>
                 </div>
+                <Button 
+                  onClick={() => navigate('/employee/new')}
+                  className="bg-gradient-to-r from-medical-gradient-start to-medical-gradient-end hover:shadow-lg transition-all duration-300 group"
+                >
+                  <Plus className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
+                  Add Employee
+                </Button>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredEmployees.map((employee) => (
+              <div className="mt-6 flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-medical-secondary/50" />
+                  <input
+                    type="text"
+                    placeholder="Search employees..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-medical-secondary/20 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-medical-secondary/30 transition-all duration-300"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="hideInactive"
+                    checked={hideInactive}
+                    onChange={(e) => setHideInactive(e.target.checked)}
+                    className="rounded border-medical-secondary/20"
+                  />
+                  <label htmlFor="hideInactive" className="text-sm text-medical-primary">
+                    Hide inactive employees
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredEmployees.map((employee) => (
                     <Card 
                       key={employee.id}
                       className="futuristic-card p-4 group hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden"
@@ -205,12 +200,10 @@ export function EmployeeDirectory() {
                         </div>
                       </div>
                     </Card>
-                  ))}
-                </div>
-              </div>
+              ))}
             </div>
           </div>
-        </SidebarProvider>
+        </div>
       </div>
     </div>
   );
