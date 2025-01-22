@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
+  CircuitBoard, Atom, Network, Signal, Terminal, Cpu, 
   ClipboardCheck, FileSearch, FilePlus2, Send, AlertTriangle, Scale,
   Car, Clock, FileText, Building2, Users, User, Upload, FileUp,
-  DollarSign, List, ExternalLink, CircleDollarSign, ChevronLeft, ChevronRight
+  DollarSign, List, CircleDollarSign, ChevronLeft, ChevronRight
 } from "lucide-react";
 
 const routes = [
@@ -55,7 +56,7 @@ const routes = [
     href: "/payment-finder"
   },
   {
-    label: "Pre-Approvals On File",
+    label: "Prior Authorization On File",
     icon: FileText,
     href: "/prior-auths"
   },
@@ -70,12 +71,12 @@ const routes = [
     href: "/affiliates"
   },
   {
-    label: "Client List",
+    label: "Patient List",
     icon: User,
     href: "/patients"
   },
   {
-    label: "Client Document Upload",
+    label: "Patient Document Upload",
     icon: Upload,
     href: "/document-upload"
   },
@@ -107,41 +108,54 @@ export function BillingSidebar() {
 
   return (
     <div className={cn(
-      "border-r bg-white text-medical-primary transition-all duration-300",
+      "relative border-r bg-gradient-to-b from-medical-card-start to-medical-card-end backdrop-blur-sm",
+      "transition-all duration-300 ease-in-out",
       isCollapsed ? "w-16" : "w-64"
     )}>
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4">
-          {!isCollapsed && <h2 className="text-lg font-semibold">Billing</h2>}
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-medical-gradient-start to-medical-gradient-end">
+          {!isCollapsed && (
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <CircuitBoard className="h-5 w-5" />
+              Billing
+            </h2>
+          )}
           <Button
             variant="ghost"
             size="icon"
-            className="text-medical-primary hover:bg-medical-accent/20"
+            className="text-white hover:bg-white/10"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
         </div>
-        <div className="flex-1 px-2 py-2">
+        <div className="flex-1 px-2 py-2 overflow-y-auto">
           <div className="space-y-1">
             {routes.map((route) => (
               <Button
                 key={route.href}
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-medical-primary hover:bg-medical-accent/20",
-                  pathname === route.href && "bg-medical-accent/30",
+                  "w-full justify-start text-medical-primary relative overflow-hidden group",
+                  "hover:bg-medical-gradient-start/10 hover:shadow-md hover:scale-[1.02]",
+                  "transition-all duration-200 ease-in-out",
+                  pathname === route.href && "bg-medical-gradient-start/20 shadow-glow",
                   isCollapsed && "px-2"
                 )}
                 asChild
               >
                 <Link to={route.href} className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <route.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
-                    {!isCollapsed && <span>{route.label}</span>}
+                    <route.icon className={cn(
+                      "h-4 w-4 transition-transform group-hover:scale-110",
+                      !isCollapsed && "mr-2"
+                    )} />
+                    {!isCollapsed && (
+                      <span className="font-medium">{route.label}</span>
+                    )}
                   </div>
                   {!isCollapsed && route.count && (
-                    <span className="ml-auto text-xs bg-medical-accent/30 px-2 py-1 rounded-full">
+                    <span className="ml-auto text-xs bg-medical-gradient-start/20 px-2 py-1 rounded-full">
                       {route.count}
                     </span>
                   )}
@@ -151,6 +165,7 @@ export function BillingSidebar() {
           </div>
         </div>
       </div>
+      <div className="absolute inset-0 pointer-events-none border-r border-medical-secondary/20 bg-gradient-to-b from-transparent to-medical-gradient-end/5" />
     </div>
   );
 }
