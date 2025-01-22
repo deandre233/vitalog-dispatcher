@@ -43,10 +43,11 @@ interface Employee {
   last_login_success?: string;
   beacon_token?: string;
   latest_ping?: string;
-  pay_rate?: number;
+  pay_rate?: number | null;
+  pay_type?: string | null;
   uses_timeclock?: boolean;
-  access_codes?: string;
-  first_hired_date?: string;
+  access_codes?: string | null;
+  first_hired_date?: string | null;
 }
 
 interface PayrollHistory {
@@ -327,7 +328,7 @@ export function EmployeeProfile() {
 
   const handlePayrollChange = async (field: string, value: string | number | boolean) => {
     try {
-      const updates = {
+      const updates: Record<string, any> = {
         [field]: value,
       };
 
@@ -340,6 +341,9 @@ export function EmployeeProfile() {
 
       setEmployee(prev => prev ? { ...prev, [field]: value } : null);
       
+      // Convert value to number for pay_rate in payroll history
+      const historyValue = field === 'pay_rate' ? Number(value) : value;
+      
       const { error: historyError } = await supabase
         .from('employee_payroll_history')
         .insert({
@@ -347,7 +351,7 @@ export function EmployeeProfile() {
           effective_date: new Date().toISOString(),
           employee_type: employee?.employee_type,
           pay_type: field === 'pay_type' ? value : employee?.pay_type,
-          pay_rate: field === 'pay_rate' ? value : employee?.pay_rate,
+          pay_rate: field === 'pay_rate' ? historyValue : employee?.pay_rate,
           access_codes: employee?.access_codes,
           author: 'System',
           is_active: true
