@@ -15,7 +15,7 @@ import {
   ClipboardList, Users, FileText, Building2, Clock, AlertCircle,
   Upload, FileCheck, Send, AlertTriangle, Building, UserSquare,
   Brain, Loader2, TrendingUp, AlertOctagon, Lightbulb, BarChart3,
-  ChevronRight, DollarSign, Info, Circuit, Cpu, Database, Network, 
+  ChevronRight, DollarSign, Info, Cpu, Database, Network, 
   Radio, Rocket, Signal, Sparkles, Zap
 } from "lucide-react";
 
@@ -472,7 +472,7 @@ const Billing = () => {
                     <div className="flex items-center gap-3 text-medical-primary/80 justify-center py-8">
                       <div className="relative">
                         <div className="absolute -inset-1 bg-medical-secondary/20 rounded-full blur-sm animate-pulse" />
-                        <Circuit className="w-6 h-6 animate-spin text-medical-secondary" />
+                        <Cpu className="w-6 h-6 animate-spin text-medical-secondary" />
                       </div>
                       <p className="animate-pulse">Processing billing metrics...</p>
                     </div>
