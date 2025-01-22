@@ -9,7 +9,11 @@ import {
   Settings, 
   Database, 
   ShieldCheck, 
-  Headphones 
+  Headphones,
+  BarChart,
+  TrendingUp,
+  Truck,
+  UserCheck
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -77,6 +81,34 @@ const menuItems = [
     path: "/support",
     color: "text-violet-500",
     gradient: "from-violet-400 to-purple-500"
+  },
+  {
+    title: "Performance",
+    icon: BarChart,
+    description: "Monitor key business metrics and analytics",
+    path: "/analytics",
+    color: "text-blue-500",
+    gradient: "from-blue-400 to-indigo-500",
+    metrics: [
+      {
+        icon: UserCheck,
+        label: "Crew Performance",
+        value: "94%",
+        change: "+2.3%"
+      },
+      {
+        icon: Truck,
+        label: "Fleet Utilization",
+        value: "87%",
+        change: "+1.5%"
+      },
+      {
+        icon: TrendingUp,
+        label: "Profit Margin",
+        value: "$142K",
+        change: "+12.5%"
+      }
+    ]
   }
 ];
 
@@ -93,7 +125,7 @@ const Index = () => {
             Select a module to get started
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {menuItems.map((item) => (
+            {menuItems.slice(0, -2).map((item) => (
               <Link 
                 key={item.title} 
                 to={item.path}
@@ -131,6 +163,71 @@ const Index = () => {
                       <p className="text-sm text-medical-primary/70">
                         {item.description}
                       </p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+            
+            {/* Support and Performance panels */}
+            {menuItems.slice(-2).map((item) => (
+              <Link 
+                key={item.title} 
+                to={item.path}
+                className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1 xl:col-span-2"
+              >
+                <Card className={`
+                  h-full relative overflow-hidden
+                  bg-gradient-to-br ${item.gradient}
+                  border-0 shadow-lg hover:shadow-xl
+                  group transition-all duration-300
+                  before:absolute before:inset-0
+                  before:bg-white before:z-10 before:opacity-95
+                  before:transition-opacity before:duration-300
+                  hover:before:opacity-90
+                  after:absolute after:inset-0 after:-z-10
+                  after:bg-gradient-to-br ${item.gradient}
+                  after:opacity-0 hover:after:opacity-100
+                  after:transition-opacity after:duration-300
+                  backdrop-blur-sm
+                `}>
+                  <div className="relative z-20 p-6">
+                    <div className="flex items-center space-x-6">
+                      <div className={`
+                        p-3 rounded-xl ${item.color}
+                        bg-white/80 shadow-lg
+                        group-hover:scale-110 group-hover:shadow-xl
+                        transform transition-all duration-300
+                        backdrop-blur-sm
+                      `}>
+                        <item.icon className="w-8 h-8" />
+                      </div>
+                      <div className="flex-1">
+                        <h2 className="text-xl font-semibold text-medical-primary">
+                          {item.title}
+                        </h2>
+                        <p className="text-sm text-medical-primary/70">
+                          {item.description}
+                        </p>
+                        {item.metrics && (
+                          <div className="grid grid-cols-3 gap-4 mt-4">
+                            {item.metrics.map((metric, index) => (
+                              <div key={index} className="bg-white/50 rounded-lg p-4 backdrop-blur-sm">
+                                <metric.icon className={`w-6 h-6 ${item.color} mb-2`} />
+                                <div className="text-sm font-medium text-medical-primary">
+                                  {metric.label}
+                                </div>
+                                <div className="text-lg font-bold text-medical-primary">
+                                  {metric.value}
+                                </div>
+                                <div className="text-xs text-green-600">
+                                  {metric.change}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Card>
