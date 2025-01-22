@@ -2,10 +2,17 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Button, Modal } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const EmployeeProfile = () => {
   const { id } = useParams();
@@ -69,69 +76,69 @@ const EmployeeProfile = () => {
       <p>{employee?.email}</p>
       <Button onClick={() => setIsPayrollModalOpen(true)}>Update Payroll</Button>
 
-      <Modal open={isPayrollModalOpen} onOpenChange={setIsPayrollModalOpen}>
-        <Modal.Content>
-          <Modal.Header>Update Payroll Information</Modal.Header>
-          <Modal.Body>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="effective_date">Effective Date</Label>
-                <Input
-                  id="effective_date"
-                  type="date"
-                  value={payrollData.effective_date}
-                  onChange={(e) => setPayrollData({ ...payrollData, effective_date: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="employee_type">Employee Type</Label>
-                <Input
-                  id="employee_type"
-                  value={payrollData.employee_type}
-                  onChange={(e) => setPayrollData({ ...payrollData, employee_type: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="pay_type">Pay Type</Label>
-                <Input
-                  id="pay_type"
-                  value={payrollData.pay_type}
-                  onChange={(e) => setPayrollData({ ...payrollData, pay_type: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="pay_rate">Pay Rate</Label>
-                <Input
-                  id="pay_rate"
-                  type="number"
-                  value={payrollData.pay_rate}
-                  onChange={(e) => setPayrollData({ ...payrollData, pay_rate: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="access_codes">Access Codes</Label>
-                <Textarea
-                  id="access_codes"
-                  value={payrollData.access_codes}
-                  onChange={(e) => setPayrollData({ ...payrollData, access_codes: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="author">Author</Label>
-                <Input
-                  id="author"
-                  value={payrollData.author}
-                  onChange={(e) => setPayrollData({ ...payrollData, author: e.target.value })}
-                />
-              </div>
+      <Dialog open={isPayrollModalOpen} onOpenChange={setIsPayrollModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update Payroll Information</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="effective_date">Effective Date</Label>
+              <Input
+                id="effective_date"
+                type="date"
+                value={payrollData.effective_date}
+                onChange={(e) => setPayrollData({ ...payrollData, effective_date: e.target.value })}
+              />
             </div>
-          </Modal.Body>
-          <Modal.Footer>
+            <div>
+              <Label htmlFor="employee_type">Employee Type</Label>
+              <Input
+                id="employee_type"
+                value={payrollData.employee_type}
+                onChange={(e) => setPayrollData({ ...payrollData, employee_type: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="pay_type">Pay Type</Label>
+              <Input
+                id="pay_type"
+                value={payrollData.pay_type}
+                onChange={(e) => setPayrollData({ ...payrollData, pay_type: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="pay_rate">Pay Rate</Label>
+              <Input
+                id="pay_rate"
+                type="number"
+                value={payrollData.pay_rate}
+                onChange={(e) => setPayrollData({ ...payrollData, pay_rate: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="access_codes">Access Codes</Label>
+              <Textarea
+                id="access_codes"
+                value={payrollData.access_codes}
+                onChange={(e) => setPayrollData({ ...payrollData, access_codes: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="author">Author</Label>
+              <Input
+                id="author"
+                value={payrollData.author}
+                onChange={(e) => setPayrollData({ ...payrollData, author: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
             <Button onClick={() => handlePayrollUpdate(payrollData)}>Save</Button>
             <Button variant="outline" onClick={() => setIsPayrollModalOpen(false)}>Cancel</Button>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
