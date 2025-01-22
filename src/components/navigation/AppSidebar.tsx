@@ -4,63 +4,56 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
-  CircuitBoard, Network, Signal, Terminal, Cpu, 
-  ClipboardCheck, FileSearch, FilePlus2, Send, AlertTriangle, Scale,
-  Car, Clock, FileText, Building2, Users, User, Upload, FileUp,
-  DollarSign, List, CircleDollarSign, ChevronLeft, ChevronRight,
-  LayoutDashboard, Rocket, UserCog, MapPin, BarChart3, Bell,
-  PlusCircle, Map
+  CircuitBoard, Users, Map, CheckSquare, Zap,
+  Calendar, FileText, Phone, FileCheck, Building2,
+  Bookmark, User, Upload, BookOpen, Tag,
+  Clock, Link2, ChevronLeft, ChevronRight
 } from "lucide-react";
 
 const routes = [
   {
-    label: "Command Center",
-    icon: LayoutDashboard,
-    href: "/",
-  },
-  {
-    label: "Personnel Directory",
+    label: "Employees List",
     icon: Users,
     href: "/employees",
   },
   {
-    label: "Operations Map",
+    label: "Live Map",
     icon: Map,
     href: "/live-map",
   },
   {
-    label: "Completed Tasks",
-    icon: ClipboardCheck,
+    label: "Ended Shifts and Checklists",
+    icon: CheckSquare,
     href: "/shifts",
   },
   {
-    label: "Smart Route Planner",
-    icon: MapPin,
+    label: "Vertex AI Route Planner",
+    icon: Zap,
     href: "/route-planner",
   },
   {
-    label: "Verification Queue",
-    icon: ClipboardCheck,
+    label: "Confirmation Queue (11)",
+    icon: Calendar,
     href: "/confirmation-queue",
   },
   {
-    label: "Schedule Overview",
-    icon: Clock,
+    label: "Calendar of Upcoming",
+    icon: Calendar,
     href: "/calendar",
   },
   {
-    label: "Archive",
+    label: "Closed Dispatches",
     icon: FileText,
     href: "/closed-dispatches",
   },
   {
-    label: "Service Queue",
-    icon: Send,
+    label: "Request Queue",
+    icon: Phone,
     href: "/request-queue",
   },
   {
-    label: "Authorization Queue",
-    icon: AlertTriangle,
+    label: "Prior Authorization Queue (10)",
+    icon: FileCheck,
     href: "/prior-auth-queue",
   },
   {
@@ -69,17 +62,17 @@ const routes = [
     href: "/prior-auths",
   },
   {
-    label: "Center List",
+    label: "Facilities List",
     icon: Building2,
     href: "/facilities",
   },
   {
-    label: "Partner List",
-    icon: Users,
+    label: "Affiliates List",
+    icon: Bookmark,
     href: "/affiliates",
   },
   {
-    label: "Patient List",
+    label: "Patients List",
     icon: User,
     href: "/patients",
   },
@@ -89,59 +82,24 @@ const routes = [
     href: "/document-upload",
   },
   {
-    label: "Resource Library",
-    icon: FileUp,
+    label: "Librarian",
+    icon: BookOpen,
     href: "/librarian",
   },
   {
-    label: "Categories",
-    icon: List,
+    label: "Tags List",
+    icon: Tag,
     href: "/tags",
   },
   {
-    label: "Historical Entry",
+    label: "Book a Back-Dated Dispatch",
     icon: Clock,
     href: "/backdated-dispatch",
   },
   {
-    label: "External Link",
-    icon: Terminal,
+    label: "Custom Link 1",
+    icon: Link2,
     href: "/custom-link-1",
-  },
-  {
-    label: "Active Operations",
-    icon: Signal,
-    href: "/dispatch",
-  },
-  {
-    label: "New Operation",
-    icon: PlusCircle,
-    href: "/dispatch/new",
-  },
-  {
-    label: "Personnel Assignment",
-    icon: UserCog,
-    href: "/crew",
-  },
-  {
-    label: "Route Management",
-    icon: MapPin,
-    href: "/routes",
-  },
-  {
-    label: "Billing",
-    icon: DollarSign,
-    href: "/billing",
-  },
-  {
-    label: "Analytics Hub",
-    icon: BarChart3,
-    href: "/performance",
-  },
-  {
-    label: "Alert Settings",
-    icon: Bell,
-    href: "/alerts",
   },
 ];
 
