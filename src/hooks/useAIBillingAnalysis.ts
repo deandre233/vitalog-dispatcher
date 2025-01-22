@@ -34,5 +34,7 @@ export function useAIBillingAnalysis(metrics: any) {
     },
     enabled: !!metrics,
     retry: 1,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   });
 }
