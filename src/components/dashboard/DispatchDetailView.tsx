@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, FileText, AlertCircle, Users, DollarSign, Receipt, BookOpen, ArrowRightLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, MapPin, FileText, AlertCircle, Users, DollarSign, Receipt, BookOpen, ArrowRightLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTransportRecord, useUpdateTransport } from "@/hooks/useTransportRecord";
 import { OverviewTab } from "./dispatch/OverviewTab";
@@ -46,14 +46,7 @@ export function DispatchDetailView() {
   };
 
   if (isLoading) {
-    return (
-      <Card className="p-6 flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading dispatch details...</p>
-        </div>
-      </Card>
-    );
+    return <div>Loading...</div>;
   }
 
   if (!transportRecord) {
