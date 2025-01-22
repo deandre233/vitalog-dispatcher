@@ -1,27 +1,11 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
 import {
-  ClipboardCheck,
-  FileSearch,
-  FilePlus2,
-  Send,
-  AlertTriangle,
-  Scale,
-  Car,
-  Clock,
-  FileText,
-  Building2,
-  Users,
-  User,
-  Upload,
-  FileUp,
-  DollarSign,
-  List,
-  ExternalLink,
-  FileStack,
-  CircleDollarSign
+  ClipboardCheck, FileSearch, FilePlus2, Send, AlertTriangle, Scale,
+  Car, Clock, FileText, Building2, Users, User, Upload, FileUp,
+  DollarSign, List, ExternalLink, CircleDollarSign, ChevronLeft, ChevronRight
 } from "lucide-react";
 
 const routes = [
@@ -114,39 +98,49 @@ const routes = [
     label: "Pricing",
     icon: CircleDollarSign,
     href: "/pricing"
-  },
-  {
-    label: "Custom Link 1",
-    icon: ExternalLink,
-    href: "/custom-link-1"
   }
 ];
 
 export function BillingSidebar() {
   const pathname = useLocation().pathname;
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="w-64 border-r bg-medical-primary text-white">
-      <div className="space-y-2 py-2">
-        <h2 className="px-4 text-lg font-semibold">Billing Navigation</h2>
-        <ScrollArea className="h-[calc(100vh-4rem)]">
-          <div className="space-y-1 px-2">
+    <div className={cn(
+      "border-r bg-medical-primary text-white transition-all duration-300",
+      isCollapsed ? "w-16" : "w-64"
+    )}>
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between p-4">
+          {!isCollapsed && <h2 className="text-lg font-semibold">Billing</h2>}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-medical-secondary/20"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </Button>
+        </div>
+        <div className="flex-1 px-2 py-2">
+          <div className="space-y-1">
             {routes.map((route) => (
               <Button
                 key={route.href}
                 variant="ghost"
                 className={cn(
                   "w-full justify-start text-white hover:bg-medical-secondary/20",
-                  pathname === route.href && "bg-medical-secondary/30"
+                  pathname === route.href && "bg-medical-secondary/30",
+                  isCollapsed && "px-2"
                 )}
                 asChild
               >
                 <Link to={route.href} className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <route.icon className="mr-2 h-4 w-4" />
-                    <span>{route.label}</span>
+                    <route.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                    {!isCollapsed && <span>{route.label}</span>}
                   </div>
-                  {route.count && (
+                  {!isCollapsed && route.count && (
                     <span className="ml-auto text-xs bg-medical-secondary/30 px-2 py-1 rounded-full">
                       {route.count}
                     </span>
@@ -155,7 +149,7 @@ export function BillingSidebar() {
               </Button>
             ))}
           </div>
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );

@@ -8,19 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAIBillingAnalysis } from "@/hooks/useAIBillingAnalysis";
 import { useToast } from "@/hooks/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { AIAnalysisSection } from "@/types/billing";
+import { useState } from "react";
 import { 
   ClipboardList, Users, FileText, Building2, Clock, AlertCircle,
   Upload, FileCheck, Send, AlertTriangle, Building, UserSquare,
   Brain, Loader2, TrendingUp, AlertOctagon, Lightbulb, BarChart3,
   ChevronRight, DollarSign, Info, Cpu, Database, Network, 
-  Radio, Rocket, Signal, Sparkles, Zap
+  Radio, Rocket, Signal, Sparkles, Zap, ChevronLeft
 } from "lucide-react";
 
 const Billing = () => {
   const { toast } = useToast();
+  const [isAIPanelCollapsed, setIsAIPanelCollapsed] = useState(false);
 
   const metrics = {
     priorAuth: { value: 10, change: "+2" },
@@ -36,8 +35,6 @@ const Billing = () => {
     patientInvoicing: { value: 36, change: "+12" },
     openInvoices: { value: 363, change: "+25" }
   };
-
-  const { data: aiAnalysis, isLoading: isAnalyzing } = useAIBillingAnalysis(metrics);
 
   const analysisCards = [
     {
@@ -243,27 +240,37 @@ const Billing = () => {
                 </div>
               </div>
 
-              <Card className="p-6 bg-gradient-to-br from-medical-card-start to-medical-card-end relative overflow-hidden">
+              <Card className={cn(
+                "bg-gradient-to-br from-medical-card-start to-medical-card-end relative overflow-hidden transition-all duration-300",
+                isAIPanelCollapsed ? "p-2" : "p-6"
+              )}>
                 <div className="absolute inset-0 bg-gradient-to-r from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end opacity-5" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),rgba(255,255,255,0))]" />
                 
                 <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="relative">
-                      <div className="absolute -inset-1 bg-medical-secondary/20 rounded-full blur-sm animate-pulse" />
-                      <Brain className="w-7 h-7 text-medical-secondary relative animate-pulse" />
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="absolute -inset-1 bg-medical-secondary/20 rounded-full blur-sm animate-pulse" />
+                        <Brain className="w-7 h-7 text-medical-secondary relative animate-pulse" />
+                      </div>
+                      {!isAIPanelCollapsed && (
+                        <h3 className="text-lg font-semibold text-medical-primary bg-clip-text text-transparent bg-gradient-to-r from-medical-primary to-medical-secondary">
+                          AI Billing Analysis
+                        </h3>
+                      )}
                     </div>
-                    <h3 className="text-lg font-semibold text-medical-primary bg-clip-text text-transparent bg-gradient-to-r from-medical-primary to-medical-secondary">
-                      AI Billing Analysis
-                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-medical-primary hover:bg-medical-secondary/20"
+                      onClick={() => setIsAIPanelCollapsed(!isAIPanelCollapsed)}
+                    >
+                      {isAIPanelCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                    </Button>
                   </div>
 
-                  {isAnalyzing ? (
-                    <div className="flex items-center gap-3 text-medical-primary/80 justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-medical-secondary" />
-                      <p className="animate-pulse">Processing billing metrics...</p>
-                    </div>
-                  ) : (
+                  {!isAIPanelCollapsed && (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                       {analysisCards.map((card, index) => (
                         <AnalysisCard key={index} {...card} />
