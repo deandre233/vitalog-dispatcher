@@ -12,92 +12,92 @@ import {
 
 const routes = [
   {
-    label: "Employees List",
+    label: "Employee Directory",
     icon: Users,
     href: "/employees",
   },
   {
-    label: "Live Map",
+    label: "Operations Map",
     icon: Map,
     href: "/live-map",
   },
   {
-    label: "Ended Shifts and Checklists",
+    label: "Shift Records & Checklists",
     icon: CheckSquare,
     href: "/shifts",
   },
   {
-    label: "Vertex AI Route Planner",
+    label: "Smart Route Optimization",
     icon: Zap,
     href: "/route-planner",
   },
   {
-    label: "Confirmation Queue (11)",
+    label: "Verification Queue (11)",
     icon: Calendar,
     href: "/confirmation-queue",
   },
   {
-    label: "Calendar of Upcoming",
+    label: "Schedule Overview",
     icon: Calendar,
     href: "/calendar",
   },
   {
-    label: "Closed Dispatches",
+    label: "Completed Operations",
     icon: FileText,
     href: "/closed-dispatches",
   },
   {
-    label: "Request Queue",
+    label: "Service Queue",
     icon: Phone,
     href: "/request-queue",
   },
   {
-    label: "Prior Authorization Queue (10)",
+    label: "Authorization Queue (10)",
     icon: FileCheck,
     href: "/prior-auth-queue",
   },
   {
-    label: "Prior Auths On File",
+    label: "Authorizations on Record",
     icon: FileText,
     href: "/prior-auths",
   },
   {
-    label: "Facilities List",
+    label: "Center List",
     icon: Building2,
     href: "/facilities",
   },
   {
-    label: "Affiliates List",
+    label: "Partner List",
     icon: Bookmark,
     href: "/affiliates",
   },
   {
-    label: "Patients List",
+    label: "Patient Directory",
     icon: User,
     href: "/patients",
   },
   {
-    label: "Patient Document Upload",
+    label: "Document Upload",
     icon: Upload,
     href: "/document-upload",
   },
   {
-    label: "Librarian",
+    label: "Resource Library",
     icon: BookOpen,
     href: "/librarian",
   },
   {
-    label: "Tags List",
+    label: "Categories",
     icon: Tag,
     href: "/tags",
   },
   {
-    label: "Book a Back-Dated Dispatch",
+    label: "Historical Entry",
     icon: Clock,
     href: "/backdated-dispatch",
   },
   {
-    label: "Custom Link 1",
+    label: "External Link",
     icon: Link2,
     href: "/custom-link-1",
   },
@@ -109,22 +109,22 @@ export function AppSidebar() {
 
   return (
     <div className={cn(
-      "relative border-r bg-[#2B4B8C] backdrop-blur-sm",
+      "relative border-r bg-white backdrop-blur-sm",
       "transition-all duration-300 ease-in-out h-[calc(100vh-4rem)]",
       isCollapsed ? "w-16" : "w-64"
     )}>
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between p-4">
           {!isCollapsed && (
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-medical-primary flex items-center gap-2">
               <CircuitBoard className="h-5 w-5" />
-              Navigation
+              Dispatch Control
             </h2>
           )}
           <Button
             variant="ghost"
             size="icon"
-            className="text-white hover:bg-white/10"
+            className="text-medical-primary hover:bg-medical-accent/10"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -138,20 +138,20 @@ export function AppSidebar() {
                 variant="ghost"
                 className={cn(
                   "w-full justify-start relative overflow-hidden group",
-                  "hover:bg-white/10",
+                  "hover:bg-medical-accent/10",
                   "transition-all duration-200 ease-in-out",
-                  pathname === route.href && "bg-white/20",
+                  pathname === route.href && "bg-medical-accent/20",
                   isCollapsed ? "px-2" : "px-4"
                 )}
                 asChild
               >
                 <Link to={route.href} className="flex items-center">
                   <route.icon className={cn(
-                    "h-4 w-4 text-white",
+                    "h-4 w-4 text-medical-primary",
                     !isCollapsed && "mr-2"
                   )} />
                   {!isCollapsed && (
-                    <span className="font-medium text-white">{route.label}</span>
+                    <span className="font-medium text-medical-primary">{route.label}</span>
                   )}
                 </Link>
               </Button>
