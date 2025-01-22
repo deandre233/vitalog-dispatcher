@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
   User, 
   Phone, 
@@ -39,7 +40,9 @@ import {
   Star,
   Edit,
   Save,
-  X
+  X,
+  Camera,
+  Upload
 } from "lucide-react";
 
 const EmployeeProfile = () => {
@@ -57,6 +60,9 @@ const EmployeeProfile = () => {
     access_codes: "",
     author: ""
   });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -82,6 +88,40 @@ const EmployeeProfile = () => {
 
     fetchEmployee();
   }, [id]);
+
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !id) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('employeeId', id);
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upload-employee-photo`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        }
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to upload photo');
+      }
+
+      setEmployee({ ...employee, photo_url: data.url });
+      toast.success('Photo uploaded successfully');
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      toast.error('Failed to upload photo');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handlePayrollUpdate = async (values: any) => {
     try {
@@ -161,13 +201,43 @@ const EmployeeProfile = () => {
           <div className="max-w-7xl mx-auto space-y-6">
             <Card className="p-6 futuristic-panel">
               <div className="flex justify-between items-start">
-                <div>
-                  <h1 className="text-2xl font-bold text-medical-primary">
-                    {employee.first_name} {employee.last_name}
-                  </h1>
-                  <p className="text-medical-secondary mt-1">
-                    ID: {employee.readable_id}
-                  </p>
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <Avatar className="h-24 w-24 border-2 border-medical-secondary">
+                      <AvatarImage src={employee.photo_url} alt={`${employee.first_name} ${employee.last_name}`} />
+                      <AvatarFallback className="text-2xl">
+                        {employee.first_name?.[0]}{employee.last_name?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="absolute bottom-0 right-0 rounded-full bg-white hover:bg-gray-100"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                    >
+                      {isUploading ? (
+                        <Upload className="h-4 w-4 animate-pulse" />
+                      ) : (
+                        <Camera className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                    />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-medical-primary">
+                      {employee.first_name} {employee.last_name}
+                    </h1>
+                    <p className="text-medical-secondary mt-1">
+                      ID: {employee.readable_id}
+                    </p>
+                  </div>
                 </div>
                 <Badge 
                   variant="secondary"
