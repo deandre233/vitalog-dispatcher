@@ -15,7 +15,8 @@ import {
   Plus,
   CircuitBoard,
   Search,
-  Filter
+  Filter,
+  Loader2
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +37,7 @@ export function EmployeeDirectory() {
   const { toast } = useToast();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [hideInactive, setHideInactive] = useState(false);
 
@@ -43,16 +45,23 @@ export function EmployeeDirectory() {
     const fetchEmployees = async () => {
       try {
         setIsLoading(true);
+        setError(null);
+        console.log("Fetching employees...");
         const { data, error } = await supabase
           .from('employees')
           .select('*')
           .order('last_name', { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase error:', error);
+          throw error;
+        }
 
+        console.log("Fetched employees:", data);
         setEmployees(data || []);
       } catch (error) {
         console.error('Error fetching employees:', error);
+        setError('Failed to load employees. Please try again later.');
         toast({
           title: "Error",
           description: "Failed to load employees",
@@ -143,8 +152,29 @@ export function EmployeeDirectory() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredEmployees.map((employee) => (
+            {isLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loader2 className="h-8 w-8 animate-spin text-medical-secondary" />
+                <span className="ml-2 text-medical-secondary">Loading employees...</span>
+              </div>
+            ) : error ? (
+              <div className="text-center p-8 text-red-500">
+                <p>{error}</p>
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  variant="outline" 
+                  className="mt-4"
+                >
+                  Retry
+                </Button>
+              </div>
+            ) : filteredEmployees.length === 0 ? (
+              <div className="text-center p-8 text-gray-500">
+                <p>No employees found</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredEmployees.map((employee) => (
                     <Card 
                       key={employee.id}
                       className="futuristic-card p-4 group hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden"
@@ -200,8 +230,9 @@ export function EmployeeDirectory() {
                         </div>
                       </div>
                     </Card>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
