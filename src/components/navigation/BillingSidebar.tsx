@@ -107,7 +107,7 @@ export function BillingSidebar() {
 
   return (
     <div className={cn(
-      "border-r bg-medical-primary text-white transition-all duration-300",
+      "border-r bg-white text-medical-primary transition-all duration-300",
       isCollapsed ? "w-16" : "w-64"
     )}>
       <div className="flex flex-col h-full">
@@ -116,7 +116,7 @@ export function BillingSidebar() {
           <Button
             variant="ghost"
             size="icon"
-            className="text-white hover:bg-medical-secondary/20"
+            className="text-medical-primary hover:bg-medical-accent/20"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -129,8 +129,8 @@ export function BillingSidebar() {
                 key={route.href}
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-white hover:bg-medical-secondary/20",
-                  pathname === route.href && "bg-medical-secondary/30",
+                  "w-full justify-start text-medical-primary hover:bg-medical-accent/20",
+                  pathname === route.href && "bg-medical-accent/30",
                   isCollapsed && "px-2"
                 )}
                 asChild
@@ -141,7 +141,7 @@ export function BillingSidebar() {
                     {!isCollapsed && <span>{route.label}</span>}
                   </div>
                   {!isCollapsed && route.count && (
-                    <span className="ml-auto text-xs bg-medical-secondary/30 px-2 py-1 rounded-full">
+                    <span className="ml-auto text-xs bg-medical-accent/30 px-2 py-1 rounded-full">
                       {route.count}
                     </span>
                   )}

@@ -30,7 +30,7 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
     <div className="flex flex-col bg-white border-b">
       <div className="flex justify-between items-center p-6">
         <h1 className="text-2xl font-semibold text-medical-primary">
-          Dispatch Control
+          Billing Dashboard
         </h1>
         <div className="flex items-center gap-4">
           <Button
