@@ -123,14 +123,17 @@ export function AppSidebar() {
 
   return (
     <div className={cn(
-      "relative border-r bg-white backdrop-blur-sm",
-      "transition-all duration-300 ease-in-out h-[calc(100vh-4rem)]",
+      "relative h-[calc(100vh-4rem)]",
+      "bg-gradient-to-b from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end",
+      "border-r border-medical-secondary/20",
+      "backdrop-blur-sm shadow-lg",
+      "transition-all duration-300 ease-in-out",
       isCollapsed ? "w-16" : "w-64"
     )}>
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between p-4">
           {!isCollapsed && (
-            <h2 className="text-lg font-semibold text-medical-primary flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2 animate-fade-in">
               <CircuitBoard className="h-5 w-5" />
               Dispatch Control
             </h2>
@@ -138,7 +141,7 @@ export function AppSidebar() {
           <Button
             variant="ghost"
             size="icon"
-            className="text-medical-primary hover:bg-medical-accent/10"
+            className="text-white hover:bg-white/10 transition-colors"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -148,25 +151,29 @@ export function AppSidebar() {
         <nav className="flex-1 overflow-y-auto">
           <div className="space-y-1 p-2">
             {routes.map((route) => (
-              <div key={route.href}>
+              <div key={route.href} className="group">
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start relative overflow-hidden group",
-                    "hover:bg-medical-accent/10",
+                    "w-full justify-start relative overflow-hidden",
+                    "hover:bg-medical-secondary/20 hover:shadow-glow",
                     "transition-all duration-200 ease-in-out",
-                    pathname === route.href && "bg-medical-accent/20",
+                    "group-hover:translate-x-1",
+                    pathname === route.href && "bg-medical-secondary/30 shadow-glow",
                     isCollapsed ? "px-2" : "px-4"
                   )}
                   asChild
                 >
                   <Link to={route.href} className="flex items-center">
                     <route.icon className={cn(
-                      "h-4 w-4 text-medical-primary",
+                      "h-4 w-4 text-white transition-transform group-hover:scale-110",
                       !isCollapsed && "mr-2"
                     )} />
                     {!isCollapsed && (
-                      <span className="font-medium text-medical-primary">{route.label}</span>
+                      <span className="font-medium text-white">{route.label}</span>
+                    )}
+                    {!isCollapsed && pathname === route.href && (
+                      <div className="absolute inset-0 bg-medical-secondary/10 animate-pulse pointer-events-none" />
                     )}
                   </Link>
                 </Button>
@@ -174,6 +181,11 @@ export function AppSidebar() {
             ))}
           </div>
         </nav>
+
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-medical-gradient-end/20 to-transparent" />
+          <div className="absolute inset-0 bg-grid-white/[0.02]" />
+        </div>
       </div>
     </div>
   );
