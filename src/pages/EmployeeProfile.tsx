@@ -12,11 +12,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 import { 
   User, Phone, MapPin, Shield, Clock, ArrowLeft, Calendar, Mail,
   Building2, AlertCircle, FileText, Award, AlertTriangle, Bell,
   Syringe, CircuitBoard, Signal, Key, Camera, HelpCircle, Fingerprint,
-  Calculator, DollarSign, Wallet, Receipt, CreditCard, BankNote,
+  Calculator, DollarSign, Wallet, Receipt, CreditCard, Banknote,
   Percent, Clock3, Landmark, FileSpreadsheet, CircleDollarSign, CalendarDays, BadgeDollarSign
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -132,7 +133,7 @@ export function EmployeeProfile() {
           .from('employee_roles')
           .select('*')
           .eq('employee_id', id)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
 
@@ -156,6 +157,29 @@ export function EmployeeProfile() {
             isAdministrator: data.is_administrator,
             isPrincipal: data.is_principal,
             isProvisional: data.is_provisional
+          });
+        } else {
+          // Initialize with default values if no roles exist
+          console.log('No roles found for employee, using defaults');
+          setRoles({
+            isCrew: false,
+            isSupervisor: false,
+            supervisorRole: '',
+            isBiller: false,
+            isDispatcher: false,
+            isQAReviewer: false,
+            isHR: false,
+            isMechanic: false,
+            isSalesperson: false,
+            isMedicalDirector: false,
+            isOnlooker: false,
+            onlookerFacility: '',
+            onlookerCity: '',
+            onlookerCounty: '',
+            canSeeNonEmergent: false,
+            isAdministrator: false,
+            isPrincipal: false,
+            isProvisional: false
           });
         }
       } catch (error) {
