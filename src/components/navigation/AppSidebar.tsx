@@ -2,81 +2,65 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
 import {
-  Bell,
-  BarChart3,
-  ClipboardList,
-  CreditCard,
-  MapPin,
-  Users,
-  PlusCircle,
-  Home,
-  FileText,
-  History,
-  User,
-  Archive,
-  Map,
-  CheckSquare,
-  Calendar,
-  PhoneCall,
-  Building2,
-  BookOpen,
-  Tags,
-  Clock,
-  ExternalLink,
-  Upload,
-  Library
+  CircuitBoard, Network, Signal, Terminal, Cpu, 
+  ClipboardCheck, FileSearch, FilePlus2, Send, AlertTriangle, Scale,
+  Car, Clock, FileText, Building2, Users, User, Upload, FileUp,
+  DollarSign, List, CircleDollarSign, ChevronLeft, ChevronRight,
+  LayoutDashboard, Rocket, UserCog, MapPin, BarChart3, Bell,
+  PlusCircle, Map
 } from "lucide-react";
 
 const routes = [
   {
-    label: "Home",
-    icon: Home,
+    label: "Command Center",
+    icon: LayoutDashboard,
     href: "/",
   },
   {
-    label: "Employees List",
+    label: "Personnel Directory",
     icon: Users,
     href: "/employees",
   },
   {
-    label: "Live Map",
+    label: "Operations Map",
     icon: Map,
     href: "/live-map",
   },
   {
-    label: "Ended Shifts & Checklists",
-    icon: CheckSquare,
+    label: "Completed Tasks",
+    icon: ClipboardCheck,
     href: "/shifts",
   },
   {
-    label: "Vertex AI Route Planner",
+    label: "Smart Route Planner",
     icon: MapPin,
     href: "/route-planner",
   },
   {
-    label: "Confirmation Queue",
-    icon: ClipboardList,
+    label: "Verification Queue",
+    icon: ClipboardCheck,
     href: "/confirmation-queue",
   },
   {
-    label: "Calendar of Upcoming",
-    icon: Calendar,
+    label: "Schedule Overview",
+    icon: Clock,
     href: "/calendar",
   },
   {
-    label: "Closed Dispatches",
-    icon: Archive,
+    label: "Archive",
+    icon: FileText,
     href: "/closed-dispatches",
   },
   {
-    label: "Request Queue",
-    icon: PhoneCall,
+    label: "Service Queue",
+    icon: Send,
     href: "/request-queue",
   },
   {
-    label: "Prior Authorization Queue",
-    icon: Clock,
+    label: "Authorization Queue",
+    icon: AlertTriangle,
     href: "/prior-auth-queue",
   },
   {
@@ -85,17 +69,17 @@ const routes = [
     href: "/prior-auths",
   },
   {
-    label: "Facilities List",
+    label: "Center List",
     icon: Building2,
     href: "/facilities",
   },
   {
-    label: "Affiliates List",
+    label: "Partner List",
     icon: Users,
     href: "/affiliates",
   },
   {
-    label: "Patients List",
+    label: "Patient List",
     icon: User,
     href: "/patients",
   },
@@ -105,52 +89,52 @@ const routes = [
     href: "/document-upload",
   },
   {
-    label: "Librarian",
-    icon: Library,
+    label: "Resource Library",
+    icon: FileUp,
     href: "/librarian",
   },
   {
-    label: "Tags List",
-    icon: Tags,
+    label: "Categories",
+    icon: List,
     href: "/tags",
   },
   {
-    label: "Book a Back-Dated Dispatch",
-    icon: History,
+    label: "Historical Entry",
+    icon: Clock,
     href: "/backdated-dispatch",
   },
   {
-    label: "Custom Link 1",
-    icon: ExternalLink,
+    label: "External Link",
+    icon: Terminal,
     href: "/custom-link-1",
   },
   {
-    label: "Active Dispatches",
-    icon: ClipboardList,
+    label: "Active Operations",
+    icon: Signal,
     href: "/dispatch",
   },
   {
-    label: "Create Dispatch",
+    label: "New Operation",
     icon: PlusCircle,
     href: "/dispatch/new",
   },
   {
-    label: "Crew Assignment",
-    icon: Users,
+    label: "Personnel Assignment",
+    icon: UserCog,
     href: "/crew",
   },
   {
-    label: "Manage Routes",
+    label: "Route Management",
     icon: MapPin,
     href: "/routes",
   },
   {
     label: "Billing",
-    icon: CreditCard,
+    icon: DollarSign,
     href: "/billing",
   },
   {
-    label: "Performance",
+    label: "Analytics Hub",
     icon: BarChart3,
     href: "/performance",
   },
@@ -163,31 +147,61 @@ const routes = [
 
 export function AppSidebar() {
   const pathname = useLocation().pathname;
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="w-64 border-r border-gray-200 bg-white">
-      <div className="space-y-2 py-2">
-        <h2 className="px-4 text-lg font-semibold text-gray-900">Navigation</h2>
-        <ScrollArea className="h-[calc(100vh-4rem)]">
-          <div className="space-y-1 px-2">
+    <div className={cn(
+      "relative border-r bg-gradient-to-b from-medical-card-start to-medical-card-end backdrop-blur-sm",
+      "transition-all duration-300 ease-in-out h-[calc(100vh-4rem)]",
+      isCollapsed ? "w-16" : "w-64"
+    )}>
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-medical-gradient-start to-medical-gradient-end">
+          {!isCollapsed && (
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <CircuitBoard className="h-5 w-5" />
+              Navigation
+            </h2>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/10"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </Button>
+        </div>
+        <ScrollArea className="flex-1">
+          <div className="p-2 space-y-1">
             {routes.map((route) => (
               <Button
                 key={route.href}
-                variant={pathname === route.href ? "secondary" : "ghost"}
-                className={cn("w-full justify-start", {
-                  "bg-gray-100": pathname === route.href,
-                })}
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start relative overflow-hidden group",
+                  "hover:bg-medical-gradient-start/10 hover:shadow-md hover:scale-[1.02]",
+                  "transition-all duration-200 ease-in-out",
+                  pathname === route.href && "bg-medical-gradient-start/20 shadow-glow",
+                  isCollapsed ? "px-2" : "px-4"
+                )}
                 asChild
               >
-                <Link to={route.href}>
-                  <route.icon className="mr-2 h-4 w-4" />
-                  {route.label}
+                <Link to={route.href} className="flex items-center">
+                  <route.icon className={cn(
+                    "h-4 w-4 transition-transform group-hover:scale-110",
+                    !isCollapsed && "mr-2"
+                  )} />
+                  {!isCollapsed && (
+                    <span className="font-medium">{route.label}</span>
+                  )}
                 </Link>
               </Button>
             ))}
           </div>
         </ScrollArea>
       </div>
+      <div className="absolute inset-0 pointer-events-none border-r border-medical-secondary/20 bg-gradient-to-b from-transparent to-medical-gradient-end/5" />
     </div>
   );
 }
