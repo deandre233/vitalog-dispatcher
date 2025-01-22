@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import CreateDispatch from './pages/CreateDispatch';
 import ActiveDispatches from './pages/ActiveDispatches';
@@ -19,24 +19,22 @@ import './App.css';
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dispatch" element={<CreateDispatch />} />
-          <Route path="/dispatch/active" element={<ActiveDispatches />} />
-          <Route path="/dispatch/closed" element={<ClosedDispatches />} />
-          <Route path="/dispatch/crew" element={<CrewAssignment />} />
-          <Route path="/dispatch/routes" element={<ManageRoutes />} />
-          <Route path="/performance" element={<Performance />} />
-          <Route path="/billing" element={<Billing />} />
-          <Route path="/employees" element={<EmployeeDirectory />} />
-          <Route path="/employees/:id" element={<EmployeeProfile />} />
-          <Route path="/alerts" element={<AlertsConfig />} />
-          <Route path="/patient/:id" element={<PatientRecord />} />
-        </Routes>
-        <Toaster />
-        <SonnerToaster position="bottom-right" />
-      </Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/dispatch" element={<CreateDispatch />} />
+        <Route path="/dispatch/active" element={<ActiveDispatches />} />
+        <Route path="/dispatch/closed" element={<ClosedDispatches />} />
+        <Route path="/dispatch/crew" element={<CrewAssignment />} />
+        <Route path="/dispatch/routes" element={<ManageRoutes />} />
+        <Route path="/performance" element={<Performance />} />
+        <Route path="/billing" element={<Billing />} />
+        <Route path="/employees" element={<EmployeeDirectory />} />
+        <Route path="/employees/:id" element={<EmployeeProfile />} />
+        <Route path="/alerts" element={<AlertsConfig />} />
+        <Route path="/patient/:id" element={<PatientRecord />} />
+      </Routes>
+      <Toaster />
+      <SonnerToaster position="bottom-right" />
     </ThemeProvider>
   );
 }
