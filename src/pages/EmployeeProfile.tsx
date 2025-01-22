@@ -57,6 +57,26 @@ export function EmployeeProfile() {
     supervisor: false,
     twoFactor: false
   });
+  const [roles, setRoles] = useState({
+    isCrew: false,
+    isSupervisor: false,
+    supervisorRole: '',
+    isBiller: false,
+    isDispatcher: false,
+    isQAReviewer: false,
+    isHR: false,
+    isMechanic: false,
+    isSalesperson: false,
+    isMedicalDirector: false,
+    isOnlooker: false,
+    onlookerFacility: '',
+    onlookerCity: '',
+    onlookerCounty: '',
+    canSeeNonEmergent: false,
+    isAdministrator: false,
+    isPrincipal: false,
+    isProvisional: false
+  });
 
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -88,6 +108,84 @@ export function EmployeeProfile() {
     }
   }, [id, toast]);
 
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('employee_roles')
+          .select('*')
+          .eq('employee_id', id)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          setRoles({
+            isCrew: data.is_crew_member,
+            isSupervisor: data.is_supervisor,
+            supervisorRole: data.supervisor_role || '',
+            isBiller: data.is_biller,
+            isDispatcher: data.is_dispatcher,
+            isQAReviewer: data.is_qa_reviewer,
+            isHR: data.is_hr,
+            isMechanic: data.is_mechanic,
+            isSalesperson: data.is_salesperson,
+            isMedicalDirector: data.is_medical_director,
+            isOnlooker: data.is_onlooker,
+            onlookerFacility: data.onlooker_facility || '',
+            onlookerCity: data.onlooker_city || '',
+            onlookerCounty: data.onlooker_county || '',
+            canSeeNonEmergent: data.can_see_non_emergent,
+            isAdministrator: data.is_administrator,
+            isPrincipal: data.is_principal,
+            isProvisional: data.is_provisional
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching roles:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load employee roles",
+          variant: "destructive",
+        });
+      }
+    };
+
+    if (id) {
+      fetchRoles();
+    }
+  }, [id, toast]);
+
+  const handleRoleChange = async (field: string, value: boolean | string) => {
+    try {
+      const updates = {
+        employee_id: id,
+        [field]: value,
+      };
+
+      const { error } = await supabase
+        .from('employee_roles')
+        .upsert(updates)
+        .eq('employee_id', id);
+
+      if (error) throw error;
+
+      setRoles(prev => ({ ...prev, [field]: value }));
+      
+      toast({
+        title: "Success",
+        description: "Role updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating role:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update role",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!employee) {
     return null;
   }
@@ -100,7 +198,6 @@ export function EmployeeProfile() {
   };
 
   const handleAddPortrait = () => {
-    // Implementation for adding portrait
     toast({
       title: "Upload Portrait",
       description: "Portrait upload functionality will be implemented soon.",
@@ -407,14 +504,233 @@ export function EmployeeProfile() {
                               <Shield className="h-6 w-6 text-medical-secondary" />
                               <h3 className="text-lg font-semibold">Roles & Permissions</h3>
                             </div>
-                            <div className="space-y-4">
-                              <div className="flex items-center space-x-2">
-                                <Checkbox id="role-admin" />
-                                <label htmlFor="role-admin" className="text-sm font-medium">Administrator</label>
+                            <div className="grid grid-cols-2 gap-6">
+                              <div className="space-y-4">
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="crew-member"
+                                    checked={roles.isCrew}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_crew_member', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="crew-member" className="text-sm font-medium">
+                                    Crew Member
+                                  </label>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="supervisor"
+                                      checked={roles.isSupervisor}
+                                      onCheckedChange={(checked) => 
+                                        handleRoleChange('is_supervisor', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="supervisor" className="text-sm font-medium">
+                                      Supervisor
+                                    </label>
+                                  </div>
+                                  {roles.isSupervisor && (
+                                    <Select 
+                                      value={roles.supervisorRole}
+                                      onValueChange={(value) => handleRoleChange('supervisor_role', value)}
+                                    >
+                                      <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select supervisor role" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="Captain">Captain</SelectItem>
+                                        <SelectItem value="Lieutenant">Lieutenant</SelectItem>
+                                        <SelectItem value="Full privileges">Full privileges</SelectItem>
+                                        <SelectItem value="Call-taker / Self-dispatch">Call-taker / Self-dispatch</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  )}
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="biller"
+                                    checked={roles.isBiller}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_biller', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="biller" className="text-sm font-medium">
+                                    Biller
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="dispatcher"
+                                    checked={roles.isDispatcher}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_dispatcher', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="dispatcher" className="text-sm font-medium">
+                                    Dispatcher
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="qa-reviewer"
+                                    checked={roles.isQAReviewer}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_qa_reviewer', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="qa-reviewer" className="text-sm font-medium">
+                                    QA Reviewer
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="hr"
+                                    checked={roles.isHR}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_hr', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="hr" className="text-sm font-medium">
+                                    HR
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="mechanic"
+                                    checked={roles.isMechanic}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_mechanic', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="mechanic" className="text-sm font-medium">
+                                    Mechanic
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="salesperson"
+                                    checked={roles.isSalesperson}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_salesperson', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="salesperson" className="text-sm font-medium">
+                                    Salesperson
+                                  </label>
+                                </div>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                <Checkbox id="role-supervisor" />
-                                <label htmlFor="role-supervisor" className="text-sm font-medium">Supervisor</label>
+
+                              <div className="space-y-4">
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="medical-director"
+                                    checked={roles.isMedicalDirector}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_medical_director', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="medical-director" className="text-sm font-medium">
+                                    Medical Director
+                                  </label>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox 
+                                      id="onlooker"
+                                      checked={roles.isOnlooker}
+                                      onCheckedChange={(checked) => 
+                                        handleRoleChange('is_onlooker', checked as boolean)
+                                      }
+                                    />
+                                    <label htmlFor="onlooker" className="text-sm font-medium">
+                                      Onlooker
+                                    </label>
+                                  </div>
+                                  {roles.isOnlooker && (
+                                    <div className="space-y-2 pl-6">
+                                      <Input 
+                                        placeholder="Facility"
+                                        value={roles.onlookerFacility}
+                                        onChange={(e) => handleRoleChange('onlooker_facility', e.target.value)}
+                                        className="bg-medical-accent/10"
+                                      />
+                                      <Input 
+                                        placeholder="City"
+                                        value={roles.onlookerCity}
+                                        onChange={(e) => handleRoleChange('onlooker_city', e.target.value)}
+                                        className="bg-medical-accent/10"
+                                      />
+                                      <Input 
+                                        placeholder="County"
+                                        value={roles.onlookerCounty}
+                                        onChange={(e) => handleRoleChange('onlooker_county', e.target.value)}
+                                        className="bg-medical-accent/10"
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="non-emergent"
+                                    checked={roles.canSeeNonEmergent}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('can_see_non_emergent', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="non-emergent" className="text-sm font-medium">
+                                    Can see non-emergent
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="administrator"
+                                    checked={roles.isAdministrator}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_administrator', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="administrator" className="text-sm font-medium">
+                                    Administrator
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="principal"
+                                    checked={roles.isPrincipal}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_principal', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="principal" className="text-sm font-medium">
+                                    Principal
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id="provisional"
+                                    checked={roles.isProvisional}
+                                    onCheckedChange={(checked) => 
+                                      handleRoleChange('is_provisional', checked as boolean)
+                                    }
+                                  />
+                                  <label htmlFor="provisional" className="text-sm font-medium">
+                                    Provisional
+                                  </label>
+                                </div>
                               </div>
                             </div>
                           </div>

@@ -318,6 +318,93 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_roles: {
+        Row: {
+          can_see_non_emergent: boolean | null
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          is_administrator: boolean | null
+          is_biller: boolean | null
+          is_crew_member: boolean | null
+          is_dispatcher: boolean | null
+          is_hr: boolean | null
+          is_mechanic: boolean | null
+          is_medical_director: boolean | null
+          is_onlooker: boolean | null
+          is_principal: boolean | null
+          is_provisional: boolean | null
+          is_qa_reviewer: boolean | null
+          is_salesperson: boolean | null
+          is_supervisor: boolean | null
+          onlooker_city: string | null
+          onlooker_county: string | null
+          onlooker_facility: string | null
+          supervisor_role: Database["public"]["Enums"]["supervisor_role"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          can_see_non_emergent?: boolean | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          is_administrator?: boolean | null
+          is_biller?: boolean | null
+          is_crew_member?: boolean | null
+          is_dispatcher?: boolean | null
+          is_hr?: boolean | null
+          is_mechanic?: boolean | null
+          is_medical_director?: boolean | null
+          is_onlooker?: boolean | null
+          is_principal?: boolean | null
+          is_provisional?: boolean | null
+          is_qa_reviewer?: boolean | null
+          is_salesperson?: boolean | null
+          is_supervisor?: boolean | null
+          onlooker_city?: string | null
+          onlooker_county?: string | null
+          onlooker_facility?: string | null
+          supervisor_role?:
+            | Database["public"]["Enums"]["supervisor_role"]
+            | null
+          updated_at?: string | null
+        }
+        Update: {
+          can_see_non_emergent?: boolean | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          is_administrator?: boolean | null
+          is_biller?: boolean | null
+          is_crew_member?: boolean | null
+          is_dispatcher?: boolean | null
+          is_hr?: boolean | null
+          is_mechanic?: boolean | null
+          is_medical_director?: boolean | null
+          is_onlooker?: boolean | null
+          is_principal?: boolean | null
+          is_provisional?: boolean | null
+          is_qa_reviewer?: boolean | null
+          is_salesperson?: boolean | null
+          is_supervisor?: boolean | null
+          onlooker_city?: string | null
+          onlooker_county?: string | null
+          onlooker_facility?: string | null
+          supervisor_role?:
+            | Database["public"]["Enums"]["supervisor_role"]
+            | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_roles_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
           certification_level: string | null
@@ -1242,6 +1329,11 @@ export type Database = {
       priority_level: "Critical" | "Emergency" | "Lower acuity" | "Scheduled"
       recurrence_type: "Disabled" | "Daily" | "Weekly" | "Monthly"
       service_type: "WC" | "BLS" | "ALS" | "MICU"
+      supervisor_role:
+        | "Captain"
+        | "Lieutenant"
+        | "Full privileges"
+        | "Call-taker / Self-dispatch"
       trip_type: "One way" | "Wait-and-return" | "Round trip"
     }
     CompositeTypes: {
