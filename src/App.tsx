@@ -9,7 +9,7 @@ import Performance from "./pages/Performance";
 import AlertsConfig from "./pages/AlertsConfig";
 import Billing from "./pages/Billing";
 import { EmployeeDirectory } from "./pages/EmployeeDirectory";
-import { EmployeeProfile } from "./pages/EmployeeProfile";
+import EmployeeProfile from "./pages/EmployeeProfile";
 import { PatientRecord } from "./pages/PatientRecord";
 
 const router = createBrowserRouter([
