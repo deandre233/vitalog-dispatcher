@@ -272,7 +272,8 @@ const EmployeeProfile = () => {
                     { value: "certs", label: "Certifications", icon: BadgeCheck },
                     { value: "achievements", label: "Achievements", icon: Award },
                     { value: "damage", label: "Damage Reports", icon: ClipboardList },
-                    { value: "announcements", label: "Announcements", icon: Bell },
+                    { value: "notifications", label: "Notifications", icon: Bell },
+                    { value: "beacon", label: "Beacon", icon: Key },
                     { value: "immunizations", label: "Immunizations", icon: Syringe },
                     { value: "performance", label: "Performance", icon: Star }
                   ].map(({ value, label, icon: Icon }) => (
@@ -377,68 +378,6 @@ const EmployeeProfile = () => {
                                 <span>{employee?.login_name || 'Not set'}</span>
                               </div>
                             )}
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label className="text-medical-primary font-medium">Beacon App Token</Label>
-                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
-                              <Key className="h-4 w-4 text-medical-secondary" />
-                              <span className="font-mono text-sm">{employee?.beacon_token || 'Not generated'}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="space-y-6">
-                          <div>
-                            <Label className="text-medical-primary font-medium mb-4 block">Messaging Preferences</Label>
-                            <Card className="p-4 bg-white/50 backdrop-blur-sm border-medical-secondary/10">
-                              <div className="space-y-4">
-                                <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
-                                  <Label className="cursor-pointer">SMS Notifications</Label>
-                                  <Switch
-                                    checked={editData.sms_notifications}
-                                    onCheckedChange={(checked) => 
-                                      setEditData({ ...editData, sms_notifications: checked })
-                                    }
-                                    disabled={!editMode}
-                                  />
-                                </div>
-                                <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
-                                  <Label className="cursor-pointer">Email Notifications</Label>
-                                  <Switch
-                                    checked={editData.email_notifications}
-                                    onCheckedChange={(checked) => 
-                                      setEditData({ ...editData, email_notifications: checked })
-                                    }
-                                    disabled={!editMode}
-                                  />
-                                </div>
-                                <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
-                                  <Label className="cursor-pointer">Two-factor Authentication</Label>
-                                  <Switch
-                                    checked={editData.two_factor_auth}
-                                    onCheckedChange={(checked) => 
-                                      setEditData({ ...editData, two_factor_auth: checked })
-                                    }
-                                    disabled={!editMode}
-                                  />
-                                </div>
-                              </div>
-                            </Card>
-                          </div>
-
-                          <div className="space-y-4">
-                            <Label className="text-medical-primary font-medium block">Last Login</Label>
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
-                                <Clock className="h-4 w-4 text-medical-secondary" />
-                                <span>Last attempt: {employee?.last_login_attempt || 'Never'}</span>
-                              </div>
-                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
-                                <CheckCircle className="h-4 w-4 text-medical-secondary" />
-                                <span>Last success: {employee?.last_login_success || 'Never'}</span>
-                              </div>
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -557,33 +496,84 @@ const EmployeeProfile = () => {
                     </Card>
                   </TabsContent>
 
-                  <TabsContent value="announcements" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Bell className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Announcements</span>
+                  <TabsContent value="notifications" className="space-y-4 mt-6">
+                    <Card className="p-6 backdrop-blur-sm bg-white/90 border-medical-secondary/20 transition-all duration-300 hover:shadow-glow">
+                      <div className="flex items-center gap-2 mb-6">
+                        <Bell className="h-5 w-5 text-medical-secondary" />
+                        <span className="font-medium text-lg">Messaging & Notifications</span>
                       </div>
-                      <p className="mt-2">No announcements available for this employee.</p>
+                      
+                      <div className="space-y-6">
+                        <Card className="p-4 bg-white/50 backdrop-blur-sm border-medical-secondary/10">
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
+                              <Label className="cursor-pointer">SMS Notifications</Label>
+                              <Switch
+                                checked={editData.sms_notifications}
+                                onCheckedChange={(checked) => 
+                                  setEditData({ ...editData, sms_notifications: checked })
+                                }
+                                disabled={!editMode}
+                              />
+                            </div>
+                            <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
+                              <Label className="cursor-pointer">Email Notifications</Label>
+                              <Switch
+                                checked={editData.email_notifications}
+                                onCheckedChange={(checked) => 
+                                  setEditData({ ...editData, email_notifications: checked })
+                                }
+                                disabled={!editMode}
+                              />
+                            </div>
+                            <div className="flex items-center justify-between p-2 hover:bg-medical-accent/20 rounded-md transition-colors duration-200">
+                              <Label className="cursor-pointer">Two-factor Authentication</Label>
+                              <Switch
+                                checked={editData.two_factor_auth}
+                                onCheckedChange={(checked) => 
+                                  setEditData({ ...editData, two_factor_auth: checked })
+                                }
+                                disabled={!editMode}
+                              />
+                            </div>
+                          </div>
+                        </Card>
+                      </div>
                     </Card>
                   </TabsContent>
 
-                  <TabsContent value="immunizations" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Syringe className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Immunizations</span>
+                  <TabsContent value="beacon" className="space-y-4 mt-6">
+                    <Card className="p-6 backdrop-blur-sm bg-white/90 border-medical-secondary/20 transition-all duration-300 hover:shadow-glow">
+                      <div className="flex items-center gap-2 mb-6">
+                        <Key className="h-5 w-5 text-medical-secondary" />
+                        <span className="font-medium text-lg">Beacon Access</span>
                       </div>
-                      <p className="mt-2">No immunizations available for this employee.</p>
-                    </Card>
-                  </TabsContent>
+                      
+                      <div className="space-y-6">
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label className="text-medical-primary font-medium">Beacon App Token</Label>
+                            <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                              <Key className="h-4 w-4 text-medical-secondary" />
+                              <span className="font-mono text-sm">{employee?.beacon_token || 'Not generated'}</span>
+                            </div>
+                          </div>
 
-                  <TabsContent value="performance" className="space-y-4 mt-6">
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Star className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Performance</span>
+                          <div className="space-y-4">
+                            <Label className="text-medical-primary font-medium block">Last Login</Label>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                <Clock className="h-4 w-4 text-medical-secondary" />
+                                <span>Last attempt: {employee?.last_login_attempt || 'Never'}</span>
+                              </div>
+                              <div className="flex items-center gap-2 p-3 bg-white/30 rounded-md backdrop-blur-sm border border-medical-secondary/10">
+                                <CheckCircle className="h-4 w-4 text-medical-secondary" />
+                                <span>Last success: {employee?.last_login_success || 'Never'}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <p className="mt-2">No performance data available for this employee.</p>
                     </Card>
                   </TabsContent>
                 </div>
