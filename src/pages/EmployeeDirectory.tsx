@@ -15,7 +15,9 @@ import {
   Shield,
   Clock,
   Plus,
-  CircuitBoard
+  CircuitBoard,
+  Search,
+  Filter
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +38,8 @@ export function EmployeeDirectory() {
   const { toast } = useToast();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [hideInactive, setHideInactive] = useState(false);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -81,6 +85,14 @@ export function EmployeeDirectory() {
     }
   };
 
+  const filteredEmployees = employees.filter(employee => {
+    const matchesSearch = (employee.first_name + " " + employee.last_name)
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesStatus = hideInactive ? employee.status?.toLowerCase() === 'active' : true;
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-accent to-white">
       <Header />
@@ -109,10 +121,35 @@ export function EmployeeDirectory() {
                       Add Employee
                     </Button>
                   </div>
+
+                  <div className="mt-6 flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-medical-secondary/50" />
+                      <input
+                        type="text"
+                        placeholder="Search employees..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-medical-secondary/20 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-medical-secondary/30 transition-all duration-300"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="hideInactive"
+                        checked={hideInactive}
+                        onChange={(e) => setHideInactive(e.target.checked)}
+                        className="rounded border-medical-secondary/20"
+                      />
+                      <label htmlFor="hideInactive" className="text-sm text-medical-primary">
+                        Hide inactive employees
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {employees.map((employee) => (
+                  {filteredEmployees.map((employee) => (
                     <Card 
                       key={employee.id}
                       className="futuristic-card p-4 group hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden"
