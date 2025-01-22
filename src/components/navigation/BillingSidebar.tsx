@@ -10,87 +10,87 @@ import {
 
 const routes = [
   {
-    label: "QA Review Queue",
+    label: "Quality Review Queue",
     icon: ClipboardCheck,
     href: "/qa-review",
     count: "124"
   },
   {
-    label: "Insurance Review Queue",
+    label: "Coverage Review Queue",
     icon: FileSearch,
     href: "/insurance-review",
     count: "65"
   },
   {
-    label: "Insurance Filing Queue",
+    label: "Coverage Filing Queue",
     icon: FilePlus2,
     href: "/insurance-filing",
     count: "136"
   },
   {
-    label: "Insurance Trans Queue",
+    label: "Coverage Trans Queue",
     icon: Send,
     href: "/insurance-trans",
     count: "4,323+204"
   },
   {
-    label: "Insurance Exception Queue",
+    label: "Coverage Exception Queue",
     icon: AlertTriangle,
     href: "/insurance-exception",
     count: "1"
   },
   {
-    label: "Insurance Appeal Queue",
+    label: "Coverage Appeal Queue",
     icon: Scale,
     href: "/insurance-appeal"
   },
   {
-    label: "Parking Lot",
+    label: "Holding Area",
     icon: Car,
     href: "/parking-lot"
   },
   {
-    label: "Payment Event Finder",
+    label: "Payment Tracking",
     icon: Clock,
     href: "/payment-finder"
   },
   {
-    label: "Prior Auths On File",
+    label: "Pre-Approvals On File",
     icon: FileText,
     href: "/prior-auths"
   },
   {
-    label: "Facilities List",
+    label: "Centers List",
     icon: Building2,
     href: "/facilities"
   },
   {
-    label: "Affiliates List",
+    label: "Partners List",
     icon: Users,
     href: "/affiliates"
   },
   {
-    label: "Patients List",
+    label: "Client List",
     icon: User,
     href: "/patients"
   },
   {
-    label: "Patient Document Upload",
+    label: "Client Document Upload",
     icon: Upload,
     href: "/document-upload"
   },
   {
-    label: "Import an EDI Document",
+    label: "Import EDI Document",
     icon: FileUp,
     href: "/import-edi"
   },
   {
-    label: "Record a Payment Event",
+    label: "Record Payment Event",
     icon: DollarSign,
     href: "/record-payment"
   },
   {
-    label: "Insurance Payor ID List",
+    label: "Coverage Provider IDs",
     icon: List,
     href: "/payor-list"
   },
