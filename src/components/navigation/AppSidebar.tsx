@@ -151,12 +151,12 @@ export function AppSidebar() {
 
   return (
     <div className={cn(
-      "relative border-r bg-gradient-to-b from-medical-card-start to-medical-card-end backdrop-blur-sm",
+      "relative border-r bg-[#2B4B8C] backdrop-blur-sm",
       "transition-all duration-300 ease-in-out h-[calc(100vh-4rem)]",
       isCollapsed ? "w-16" : "w-64"
     )}>
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-medical-gradient-start to-medical-gradient-end">
+        <div className="flex items-center justify-between p-4">
           {!isCollapsed && (
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
               <CircuitBoard className="h-5 w-5" />
@@ -180,20 +180,20 @@ export function AppSidebar() {
                 variant="ghost"
                 className={cn(
                   "w-full justify-start relative overflow-hidden group",
-                  "hover:bg-medical-gradient-start/10 hover:shadow-md hover:scale-[1.02]",
+                  "hover:bg-white/10",
                   "transition-all duration-200 ease-in-out",
-                  pathname === route.href && "bg-medical-gradient-start/20 shadow-glow",
+                  pathname === route.href && "bg-white/20",
                   isCollapsed ? "px-2" : "px-4"
                 )}
                 asChild
               >
                 <Link to={route.href} className="flex items-center">
                   <route.icon className={cn(
-                    "h-4 w-4 transition-transform group-hover:scale-110",
+                    "h-4 w-4 text-white",
                     !isCollapsed && "mr-2"
                   )} />
                   {!isCollapsed && (
-                    <span className="font-medium">{route.label}</span>
+                    <span className="font-medium text-white">{route.label}</span>
                   )}
                 </Link>
               </Button>
@@ -201,7 +201,6 @@ export function AppSidebar() {
           </div>
         </ScrollArea>
       </div>
-      <div className="absolute inset-0 pointer-events-none border-r border-medical-secondary/20 bg-gradient-to-b from-transparent to-medical-gradient-end/5" />
     </div>
   );
 }
