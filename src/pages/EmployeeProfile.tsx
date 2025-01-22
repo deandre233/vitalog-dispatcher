@@ -71,9 +71,16 @@ const EmployeeProfile = () => {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold">{employee?.name}</h1>
-      <p>{employee?.email}</p>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">
+        {employee?.first_name} {employee?.last_name}
+      </h1>
+      <div className="mb-4">
+        <p className="text-gray-600">Employee ID: {employee?.readable_id}</p>
+        <p className="text-gray-600">Mobile: {employee?.mobile}</p>
+        <p className="text-gray-600">Station: {employee?.station}</p>
+      </div>
+      
       <Button onClick={() => setIsPayrollModalOpen(true)}>Update Payroll</Button>
 
       <Dialog open={isPayrollModalOpen} onOpenChange={setIsPayrollModalOpen}>
@@ -134,8 +141,8 @@ const EmployeeProfile = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => handlePayrollUpdate(payrollData)}>Save</Button>
             <Button variant="outline" onClick={() => setIsPayrollModalOpen(false)}>Cancel</Button>
+            <Button onClick={() => handlePayrollUpdate(payrollData)}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
