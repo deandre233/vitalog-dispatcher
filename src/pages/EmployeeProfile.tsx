@@ -279,24 +279,120 @@ export function EmployeeProfile() {
                               <User className="h-6 w-6 text-medical-secondary" />
                               <h3 className="text-lg font-semibold">Demographics</h3>
                             </div>
-                            <div className="grid grid-cols-2 gap-6">
-                              <div className="space-y-4">
+                            <div className="space-y-6">
+                              <div className="grid grid-cols-1 gap-4">
                                 <div className="space-y-2">
-                                  <Label>Date of Birth</Label>
-                                  <Input type="date" className="bg-medical-accent/10" />
+                                  <Label>Street address</Label>
+                                  <Input placeholder="Street address line 1" className="bg-medical-accent/10" />
+                                  <Input placeholder="Street address line 2" className="bg-medical-accent/10" />
                                 </div>
+                                
+                                <div className="grid grid-cols-3 gap-4">
+                                  <div className="space-y-2">
+                                    <Label>City</Label>
+                                    <Input placeholder="City" className="bg-medical-accent/10" />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label>State</Label>
+                                    <Select defaultValue="GA">
+                                      <SelectTrigger className="bg-medical-accent/10">
+                                        <SelectValue placeholder="Select state" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="GA">Georgia</SelectItem>
+                                        {/* Add other states as needed */}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label>ZIP</Label>
+                                    <Input placeholder="#####" className="bg-medical-accent/10" />
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="space-y-2">
+                                    <Label>Date of birth</Label>
+                                    <div className="flex items-center gap-2">
+                                      <Input type="date" defaultValue="1983-04-23" className="bg-medical-accent/10" />
+                                      <span className="text-sm text-muted-foreground">(41 years old)</span>
+                                    </div>
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label>Citizenship</Label>
+                                    <Input defaultValue="US" className="bg-medical-accent/10" />
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="space-y-2">
+                                    <Label>Gender</Label>
+                                    <Select defaultValue="male">
+                                      <SelectTrigger className="bg-medical-accent/10">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="male">Male</SelectItem>
+                                        <SelectItem value="female">Female</SelectItem>
+                                        <SelectItem value="other">Other</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label>Race</Label>
+                                    <Select defaultValue="black">
+                                      <SelectTrigger className="bg-medical-accent/10">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="black">Black or African American</SelectItem>
+                                        <SelectItem value="white">White</SelectItem>
+                                        <SelectItem value="asian">Asian</SelectItem>
+                                        <SelectItem value="hispanic">Hispanic or Latino</SelectItem>
+                                        <SelectItem value="native">Native American</SelectItem>
+                                        <SelectItem value="pacific">Pacific Islander</SelectItem>
+                                        <SelectItem value="other">Other</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+
                                 <div className="space-y-2">
-                                  <Label>Gender</Label>
-                                  <Select>
-                                    <SelectTrigger className="bg-medical-accent/10">
-                                      <SelectValue placeholder="Select gender" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="male">Male</SelectItem>
-                                      <SelectItem value="female">Female</SelectItem>
-                                      <SelectItem value="other">Other</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                  <Label>Rank</Label>
+                                  <div className="flex items-center gap-2">
+                                    <Input className="bg-medical-accent/10" />
+                                    <span className="text-sm text-muted-foreground">(NFIRS-1-M / NFIRS-9-B)</span>
+                                  </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>Provider-issued ID number</Label>
+                                  <div className="flex items-center gap-2">
+                                    <Input placeholder="if different than patch number" className="bg-medical-accent/10" />
+                                    <span className="text-sm text-muted-foreground">(dPersonnel.21)</span>
+                                  </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label>Other email</Label>
+                                  <Input placeholder="optional" className="bg-medical-accent/10" />
+                                  <p className="text-sm text-muted-foreground">This email address is for your reference only.</p>
+                                </div>
+
+                                <div className="space-y-4">
+                                  <Label>Other telephones</Label>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <Input placeholder="###-###-####" className="bg-medical-accent/10" />
+                                    <span className="flex items-center">home</span>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <Input placeholder="###-###-####" className="bg-medical-accent/10" />
+                                    <span className="flex items-center">work</span>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <Input placeholder="###-###-####" className="bg-medical-accent/10" />
+                                    <span className="flex items-center">pager</span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
