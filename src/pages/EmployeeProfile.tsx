@@ -42,7 +42,10 @@ import {
   Save,
   X,
   Camera,
-  Upload
+  Upload,
+  Key,
+  Switch,
+  CheckCircle
 } from "lucide-react";
 
 const EmployeeProfile = () => {
@@ -288,7 +291,7 @@ const EmployeeProfile = () => {
                     <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-medical-secondary" />
-                        <span className="font-medium">Personal Information</span>
+                        <span className="font-medium">Identity & Contact Information</span>
                       </div>
                       {editMode === 'demographics' ? (
                         <div className="flex gap-2">
@@ -323,36 +326,117 @@ const EmployeeProfile = () => {
                         </Button>
                       )}
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-medical-primary">Phone</Label>
-                        {editMode === 'demographics' ? (
-                          <Input
-                            value={editData.mobile || ''}
-                            onChange={(e) => setEditData({ ...editData, mobile: e.target.value })}
-                            className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
-                          />
-                        ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div>
+                          <Label className="text-medical-primary">NEMSIS UUID</Label>
+                          {editMode === 'demographics' ? (
+                            <Input
+                              value={editData.nemsis_uuid || ''}
+                              onChange={(e) => setEditData({ ...editData, nemsis_uuid: e.target.value })}
+                              className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                              <FileText className="h-4 w-4 text-medical-secondary" />
+                              <span>{employee.nemsis_uuid || 'Not assigned'}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div>
+                          <Label className="text-medical-primary">Phone</Label>
+                          {editMode === 'demographics' ? (
+                            <Input
+                              value={editData.mobile || ''}
+                              onChange={(e) => setEditData({ ...editData, mobile: e.target.value })}
+                              className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                              <Phone className="h-4 w-4 text-medical-secondary" />
+                              <span>{employee.mobile || 'Not provided'}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div>
+                          <Label className="text-medical-primary">Login Name</Label>
+                          {editMode === 'demographics' ? (
+                            <Input
+                              value={editData.login_name || ''}
+                              onChange={(e) => setEditData({ ...editData, login_name: e.target.value })}
+                              className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                              <User className="h-4 w-4 text-medical-secondary" />
+                              <span>{employee.login_name || 'Not set'}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div>
+                          <Label className="text-medical-primary">Beacon App Token</Label>
                           <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
-                            <Phone className="h-4 w-4 text-medical-secondary" />
-                            <span>{employee.mobile || 'Not provided'}</span>
+                            <Key className="h-4 w-4 text-medical-secondary" />
+                            <span className="font-mono text-sm">{employee.beacon_token || 'Not generated'}</span>
                           </div>
-                        )}
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label className="text-medical-primary">Station</Label>
-                        {editMode === 'demographics' ? (
-                          <Input
-                            value={editData.station || ''}
-                            onChange={(e) => setEditData({ ...editData, station: e.target.value })}
-                            className="bg-white/50 backdrop-blur-sm border-medical-secondary/20 focus:border-medical-secondary transition-colors duration-300"
-                          />
-                        ) : (
-                          <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
-                            <MapPin className="h-4 w-4 text-medical-secondary" />
-                            <span>{employee.station || 'Not assigned'}</span>
+
+                      <div className="space-y-4">
+                        <div>
+                          <Label className="text-medical-primary">Messaging Preferences</Label>
+                          <Card className="p-4 bg-white/50 backdrop-blur-sm">
+                            <div className="space-y-4">
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={editData.sms_notifications}
+                                  onCheckedChange={(checked) => 
+                                    setEditData({ ...editData, sms_notifications: checked })
+                                  }
+                                  disabled={!editMode}
+                                />
+                                <Label>SMS Notifications</Label>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={editData.email_notifications}
+                                  onCheckedChange={(checked) => 
+                                    setEditData({ ...editData, email_notifications: checked })
+                                  }
+                                  disabled={!editMode}
+                                />
+                                <Label>Email Notifications</Label>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={editData.two_factor_auth}
+                                  onCheckedChange={(checked) => 
+                                    setEditData({ ...editData, two_factor_auth: checked })
+                                  }
+                                  disabled={!editMode}
+                                />
+                                <Label>Two-factor Authentication</Label>
+                              </div>
+                            </div>
+                          </Card>
+                        </div>
+
+                        <div>
+                          <Label className="text-medical-primary">Last Login</Label>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                              <Clock className="h-4 w-4 text-medical-secondary" />
+                              <span>Last attempt: {employee.last_login_attempt || 'Never'}</span>
+                            </div>
+                            <div className="flex items-center gap-2 p-2 bg-white/30 rounded-md backdrop-blur-sm">
+                              <CheckCircle className="h-4 w-4 text-medical-secondary" />
+                              <span>Last success: {employee.last_login_success || 'Never'}</span>
+                            </div>
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
                   </Card>
