@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,6 +7,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -19,6 +19,7 @@ serve(async (req) => {
     }
 
     const { metrics } = await req.json();
+    console.log('Received metrics:', metrics);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -31,11 +32,11 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are an expert medical billing analyst. Analyze the billing metrics and provide concise, actionable insights."
+            content: "You are an expert medical billing analyst. Analyze the billing metrics and provide concise, actionable insights focusing on key trends, potential issues, and recommendations."
           },
           {
             role: "user",
-            content: `Analyze these billing metrics and provide insights: ${JSON.stringify(metrics)}`
+            content: `Please analyze these billing metrics and provide key insights: ${JSON.stringify(metrics)}`
           }
         ],
         temperature: 0.3,
