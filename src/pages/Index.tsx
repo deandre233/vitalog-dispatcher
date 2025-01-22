@@ -209,24 +209,6 @@ const Index = () => {
                         <p className="text-sm text-medical-primary/70">
                           {item.description}
                         </p>
-                        {item.metrics && (
-                          <div className="grid grid-cols-3 gap-4 mt-4">
-                            {item.metrics.map((metric, index) => (
-                              <div key={index} className="bg-white/50 rounded-lg p-4 backdrop-blur-sm">
-                                <metric.icon className={`w-6 h-6 ${item.color} mb-2`} />
-                                <div className="text-sm font-medium text-medical-primary">
-                                  {metric.label}
-                                </div>
-                                <div className="text-lg font-bold text-medical-primary">
-                                  {metric.value}
-                                </div>
-                                <div className="text-xs text-green-600">
-                                  {metric.change}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
