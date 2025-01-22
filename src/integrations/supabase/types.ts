@@ -327,6 +327,7 @@ export type Database = {
           id: string
           last_name: string
           mobile: string | null
+          readable_id: string | null
           station: string | null
           status: string | null
           updated_at: string | null
@@ -339,6 +340,7 @@ export type Database = {
           id?: string
           last_name: string
           mobile?: string | null
+          readable_id?: string | null
           station?: string | null
           status?: string | null
           updated_at?: string | null
@@ -351,6 +353,7 @@ export type Database = {
           id?: string
           last_name?: string
           mobile?: string | null
+          readable_id?: string | null
           station?: string | null
           status?: string | null
           updated_at?: string | null
@@ -1187,6 +1190,10 @@ export type Database = {
         Returns: string
       }
       generate_patient_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_readable_employee_id: {
         Args: Record<PropertyKey, never>
         Returns: string
       }
