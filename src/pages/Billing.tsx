@@ -1,5 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/navigation/AppSidebar";
+import { BillingSidebar } from "@/components/navigation/BillingSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -18,13 +18,6 @@ import {
   ChevronRight, DollarSign, Info, Cpu, Database, Network, 
   Radio, Rocket, Signal, Sparkles, Zap
 } from "lucide-react";
-
-interface MetricAnalysis {
-  insights: string[];
-  recommendations: string[];
-  impact: string;
-  trends: string[];
-}
 
 const Billing = () => {
   const { toast } = useToast();
@@ -232,7 +225,7 @@ const Billing = () => {
       <Header />
       <div className="flex-1 flex">
         <SidebarProvider>
-          <AppSidebar />
+          <BillingSidebar />
           <div className="flex-1 overflow-auto">
             <DashboardHeader />
             <main className="p-6 space-y-6">
