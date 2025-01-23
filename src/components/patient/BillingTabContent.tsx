@@ -2,6 +2,14 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/common/PhoneInput";
+import { SearchBar } from "@/components/common/SearchBar";
+import { 
+  validateEmail,
+  sanitizeString,
+  formatFullName,
+  truncateString
+} from "@/utils/stringUtils";
 import { 
   Select,
   SelectContent,
@@ -688,11 +696,10 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium">Claims Phone</Label>
-              <Input
-                value={record?.phone}
-                onChange={(e) => handleInsuranceChange(type, 'phone', e.target.value)}
+              <PhoneInput
+                value={record?.phone || ''}
+                onChange={(value) => handleInsuranceChange(type, 'phone', value)}
                 className="h-9"
-                placeholder="(877) 567-7271"
               />
             </div>
             <div>
@@ -802,6 +809,14 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
 
   return (
     <div className="space-y-6">
+      <SearchBar
+        items={insuranceRecords}
+        searchFields={['carrier_name', 'policy_number', 'group_name']}
+        onResultsChange={(results) => console.log('Search results:', results)}
+        placeholder="Search insurance records..."
+        className="mb-4"
+      />
+
       <div className="grid grid-cols-3 gap-6">
         <InsuranceSection 
           type="primary" 
