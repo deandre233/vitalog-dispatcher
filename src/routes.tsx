@@ -8,9 +8,9 @@ import CrewAssignment from "./pages/CrewAssignment";
 import Performance from "./pages/Performance";
 import AlertsConfig from "./pages/AlertsConfig";
 import Billing from "./pages/Billing";
-import EmployeeDirectory from "./pages/EmployeeDirectory";
-import EmployeeProfile from "./pages/EmployeeProfile";
-import PatientRecord from "./pages/PatientRecord";
+import { EmployeeDirectory } from "./pages/EmployeeDirectory";
+import { EmployeeProfile } from "./pages/EmployeeProfile";
+import { PatientRecord } from "./pages/PatientRecord";
 import ManageRoutes from "./pages/ManageRoutes";
 
 export const router = createBrowserRouter([
