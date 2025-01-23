@@ -444,7 +444,7 @@ export function DispatchBoard() {
       );
       
       if (traffic) {
-        trafficInfo.congestionLevel = (traffic.congestionLevel === 'medium' ? 'medium' : 'low') as CongestionLevel;
+        trafficInfo.congestionLevel = traffic.congestionLevel as CongestionLevel;
         trafficInfo.estimatedDelay = traffic.delayMinutes || Math.floor(Math.random() * 15);
         trafficInfo.alternateRouteAvailable = traffic.alternateRouteAvailable || false;
       }
@@ -462,11 +462,7 @@ export function DispatchBoard() {
       aiRecommendations: {
         ...dispatch.aiRecommendations,
         insights: aiInsights,
-        trafficStatus: {
-          congestionLevel: trafficInfo.congestionLevel,
-          estimatedDelay: trafficInfo.estimatedDelay,
-          alternateRouteAvailable: trafficInfo.alternateRouteAvailable
-        }
+        trafficStatus: trafficInfo
       }
     };
   };
