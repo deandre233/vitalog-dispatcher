@@ -10,6 +10,8 @@ export function usePatientData(patientId?: string) {
     queryFn: async () => {
       if (!patientId) return null;
 
+      console.log('Fetching patient data for ID:', patientId);
+
       // Check if the ID is in PAT-XXX format
       const isPATFormat = patientId.startsWith('PAT-');
       
@@ -30,6 +32,7 @@ export function usePatientData(patientId?: string) {
         throw error;
       }
 
+      console.log('Fetched patient data:', data);
       return data;
     },
     enabled: !!patientId
@@ -39,6 +42,8 @@ export function usePatientData(patientId?: string) {
     mutationFn: async (updates: Partial<typeof patient>) => {
       if (!patientId) throw new Error('No patient ID provided');
 
+      console.log('Updating patient with ID:', patientId, 'Updates:', updates);
+
       // Check if the ID is in PAT-XXX format
       const isPATFormat = patientId.startsWith('PAT-');
       
@@ -47,7 +52,10 @@ export function usePatientData(patientId?: string) {
         .update(updates)
         .eq(isPATFormat ? 'legacy_display_id' : 'id', patientId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating patient:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patient', patientId] });
