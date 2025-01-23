@@ -8,9 +8,13 @@ export function useMobile() {
       setIsMobile(window.innerWidth < 768);
     };
 
+    // Initial check
     checkMobile();
+
+    // Add event listener
     window.addEventListener('resize', checkMobile);
 
+    // Cleanup
     return () => {
       window.removeEventListener('resize', checkMobile);
     };
@@ -18,3 +22,6 @@ export function useMobile() {
 
   return isMobile;
 }
+
+// For backward compatibility
+export const useIsMobile = useMobile;
