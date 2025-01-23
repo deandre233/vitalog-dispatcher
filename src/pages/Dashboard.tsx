@@ -5,15 +5,21 @@ import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
 import { useState } from "react";
 import type { ViewType } from "@/components/dashboard/DashboardHeader";
 
-export default function Dashboard() {
+export function Dashboard() {
   const [currentView, setCurrentView] = useState<ViewType>("active");
+
+  const handleViewChange = (view: ViewType) => {
+    setCurrentView(view);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader onViewChange={setCurrentView} defaultView="active" />
-      <WelcomeBanner />
-      <DashboardMetrics />
-      <DispatchBoard />
+      <DashboardHeader onViewChange={handleViewChange} defaultView={currentView} />
+      <div className="container mx-auto px-4 py-8 space-y-6">
+        <WelcomeBanner />
+        <DashboardMetrics />
+        <DispatchBoard />
+      </div>
     </div>
   );
 }

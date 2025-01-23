@@ -2,6 +2,8 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Employee } from "@/types/employee";
+import { useUIData } from "@/hooks/useUIData";
+import { useEffect } from "react";
 
 interface PayrollHistory {
   id: string;
@@ -15,6 +17,7 @@ interface PayrollHistory {
 
 export function EmployeeProfile() {
   const { id } = useParams<{ id: string }>();
+  const { createPage, createPanel, createAction } = useUIData();
 
   const { data: employee } = useQuery({
     queryKey: ['employee', id],
@@ -43,6 +46,39 @@ export function EmployeeProfile() {
       return data as PayrollHistory[];
     },
   });
+
+  // Auto-create page data when component mounts
+  useEffect(() => {
+    if (employee) {
+      createPage.mutate({
+        name: `Employee Profile - ${employee.first_name} ${employee.last_name}`,
+        url: `/employee/${employee.id}`,
+        meta_data: {
+          description: `Profile page for employee ${employee.first_name} ${employee.last_name}`,
+          category: 'employee',
+          employeeId: employee.id
+        }
+      });
+
+      // Create related panels
+      createPanel.mutate({
+        name: 'Payroll History Panel',
+        content: { type: 'payroll_history' },
+        visibility_rule: 'authenticated',
+        is_active: true
+      });
+
+      // Create common actions
+      createAction.mutate({
+        action_name: 'Update Payroll',
+        trigger_element: 'update_payroll_button',
+        event_handler: {
+          type: 'form_submit',
+          validation: ['required_fields', 'number_validation']
+        }
+      });
+    }
+  }, [employee, createPage, createPanel, createAction]);
 
   const updatePayrollHistory = async (values: Partial<PayrollHistory>) => {
     const { error } = await supabase
