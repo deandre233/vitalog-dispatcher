@@ -82,7 +82,15 @@ const mockPatients: Patient[] = [
     legacy_display_id: "PAT-12346",
     last_physical: "2024-01-10T09:15:00.000Z",
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
+    blood_type: "A+",
+    height: "5'4\"",
+    weight: "135",
+    marital_status: "Single",
+    occupation: "Teacher",
+    preferred_language: "Spanish",
+    primary_care_physician: "Dr. Martinez",
+    usual_transport_mode: "Ambulance"
   },
   {
     id: "3",
@@ -106,7 +114,15 @@ const mockPatients: Patient[] = [
     legacy_display_id: "PAT-12347",
     last_physical: "2023-12-20T11:45:00.000Z",
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
+    blood_type: "B-",
+    height: "6'0\"",
+    weight: "200",
+    marital_status: "Divorced",
+    occupation: "Accountant",
+    preferred_language: "English",
+    primary_care_physician: "Dr. Thompson",
+    usual_transport_mode: "Wheelchair Van"
   }
 ];
 
