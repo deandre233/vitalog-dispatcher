@@ -1,75 +1,32 @@
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Employee } from "@/types/employee";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/navigation/AppSidebar";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { Card } from "@/components/ui/card";
 
-interface PayrollHistory {
-  id: string;
-  employee_id: string;
-  pay_rate: number;
-  pay_type: string;
-  effective_date: string;
-  end_date: string | null;
-  is_active: boolean;
-}
-
-export function EmployeeProfile() {
-  const { id } = useParams<{ id: string }>();
-
-  const { data: employee } = useQuery({
-    queryKey: ['employee', id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('employees')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      return data as Employee;
-    },
-  });
-
-  const { data: payrollHistory } = useQuery({
-    queryKey: ['payroll_history', id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('employee_payroll_history')
-        .select('*')
-        .eq('employee_id', id)
-        .order('effective_date', { ascending: false });
-
-      if (error) throw error;
-      return data as PayrollHistory[];
-    },
-  });
-
-  const updatePayrollHistory = async (values: Partial<PayrollHistory>) => {
-    const { error } = await supabase
-      .from('employee_payroll_history')
-      .insert({
-        employee_id: id,
-        pay_rate: typeof values.pay_rate === 'string' ? parseFloat(values.pay_rate) : values.pay_rate,
-        pay_type: values.pay_type,
-        effective_date: values.effective_date,
-        is_active: true
-      });
-
-    if (error) throw error;
-  };
+export const EmployeeProfile = () => {
+  const { id } = useParams();
 
   return (
-    <div>
-      {employee && (
-        <div>
-          <h1>{employee.first_name} {employee.last_name}</h1>
-          <div>
-            <h2>Current Pay Information</h2>
-            <p>Pay Rate: {payrollHistory?.[0]?.pay_rate}</p>
-            <p>Pay Type: {payrollHistory?.[0]?.pay_type}</p>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <div className="flex-1 flex">
+        <SidebarProvider>
+          <AppSidebar />
+          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+            <DashboardHeader />
+            <main className="p-6">
+              <Card className="p-6">
+                <h2 className="text-2xl font-semibold mb-6">Employee Profile</h2>
+                <p className="text-gray-500">Profile for employee ID: {id}</p>
+              </Card>
+            </main>
           </div>
-        </div>
-      )}
+        </SidebarProvider>
+      </div>
+      <Footer />
     </div>
   );
-}
+};
