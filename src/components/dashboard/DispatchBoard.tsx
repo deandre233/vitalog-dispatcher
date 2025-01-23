@@ -23,8 +23,15 @@ import {
 } from "@/utils/aiLearningUtils";
 import { supabase } from "@/integrations/supabase/client";
 
-// Define the congestion level type
+// Define the congestion level type that allows both values
 type CongestionLevel = "low" | "medium";
+
+// Define the traffic status interface
+interface TrafficStatus {
+  congestionLevel: CongestionLevel;
+  estimatedDelay: number;
+  alternateRouteAvailable: boolean;
+}
 
 // Update the mockDispatches to use the correct type
 const mockDispatches = [
@@ -424,9 +431,9 @@ export function DispatchBoard() {
       aiInsights = ['Unable to generate insights'];
     }
 
-    const trafficInfo = {
-      congestionLevel: "low" as CongestionLevel,
-      delayMinutes: 0,
+    const trafficInfo: TrafficStatus = {
+      congestionLevel: "low",
+      estimatedDelay: 0,
       alternateRouteAvailable: false
     };
 
@@ -438,7 +445,7 @@ export function DispatchBoard() {
       
       if (traffic) {
         trafficInfo.congestionLevel = (traffic.congestionLevel === 'medium' ? 'medium' : 'low') as CongestionLevel;
-        trafficInfo.delayMinutes = traffic.delayMinutes || Math.floor(Math.random() * 15);
+        trafficInfo.estimatedDelay = traffic.delayMinutes || Math.floor(Math.random() * 15);
         trafficInfo.alternateRouteAvailable = traffic.alternateRouteAvailable || false;
       }
     } catch (error) {
@@ -457,7 +464,7 @@ export function DispatchBoard() {
         insights: aiInsights,
         trafficStatus: {
           congestionLevel: trafficInfo.congestionLevel,
-          estimatedDelay: trafficInfo.delayMinutes,
+          estimatedDelay: trafficInfo.estimatedDelay,
           alternateRouteAvailable: trafficInfo.alternateRouteAvailable
         }
       }
