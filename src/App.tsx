@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "./components/ui/button";
 import Index from "./pages/Index";
 import ActiveDispatches from "./pages/ActiveDispatches";
 import ClosedDispatches from "./pages/ClosedDispatches";
