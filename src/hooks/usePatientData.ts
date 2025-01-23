@@ -10,9 +10,6 @@ export function usePatientData(patientId?: string) {
     queryFn: async () => {
       if (!patientId) return null;
 
-      // Check if the ID is in PAT-XXX format
-      const isPATFormat = patientId.startsWith('PAT-');
-      
       const { data, error } = await supabase
         .from('patients')
         .select(`
@@ -21,7 +18,7 @@ export function usePatientData(patientId?: string) {
           insurance_policies (*),
           appointments (*)
         `)
-        .eq(isPATFormat ? 'legacy_display_id' : 'id', patientId)
+        .eq('id', patientId)
         .maybeSingle();
 
       if (error) {
@@ -39,13 +36,10 @@ export function usePatientData(patientId?: string) {
     mutationFn: async (updates: Partial<typeof patient>) => {
       if (!patientId) throw new Error('No patient ID provided');
 
-      // Check if the ID is in PAT-XXX format
-      const isPATFormat = patientId.startsWith('PAT-');
-      
       const { error } = await supabase
         .from('patients')
         .update(updates)
-        .eq(isPATFormat ? 'legacy_display_id' : 'id', patientId);
+        .eq('id', patientId);
 
       if (error) throw error;
     },
