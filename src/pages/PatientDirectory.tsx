@@ -29,7 +29,7 @@ type Patient = Tables<"patients">;
 // Mock data for development and testing
 const mockPatients: Patient[] = [
   {
-    id: "1",
+    id: "123e4567-e89b-12d3-a456-426614174000",
     first_name: "John",
     last_name: "Smith",
     dob: "1985-03-15",
@@ -61,7 +61,7 @@ const mockPatients: Patient[] = [
     usual_transport_mode: "Car"
   },
   {
-    id: "2",
+    id: "223e4567-e89b-12d3-a456-426614174000",
     first_name: "Maria",
     last_name: "Garcia",
     dob: "1992-07-22",
@@ -93,7 +93,7 @@ const mockPatients: Patient[] = [
     usual_transport_mode: "Ambulance"
   },
   {
-    id: "3",
+    id: "323e4567-e89b-12d3-a456-426614174000",
     first_name: "Robert",
     last_name: "Johnson",
     dob: "1978-11-30",
@@ -368,3 +368,4 @@ export const PatientDirectory = () => {
 };
 
 export default PatientDirectory;
+
