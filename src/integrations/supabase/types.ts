@@ -745,60 +745,6 @@ export type Database = {
         }
         Relationships: []
       }
-      files: {
-        Row: {
-          bucket_name: string
-          created_at: string | null
-          file_name: string
-          file_type: Database["public"]["Enums"]["file_type"]
-          id: string
-          is_public: boolean | null
-          metadata: Json | null
-          mime_type: string | null
-          original_name: string
-          related_entity_id: string | null
-          related_entity_type: string | null
-          size_bytes: number | null
-          storage_path: string
-          updated_at: string | null
-          uploaded_by: string | null
-        }
-        Insert: {
-          bucket_name: string
-          created_at?: string | null
-          file_name: string
-          file_type?: Database["public"]["Enums"]["file_type"]
-          id?: string
-          is_public?: boolean | null
-          metadata?: Json | null
-          mime_type?: string | null
-          original_name: string
-          related_entity_id?: string | null
-          related_entity_type?: string | null
-          size_bytes?: number | null
-          storage_path: string
-          updated_at?: string | null
-          uploaded_by?: string | null
-        }
-        Update: {
-          bucket_name?: string
-          created_at?: string | null
-          file_name?: string
-          file_type?: Database["public"]["Enums"]["file_type"]
-          id?: string
-          is_public?: boolean | null
-          metadata?: Json | null
-          mime_type?: string | null
-          original_name?: string
-          related_entity_id?: string | null
-          related_entity_type?: string | null
-          size_bytes?: number | null
-          storage_path?: string
-          updated_at?: string | null
-          uploaded_by?: string | null
-        }
-        Relationships: []
-      }
       insurance_carriers: {
         Row: {
           carrier_name: string
@@ -1826,7 +1772,6 @@ export type Database = {
         | "in_review"
         | "appealed"
       dispatch_status: "Pending" | "In Progress" | "Completed" | "Canceled"
-      file_type: "document" | "image" | "pdf" | "spreadsheet" | "other"
       gender_type:
         | "male"
         | "female"
