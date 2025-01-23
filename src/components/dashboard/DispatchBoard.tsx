@@ -23,64 +23,323 @@ import {
 } from "@/utils/aiLearningUtils";
 import { supabase } from "@/integrations/supabase/client";
 
-interface Patient {
-  id: string;
-  name: string;
-  dob?: string;
-  condition?: string;
-}
-
-interface AIRecommendations {
-  route: string;
-  crew: string;
-  billing: string;
-  insights?: string[];
-  trafficStatus?: {
-    congestionLevel: "low" | "medium" | "high";
-    estimatedDelay: number;
-    alternateRouteAvailable: boolean;
-  };
-}
-
-interface Dispatch {
-  id: string;
-  activationTime: string;
-  patient: Patient;
-  serviceType: string;
-  origin: string;
-  destination: string;
-  status: string;
-  priority: string;
-  assignedTo: string;
-  aiRecommendations: AIRecommendations;
-  eta: string;
-  comments?: string;
-  warnings?: string;
-  progress?: number;
-  elapsedTime?: string;
-  lastUpdated?: string;
-  efficiency?: number;
-}
-
-interface ScheduledTransportProps {
-  id: string;
-  scheduledTime: string;
-  patient: string;
-  serviceType: string;
-  origin: string;
-  destination: string;
-  status: "Scheduled" | "Assigned" | "Completed" | "Canceled";
-  warnings?: string[];
-  unitAssigned?: string;
-  progress?: number;
-  recurrence?: string;
-}
+const mockDispatches = [
+  {
+    id: "DISP-00001",
+    activationTime: new Date(Date.now() - 3600000).toISOString(),
+    patient: {
+      id: "PAT-001",
+      name: "John Smith",
+      condition: "Stable - Routine Transfer"
+    },
+    serviceType: "BLS",
+    origin: "Memorial Hospital",
+    destination: "Sunset Nursing Home",
+    status: "enroute",
+    priority: "medium",
+    assignedTo: "Unit 101",
+    aiRecommendations: {
+      route: "Recommended Route: Via Main St",
+      crew: "Recommended Crew: BLS Team",
+      billing: "Insurance: Medicare",
+      insights: ["Traffic conditions favorable", "ETA within normal range"],
+      trafficStatus: {
+        congestionLevel: "low" as const,
+        estimatedDelay: 5,
+        alternateRouteAvailable: false
+      }
+    },
+    eta: "15 mins",
+    progress: 40,
+    elapsedTime: "45 min",
+    lastUpdated: new Date().toISOString(),
+    efficiency: 92
+  },
+  {
+    id: "DISP-00002",
+    activationTime: new Date(Date.now() - 7200000).toISOString(),
+    patient: {
+      id: "PAT-002",
+      name: "Mary Johnson",
+      condition: "Post-Op Transfer"
+    },
+    serviceType: "ALS",
+    origin: "City Medical Center",
+    destination: "Rehabilitation Center",
+    status: "transporting",
+    priority: "high",
+    assignedTo: "Unit 102",
+    aiRecommendations: {
+      route: "Recommended Route: Highway 101",
+      crew: "Recommended Crew: ALS Team",
+      billing: "Insurance: Blue Cross",
+      insights: ["Priority case", "Monitor vital signs"],
+      trafficStatus: {
+        congestionLevel: "medium" as const,
+        estimatedDelay: 10,
+        alternateRouteAvailable: true
+      }
+    },
+    eta: "20 mins",
+    progress: 60,
+    elapsedTime: "1h 15min",
+    lastUpdated: new Date().toISOString(),
+    efficiency: 88
+  },
+  {
+    id: "DISP-00003",
+    activationTime: new Date(Date.now() - 5400000).toISOString(),
+    patient: {
+      id: "PAT-003",
+      name: "Robert Wilson",
+      condition: "Dialysis Transport"
+    },
+    serviceType: "WC",
+    origin: "Willow Creek Apartments",
+    destination: "Dialysis Center",
+    status: "onscene",
+    priority: "medium",
+    assignedTo: "Unit 103",
+    aiRecommendations: {
+      route: "Recommended Route: Local streets",
+      crew: "Recommended Crew: Basic Transport",
+      billing: "Insurance: Medicaid",
+      insights: ["Regular patient", "Wheelchair assistance required"],
+      trafficStatus: {
+        congestionLevel: "low" as const,
+        estimatedDelay: 3,
+        alternateRouteAvailable: false
+      }
+    },
+    eta: "30 mins",
+    progress: 20,
+    elapsedTime: "25 min",
+    lastUpdated: new Date().toISOString(),
+    efficiency: 95
+  },
+  {
+    id: "DISP-00004",
+    activationTime: new Date(Date.now() - 1800000).toISOString(),
+    patient: {
+      id: "PAT-004",
+      name: "Sarah Davis",
+      condition: "Cardiac Monitoring"
+    },
+    serviceType: "ALS",
+    origin: "Emergency Care Clinic",
+    destination: "Heart Center",
+    status: "transporting",
+    priority: "high",
+    assignedTo: "Unit 104",
+    aiRecommendations: {
+      route: "Recommended Route: Express Route",
+      crew: "Recommended Crew: Critical Care",
+      billing: "Insurance: Private",
+      insights: ["Critical transfer", "Continuous monitoring required"],
+      trafficStatus: {
+        congestionLevel: "low" as const,
+        estimatedDelay: 2,
+        alternateRouteAvailable: true
+      }
+    },
+    eta: "10 mins",
+    progress: 75,
+    elapsedTime: "20 min",
+    lastUpdated: new Date().toISOString(),
+    efficiency: 98
+  },
+  {
+    id: "DISP-00005",
+    activationTime: new Date(Date.now() - 900000).toISOString(),
+    patient: {
+      id: "PAT-005",
+      name: "James Brown",
+      condition: "Physical Therapy"
+    },
+    serviceType: "BLS",
+    origin: "Senior Living Complex",
+    destination: "Physical Therapy Center",
+    status: "enroute",
+    priority: "medium",
+    assignedTo: "Unit 105",
+    aiRecommendations: {
+      route: "Recommended Route: Secondary roads",
+      crew: "Recommended Crew: Basic Transport",
+      billing: "Insurance: Medicare",
+      insights: ["Regular schedule", "Mobility assistance needed"],
+      trafficStatus: {
+        congestionLevel: "low" as const,
+        estimatedDelay: 5,
+        alternateRouteAvailable: false
+      }
+    },
+    eta: "25 mins",
+    progress: 30,
+    elapsedTime: "10 min",
+    lastUpdated: new Date().toISOString(),
+    efficiency: 90
+  },
+  {
+    id: "DISP-00006",
+    activationTime: new Date().toISOString(),
+    patient: {
+      id: "PAT-006",
+      name: "Patricia Miller",
+      condition: "Scheduled Check-up"
+    },
+    serviceType: "BLS",
+    origin: "Oakwood Residence",
+    destination: "Community Health Center",
+    status: "dispatch",
+    priority: "medium",
+    assignedTo: "Unassigned",
+    aiRecommendations: {
+      route: "Pending Assignment",
+      crew: "Recommended: BLS Team",
+      billing: "Insurance: Pending",
+      insights: ["Routine transport", "No special requirements"],
+      trafficStatus: {
+        congestionLevel: "low" as const,
+        estimatedDelay: 0,
+        alternateRouteAvailable: false
+      }
+    },
+    eta: "Pending",
+    progress: 0,
+    elapsedTime: "5 min",
+    lastUpdated: new Date().toISOString(),
+    efficiency: 0
+  },
+  {
+    id: "DISP-00007",
+    activationTime: new Date().toISOString(),
+    patient: {
+      id: "PAT-007",
+      name: "Michael Clark",
+      condition: "Emergency Evaluation"
+    },
+    serviceType: "ALS",
+    origin: "Home Address",
+    destination: "Emergency Room",
+    status: "dispatch",
+    priority: "high",
+    assignedTo: "Unassigned",
+    aiRecommendations: {
+      route: "Pending Assignment",
+      crew: "Recommended: ALS Team",
+      billing: "Insurance: Pending",
+      insights: ["High priority case", "Immediate response needed"],
+      trafficStatus: {
+        congestionLevel: "medium" as const,
+        estimatedDelay: 0,
+        alternateRouteAvailable: false
+      }
+    },
+    eta: "Pending",
+    progress: 0,
+    elapsedTime: "2 min",
+    lastUpdated: new Date().toISOString(),
+    efficiency: 0
+  },
+  {
+    id: "DISP-00008",
+    activationTime: new Date().toISOString(),
+    patient: {
+      id: "PAT-008",
+      name: "Elizabeth Taylor",
+      condition: "Scheduled Surgery"
+    },
+    serviceType: "BLS",
+    origin: "Assisted Living Facility",
+    destination: "Surgical Center",
+    status: "dispatch",
+    priority: "medium",
+    assignedTo: "Unassigned",
+    aiRecommendations: {
+      route: "Pending Assignment",
+      crew: "Recommended: BLS Team",
+      billing: "Insurance: Pending",
+      insights: ["Pre-scheduled transport", "Surgery prep required"],
+      trafficStatus: {
+        congestionLevel: "low" as const,
+        estimatedDelay: 0,
+        alternateRouteAvailable: false
+      }
+    },
+    eta: "Pending",
+    progress: 0,
+    elapsedTime: "8 min",
+    lastUpdated: new Date().toISOString(),
+    efficiency: 0
+  },
+  {
+    id: "DISP-00009",
+    activationTime: new Date().toISOString(),
+    patient: {
+      id: "PAT-009",
+      name: "William Anderson",
+      condition: "Respiratory Distress"
+    },
+    serviceType: "ALS",
+    origin: "Urgent Care",
+    destination: "Pulmonary Center",
+    status: "dispatch",
+    priority: "high",
+    assignedTo: "Unassigned",
+    aiRecommendations: {
+      route: "Pending Assignment",
+      crew: "Recommended: ALS Team",
+      billing: "Insurance: Pending",
+      insights: ["Respiratory monitoring needed", "Oxygen support required"],
+      trafficStatus: {
+        congestionLevel: "low" as const,
+        estimatedDelay: 0,
+        alternateRouteAvailable: false
+      }
+    },
+    eta: "Pending",
+    progress: 0,
+    elapsedTime: "3 min",
+    lastUpdated: new Date().toISOString(),
+    efficiency: 0
+  },
+  {
+    id: "DISP-00010",
+    activationTime: new Date().toISOString(),
+    patient: {
+      id: "PAT-010",
+      name: "Jennifer White",
+      condition: "Post-Procedure"
+    },
+    serviceType: "WC",
+    origin: "Day Surgery Center",
+    destination: "Home Address",
+    status: "dispatch",
+    priority: "medium",
+    assignedTo: "Unassigned",
+    aiRecommendations: {
+      route: "Pending Assignment",
+      crew: "Recommended: Basic Transport",
+      billing: "Insurance: Pending",
+      insights: ["Wheelchair transport", "Post-procedure care"],
+      trafficStatus: {
+        congestionLevel: "low" as const,
+        estimatedDelay: 0,
+        alternateRouteAvailable: false
+      }
+    },
+    eta: "Pending",
+    progress: 0,
+    elapsedTime: "1 min",
+    lastUpdated: new Date().toISOString(),
+    efficiency: 0
+  }
+];
 
 export function DispatchBoard() {
   const [activeView, setActiveView] = useState<"active" | "scheduled">("active");
-  const [dispatches, setDispatches] = useState<Dispatch[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
+  const [dispatches, setDispatches] = useState(mockDispatches);
+  const [isLoading, setIsLoading] = useState(false);
   const [aiPredictions, setAiPredictions] = useState<{
     maintenance: MaintenancePrediction[];
     staffing: StaffingPrediction;
@@ -94,89 +353,14 @@ export function DispatchBoard() {
     }
   });
 
-  useEffect(() => {
-    const fetchDispatches = async () => {
-      try {
-        const { data: transportRecords, error } = await supabase
-          .from('transport_records')
-          .select(`
-            *,
-            patients (
-              id,
-              first_name,
-              last_name,
-              medical_conditions
-            )
-          `)
-          .order('scheduled_time', { ascending: true });
-
-        if (error) throw error;
-
-        const formattedDispatches: Dispatch[] = transportRecords.map(record => ({
-          id: record.dispatch_id,
-          activationTime: record.scheduled_time,
-          patient: {
-            id: record.patients?.id || '',
-            name: `${record.patients?.last_name || ''}, ${record.patients?.first_name || ''}`,
-            condition: record.patients?.medical_conditions?.[0] || undefined
-          },
-          serviceType: record.transport_type || 'BLS',
-          origin: record.pickup_location,
-          destination: record.dropoff_location,
-          status: record.status,
-          priority: record.warnings?.includes('High priority case') ? 'high' : 'medium',
-          assignedTo: record.crew_assigned || 'Unassigned',
-          aiRecommendations: {
-            route: `Recommended Route: ${record.origin_address} to ${record.destination_address}`,
-            crew: `Recommended Crew: ${record.crew_assigned || 'TBD'}`,
-            billing: "Insurance: TBD",
-            insights: record.warnings || []
-          },
-          eta: '15 mins',
-          comments: record.notes,
-          warnings: record.warnings?.join(', '),
-          progress: record.dispatch_status === 'Completed' ? 100 : 
-                   record.dispatch_status === 'In Progress' ? 50 : 0,
-          elapsedTime: 'will call'
-        }));
-
-        setDispatches(formattedDispatches);
-      } catch (error) {
-        console.error('Error fetching dispatches:', error);
-        toast.error('Failed to load dispatch data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchDispatches();
-    
-    // Set up real-time subscription
-    const subscription = supabase
-      .channel('transport_records_changes')
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'transport_records' 
-        }, 
-        fetchDispatches
-      )
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const filterDispatches = (dispatches: Dispatch[], status: "assigned" | "unassigned"): Dispatch[] => {
+  const filterDispatches = (dispatches: typeof mockDispatches, status: "assigned" | "unassigned"): typeof mockDispatches => {
     return dispatches.filter(dispatch => {
       const isAssigned = dispatch.assignedTo && dispatch.assignedTo !== "Unassigned";
       return status === "assigned" ? isAssigned : !isAssigned;
     });
   };
 
-  const simulateRealTimeUpdates = async (dispatch: Dispatch): Promise<Dispatch> => {
+  const simulateRealTimeUpdates = async (dispatch: (typeof mockDispatches)[0]): Promise<(typeof mockDispatches)[0]> => {
     const now = new Date();
     const activationTime = new Date(dispatch.activationTime);
     const elapsedMinutes = Math.floor((now.getTime() - activationTime.getTime()) / (1000 * 60));
@@ -186,12 +370,11 @@ export function DispatchBoard() {
       progress = Math.min(100, progress + Math.random() * 5);
     }
 
-    // Update status check to use correct capitalization
     let status = dispatch.status;
     if (progress === 100) {
-      status = "Completed";
+      status = "available";
     } else if (progress > 0) {
-      status = "In Progress";
+      status = "transporting";
     }
 
     const analytics = {
@@ -214,22 +397,16 @@ export function DispatchBoard() {
       );
       
       if (efficiencyResult) {
-        analytics.efficiency = Number(efficiencyResult.efficiency || 0);
-        analytics.suggestedActions = Array.isArray(efficiencyResult.suggestedActions) 
-          ? efficiencyResult.suggestedActions.map(String)
-          : [];
-        analytics.riskLevel = String(efficiencyResult.riskLevel || 'low') as "low" | "medium" | "high";
+        analytics.efficiency = efficiencyResult.efficiency || 0;
+        analytics.suggestedActions = efficiencyResult.suggestedActions || [];
+        analytics.riskLevel = efficiencyResult.riskLevel || 'low';
       }
     } catch (error) {
       console.error('Error analyzing dispatch efficiency:', error);
     }
 
     try {
-      monitorDispatchProgress(
-        String(dispatch.status || '').toLowerCase(), 
-        String(elapsedMinutes), 
-        30
-      );
+      monitorDispatchProgress(status, String(elapsedMinutes), 30);
     } catch (error) {
       console.error('Error monitoring dispatch progress:', error);
     }
@@ -237,11 +414,7 @@ export function DispatchBoard() {
     let aiInsights: string[] = [];
     try {
       const rawInsights = generateAIInsights(analytics);
-      aiInsights = Array.isArray(rawInsights) 
-        ? rawInsights.map(insight => 
-            typeof insight === 'string' ? insight : JSON.stringify(insight)
-          )
-        : [];
+      aiInsights = Array.isArray(rawInsights) ? rawInsights : [];
     } catch (error) {
       console.error('Error generating AI insights:', error);
       aiInsights = ['Unable to generate insights'];
@@ -260,9 +433,9 @@ export function DispatchBoard() {
       );
       
       if (traffic) {
-        trafficInfo.congestionLevel = String(traffic.congestionLevel || 'low') as "low" | "medium" | "high";
-        trafficInfo.delayMinutes = Number(traffic.delayMinutes || Math.floor(Math.random() * 15));
-        trafficInfo.alternateRouteAvailable = Boolean(traffic.alternateRouteAvailable);
+        trafficInfo.congestionLevel = traffic.congestionLevel || 'low';
+        trafficInfo.delayMinutes = traffic.delayMinutes || Math.floor(Math.random() * 15);
+        trafficInfo.alternateRouteAvailable = traffic.alternateRouteAvailable || false;
       }
     } catch (error) {
       console.error('Error getting traffic info:', error);
@@ -270,36 +443,18 @@ export function DispatchBoard() {
 
     return {
       ...dispatch,
-      id: String(dispatch.id),
-      activationTime: String(dispatch.activationTime),
-      patient: {
-        ...dispatch.patient,
-        id: String(dispatch.patient.id),
-        name: String(dispatch.patient.name),
-        condition: dispatch.patient.condition ? String(dispatch.patient.condition) : undefined
-      },
-      serviceType: String(dispatch.serviceType),
-      origin: String(dispatch.origin),
-      destination: String(dispatch.destination),
       status,
-      priority: String(dispatch.priority),
-      assignedTo: String(dispatch.assignedTo),
-      progress: Number(progress),
-      elapsedTime: String(elapsedMinutes) + ' min',
+      progress,
+      elapsedTime: `${elapsedMinutes} min`,
       lastUpdated: now.toISOString(),
-      efficiency: Number(analytics.efficiency),
-      eta: String(dispatch.eta),
-      comments: dispatch.comments ? String(dispatch.comments) : undefined,
-      warnings: dispatch.warnings ? String(dispatch.warnings) : undefined,
+      efficiency: analytics.efficiency,
       aiRecommendations: {
-        route: String(dispatch.aiRecommendations.route),
-        crew: String(dispatch.aiRecommendations.crew),
-        billing: String(dispatch.aiRecommendations.billing),
+        ...dispatch.aiRecommendations,
         insights: aiInsights,
         trafficStatus: {
           congestionLevel: trafficInfo.congestionLevel,
-          estimatedDelay: Number(trafficInfo.delayMinutes),
-          alternateRouteAvailable: Boolean(trafficInfo.alternateRouteAvailable)
+          estimatedDelay: trafficInfo.delayMinutes,
+          alternateRouteAvailable: trafficInfo.alternateRouteAvailable
         }
       }
     };
@@ -363,10 +518,10 @@ export function DispatchBoard() {
     [dispatches]
   );
 
-  const assignedDispatches = useMemo(() => {
-    const assignedRegularDispatches = filterDispatches(dispatches, "assigned");
-    return assignedRegularDispatches;
-  }, [dispatches]);
+  const assignedDispatches = useMemo(() => 
+    filterDispatches(dispatches, "assigned"),
+    [dispatches]
+  );
 
   useEffect(() => {
     if (unassignedDispatches.length > 0) {
@@ -442,9 +597,7 @@ export function DispatchBoard() {
           <TabsList className="grid w-full grid-cols-2 bg-medical-accent">
             <TabsTrigger 
               value="unassigned"
-              className={`${unassignedDispatches.length > 0 
-                ? "data-[state=active]:bg-red-100 data-[state=active]:text-red-700" 
-                : "data-[state=active]:bg-medical-secondary data-[state=active]:text-white"}`}
+              className={`${unassignedTabStyle || "data-[state=active]:bg-medical-secondary data-[state=active]:text-white"}`}
             >
               Unassigned ({unassignedDispatches.length})
             </TabsTrigger>
