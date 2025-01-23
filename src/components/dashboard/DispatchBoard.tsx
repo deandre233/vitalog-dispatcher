@@ -26,6 +26,10 @@ import { supabase } from "@/integrations/supabase/client";
 type PriorityType = "low" | "medium";
 type CongestionLevel = "low" | "medium";
 
+interface DispatchBoardProps {
+  priority?: PriorityType;
+}
+
 interface TrafficStatus {
   congestionLevel: CongestionLevel;
   estimatedDelay: number;
