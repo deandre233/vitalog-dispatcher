@@ -24,6 +24,82 @@ import { Tables } from "@/integrations/supabase/types";
 
 type Patient = Tables<"patients">;
 
+// Mock data for development and testing
+const mockPatients: Patient[] = [
+  {
+    id: "1",
+    first_name: "John",
+    last_name: "Smith",
+    dob: "1985-03-15",
+    gender: "Male",
+    address: "123 Medical Center Dr",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30308",
+    phone: "(404) 555-0123",
+    email: "john.smith@email.com",
+    primary_insurance: "Blue Cross Blue Shield",
+    secondary_insurance: "Medicare",
+    medical_conditions: ["Hypertension", "Type 2 Diabetes"],
+    allergies: ["Penicillin"],
+    medications: ["Metformin", "Lisinopril"],
+    emergency_contact_name: "Jane Smith",
+    emergency_contact_phone: "(404) 555-0124",
+    legacy_display_id: "PAT-12345",
+    last_physical: "2023-11-15T14:30:00.000Z",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "2",
+    first_name: "Maria",
+    last_name: "Garcia",
+    dob: "1992-07-22",
+    gender: "Female",
+    address: "456 Healthcare Ave",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30309",
+    phone: "(404) 555-0125",
+    email: "maria.garcia@email.com",
+    primary_insurance: "Aetna",
+    secondary_insurance: null,
+    medical_conditions: ["Asthma"],
+    allergies: ["Latex", "Pollen"],
+    medications: ["Albuterol"],
+    emergency_contact_name: "Carlos Garcia",
+    emergency_contact_phone: "(404) 555-0126",
+    legacy_display_id: "PAT-12346",
+    last_physical: "2024-01-10T09:15:00.000Z",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "3",
+    first_name: "Robert",
+    last_name: "Johnson",
+    dob: "1978-11-30",
+    gender: "Male",
+    address: "789 Wellness Pkwy",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30310",
+    phone: "(404) 555-0127",
+    email: "robert.johnson@email.com",
+    primary_insurance: "United Healthcare",
+    secondary_insurance: "Medicaid",
+    medical_conditions: ["Arthritis", "High Cholesterol"],
+    allergies: ["Sulfa Drugs"],
+    medications: ["Lipitor", "Celebrex"],
+    emergency_contact_name: "Mary Johnson",
+    emergency_contact_phone: "(404) 555-0128",
+    legacy_display_id: "PAT-12347",
+    last_physical: "2023-12-20T11:45:00.000Z",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+];
+
 export const PatientDirectory = () => {
   const navigate = useNavigate();
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
@@ -43,8 +119,10 @@ export const PatientDirectory = () => {
         throw error;
       }
 
-      console.log('Fetched patients:', data);
-      return data || [];
+      // For development, combine real data with mock data if no real data exists
+      const combinedData = data?.length ? data : mockPatients;
+      console.log('Fetched patients:', combinedData);
+      return combinedData;
     }
   });
 
