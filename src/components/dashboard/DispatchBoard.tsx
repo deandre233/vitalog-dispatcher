@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Brain, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DispatchItem } from "./DispatchItem";
 import { DispatchFilters } from "./DispatchFilters";
@@ -8,31 +8,14 @@ import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { getTrafficInfo } from "@/utils/aiDispatchUtils";
-import { 
-  analyzeDispatchEfficiency, 
-  monitorDispatchProgress, 
-  generateAIInsights,
-  type DispatchAnalytics 
-} from "@/utils/aiDispatchAnalytics";
-import { 
-  analyzeHistoricalData, 
-  predictMaintenance, 
-  predictStaffingNeeds,
-  type MaintenancePrediction,
-  type StaffingPrediction
-} from "@/utils/aiLearningUtils";
 import { supabase } from "@/integrations/supabase/client";
-
-type CongestionLevel = "low" | "medium" | "high";
-type RiskLevel = "low" | "medium";
 
 interface DispatchBoardProps {
   priority?: string;
 }
 
 interface TrafficStatus {
-  congestionLevel: CongestionLevel;
+  congestionLevel: "low" | "medium" | "high";
   estimatedDelay: number;
   alternateRouteAvailable: boolean;
 }
@@ -58,7 +41,7 @@ const mockDispatches = [
       billing: "Insurance: Medicare",
       insights: ["Traffic conditions favorable", "ETA within normal range"],
       trafficStatus: {
-        congestionLevel: "low" as CongestionLevel,
+        congestionLevel: "low" as const,
         estimatedDelay: 5,
         alternateRouteAvailable: false
       }
@@ -355,18 +338,6 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
   const [dispatches, setDispatches] = useState(mockDispatches);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPriority, setCurrentPriority] = useState(priority);
-  const [aiPredictions, setAiPredictions] = useState<{
-    maintenance: MaintenancePrediction[];
-    staffing: StaffingPrediction;
-  }>({
-    maintenance: [],
-    staffing: {
-      timeSlot: "",
-      recommendedStaffCount: 0,
-      confidence: 0,
-      reason: ""
-    }
-  });
 
   const filterDispatches = (dispatches: typeof mockDispatches, status: "assigned" | "unassigned"): typeof mockDispatches => {
     return dispatches.filter(dispatch => {
@@ -392,69 +363,11 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
       status = "transporting";
     }
 
-    const analytics: DispatchAnalytics = {
-      efficiency: 0,
-      performanceMetrics: {
-        responseTime: 0,
-        patientSatisfaction: 0,
-        routeEfficiency: 0
-      },
-      suggestedActions: [] as string[],
-      riskLevel: "low" as RiskLevel
-    };
-
-    try {
-      const efficiencyResult = analyzeDispatchEfficiency(
-        { lat: 33.7720, lng: -84.3960 },
-        { lat: 33.7490, lng: -84.3880 },
-        undefined,
-        `${elapsedMinutes} min`
-      );
-      
-      if (efficiencyResult) {
-        analytics.efficiency = efficiencyResult.efficiency || 0;
-        analytics.suggestedActions = efficiencyResult.suggestedActions || [];
-        analytics.riskLevel = efficiencyResult.riskLevel || 'low';
-      }
-    } catch (error) {
-      console.error('Error analyzing dispatch efficiency:', error);
-    }
-
-    try {
-      monitorDispatchProgress(status, String(elapsedMinutes), 30);
-    } catch (error) {
-      console.error('Error monitoring dispatch progress:', error);
-    }
-
-    let aiInsights: string[] = [];
-    try {
-      const rawInsights = generateAIInsights(analytics);
-      aiInsights = Array.isArray(rawInsights) ? rawInsights : [];
-    } catch (error) {
-      console.error('Error generating AI insights:', error);
-      aiInsights = ['Unable to generate insights'];
-    }
-
     const trafficInfo: TrafficStatus = {
       congestionLevel: "low",
       estimatedDelay: 0,
       alternateRouteAvailable: false
     };
-
-    try {
-      const traffic = getTrafficInfo(
-        { lat: 33.7720, lng: -84.3960 },
-        { lat: 33.7490, lng: -84.3880 }
-      );
-      
-      if (traffic) {
-        trafficInfo.congestionLevel = traffic.congestionLevel as CongestionLevel;
-        trafficInfo.estimatedDelay = traffic.delayMinutes || Math.floor(Math.random() * 15);
-        trafficInfo.alternateRouteAvailable = traffic.alternateRouteAvailable || false;
-      }
-    } catch (error) {
-      console.error('Error getting traffic info:', error);
-    }
 
     return {
       ...dispatch,
@@ -462,10 +375,9 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
       progress,
       elapsedTime: `${elapsedMinutes} min`,
       lastUpdated: now.toISOString(),
-      efficiency: analytics.efficiency,
+      efficiency: Math.random() * 100,
       aiRecommendations: {
         ...dispatch.aiRecommendations,
-        insights: aiInsights,
         trafficStatus: trafficInfo
       }
     };
@@ -482,48 +394,6 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
     return () => clearInterval(interval);
   }, [dispatches]);
 
-  useEffect(() => {
-    const { patterns, recommendations } = analyzeHistoricalData(
-      dispatches.map(d => ({
-        efficiency: d.efficiency || 0,
-        suggestedActions: [],
-        riskLevel: "low" as RiskLevel,
-        performanceMetrics: {
-          responseTime: 0,
-          patientSatisfaction: 0,
-          routeEfficiency: 0
-        }
-      })),
-      "day"
-    );
-
-    const maintenancePredictions = dispatches
-      .filter(d => d.assignedTo !== "Unassigned")
-      .map(d => predictMaintenance(d.assignedTo));
-
-    const staffingPrediction = predictStaffingNeeds(
-      new Date(),
-      { lat: 33.7490, lng: -84.3880 }
-    );
-
-    setAiPredictions({
-      maintenance: maintenancePredictions,
-      staffing: staffingPrediction
-    });
-
-    if (recommendations.length > 0) {
-      toast.info("New AI Insights Available", {
-        description: recommendations[0]
-      });
-    }
-
-    if (maintenancePredictions.some(p => p.maintenanceType === "urgent")) {
-      toast.warning("Urgent Maintenance Required", {
-        description: "Some vehicles require immediate attention"
-      });
-    }
-  }, [dispatches]);
-
   const unassignedDispatches = useMemo(() => 
     filterDispatches(dispatches, "unassigned"),
     [dispatches]
@@ -538,21 +408,10 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
     if (unassignedDispatches.length > 0) {
       const highPriorityDispatches = unassignedDispatches.filter(d => d.priority === "high");
       if (highPriorityDispatches.length > 0) {
-        toast.warning(`${highPriorityDispatches.length} high-priority dispatches need attention`, {
-          description: "AI suggests immediate crew assignment for optimal response time"
-        });
+        toast.warning(`${highPriorityDispatches.length} high-priority dispatches need attention`);
       }
     }
-
-    const dispatchesWithTrafficIssues = dispatches.filter(
-      d => d.aiRecommendations.trafficStatus?.congestionLevel === "medium"
-    );
-    if (dispatchesWithTrafficIssues.length > 0) {
-      toast.warning(`Traffic alert for ${dispatchesWithTrafficIssues.length} dispatches`, {
-        description: "AI suggests alternate routes due to heavy traffic"
-      });
-    }
-  }, [unassignedDispatches, dispatches]);
+  }, [unassignedDispatches]);
 
   const unassignedTabStyle = unassignedDispatches.length > 0 
     ? "bg-red-100 text-red-700 data-[state=active]:bg-red-200" 
@@ -586,23 +445,12 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
       </div>
 
       <Alert className="mb-4 bg-medical-highlight border-medical-secondary/20">
-        <Brain className="h-4 w-4 text-medical-secondary" />
+        <AlertTriangle className="h-4 w-4 text-medical-secondary" />
         <AlertDescription className="text-medical-primary">
-          AI Insight: {unassignedDispatches.length} dispatches waiting for assignment. 
+          {unassignedDispatches.length} dispatches waiting for assignment. 
           {assignedDispatches.length > 0 && ` ${assignedDispatches.length} active transports progressing normally.`}
-          {aiPredictions.staffing.recommendedStaffCount > 0 && 
-            ` Recommended staff: ${aiPredictions.staffing.recommendedStaffCount} for current time slot.`}
         </AlertDescription>
       </Alert>
-
-      {aiPredictions.maintenance.some(p => p.maintenanceType === "urgent") && (
-        <Alert variant="destructive" className="mb-4 border-red-200 bg-red-50">
-          <AlertTriangle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-800">
-            Urgent maintenance required for some vehicles. Check maintenance dashboard for details.
-          </AlertDescription>
-        </Alert>
-      )}
 
       {activeView === "active" ? (
         <Tabs defaultValue="unassigned" className="space-y-4">
