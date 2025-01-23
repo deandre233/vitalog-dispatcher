@@ -9,6 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      actions: {
+        Row: {
+          action_name: string
+          created_at: string | null
+          event_handler: Json | null
+          id: string
+          linked_page_id: string | null
+          linked_panel_id: string | null
+          trigger_element: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_name: string
+          created_at?: string | null
+          event_handler?: Json | null
+          id?: string
+          linked_page_id?: string | null
+          linked_panel_id?: string | null
+          trigger_element: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_name?: string
+          created_at?: string | null
+          event_handler?: Json | null
+          id?: string
+          linked_page_id?: string | null
+          linked_panel_id?: string | null
+          trigger_element?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "actions_linked_page_id_fkey"
+            columns: ["linked_page_id"]
+            isOneToOne: false
+            referencedRelation: "pages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "actions_linked_panel_id_fkey"
+            columns: ["linked_panel_id"]
+            isOneToOne: false
+            referencedRelation: "panels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_analysis_results: {
         Row: {
           analysis_type: string
@@ -110,6 +158,39 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          changed_at: string | null
+          changed_by: string | null
+          id: string
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string
+          table_name: string
+        }
+        Insert: {
+          action: string
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id: string
+          table_name: string
+        }
+        Update: {
+          action?: string
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string
+          table_name?: string
+        }
+        Relationships: []
+      }
       billing_settings: {
         Row: {
           created_at: string | null
@@ -207,6 +288,114 @@ export type Database = {
           },
         ]
       }
+      corrective_action_documents: {
+        Row: {
+          corrective_action_id: string | null
+          description: string | null
+          file_name: string
+          file_path: string
+          file_type: string | null
+          id: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          corrective_action_id?: string | null
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_type?: string | null
+          id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          corrective_action_id?: string | null
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_type?: string | null
+          id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corrective_action_documents_corrective_action_id_fkey"
+            columns: ["corrective_action_id"]
+            isOneToOne: false
+            referencedRelation: "corrective_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corrective_action_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      corrective_actions: {
+        Row: {
+          acknowledgment_date: string | null
+          action_type: string
+          created_at: string | null
+          description: string
+          employee_id: string | null
+          follow_up_date: string | null
+          id: string
+          improvement_plan: string | null
+          issue_date: string | null
+          issued_by: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          acknowledgment_date?: string | null
+          action_type: string
+          created_at?: string | null
+          description: string
+          employee_id?: string | null
+          follow_up_date?: string | null
+          id?: string
+          improvement_plan?: string | null
+          issue_date?: string | null
+          issued_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          acknowledgment_date?: string | null
+          action_type?: string
+          created_at?: string | null
+          description?: string
+          employee_id?: string | null
+          follow_up_date?: string | null
+          id?: string
+          improvement_plan?: string | null
+          issue_date?: string | null
+          issued_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corrective_actions_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corrective_actions_issued_by_fkey"
+            columns: ["issued_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dispatch_locations: {
         Row: {
           address: string | null
@@ -282,6 +471,331 @@ export type Database = {
           location_data?: Json | null
           pattern_type?: string
           time_patterns?: Json | null
+        }
+        Relationships: []
+      }
+      employee_payroll_history: {
+        Row: {
+          access_codes: string | null
+          author: string | null
+          created_at: string | null
+          effective_date: string | null
+          employee_id: string | null
+          employee_type: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          pay_rate: number | null
+          pay_type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_codes?: string | null
+          author?: string | null
+          created_at?: string | null
+          effective_date?: string | null
+          employee_id?: string | null
+          employee_type?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          pay_rate?: number | null
+          pay_type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_codes?: string | null
+          author?: string | null
+          created_at?: string | null
+          effective_date?: string | null
+          employee_id?: string | null
+          employee_type?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          pay_rate?: number | null
+          pay_type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_payroll_history_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_privileges: {
+        Row: {
+          can_create_reports: boolean | null
+          can_delete_billing_info: boolean | null
+          can_delete_dispatch_info: boolean | null
+          can_delete_patient_info: boolean | null
+          can_delete_reports: boolean | null
+          can_edit_billing_info: boolean | null
+          can_edit_dispatch_info: boolean | null
+          can_edit_patient_info: boolean | null
+          can_edit_reports: boolean | null
+          can_use_ai_assistance: boolean | null
+          can_view_billing_info: boolean | null
+          can_view_dispatch_info: boolean | null
+          can_view_patient_info: boolean | null
+          can_view_reports: boolean | null
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          can_create_reports?: boolean | null
+          can_delete_billing_info?: boolean | null
+          can_delete_dispatch_info?: boolean | null
+          can_delete_patient_info?: boolean | null
+          can_delete_reports?: boolean | null
+          can_edit_billing_info?: boolean | null
+          can_edit_dispatch_info?: boolean | null
+          can_edit_patient_info?: boolean | null
+          can_edit_reports?: boolean | null
+          can_use_ai_assistance?: boolean | null
+          can_view_billing_info?: boolean | null
+          can_view_dispatch_info?: boolean | null
+          can_view_patient_info?: boolean | null
+          can_view_reports?: boolean | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          can_create_reports?: boolean | null
+          can_delete_billing_info?: boolean | null
+          can_delete_dispatch_info?: boolean | null
+          can_delete_patient_info?: boolean | null
+          can_delete_reports?: boolean | null
+          can_edit_billing_info?: boolean | null
+          can_edit_dispatch_info?: boolean | null
+          can_edit_patient_info?: boolean | null
+          can_edit_reports?: boolean | null
+          can_use_ai_assistance?: boolean | null
+          can_view_billing_info?: boolean | null
+          can_view_dispatch_info?: boolean | null
+          can_view_patient_info?: boolean | null
+          can_view_reports?: boolean | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_privileges_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: true
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_roles: {
+        Row: {
+          can_see_non_emergent: boolean | null
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          is_administrator: boolean | null
+          is_biller: boolean | null
+          is_crew_member: boolean | null
+          is_dispatcher: boolean | null
+          is_hr: boolean | null
+          is_mechanic: boolean | null
+          is_medical_director: boolean | null
+          is_onlooker: boolean | null
+          is_principal: boolean | null
+          is_provisional: boolean | null
+          is_qa_reviewer: boolean | null
+          is_salesperson: boolean | null
+          is_supervisor: boolean | null
+          onlooker_city: string | null
+          onlooker_county: string | null
+          onlooker_facility: string | null
+          supervisor_role: Database["public"]["Enums"]["supervisor_role"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          can_see_non_emergent?: boolean | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          is_administrator?: boolean | null
+          is_biller?: boolean | null
+          is_crew_member?: boolean | null
+          is_dispatcher?: boolean | null
+          is_hr?: boolean | null
+          is_mechanic?: boolean | null
+          is_medical_director?: boolean | null
+          is_onlooker?: boolean | null
+          is_principal?: boolean | null
+          is_provisional?: boolean | null
+          is_qa_reviewer?: boolean | null
+          is_salesperson?: boolean | null
+          is_supervisor?: boolean | null
+          onlooker_city?: string | null
+          onlooker_county?: string | null
+          onlooker_facility?: string | null
+          supervisor_role?:
+            | Database["public"]["Enums"]["supervisor_role"]
+            | null
+          updated_at?: string | null
+        }
+        Update: {
+          can_see_non_emergent?: boolean | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          is_administrator?: boolean | null
+          is_biller?: boolean | null
+          is_crew_member?: boolean | null
+          is_dispatcher?: boolean | null
+          is_hr?: boolean | null
+          is_mechanic?: boolean | null
+          is_medical_director?: boolean | null
+          is_onlooker?: boolean | null
+          is_principal?: boolean | null
+          is_provisional?: boolean | null
+          is_qa_reviewer?: boolean | null
+          is_salesperson?: boolean | null
+          is_supervisor?: boolean | null
+          onlooker_city?: string | null
+          onlooker_county?: string | null
+          onlooker_facility?: string | null
+          supervisor_role?:
+            | Database["public"]["Enums"]["supervisor_role"]
+            | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_roles_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employees: {
+        Row: {
+          access_codes: string | null
+          certification_level: string | null
+          created_at: string | null
+          employee_type: string | null
+          first_hired_date: string | null
+          first_name: string
+          id: string
+          last_name: string
+          mobile: string | null
+          pay_rate: number | null
+          pay_type: string | null
+          photo_url: string | null
+          readable_id: string | null
+          station: string | null
+          status: string | null
+          updated_at: string | null
+          uses_timeclock: boolean | null
+        }
+        Insert: {
+          access_codes?: string | null
+          certification_level?: string | null
+          created_at?: string | null
+          employee_type?: string | null
+          first_hired_date?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          mobile?: string | null
+          pay_rate?: number | null
+          pay_type?: string | null
+          photo_url?: string | null
+          readable_id?: string | null
+          station?: string | null
+          status?: string | null
+          updated_at?: string | null
+          uses_timeclock?: boolean | null
+        }
+        Update: {
+          access_codes?: string | null
+          certification_level?: string | null
+          created_at?: string | null
+          employee_type?: string | null
+          first_hired_date?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          mobile?: string | null
+          pay_rate?: number | null
+          pay_type?: string | null
+          photo_url?: string | null
+          readable_id?: string | null
+          station?: string | null
+          status?: string | null
+          updated_at?: string | null
+          uses_timeclock?: boolean | null
+        }
+        Relationships: []
+      }
+      files: {
+        Row: {
+          bucket_name: string
+          created_at: string | null
+          file_name: string
+          file_type: Database["public"]["Enums"]["file_type"]
+          id: string
+          is_public: boolean | null
+          metadata: Json | null
+          mime_type: string | null
+          original_name: string
+          related_entity_id: string | null
+          related_entity_type: string | null
+          size_bytes: number | null
+          storage_path: string
+          updated_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          bucket_name: string
+          created_at?: string | null
+          file_name: string
+          file_type?: Database["public"]["Enums"]["file_type"]
+          id?: string
+          is_public?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          original_name: string
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          size_bytes?: number | null
+          storage_path: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          bucket_name?: string
+          created_at?: string | null
+          file_name?: string
+          file_type?: Database["public"]["Enums"]["file_type"]
+          id?: string
+          is_public?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          original_name?: string
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          size_bytes?: number | null
+          storage_path?: string
+          updated_at?: string | null
+          uploaded_by?: string | null
         }
         Relationships: []
       }
@@ -683,6 +1197,152 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      navigation: {
+        Row: {
+          created_at: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          link: string
+          name: string
+          position: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          link: string
+          name: string
+          position: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          link?: string
+          name?: string
+          position?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          metadata: Json | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          metadata?: Json | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          metadata?: Json | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      pages: {
+        Row: {
+          content: Json | null
+          created_at: string | null
+          id: string
+          meta_data: Json | null
+          name: string
+          updated_at: string | null
+          url: string
+          user_access_level:
+            | Database["public"]["Enums"]["user_access_level"]
+            | null
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string | null
+          id?: string
+          meta_data?: Json | null
+          name: string
+          updated_at?: string | null
+          url: string
+          user_access_level?:
+            | Database["public"]["Enums"]["user_access_level"]
+            | null
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string | null
+          id?: string
+          meta_data?: Json | null
+          name?: string
+          updated_at?: string | null
+          url?: string
+          user_access_level?:
+            | Database["public"]["Enums"]["user_access_level"]
+            | null
+        }
+        Relationships: []
+      }
+      panels: {
+        Row: {
+          content: Json | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          linked_page_id: string | null
+          name: string
+          updated_at: string | null
+          visibility_rule: string | null
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          linked_page_id?: string | null
+          name: string
+          updated_at?: string | null
+          visibility_rule?: string | null
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          linked_page_id?: string | null
+          name?: string
+          updated_at?: string | null
+          visibility_rule?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "panels_linked_page_id_fkey"
+            columns: ["linked_page_id"]
+            isOneToOne: false
+            referencedRelation: "pages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       patients: {
         Row: {
@@ -1095,6 +1755,36 @@ export type Database = {
           },
         ]
       }
+      user_preferences: {
+        Row: {
+          created_at: string | null
+          dashboard_layout: Json | null
+          id: string
+          notification_preferences: Json | null
+          theme: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dashboard_layout?: Json | null
+          id?: string
+          notification_preferences?: Json | null
+          theme?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dashboard_layout?: Json | null
+          id?: string
+          notification_preferences?: Json | null
+          theme?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1118,6 +1808,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_readable_employee_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       generate_unique_dispatch_id: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -1132,6 +1826,7 @@ export type Database = {
         | "in_review"
         | "appealed"
       dispatch_status: "Pending" | "In Progress" | "Completed" | "Canceled"
+      file_type: "document" | "image" | "pdf" | "spreadsheet" | "other"
       gender_type:
         | "male"
         | "female"
@@ -1152,6 +1847,12 @@ export type Database = {
         | "widowed"
         | "separated"
         | "other"
+      notification_type:
+        | "dispatch_update"
+        | "crew_assignment"
+        | "patient_update"
+        | "billing_alert"
+        | "system_alert"
       payment_method_type:
         | "credit_card"
         | "debit_card"
@@ -1163,7 +1864,13 @@ export type Database = {
       priority_level: "Critical" | "Emergency" | "Lower acuity" | "Scheduled"
       recurrence_type: "Disabled" | "Daily" | "Weekly" | "Monthly"
       service_type: "WC" | "BLS" | "ALS" | "MICU"
+      supervisor_role:
+        | "Captain"
+        | "Lieutenant"
+        | "Full privileges"
+        | "Call-taker / Self-dispatch"
       trip_type: "One way" | "Wait-and-return" | "Round trip"
+      user_access_level: "admin" | "user" | "guest"
     }
     CompositeTypes: {
       [_ in never]: never

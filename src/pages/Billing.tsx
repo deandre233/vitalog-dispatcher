@@ -17,7 +17,7 @@ const Billing = () => {
             <main className="p-6">
               <Card className="p-6">
                 <h2 className="text-2xl font-semibold mb-6">Billing Management</h2>
-                <p className="text-gray-500">Billing system implementation coming in next iteration</p>
+                <p className="text-gray-500">Billing management interface will be implemented here.</p>
               </Card>
             </main>
           </div>

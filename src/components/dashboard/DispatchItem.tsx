@@ -125,8 +125,19 @@ export function DispatchItem({
   const [currentStatus, setCurrentStatus] = useState<DispatchStatus>("dispatch");
   const navigate = useNavigate();
 
-  const handleUnassign = () => {
-    toast.success(`Crew unassigned from dispatch ${id}`);
+  const handleUnassign = async () => {
+    try {
+      const { error } = await supabase
+        .from('transport_records')
+        .update({ crew_assigned: null })
+        .eq('dispatch_id', id);
+
+      if (error) throw error;
+      toast.success(`Crew unassigned from dispatch ${id}`);
+    } catch (error) {
+      console.error('Error unassigning crew:', error);
+      toast.error('Failed to unassign crew');
+    }
   };
 
   const handleCancel = async () => {

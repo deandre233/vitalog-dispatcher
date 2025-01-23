@@ -1,111 +1,179 @@
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 import {
-  Bell,
-  BarChart3,
-  ClipboardList,
-  CreditCard,
-  MapPin,
+  ChevronLeft,
+  ChevronRight,
+  CircuitBoard,
   Users,
-  PlusCircle,
-  Home,
+  Map,
+  CheckSquare,
+  Zap,
+  Calendar,
   FileText,
-  History,
+  Phone,
+  FileCheck,
+  Building2,
+  Bookmark,
   User,
-  Archive,
+  Upload,
+  BookOpen,
+  Tag,
+  Clock,
+  Link2
 } from "lucide-react";
 
 const routes = [
   {
-    label: "Home",
-    icon: Home,
-    href: "/",
+    label: "Employee Directory",
+    icon: Users,
+    href: "/employees",
   },
   {
-    label: "Patient Profile",
-    icon: User,
-    href: "/patient-profile",
+    label: "Operations Map",
+    icon: Map,
+    href: "/live-map",
   },
   {
-    label: "Medical Records",
+    label: "Shift Records & Checklists",
+    icon: CheckSquare,
+    href: "/shifts",
+  },
+  {
+    label: "Smart Route Optimization",
+    icon: Zap,
+    href: "/route-planner",
+  },
+  {
+    label: "Verification Queue (11)",
+    icon: Calendar,
+    href: "/confirmation-queue",
+  },
+  {
+    label: "Schedule Overview",
+    icon: Calendar,
+    href: "/calendar",
+  },
+  {
+    label: "Dispatch Page",
     icon: FileText,
-    href: "/medical-records",
-  },
-  {
-    label: "Transport History",
-    icon: History,
-    href: "/transport-history",
-  },
-  {
-    label: "Active Dispatches",
-    icon: ClipboardList,
     href: "/dispatch",
   },
   {
-    label: "Closed Dispatches",
-    icon: Archive,
-    href: "/closed-dispatches",
+    label: "Service Queue",
+    icon: Phone,
+    href: "/request-queue",
   },
   {
-    label: "Create Dispatch",
-    icon: PlusCircle,
-    href: "/dispatch/new",
+    label: "Authorization Queue (10)",
+    icon: FileCheck,
+    href: "/prior-auth-queue",
   },
   {
-    label: "Crew Assignment",
-    icon: Users,
-    href: "/crew",
+    label: "Authorizations on Record",
+    icon: FileText,
+    href: "/prior-auths",
   },
   {
-    label: "Manage Routes",
-    icon: MapPin,
-    href: "/routes",
+    label: "Center List",
+    icon: Building2,
+    href: "/facilities",
   },
   {
-    label: "Billing",
-    icon: CreditCard,
-    href: "/billing",
+    label: "Partner List",
+    icon: Bookmark,
+    href: "/affiliates",
   },
   {
-    label: "Performance",
-    icon: BarChart3,
-    href: "/performance",
+    label: "Patient Directory",
+    icon: User,
+    href: "/patients",
   },
   {
-    label: "Alert Settings",
-    icon: Bell,
-    href: "/alerts",
+    label: "Document Upload",
+    icon: Upload,
+    href: "/document-upload",
+  },
+  {
+    label: "Resource Library",
+    icon: BookOpen,
+    href: "/librarian",
+  },
+  {
+    label: "Categories",
+    icon: Tag,
+    href: "/tags",
+  },
+  {
+    label: "Historical Entry",
+    icon: Clock,
+    href: "/backdated-dispatch",
+  },
+  {
+    label: "External Link",
+    icon: Link2,
+    href: "/custom-link-1",
   },
 ];
 
 export function AppSidebar() {
-  const pathname = useLocation().pathname;
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { pathname } = useLocation();
 
   return (
-    <div className="w-64 border-r border-gray-200 bg-white">
-      <div className="space-y-2 py-2">
-        <h2 className="px-4 text-lg font-semibold text-gray-900">Navigation</h2>
-        <ScrollArea className="h-[calc(100vh-4rem)]">
-          <div className="space-y-1 px-2">
+    <div className={cn(
+      "relative border-r bg-white backdrop-blur-sm",
+      "transition-all duration-300 ease-in-out h-[calc(100vh-4rem)]",
+      isCollapsed ? "w-16" : "w-64"
+    )}>
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between p-4">
+          {!isCollapsed && (
+            <h2 className="text-lg font-semibold text-medical-primary flex items-center gap-2">
+              <CircuitBoard className="h-5 w-5" />
+              Dispatch Control
+            </h2>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-medical-primary hover:bg-medical-accent/10"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </Button>
+        </div>
+        
+        <nav className="flex-1 overflow-y-auto">
+          <div className="space-y-1 p-2">
             {routes.map((route) => (
-              <Button
-                key={route.href}
-                variant={pathname === route.href ? "secondary" : "ghost"}
-                className={cn("w-full justify-start", {
-                  "bg-gray-100": pathname === route.href,
-                })}
-                asChild
-              >
-                <Link to={route.href}>
-                  <route.icon className="mr-2 h-4 w-4" />
-                  {route.label}
-                </Link>
-              </Button>
+              <div key={route.href}>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start relative overflow-hidden group",
+                    "hover:bg-medical-accent/10",
+                    "transition-all duration-200 ease-in-out",
+                    pathname === route.href && "bg-medical-accent/20",
+                    isCollapsed ? "px-2" : "px-4"
+                  )}
+                  asChild
+                >
+                  <Link to={route.href} className="flex items-center">
+                    <route.icon className={cn(
+                      "h-4 w-4 text-medical-primary",
+                      !isCollapsed && "mr-2"
+                    )} />
+                    {!isCollapsed && (
+                      <span className="font-medium text-medical-primary">{route.label}</span>
+                    )}
+                  </Link>
+                </Button>
+              </div>
             ))}
           </div>
-        </ScrollArea>
+        </nav>
       </div>
     </div>
   );
