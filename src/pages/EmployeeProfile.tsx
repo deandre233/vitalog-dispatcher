@@ -89,7 +89,7 @@ const EmployeeProfile = () => {
 
       if (error) {
         console.error('Error fetching employee:', error);
-        toast.error("Failed to fetch employee data");
+        toast("Failed to fetch employee data");
       } else {
         setEmployee(data);
         setEditData(data);
@@ -124,10 +124,10 @@ const EmployeeProfile = () => {
       }
 
       setEmployee({ ...employee, photo_url: data.url });
-      toast.success('Photo uploaded successfully');
+      toast("Photo uploaded successfully");
     } catch (error) {
       console.error('Error uploading photo:', error);
-      toast.error('Failed to upload photo');
+      toast("Failed to upload photo");
     } finally {
       setIsUploading(false);
     }
@@ -149,11 +149,11 @@ const EmployeeProfile = () => {
         });
 
       if (error) throw error;
-      toast.success("Payroll information updated successfully");
+      toast("Payroll information updated successfully");
       setIsPayrollModalOpen(false);
     } catch (error) {
       console.error('Error updating payroll:', error);
-      toast.error("Failed to update payroll information");
+      toast("Failed to update payroll information");
     }
   };
 
@@ -172,16 +172,11 @@ const EmployeeProfile = () => {
       if (error) throw error;
       setEmployee(editData);
       setEditMode(null);
-      toast.success(`${section} updated successfully`);
+      toast(`${section} updated successfully`);
     } catch (error) {
       console.error('Error updating employee:', error);
-      toast.error(`Failed to update ${section}`);
+      toast(`Failed to update ${section}`);
     }
-  };
-
-  const handleCancel = () => {
-    setEditMode(null);
-    setEditData(employee);
   };
 
   if (!employee) {
