@@ -268,7 +268,6 @@ const EmployeeProfile = () => {
                     />
                     <Label htmlFor="employee_type">Employee Type</Label>
                     <Select
-                      id="employee_type"
                       value={payrollData.employee_type}
                       onValueChange={(value) => setPayrollData({ ...payrollData, employee_type: value })}
                     >
@@ -282,7 +281,6 @@ const EmployeeProfile = () => {
                     </Select>
                     <Label htmlFor="pay_type">Pay Type</Label>
                     <Select
-                      id="pay_type"
                       value={payrollData.pay_type}
                       onValueChange={(value) => setPayrollData({ ...payrollData, pay_type: value })}
                     >
@@ -315,7 +313,7 @@ const EmployeeProfile = () => {
                     />
                   </div>
                   <DialogFooter>
-                    <Button onClick={handlePayrollUpdate}>Save</Button>
+                    <Button onClick={() => handlePayrollUpdate(payrollData)}>Save</Button>
                     <Button variant="outline" onClick={() => setIsPayrollModalOpen(false)}>Cancel</Button>
                   </DialogFooter>
                 </DialogContent>
@@ -326,6 +324,6 @@ const EmployeeProfile = () => {
       </div>
     </div>
   );
-}
+};
 
 export default EmployeeProfile;
