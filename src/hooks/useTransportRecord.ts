@@ -1,14 +1,39 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { TransportRecord } from '@/types/dispatch';
-import { toast } from 'sonner';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-export function useTransportRecord(id: string) {
-  const queryClient = useQueryClient();
+export interface TransportRecord {
+  id: string;
+  patient_id?: string;
+  dispatch_id: string;
+  pickup_location: string;
+  dropoff_location: string;
+  transport_date?: string;
+  status: string;
+  crew_assigned?: string;
+  notes?: string;
+  created_at?: string;
+  recurrence_type?: string;
+  recurrence_day?: string;
+  recurrence_frequency?: string;
+  warnings?: string[];
+  incidents?: Array<{
+    id: string;
+    timestamp: string;
+    description: string;
+    analysis?: {
+      severity: string;
+      recommendation: string;
+      actionItems: string[];
+    };
+  }>;
+}
 
-  const { data: transport, isLoading, error } = useQuery({
+export function useTransportRecord(id: string | undefined) {
+  return useQuery({
     queryKey: ['transport', id],
     queryFn: async () => {
+      if (!id) return null;
+
       const { data, error } = await supabase
         .from('transport_records')
         .select('*')
@@ -17,32 +42,7 @@ export function useTransportRecord(id: string) {
 
       if (error) throw error;
       return data as TransportRecord;
-    }
-  });
-
-  const updateTransport = useMutation({
-    mutationFn: async (updates: Partial<TransportRecord>) => {
-      const { error } = await supabase
-        .from('transport_records')
-        .update(updates)
-        .eq('id', id);
-
-      if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transport', id] });
-      toast.success('Transport record updated successfully');
-    },
-    onError: (error) => {
-      console.error('Error updating transport:', error);
-      toast.error('Failed to update transport record');
-    }
+    enabled: !!id
   });
-
-  return {
-    transport,
-    isLoading,
-    error,
-    updateTransport
-  };
 }
