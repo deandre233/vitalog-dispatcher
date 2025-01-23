@@ -11,6 +11,22 @@ import Billing from "./pages/Billing";
 import { EmployeeDirectory } from "./pages/EmployeeDirectory";
 import { EmployeeProfile } from "./pages/EmployeeProfile";
 import { PatientRecord } from "./pages/PatientRecord";
+import { OperationsMap } from "./pages/OperationsMap";
+import { ShiftRecords } from "./pages/ShiftRecords";
+import { SmartRouteOptimization } from "./pages/SmartRouteOptimization";
+import { VerificationQueue } from "./pages/VerificationQueue";
+import { ScheduleOverview } from "./pages/ScheduleOverview";
+import { ServiceQueue } from "./pages/ServiceQueue";
+import { AuthorizationQueue } from "./pages/AuthorizationQueue";
+import { AuthorizationsOnRecord } from "./pages/AuthorizationsOnRecord";
+import { CenterList } from "./pages/CenterList";
+import { PartnerList } from "./pages/PartnerList";
+import { PatientDirectory } from "./pages/PatientDirectory";
+import { DocumentUpload } from "./pages/DocumentUpload";
+import { ResourceLibrary } from "./pages/ResourceLibrary";
+import { Categories } from "./pages/Categories";
+import { HistoricalEntry } from "./pages/HistoricalEntry";
+import { ExternalLink } from "./pages/ExternalLink";
 
 const router = createBrowserRouter([
   {
@@ -60,6 +76,70 @@ const router = createBrowserRouter([
   {
     path: "/patient/:patientName",
     element: <PatientRecord />,
+  },
+  {
+    path: "/operations-map",
+    element: <OperationsMap />,
+  },
+  {
+    path: "/shift-records",
+    element: <ShiftRecords />,
+  },
+  {
+    path: "/smart-route-optimization",
+    element: <SmartRouteOptimization />,
+  },
+  {
+    path: "/verification-queue",
+    element: <VerificationQueue />,
+  },
+  {
+    path: "/schedule-overview",
+    element: <ScheduleOverview />,
+  },
+  {
+    path: "/service-queue",
+    element: <ServiceQueue />,
+  },
+  {
+    path: "/authorization-queue",
+    element: <AuthorizationQueue />,
+  },
+  {
+    path: "/authorizations-on-record",
+    element: <AuthorizationsOnRecord />,
+  },
+  {
+    path: "/center-list",
+    element: <CenterList />,
+  },
+  {
+    path: "/partner-list",
+    element: <PartnerList />,
+  },
+  {
+    path: "/patient-directory",
+    element: <PatientDirectory />,
+  },
+  {
+    path: "/document-upload",
+    element: <DocumentUpload />,
+  },
+  {
+    path: "/resource-library",
+    element: <ResourceLibrary />,
+  },
+  {
+    path: "/categories",
+    element: <Categories />,
+  },
+  {
+    path: "/historical-entry",
+    element: <HistoricalEntry />,
+  },
+  {
+    path: "/external-link",
+    element: <ExternalLink />,
   }
 ]);
 
