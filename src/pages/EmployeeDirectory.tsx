@@ -85,7 +85,7 @@ export function EmployeeDirectory() {
   }, [toast]);
 
   const handleEmployeeClick = (id: string) => {
-    navigate(`/employee/${id}`);
+    navigate(`/employees/${id}`);  // Updated from /employee/ to /employees/
   };
 
   const getStatusColor = (status: string | null) => {

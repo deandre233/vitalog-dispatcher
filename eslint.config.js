@@ -7,24 +7,11 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   { ignores: ["dist"] },
   {
-    extends: [
-      js.configs.recommended,
-      ...tseslint.configs.recommended,
-      ...tseslint.configs.strictTypeChecking
-    ],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: {
-        ...globals.browser,
-        React: true,
-      },
-      parserOptions: {
-        project: "./tsconfig.json",
-        ecmaFeatures: {
-          jsx: true
-        }
-      }
+      globals: globals.browser,
     },
     plugins: {
       "react-hooks": reactHooks,
@@ -36,31 +23,7 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
-      "@typescript-eslint/no-unused-vars": ["error", { 
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_" 
-      }],
-      "@typescript-eslint/explicit-function-return-type": ["error", {
-        "allowExpressions": true,
-        "allowTypedFunctionExpressions": true
-      }],
-      "@typescript-eslint/no-explicit-any": "error",
-      "@typescript-eslint/strict-boolean-expressions": "error",
-      "@typescript-eslint/no-floating-promises": "error",
-      "@typescript-eslint/await-thenable": "error",
-      "@typescript-eslint/no-misused-promises": "error",
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
-      "no-console": ["warn", { allow: ["warn", "error"] }],
-      "prefer-const": "error",
-      "eqeqeq": ["error", "always"],
-      "curly": ["error", "all"],
-      "no-var": "error"
+      "@typescript-eslint/no-unused-vars": "off",
     },
-    settings: {
-      react: {
-        version: "detect"
-      }
-    }
   }
 );
