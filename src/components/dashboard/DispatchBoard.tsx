@@ -23,14 +23,12 @@ import {
 } from "@/utils/aiLearningUtils";
 import { supabase } from "@/integrations/supabase/client";
 
-type CongestionLevel = "low" | "medium";
-
 interface DispatchBoardProps {
   priority?: string;
 }
 
 interface TrafficStatus {
-  congestionLevel: CongestionLevel;
+  congestionLevel: string;
   estimatedDelay: number;
   alternateRouteAvailable: boolean;
 }
@@ -56,7 +54,7 @@ const mockDispatches = [
       billing: "Insurance: Medicare",
       insights: ["Traffic conditions favorable", "ETA within normal range"],
       trafficStatus: {
-        congestionLevel: "low" as const,
+        congestionLevel: "low",
         estimatedDelay: 5,
         alternateRouteAvailable: false
       }
@@ -87,7 +85,7 @@ const mockDispatches = [
       billing: "Insurance: Blue Cross",
       insights: ["Priority case", "Monitor vital signs"],
       trafficStatus: {
-        congestionLevel: "medium" as CongestionLevel,
+        congestionLevel: "medium",
         estimatedDelay: 10,
         alternateRouteAvailable: true
       }
@@ -118,7 +116,7 @@ const mockDispatches = [
       billing: "Insurance: Medicaid",
       insights: ["Regular patient", "Wheelchair assistance required"],
       trafficStatus: {
-        congestionLevel: "low" as const,
+        congestionLevel: "low",
         estimatedDelay: 3,
         alternateRouteAvailable: false
       }
@@ -149,7 +147,7 @@ const mockDispatches = [
       billing: "Insurance: Private",
       insights: ["Critical transfer", "Continuous monitoring required"],
       trafficStatus: {
-        congestionLevel: "low" as const,
+        congestionLevel: "low",
         estimatedDelay: 2,
         alternateRouteAvailable: true
       }
@@ -180,7 +178,7 @@ const mockDispatches = [
       billing: "Insurance: Medicare",
       insights: ["Regular schedule", "Mobility assistance needed"],
       trafficStatus: {
-        congestionLevel: "low" as const,
+        congestionLevel: "low",
         estimatedDelay: 5,
         alternateRouteAvailable: false
       }
@@ -211,7 +209,7 @@ const mockDispatches = [
       billing: "Insurance: Pending",
       insights: ["Routine transport", "No special requirements"],
       trafficStatus: {
-        congestionLevel: "low" as const,
+        congestionLevel: "low",
         estimatedDelay: 0,
         alternateRouteAvailable: false
       }
@@ -242,7 +240,7 @@ const mockDispatches = [
       billing: "Insurance: Pending",
       insights: ["High priority case", "Immediate response needed"],
       trafficStatus: {
-        congestionLevel: "medium" as const,
+        congestionLevel: "medium",
         estimatedDelay: 0,
         alternateRouteAvailable: false
       }
@@ -273,7 +271,7 @@ const mockDispatches = [
       billing: "Insurance: Pending",
       insights: ["Pre-scheduled transport", "Surgery prep required"],
       trafficStatus: {
-        congestionLevel: "low" as const,
+        congestionLevel: "low",
         estimatedDelay: 0,
         alternateRouteAvailable: false
       }
@@ -304,7 +302,7 @@ const mockDispatches = [
       billing: "Insurance: Pending",
       insights: ["Respiratory monitoring needed", "Oxygen support required"],
       trafficStatus: {
-        congestionLevel: "low" as const,
+        congestionLevel: "low",
         estimatedDelay: 0,
         alternateRouteAvailable: false
       }
@@ -335,7 +333,7 @@ const mockDispatches = [
       billing: "Insurance: Pending",
       insights: ["Wheelchair transport", "Post-procedure care"],
       trafficStatus: {
-        congestionLevel: "low" as const,
+        congestionLevel: "low",
         estimatedDelay: 0,
         alternateRouteAvailable: false
       }
@@ -398,7 +396,7 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
         routeEfficiency: 0
       },
       suggestedActions: [] as string[],
-      riskLevel: "low" as const
+      riskLevel: "low"
     };
 
     try {
@@ -446,7 +444,7 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
       );
       
       if (traffic) {
-        trafficInfo.congestionLevel = traffic.congestionLevel as CongestionLevel;
+        trafficInfo.congestionLevel = traffic.congestionLevel;
         trafficInfo.estimatedDelay = traffic.delayMinutes || Math.floor(Math.random() * 15);
         trafficInfo.alternateRouteAvailable = traffic.alternateRouteAvailable || false;
       }
