@@ -1,3 +1,4 @@
+import React, { useState, useCallback } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -11,14 +12,15 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+import { SearchBar } from "@/components/common/SearchBar";
+import { 
+  Table, TableBody, TableCell, TableHead, 
+  TableHeader, TableRow 
 } from "@/components/ui/table";
+import { 
+  Database, Import, Files, FileText, 
+  Users, Download 
+} from "lucide-react";
 
 export const PatientDirectory = () => {
   const navigate = useNavigate();
@@ -48,7 +50,6 @@ export const PatientDirectory = () => {
     return new Date(date).toLocaleDateString();
   };
 
-  // Function to mask SSN for privacy
   const maskSSN = (ssn: string | null) => {
     if (!ssn) return 'N/A';
     return `XXX-XX-${ssn.slice(-4)}`;
@@ -66,29 +67,44 @@ export const PatientDirectory = () => {
               <Card className="p-6">
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-semibold">Patient Directory</h2>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-6 w-6 text-gray-500" />
+                      <h2 className="text-2xl font-semibold">Patient Directory</h2>
+                    </div>
                     <div className="flex gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">Last name:</Label>
-                        <div className="flex gap-2">
-                          <Input id="lastName" placeholder="Search by last name..." className="w-64" />
-                        </div>
+                      <button className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-900">
+                        <Import className="h-4 w-4" />
+                        Import
+                      </button>
+                      <button className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-900">
+                        <Download className="h-4 w-4" />
+                        Export
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-4 items-end">
+                    <div className="space-y-2 flex-1">
+                      <Label htmlFor="search">Search:</Label>
+                      <div className="flex gap-2 items-center">
+                        <Database className="h-4 w-4 text-gray-500" />
+                        <Input id="search" placeholder="Search by name, ID, or insurance..." className="w-full" />
                       </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Filters:</Label>
                       <div className="space-y-2">
-                        <Label>Filters:</Label>
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox id="hideInactive" />
-                            <label htmlFor="hideInactive" className="text-sm">
-                              Hide inactive patients
-                            </label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox id="hideNotSeen" />
-                            <label htmlFor="hideNotSeen" className="text-sm">
-                              Hide patients not seen in the past year
-                            </label>
-                          </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="hideInactive" />
+                          <label htmlFor="hideInactive" className="text-sm">
+                            Hide inactive patients
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="hideNotSeen" />
+                          <label htmlFor="hideNotSeen" className="text-sm">
+                            Hide patients not seen in the past year
+                          </label>
                         </div>
                       </div>
                     </div>
@@ -108,7 +124,12 @@ export const PatientDirectory = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>ID</TableHead>
+                          <TableHead>
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-4 w-4" />
+                              ID
+                            </div>
+                          </TableHead>
                           <TableHead>Last Name</TableHead>
                           <TableHead>First Name</TableHead>
                           <TableHead>SSN</TableHead>
@@ -126,7 +147,10 @@ export const PatientDirectory = () => {
                             onClick={() => navigate(`/patient/${patient.id}`)}
                           >
                             <TableCell className="font-medium">
-                              {patient.legacy_display_id || patient.id.slice(0, 8)}
+                              <div className="flex items-center gap-2">
+                                <Files className="h-4 w-4 text-gray-500" />
+                                {patient.legacy_display_id || patient.id.slice(0, 8)}
+                              </div>
                             </TableCell>
                             <TableCell>{patient.last_name}</TableCell>
                             <TableCell>{patient.first_name}</TableCell>
@@ -146,7 +170,6 @@ export const PatientDirectory = () => {
                               </div>
                             </TableCell>
                             <TableCell>
-                              {/* This would need to be added to the database schema */}
                               N/A
                             </TableCell>
                           </TableRow>
