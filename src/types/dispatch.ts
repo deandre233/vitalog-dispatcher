@@ -64,6 +64,10 @@ export interface DispatchFormData {
   service_complaint?: string;
   dispatcher_notes?: string;
   billing_notes?: string;
+  recurrence_type?: string;
+  patient_first_name?: string;
+  patient_last_name?: string;
+  patient_dob?: string;
 }
 
 export interface TransportRecord {
@@ -78,7 +82,7 @@ export interface TransportRecord {
   notes?: string;
   route_data?: Json;
   traffic_conditions?: Json;
-  [key: string]: any; // Allow additional properties from database
+  [key: string]: any;
 }
 
 export interface DispatchAssignment {
@@ -93,4 +97,28 @@ export interface DispatchAssignment {
 export interface SearchableItem {
   id: string;
   [key: string]: any;
+}
+
+export interface InsuranceRecord extends SearchableItem {
+  id: string;
+  patient_id?: string;
+  type: string;
+  carrier_type: string;
+  carrier_name: string;
+  policy_number: string;
+  phone?: string;
+  claims_zip?: string;
+  activation_date?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AIAnalysisResult {
+  efficiency_score: number;
+  communication_score: number;
+  teamwork_score: number;
+  technical_skills: number;
+  training_needs: string[];
+  growth_opportunities: string[];
+  performance_insights: string;
 }
