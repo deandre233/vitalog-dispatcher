@@ -19,21 +19,12 @@ export default {
     },
     extend: {
       colors: {
-        // Futuristic medical theme colors
+        // Custom medical theme colors
         medical: {
           primary: "#0A2342",
           secondary: "#2CA3DC",
           accent: "#F5F7F9",
           highlight: "#E3F2FD",
-          gradient: {
-            start: "#2CA3DC",
-            middle: "#4B9FE1",
-            end: "#6B9BE6"
-          },
-          card: {
-            start: "#FFFFFF",
-            end: "#F5F7F9"
-          }
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -86,20 +77,11 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        shimmer: {
-          '100%': {
-            transform: 'translateX(100%)',
-          },
-        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        shimmer: 'shimmer 2s infinite',
       },
-      boxShadow: {
-        'glow': '0 0 20px rgba(44, 163, 220, 0.2)',
-      }
     },
   },
   plugins: [require("tailwindcss-animate")],
