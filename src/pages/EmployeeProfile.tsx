@@ -49,7 +49,7 @@ export function EmployeeProfile() {
       .from('employee_payroll_history')
       .insert({
         employee_id: id,
-        pay_rate: typeof values.pay_rate === 'string' ? parseFloat(values.pay_rate) : values.pay_rate,
+        pay_rate: values.pay_rate,
         pay_type: values.pay_type,
         effective_date: values.effective_date,
         is_active: true
