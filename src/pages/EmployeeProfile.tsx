@@ -162,11 +162,6 @@ const EmployeeProfile = () => {
     setEditData({ ...employee });
   };
 
-  const handleCancel = () => {
-    setEditMode(null);
-    setEditData(employee);
-  };
-
   const handleSave = async (section: string) => {
     try {
       const { error } = await supabase
