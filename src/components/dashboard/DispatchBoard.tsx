@@ -23,7 +23,7 @@ import {
 } from "@/utils/aiLearningUtils";
 import { supabase } from "@/integrations/supabase/client";
 
-// Define the congestion level type that allows both values
+// Update the congestion level type that allows both values
 type CongestionLevel = "low" | "medium";
 
 // Define the traffic status interface
@@ -651,3 +651,5 @@ export function DispatchBoard() {
     </Card>
   );
 }
+
+export default DispatchBoard;
