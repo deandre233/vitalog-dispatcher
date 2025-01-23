@@ -21,6 +21,9 @@ import {
   Database, Import, Files, FileText, 
   Users, Download 
 } from "lucide-react";
+import { Tables } from "@/integrations/supabase/types";
+
+type Patient = Tables<"patients">;
 
 export const PatientDirectory = () => {
   const navigate = useNavigate();
@@ -48,11 +51,6 @@ export const PatientDirectory = () => {
   const formatDate = (date: string | null) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString();
-  };
-
-  const maskSSN = (ssn: string | null) => {
-    if (!ssn) return 'N/A';
-    return `XXX-XX-${ssn.slice(-4)}`;
   };
 
   return (
@@ -132,7 +130,6 @@ export const PatientDirectory = () => {
                           </TableHead>
                           <TableHead>Last Name</TableHead>
                           <TableHead>First Name</TableHead>
-                          <TableHead>SSN</TableHead>
                           <TableHead>Gender</TableHead>
                           <TableHead>DOB</TableHead>
                           <TableHead>Insurance</TableHead>
@@ -140,7 +137,7 @@ export const PatientDirectory = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {patients?.map((patient) => (
+                        {patients?.map((patient: Patient) => (
                           <TableRow
                             key={patient.id}
                             className="cursor-pointer hover:bg-gray-50"
@@ -154,7 +151,6 @@ export const PatientDirectory = () => {
                             </TableCell>
                             <TableCell>{patient.last_name}</TableCell>
                             <TableCell>{patient.first_name}</TableCell>
-                            <TableCell>{maskSSN(patient.ssn)}</TableCell>
                             <TableCell>{patient.gender || 'N/A'}</TableCell>
                             <TableCell>{formatDate(patient.dob)}</TableCell>
                             <TableCell>
@@ -170,7 +166,7 @@ export const PatientDirectory = () => {
                               </div>
                             </TableCell>
                             <TableCell>
-                              N/A
+                              {patient.last_physical ? formatDate(patient.last_physical) : 'N/A'}
                             </TableCell>
                           </TableRow>
                         ))}
