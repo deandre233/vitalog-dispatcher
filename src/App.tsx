@@ -84,7 +84,7 @@ const router = createBrowserRouter([
     element: <EmployeeProfile />,
   },
   {
-    path: "/patient/:patientName",
+    path: "/patient/:id",
     element: <PatientRecord />,
   },
   {
