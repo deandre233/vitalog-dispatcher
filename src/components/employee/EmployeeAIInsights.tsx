@@ -2,13 +2,14 @@ import { Card } from "@/components/ui/card";
 import { useAIEmployeeAnalysis } from "@/hooks/useAIEmployeeAnalysis";
 import { Progress } from "@/components/ui/progress";
 import { Brain, TrendingUp, Award, BookOpen } from "lucide-react";
+import type { AIAnalysisResult } from "@/types/dispatch";
 
 interface EmployeeAIInsightsProps {
   employeeId: string;
 }
 
 export function EmployeeAIInsights({ employeeId }: EmployeeAIInsightsProps) {
-  const { data: analysis, isLoading } = useAIEmployeeAnalysis(employeeId);
+  const { analysis, isLoading } = useAIEmployeeAnalysis(employeeId);
 
   if (isLoading || !analysis) {
     return <div>Loading AI insights...</div>;

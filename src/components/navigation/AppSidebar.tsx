@@ -124,8 +124,8 @@ export function AppSidebar() {
   const { pathname } = useLocation();
   const isMobile = useMobile();
 
-  // Auto-collapse on mobile by default
-  useState(() => {
+  // Fix: Remove second argument from useState
+  useEffect(() => {
     if (isMobile) {
       setIsCollapsed(true);
     }

@@ -24,9 +24,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { DollarSign, CreditCard, Receipt, Save, Check, AlertCircle, Upload, Wand2, Loader2 } from "lucide-react";
+import type { SearchableItem } from "@/types/common";
 
-interface InsuranceRecord {
-  id?: string;
+interface InsuranceRecord extends SearchableItem {
+  id: string; // Make id required
   type: 'primary' | 'secondary' | 'reserved';
   carrier_type: string;
   carrier_name: string;

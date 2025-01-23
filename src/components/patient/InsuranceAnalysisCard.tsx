@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, CheckCircle, XCircle, TrendingUp, Shield } from "lucide-react";
-import type { InsuranceAnalysis } from "@/hooks/useInsuranceAnalysis";
+import type { InsuranceAnalysis } from "@/types/insurance";
 import { cn } from "@/lib/utils";
 
 interface InsuranceAnalysisCardProps {
