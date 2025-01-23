@@ -288,6 +288,72 @@ export type Database = {
           },
         ]
       }
+      content_templates: {
+        Row: {
+          content: Json
+          created_at: string | null
+          description: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          template_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          content?: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          template_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          template_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      content_versions: {
+        Row: {
+          content: Json
+          content_id: string
+          content_type: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          metadata: Json | null
+          version_number: number
+        }
+        Insert: {
+          content: Json
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          metadata?: Json | null
+          version_number: number
+        }
+        Update: {
+          content?: Json
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          metadata?: Json | null
+          version_number?: number
+        }
+        Relationships: []
+      }
       corrective_action_documents: {
         Row: {
           corrective_action_id: string | null
@@ -1785,6 +1851,77 @@ export type Database = {
         }
         Relationships: []
       }
+      workflow_logs: {
+        Row: {
+          created_at: string | null
+          execution_details: Json | null
+          id: string
+          status: string
+          triggered_by: string | null
+          workflow_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          execution_details?: Json | null
+          id?: string
+          status: string
+          triggered_by?: string | null
+          workflow_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          execution_details?: Json | null
+          id?: string
+          status?: string
+          triggered_by?: string | null
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_logs_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflows: {
+        Row: {
+          actions: Json[]
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          trigger_conditions: Json
+          trigger_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          actions: Json[]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          trigger_conditions: Json
+          trigger_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          actions?: Json[]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          trigger_conditions?: Json
+          trigger_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1825,6 +1962,7 @@ export type Database = {
         | "rejected"
         | "in_review"
         | "appealed"
+      content_status: "draft" | "published" | "archived"
       dispatch_status: "Pending" | "In Progress" | "Completed" | "Canceled"
       file_type: "document" | "image" | "pdf" | "spreadsheet" | "other"
       gender_type:
