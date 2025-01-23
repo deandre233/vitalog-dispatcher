@@ -10,6 +10,8 @@ export function usePatientData(patientId?: string) {
     queryFn: async () => {
       if (!patientId) return null;
 
+      console.log('Fetching patient data for ID:', patientId);
+
       const { data, error } = await supabase
         .from('patients')
         .select(`
@@ -18,7 +20,7 @@ export function usePatientData(patientId?: string) {
           insurance_policies (*),
           appointments (*)
         `)
-        .eq('id', patientId)
+        .eq('legacy_display_id', `PAT-${patientId}`)
         .maybeSingle();
 
       if (error) {
@@ -27,6 +29,7 @@ export function usePatientData(patientId?: string) {
         throw error;
       }
 
+      console.log('Fetched patient data:', data);
       return data;
     },
     enabled: !!patientId
@@ -39,7 +42,7 @@ export function usePatientData(patientId?: string) {
       const { error } = await supabase
         .from('patients')
         .update(updates)
-        .eq('id', patientId);
+        .eq('legacy_display_id', `PAT-${patientId}`);
 
       if (error) throw error;
     },
