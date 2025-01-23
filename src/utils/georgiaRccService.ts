@@ -17,87 +17,15 @@ interface HospitalStatus {
 }
 
 export const fetchHospitalStatus = async (hospitalName: string): Promise<HospitalStatus | null> => {
-  try {
-    const response = await fetch('https://www.georgiarcc.org/', {
-      method: 'GET',
-      headers: {
-        'Accept': 'text/html',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
-    });
-
-    if (!response.ok) {
-      console.error('Failed to fetch Georgia RCC data:', response.statusText);
-      return mockHospitalStatus(hospitalName);
-    }
-
-    const html = await response.text();
-    return parseHospitalData(html, hospitalName) || mockHospitalStatus(hospitalName);
-  } catch (error) {
-    console.error('Error fetching hospital status:', error);
-    return mockHospitalStatus(hospitalName);
-  }
-};
-
-const parseHospitalData = (html: string, hospitalName: string): HospitalStatus | null => {
-  try {
-    // Create a temporary DOM element to parse the HTML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    // Find the hospital row in the table
-    const hospitalRows = Array.from(doc.querySelectorAll('tr')).filter(row => 
-      row.textContent?.toLowerCase().includes(hospitalName.toLowerCase())
-    );
-
-    if (hospitalRows.length === 0) {
-      return null;
-    }
-
-    const row = hospitalRows[0];
-    const cells = Array.from(row.querySelectorAll('td'));
-
-    // Parse the data from the cells
-    // Note: The actual implementation would need to be adjusted based on the exact structure of georgiarcc.org
-    return {
-      name: hospitalName,
-      diversionStatus: parseDiversionStatus(cells),
-      lastUpdated: new Date().toISOString(),
-      specialtyDiversions: {
-        trauma: cells.some(cell => cell.textContent?.includes('Trauma')),
-        stroke: cells.some(cell => cell.textContent?.includes('Stroke')),
-        cardiac: cells.some(cell => cell.textContent?.includes('Cardiac')),
-        pediatric: cells.some(cell => cell.textContent?.includes('Pediatric'))
-      },
-      capacity: {
-        er: parseCapacity(cells, 'ER'),
-        icu: parseCapacity(cells, 'ICU'),
-        med: parseCapacity(cells, 'Med')
-      }
-    };
-  } catch (error) {
-    console.error('Error parsing hospital data:', error);
-    return null;
-  }
-};
-
-const parseDiversionStatus = (cells: Element[]): HospitalStatus['diversionStatus'] => {
-  const statusText = cells.find(cell => 
-    cell.textContent?.includes('Open') || 
-    cell.textContent?.includes('Full') || 
-    cell.textContent?.includes('Partial')
-  )?.textContent?.trim();
-
-  if (statusText?.includes('Open')) return 'Open';
-  if (statusText?.includes('Full')) return 'Full';
-  if (statusText?.includes('Partial')) return 'Partial';
-  return 'Unknown';
-};
-
-const parseCapacity = (cells: Element[], type: string): number => {
-  const capacityCell = cells.find(cell => cell.textContent?.includes(type));
-  const match = capacityCell?.textContent?.match(/(\d+)%/);
-  return match ? parseInt(match[1], 10) : Math.floor(Math.random() * 100);
+  // Due to CORS restrictions and the limitations of browser-based web scraping,
+  // we cannot directly fetch data from georgiarcc.org in the browser.
+  // In a production environment, this should be handled by:
+  // 1. A backend proxy service that fetches the data
+  // 2. A dedicated API provided by Georgia RCC
+  // 3. A scheduled task that updates a database with the latest status
+  
+  console.warn('Using mock hospital status data - production implementation required');
+  return mockHospitalStatus(hospitalName);
 };
 
 const mockHospitalStatus = (hospitalName: string): HospitalStatus => ({
