@@ -1,10 +1,10 @@
+import { useState, useMemo, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DispatchItem } from "./DispatchItem";
 import { DispatchFilters } from "./DispatchFilters";
 import { ScheduledTransport } from "./ScheduledTransport";
-import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -14,11 +14,7 @@ interface DispatchBoardProps {
   priority?: string;
 }
 
-interface TrafficStatus {
-  congestionLevel: "low" | "medium" | "high";
-  estimatedDelay: number;
-  alternateRouteAvailable: boolean;
-}
+type CongestionLevel = "low" | "medium" | "high";
 
 const mockDispatches = [
   {
@@ -41,7 +37,7 @@ const mockDispatches = [
       billing: "Insurance: Medicare",
       insights: ["Traffic conditions favorable", "ETA within normal range"],
       trafficStatus: {
-        congestionLevel: "low" as const,
+        congestionLevel: "low" as CongestionLevel,
         estimatedDelay: 5,
         alternateRouteAvailable: false
       }
@@ -72,7 +68,7 @@ const mockDispatches = [
       billing: "Insurance: Blue Cross",
       insights: ["Priority case", "Monitor vital signs"],
       trafficStatus: {
-        congestionLevel: "medium",
+        congestionLevel: "medium" as CongestionLevel,
         estimatedDelay: 10,
         alternateRouteAvailable: true
       }
@@ -103,7 +99,7 @@ const mockDispatches = [
       billing: "Insurance: Medicaid",
       insights: ["Regular patient", "Wheelchair assistance required"],
       trafficStatus: {
-        congestionLevel: "low",
+        congestionLevel: "low" as CongestionLevel,
         estimatedDelay: 3,
         alternateRouteAvailable: false
       }
@@ -134,7 +130,7 @@ const mockDispatches = [
       billing: "Insurance: Private",
       insights: ["Critical transfer", "Continuous monitoring required"],
       trafficStatus: {
-        congestionLevel: "low",
+        congestionLevel: "low" as CongestionLevel,
         estimatedDelay: 2,
         alternateRouteAvailable: true
       }
@@ -165,7 +161,7 @@ const mockDispatches = [
       billing: "Insurance: Medicare",
       insights: ["Regular schedule", "Mobility assistance needed"],
       trafficStatus: {
-        congestionLevel: "low",
+        congestionLevel: "low" as CongestionLevel,
         estimatedDelay: 5,
         alternateRouteAvailable: false
       }
@@ -196,7 +192,7 @@ const mockDispatches = [
       billing: "Insurance: Pending",
       insights: ["Routine transport", "No special requirements"],
       trafficStatus: {
-        congestionLevel: "low",
+        congestionLevel: "low" as CongestionLevel,
         estimatedDelay: 0,
         alternateRouteAvailable: false
       }
@@ -227,7 +223,7 @@ const mockDispatches = [
       billing: "Insurance: Pending",
       insights: ["High priority case", "Immediate response needed"],
       trafficStatus: {
-        congestionLevel: "medium",
+        congestionLevel: "medium" as CongestionLevel,
         estimatedDelay: 0,
         alternateRouteAvailable: false
       }
@@ -258,7 +254,7 @@ const mockDispatches = [
       billing: "Insurance: Pending",
       insights: ["Pre-scheduled transport", "Surgery prep required"],
       trafficStatus: {
-        congestionLevel: "low",
+        congestionLevel: "low" as CongestionLevel,
         estimatedDelay: 0,
         alternateRouteAvailable: false
       }
@@ -289,7 +285,7 @@ const mockDispatches = [
       billing: "Insurance: Pending",
       insights: ["Respiratory monitoring needed", "Oxygen support required"],
       trafficStatus: {
-        congestionLevel: "low",
+        congestionLevel: "low" as CongestionLevel,
         estimatedDelay: 0,
         alternateRouteAvailable: false
       }
@@ -320,7 +316,7 @@ const mockDispatches = [
       billing: "Insurance: Pending",
       insights: ["Wheelchair transport", "Post-procedure care"],
       trafficStatus: {
-        congestionLevel: "low",
+        congestionLevel: "low" as CongestionLevel,
         estimatedDelay: 0,
         alternateRouteAvailable: false
       }
@@ -363,11 +359,8 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
       status = "transporting";
     }
 
-    const trafficInfo: TrafficStatus = {
-      congestionLevel: "low",
-      estimatedDelay: 0,
-      alternateRouteAvailable: false
-    };
+    const congestionLevels: CongestionLevel[] = ["low", "medium", "high"];
+    const randomCongestionLevel = congestionLevels[Math.floor(Math.random() * congestionLevels.length)];
 
     return {
       ...dispatch,
@@ -378,7 +371,10 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
       efficiency: Math.random() * 100,
       aiRecommendations: {
         ...dispatch.aiRecommendations,
-        trafficStatus: trafficInfo
+        trafficStatus: {
+          ...dispatch.aiRecommendations.trafficStatus,
+          congestionLevel: randomCongestionLevel
+        }
       }
     };
   };
