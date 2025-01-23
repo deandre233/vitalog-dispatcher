@@ -23,11 +23,10 @@ import {
 } from "@/utils/aiLearningUtils";
 import { supabase } from "@/integrations/supabase/client";
 
-type PriorityType = "low" | "medium";
 type CongestionLevel = "low" | "medium";
 
 interface DispatchBoardProps {
-  priority?: PriorityType;
+  priority?: string;
 }
 
 interface TrafficStatus {
@@ -353,7 +352,7 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
   const [activeView, setActiveView] = useState<"active" | "scheduled">("active");
   const [dispatches, setDispatches] = useState(mockDispatches);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPriority, setCurrentPriority] = useState<PriorityType>(priority);
+  const [currentPriority, setCurrentPriority] = useState(priority);
   const [aiPredictions, setAiPredictions] = useState<{
     maintenance: MaintenancePrediction[];
     staffing: StaffingPrediction;
