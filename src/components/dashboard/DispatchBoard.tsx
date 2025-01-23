@@ -9,7 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { getTrafficInfo } from "@/utils/aiDispatchUtils";
-import { analyzeDispatchEfficiency, monitorDispatchProgress, generateAIInsights } from "@/utils/aiDispatchAnalytics";
+import { 
+  analyzeDispatchEfficiency, 
+  monitorDispatchProgress, 
+  generateAIInsights 
+} from "@/utils/aiDispatchAnalytics";
 import { 
   analyzeHistoricalData, 
   predictMaintenance, 
