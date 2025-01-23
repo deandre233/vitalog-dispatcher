@@ -664,6 +664,44 @@ export type Database = {
           },
         ]
       }
+      employee_profiles: {
+        Row: {
+          ai_performance_metrics: Json | null
+          ai_recommendations: Json | null
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          last_analysis_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ai_performance_metrics?: Json | null
+          ai_recommendations?: Json | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          last_analysis_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ai_performance_metrics?: Json | null
+          ai_recommendations?: Json | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          last_analysis_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_profiles_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_roles: {
         Row: {
           can_see_non_emergent: boolean | null
