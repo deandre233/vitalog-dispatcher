@@ -29,7 +29,7 @@ type Patient = Tables<"patients">;
 // Mock data for development and testing
 const mockPatients: Patient[] = [
   {
-    id: "123e4567-e89b-12d3-a456-426614174000",
+    id: "1",
     first_name: "John",
     last_name: "Smith",
     dob: "1985-03-15",
@@ -61,7 +61,7 @@ const mockPatients: Patient[] = [
     usual_transport_mode: "Car"
   },
   {
-    id: "223e4567-e89b-12d3-a456-426614174000",
+    id: "2",
     first_name: "Maria",
     last_name: "Garcia",
     dob: "1992-07-22",
@@ -82,18 +82,10 @@ const mockPatients: Patient[] = [
     legacy_display_id: "PAT-12346",
     last_physical: "2024-01-10T09:15:00.000Z",
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    blood_type: "A+",
-    height: "5'4\"",
-    weight: "135",
-    marital_status: "Single",
-    occupation: "Teacher",
-    preferred_language: "Spanish",
-    primary_care_physician: "Dr. Martinez",
-    usual_transport_mode: "Ambulance"
+    updated_at: new Date().toISOString()
   },
   {
-    id: "323e4567-e89b-12d3-a456-426614174000",
+    id: "3",
     first_name: "Robert",
     last_name: "Johnson",
     dob: "1978-11-30",
@@ -114,15 +106,7 @@ const mockPatients: Patient[] = [
     legacy_display_id: "PAT-12347",
     last_physical: "2023-12-20T11:45:00.000Z",
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    blood_type: "B-",
-    height: "6'0\"",
-    weight: "200",
-    marital_status: "Divorced",
-    occupation: "Accountant",
-    preferred_language: "English",
-    primary_care_physician: "Dr. Thompson",
-    usual_transport_mode: "Wheelchair Van"
+    updated_at: new Date().toISOString()
   }
 ];
 
@@ -368,4 +352,3 @@ export const PatientDirectory = () => {
 };
 
 export default PatientDirectory;
-
