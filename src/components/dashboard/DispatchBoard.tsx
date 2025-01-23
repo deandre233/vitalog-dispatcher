@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Brain, Plus } from "lucide-react";
+import { Brain } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DispatchItem } from "./DispatchItem";
 import { DispatchFilters } from "./DispatchFilters";
@@ -8,7 +8,6 @@ import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
 import { getTrafficInfo } from "@/utils/aiDispatchUtils";
 import { analyzeDispatchEfficiency, monitorDispatchProgress, generateAIInsights } from "@/utils/aiDispatchAnalytics";
 import { 
@@ -413,15 +412,7 @@ export function DispatchBoard() {
             </Button>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <Link to="/book-dispatch">
-            <Button className="bg-medical-primary hover:bg-medical-primary/90 text-white flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Book New Dispatch
-            </Button>
-          </Link>
-          <DispatchFilters />
-        </div>
+        <DispatchFilters />
       </div>
 
       <Alert className="mb-4 bg-medical-highlight border-medical-secondary/20">
