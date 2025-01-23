@@ -1,11 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMobile } from "@/hooks/use-mobile";
 import {
   ChevronLeft,
-  ChevronRight,
   CircuitBoard,
   Users,
   Map,
@@ -124,7 +123,6 @@ export function AppSidebar() {
   const { pathname } = useLocation();
   const isMobile = useMobile();
 
-  // Fix: Remove second argument from useState
   useEffect(() => {
     if (isMobile) {
       setIsCollapsed(true);

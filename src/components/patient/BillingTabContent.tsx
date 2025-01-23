@@ -209,11 +209,13 @@ export const BillingTabContent = ({ patientId }: BillingTabContentProps) => {
         if (existingRecord) {
           return {
             ...existingRecord,
+            id: existingRecord.id || `temp-${type}`, // Ensure id exists
             type: isValidInsuranceType(existingRecord.type) ? existingRecord.type : type,
             patient_relation: existingRecord.patient_relation || ''
           };
         }
         return {
+          id: `temp-${type}`, // Add temporary id for new records
           type,
           carrier_type: '',
           carrier_name: '',
