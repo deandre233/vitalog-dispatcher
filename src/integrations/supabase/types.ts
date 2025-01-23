@@ -9,54 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      actions: {
-        Row: {
-          action_name: string
-          created_at: string | null
-          event_handler: Json | null
-          id: string
-          linked_page_id: string | null
-          linked_panel_id: string | null
-          trigger_element: string
-          updated_at: string | null
-        }
-        Insert: {
-          action_name: string
-          created_at?: string | null
-          event_handler?: Json | null
-          id?: string
-          linked_page_id?: string | null
-          linked_panel_id?: string | null
-          trigger_element: string
-          updated_at?: string | null
-        }
-        Update: {
-          action_name?: string
-          created_at?: string | null
-          event_handler?: Json | null
-          id?: string
-          linked_page_id?: string | null
-          linked_panel_id?: string | null
-          trigger_element?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "actions_linked_page_id_fkey"
-            columns: ["linked_page_id"]
-            isOneToOne: false
-            referencedRelation: "pages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "actions_linked_panel_id_fkey"
-            columns: ["linked_panel_id"]
-            isOneToOne: false
-            referencedRelation: "panels"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       ai_analysis_results: {
         Row: {
           analysis_type: string
@@ -1144,39 +1096,6 @@ export type Database = {
         }
         Relationships: []
       }
-      navigation: {
-        Row: {
-          created_at: string | null
-          icon: string | null
-          id: string
-          is_active: boolean | null
-          link: string
-          name: string
-          position: number
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean | null
-          link: string
-          name: string
-          position: number
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean | null
-          link?: string
-          name?: string
-          position?: number
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       notifications: {
         Row: {
           created_at: string | null
@@ -1209,86 +1128,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
-      }
-      pages: {
-        Row: {
-          content: Json | null
-          created_at: string | null
-          id: string
-          meta_data: Json | null
-          name: string
-          updated_at: string | null
-          url: string
-          user_access_level:
-            | Database["public"]["Enums"]["user_access_level"]
-            | null
-        }
-        Insert: {
-          content?: Json | null
-          created_at?: string | null
-          id?: string
-          meta_data?: Json | null
-          name: string
-          updated_at?: string | null
-          url: string
-          user_access_level?:
-            | Database["public"]["Enums"]["user_access_level"]
-            | null
-        }
-        Update: {
-          content?: Json | null
-          created_at?: string | null
-          id?: string
-          meta_data?: Json | null
-          name?: string
-          updated_at?: string | null
-          url?: string
-          user_access_level?:
-            | Database["public"]["Enums"]["user_access_level"]
-            | null
-        }
-        Relationships: []
-      }
-      panels: {
-        Row: {
-          content: Json | null
-          created_at: string | null
-          id: string
-          is_active: boolean | null
-          linked_page_id: string | null
-          name: string
-          updated_at: string | null
-          visibility_rule: string | null
-        }
-        Insert: {
-          content?: Json | null
-          created_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          linked_page_id?: string | null
-          name: string
-          updated_at?: string | null
-          visibility_rule?: string | null
-        }
-        Update: {
-          content?: Json | null
-          created_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          linked_page_id?: string | null
-          name?: string
-          updated_at?: string | null
-          visibility_rule?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "panels_linked_page_id_fkey"
-            columns: ["linked_page_id"]
-            isOneToOne: false
-            referencedRelation: "pages"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       patients: {
         Row: {
@@ -1815,7 +1654,6 @@ export type Database = {
         | "Full privileges"
         | "Call-taker / Self-dispatch"
       trip_type: "One way" | "Wait-and-return" | "Round trip"
-      user_access_level: "admin" | "user" | "guest"
     }
     CompositeTypes: {
       [_ in never]: never
