@@ -1,87 +1,32 @@
-import type { DispatchFormData } from "@/types/dispatch";
+import type { DispatchFormData } from '@/types/dispatch';
 
-export const validateDispatchForm = (data: Partial<DispatchFormData>): string[] => {
+export function validateDispatchForm(formData: DispatchFormData): string[] {
   const errors: string[] = [];
 
-  // Required fields validation
-  const requiredFields: (keyof DispatchFormData)[] = [
-    "caller_name",
-    "caller_phone",
-    "pickup_location",
-    "dropoff_location",
-    "service_type",
-    "priority_level"
-  ];
-
-  requiredFields.forEach(field => {
-    if (!data[field]) {
-      errors.push(`${field.replace(/_/g, " ")} is required`);
-    }
-  });
-
-  // Phone number validation
-  const phoneFields: (keyof DispatchFormData)[] = [
-    "caller_phone",
-    "origin_phone",
-    "destination_phone"
-  ];
-
-  const phoneRegex = /^\+?[\d\s-()]{10,}$/;
-  phoneFields.forEach(field => {
-    if (data[field] && !phoneRegex.test(data[field] as string)) {
-      errors.push(`Invalid ${field.replace(/_/g, " ")} format`);
-    }
-  });
-
-  // Date/time validation
-  if (data.activation_type === "later" && !data.activation_datetime) {
-    errors.push("Activation datetime is required when scheduling for later");
+  // Required fields
+  if (!formData.pickup_location) {
+    errors.push('Pickup location is required');
   }
 
-  if (data.pickup_type === "scheduled" && !data.pickup_time) {
-    errors.push("Pickup time is required when scheduling pickup");
+  if (!formData.dropoff_location) {
+    errors.push('Dropoff location is required');
   }
 
-  if (data.dropoff_type === "scheduled" && !data.dropoff_time) {
-    errors.push("Dropoff time is required when scheduling dropoff");
+  // Validate pickup location format (if needed)
+  if (formData.pickup_location && typeof formData.pickup_location === 'string') {
+    const cleanPickup = formData.pickup_location.replace(/[^a-zA-Z0-9\s]/g, '');
+    if (cleanPickup !== formData.pickup_location) {
+      errors.push('Pickup location contains invalid characters');
+    }
   }
 
-  // Billing validation
-  if (data.is_billable) {
-    if (
-      !data.bill_to_insurance &&
-      !data.bill_to_facility &&
-      !data.bill_to_affiliate &&
-      !data.bill_to_patient
-    ) {
-      errors.push("At least one billing option must be selected");
-    }
-
-    if (data.bill_to_facility && !data.billing_facility) {
-      errors.push("Billing facility must be specified");
-    }
-
-    if (data.bill_to_affiliate && !data.billing_affiliate) {
-      errors.push("Billing affiliate must be specified");
+  // Validate dropoff location format (if needed)
+  if (formData.dropoff_location && typeof formData.dropoff_location === 'string') {
+    const cleanDropoff = formData.dropoff_location.replace(/[^a-zA-Z0-9\s]/g, '');
+    if (cleanDropoff !== formData.dropoff_location) {
+      errors.push('Dropoff location contains invalid characters');
     }
   }
 
   return errors;
-};
-
-export const validateDispatchAssignment = (
-  crewId: string,
-  transportRecord: Record<string, unknown>
-): string[] => {
-  const errors: string[] = [];
-
-  if (!crewId) {
-    errors.push("Crew member must be selected");
-  }
-
-  if (!transportRecord.dispatch_id) {
-    errors.push("Invalid transport record");
-  }
-
-  return errors;
-};
+}

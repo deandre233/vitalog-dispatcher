@@ -1,39 +1,50 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import type { InsuranceAnalysis } from '@/types/insurance';
 
-interface InsuranceAnalysis {
-  coverage_status: string;
-  recommendations: string[];
-  risk_factors: string[];
-  next_steps: string[];
-}
+export function useInsuranceAnalysis(patientId: string) {
+  const [analysis, setAnalysis] = useState<InsuranceAnalysis | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export const useInsuranceAnalysis = (patientId: string) => {
-  return useQuery({
-    queryKey: ["insurance-analysis", patientId],
-    queryFn: async (): Promise<InsuranceAnalysis> => {
+  useEffect(() => {
+    const fetchAnalysis = async () => {
       try {
-        const { data: analysisData, error } = await supabase
-          .from("ai_analysis_results")
-          .select("*")
-          .eq("patient_id", patientId)
-          .eq("analysis_type", "insurance")
-          .single();
+        setIsLoading(true);
+        const { data, error: apiError } = await supabase.functions.invoke('analyze-insurance', {
+          body: { patientId }
+        });
 
-        if (error) throw error;
+        if (apiError) throw apiError;
 
-        return {
-          coverage_status: analysisData?.prediction || "Unknown",
-          recommendations: analysisData?.suggestions || [],
-          risk_factors: analysisData?.metadata?.risk_factors || [],
-          next_steps: analysisData?.metadata?.next_steps || []
-        };
-      } catch (error) {
-        toast.error("Failed to fetch insurance analysis");
-        throw error;
+        if (data) {
+          const analysisData: InsuranceAnalysis = {
+            validation: data.validation || { status: 'incomplete', issues: [] },
+            suggestions: data.suggestions || [],
+            coverage_gaps: data.coverage_gaps || [],
+            optimization: {
+              recommendations: data.optimization?.recommendations || [],
+              potential_savings: data.optimization?.potential_savings
+            },
+            compliance: {
+              flags: data.compliance?.flags || [],
+              required_actions: data.compliance?.required_actions || []
+            }
+          };
+          setAnalysis(analysisData);
+        }
+      } catch (err) {
+        console.error('Error fetching insurance analysis:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch insurance analysis');
+      } finally {
+        setIsLoading(false);
       }
-    },
-    enabled: !!patientId
-  });
-};
+    };
+
+    if (patientId) {
+      fetchAnalysis();
+    }
+  }, [patientId]);
+
+  return { analysis, isLoading, error };
+}
