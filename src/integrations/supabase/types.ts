@@ -650,7 +650,6 @@ export type Database = {
           mobile: string | null
           pay_rate: number | null
           pay_type: string | null
-          photo_url: string | null
           readable_id: string | null
           station: string | null
           status: string | null
@@ -669,7 +668,6 @@ export type Database = {
           mobile?: string | null
           pay_rate?: number | null
           pay_type?: string | null
-          photo_url?: string | null
           readable_id?: string | null
           station?: string | null
           status?: string | null
@@ -688,7 +686,6 @@ export type Database = {
           mobile?: string | null
           pay_rate?: number | null
           pay_type?: string | null
-          photo_url?: string | null
           readable_id?: string | null
           station?: string | null
           status?: string | null
