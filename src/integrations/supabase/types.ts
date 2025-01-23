@@ -318,59 +318,6 @@ export type Database = {
         }
         Relationships: []
       }
-      employee_payroll_history: {
-        Row: {
-          access_codes: string | null
-          author: string | null
-          created_at: string | null
-          effective_date: string | null
-          employee_id: string | null
-          employee_type: string | null
-          end_date: string | null
-          id: string
-          is_active: boolean | null
-          pay_rate: number | null
-          pay_type: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          access_codes?: string | null
-          author?: string | null
-          created_at?: string | null
-          effective_date?: string | null
-          employee_id?: string | null
-          employee_type?: string | null
-          end_date?: string | null
-          id?: string
-          is_active?: boolean | null
-          pay_rate?: number | null
-          pay_type?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          access_codes?: string | null
-          author?: string | null
-          created_at?: string | null
-          effective_date?: string | null
-          employee_id?: string | null
-          employee_type?: string | null
-          end_date?: string | null
-          id?: string
-          is_active?: boolean | null
-          pay_rate?: number | null
-          pay_type?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "employee_payroll_history_employee_id_fkey"
-            columns: ["employee_id"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       employee_privileges: {
         Row: {
           can_create_reports: boolean | null
@@ -531,58 +478,43 @@ export type Database = {
       }
       employees: {
         Row: {
-          access_codes: string | null
           certification_level: string | null
           created_at: string | null
           employee_type: string | null
-          first_hired_date: string | null
           first_name: string
           id: string
           last_name: string
           mobile: string | null
-          pay_rate: number | null
-          pay_type: string | null
           readable_id: string | null
           station: string | null
           status: string | null
           updated_at: string | null
-          uses_timeclock: boolean | null
         }
         Insert: {
-          access_codes?: string | null
           certification_level?: string | null
           created_at?: string | null
           employee_type?: string | null
-          first_hired_date?: string | null
           first_name: string
           id?: string
           last_name: string
           mobile?: string | null
-          pay_rate?: number | null
-          pay_type?: string | null
           readable_id?: string | null
           station?: string | null
           status?: string | null
           updated_at?: string | null
-          uses_timeclock?: boolean | null
         }
         Update: {
-          access_codes?: string | null
           certification_level?: string | null
           created_at?: string | null
           employee_type?: string | null
-          first_hired_date?: string | null
           first_name?: string
           id?: string
           last_name?: string
           mobile?: string | null
-          pay_rate?: number | null
-          pay_type?: string | null
           readable_id?: string | null
           station?: string | null
           status?: string | null
           updated_at?: string | null
-          uses_timeclock?: boolean | null
         }
         Relationships: []
       }
