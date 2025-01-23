@@ -1,70 +1,32 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Index from "./pages/Index";
-import ActiveDispatches from "./pages/ActiveDispatches";
-import ClosedDispatches from "./pages/ClosedDispatches";
-import CreateDispatch from "./pages/CreateDispatch";
-import CrewAssignment from "./pages/CrewAssignment";
-import ManageRoutes from "./pages/ManageRoutes";
-import Performance from "./pages/Performance";
-import AlertsConfig from "./pages/AlertsConfig";
-import Billing from "./pages/Billing";
-import { EmployeeDirectory } from "./pages/EmployeeDirectory";
-import { EmployeeProfile } from "./pages/EmployeeProfile";
-import { PatientRecord } from "./pages/PatientRecord";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { RouteOptimizationView } from './components/dispatch/RouteOptimizationView';
+import { ServiceRequestView } from './components/dispatch/ServiceRequestView';
+import { DashboardView } from './components/dashboard/DashboardView';
+import { DispatchDetailView } from './components/dashboard/DispatchDetailView';
+import { BookingForm } from './components/dispatch/BookingForm';
+import { Layout } from './components/layout/Layout';
+import { Toaster } from './components/ui/toaster';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Index />,
-  },
-  {
-    path: "/dispatch",
-    element: <ActiveDispatches />,
-  },
-  {
-    path: "/closed",
-    element: <ClosedDispatches />,
-  },
-  {
-    path: "/create",
-    element: <CreateDispatch />,
-  },
-  {
-    path: "/crew",
-    element: <CrewAssignment />,
-  },
-  {
-    path: "/routes",
-    element: <ManageRoutes />,
-  },
-  {
-    path: "/performance",
-    element: <Performance />,
-  },
-  {
-    path: "/alerts",
-    element: <AlertsConfig />,
-  },
-  {
-    path: "/billing",
-    element: <Billing />,
-  },
-  {
-    path: "/employees",
-    element: <EmployeeDirectory />,
-  },
-  {
-    path: "/employee/:id",
-    element: <EmployeeProfile />,
-  },
-  {
-    path: "/patient/:patientName",
-    element: <PatientRecord />,
-  }
-]);
+const queryClient = new QueryClient();
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<DashboardView />} />
+            <Route path="/dispatch/:id" element={<DispatchDetailView />} />
+            <Route path="/dispatch/new" element={<BookingForm />} />
+            <Route path="/dispatch/routes" element={<RouteOptimizationView />} />
+            <Route path="/dispatch/requests" element={<ServiceRequestView />} />
+          </Routes>
+        </Layout>
+        <Toaster />
+      </Router>
+    </QueryClientProvider>
+  );
 }
 
 export default App;
