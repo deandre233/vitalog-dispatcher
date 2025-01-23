@@ -23,17 +23,15 @@ import {
 } from "@/utils/aiLearningUtils";
 import { supabase } from "@/integrations/supabase/client";
 
-// Update the congestion level type that allows both values
+type PriorityType = "low" | "medium";
 type CongestionLevel = "low" | "medium";
 
-// Define the traffic status interface
 interface TrafficStatus {
   congestionLevel: CongestionLevel;
   estimatedDelay: number;
   alternateRouteAvailable: boolean;
 }
 
-// Update the mockDispatches to use the correct type
 const mockDispatches = [
   {
     id: "DISP-00001",
@@ -351,6 +349,7 @@ export function DispatchBoard() {
   const [activeView, setActiveView] = useState<"active" | "scheduled">("active");
   const [dispatches, setDispatches] = useState(mockDispatches);
   const [isLoading, setIsLoading] = useState(false);
+  const [priority, setPriority] = useState<PriorityType>("low");
   const [aiPredictions, setAiPredictions] = useState<{
     maintenance: MaintenancePrediction[];
     staffing: StaffingPrediction;
