@@ -48,7 +48,15 @@ const mockPatients: Patient[] = [
     legacy_display_id: "PAT-12345",
     last_physical: "2023-11-15T14:30:00.000Z",
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
+    blood_type: "O+",
+    height: "5'10\"",
+    weight: "180",
+    marital_status: "Married",
+    occupation: "Engineer",
+    preferred_language: "English",
+    primary_care_physician: "Dr. Johnson",
+    usual_transport_mode: "Car"
   },
   {
     id: "2",
@@ -72,7 +80,15 @@ const mockPatients: Patient[] = [
     legacy_display_id: "PAT-12346",
     last_physical: "2024-01-10T09:15:00.000Z",
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
+    blood_type: "A+",
+    height: "5'4\"",
+    weight: "135",
+    marital_status: "Single",
+    occupation: "Teacher",
+    preferred_language: "Spanish",
+    primary_care_physician: "Dr. Martinez",
+    usual_transport_mode: "Bus"
   },
   {
     id: "3",
@@ -96,7 +112,15 @@ const mockPatients: Patient[] = [
     legacy_display_id: "PAT-12347",
     last_physical: "2023-12-20T11:45:00.000Z",
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
+    blood_type: "B+",
+    height: "6'0\"",
+    weight: "200",
+    marital_status: "Divorced",
+    occupation: "Sales Manager",
+    preferred_language: "English",
+    primary_care_physician: "Dr. Williams",
+    usual_transport_mode: "Car"
   }
 ];
 
