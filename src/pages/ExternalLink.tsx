@@ -26,6 +26,4 @@ export const ExternalLink = () => {
       <Footer />
     </div>
   );
-};
-
-export default ExternalLink;
+}

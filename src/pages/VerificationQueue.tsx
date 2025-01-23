@@ -26,6 +26,4 @@ export const VerificationQueue = () => {
       <Footer />
     </div>
   );
-};
-
-export default VerificationQueue;
+}

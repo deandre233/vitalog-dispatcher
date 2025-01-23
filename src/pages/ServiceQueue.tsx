@@ -26,6 +26,4 @@ export const ServiceQueue = () => {
       <Footer />
     </div>
   );
-};
-
-export default ServiceQueue;
+}

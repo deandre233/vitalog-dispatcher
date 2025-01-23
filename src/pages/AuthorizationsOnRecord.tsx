@@ -26,6 +26,4 @@ export const AuthorizationsOnRecord = () => {
       <Footer />
     </div>
   );
-};
-
-export default AuthorizationsOnRecord;
+}

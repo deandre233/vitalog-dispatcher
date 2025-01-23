@@ -26,6 +26,4 @@ export const AuthorizationQueue = () => {
       <Footer />
     </div>
   );
-};
-
-export default AuthorizationQueue;
+}

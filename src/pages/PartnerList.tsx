@@ -26,6 +26,4 @@ export const PartnerList = () => {
       <Footer />
     </div>
   );
-};
-
-export default PartnerList;
+}

@@ -26,6 +26,4 @@ export const CenterList = () => {
       <Footer />
     </div>
   );
-};
-
-export default CenterList;
+}

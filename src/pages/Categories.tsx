@@ -26,6 +26,4 @@ export const Categories = () => {
       <Footer />
     </div>
   );
-};
-
-export default Categories;
+}

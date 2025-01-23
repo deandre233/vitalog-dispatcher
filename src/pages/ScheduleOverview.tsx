@@ -26,6 +26,4 @@ export const ScheduleOverview = () => {
       <Footer />
     </div>
   );
-};
-
-export default ScheduleOverview;
+}

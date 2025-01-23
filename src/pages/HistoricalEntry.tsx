@@ -26,6 +26,4 @@ export const HistoricalEntry = () => {
       <Footer />
     </div>
   );
-};
-
-export default HistoricalEntry;
+}

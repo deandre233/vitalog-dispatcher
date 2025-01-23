@@ -26,6 +26,4 @@ export const DocumentUpload = () => {
       <Footer />
     </div>
   );
-};
-
-export default DocumentUpload;
+}

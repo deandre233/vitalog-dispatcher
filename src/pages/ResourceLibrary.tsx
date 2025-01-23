@@ -26,6 +26,4 @@ export const ResourceLibrary = () => {
       <Footer />
     </div>
   );
-};
-
-export default ResourceLibrary;
+}
