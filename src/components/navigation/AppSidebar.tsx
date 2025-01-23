@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useMobile } from "@/hooks/use-mobile";
 import {
   ChevronLeft,
   ChevronRight,
@@ -21,7 +22,8 @@ import {
   BookOpen,
   Tag,
   Clock,
-  Link2
+  Link2,
+  Menu
 } from "lucide-react";
 
 const routes = [
@@ -120,12 +122,21 @@ const routes = [
 export function AppSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { pathname } = useLocation();
+  const isMobile = useMobile();
+
+  // Auto-collapse on mobile by default
+  useState(() => {
+    if (isMobile) {
+      setIsCollapsed(true);
+    }
+  }, [isMobile]);
 
   return (
     <div className={cn(
-      "relative border-r bg-white backdrop-blur-sm",
+      "relative border-r bg-white/80 backdrop-blur-sm",
       "transition-all duration-300 ease-in-out h-[calc(100vh-4rem)]",
-      isCollapsed ? "w-16" : "w-64"
+      isCollapsed ? "w-16" : "w-64",
+      isMobile && !isCollapsed && "absolute left-0 top-0 z-50 h-screen shadow-lg"
     )}>
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between p-4">
@@ -141,7 +152,10 @@ export function AppSidebar() {
             className="text-medical-primary hover:bg-medical-accent/10"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            {isCollapsed ? 
+              <Menu className="h-4 w-4" /> : 
+              <ChevronLeft className="h-4 w-4" />
+            }
           </Button>
         </div>
         

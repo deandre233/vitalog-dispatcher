@@ -1,7 +1,17 @@
 import { Link } from "react-router-dom";
-import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings, User } from "lucide-react";
+import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings, User, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useMobile } from "@/hooks/use-mobile";
 
 export function Header({ className = "" }) {
+  const isMobile = useMobile();
+  
   const navItems = [
     { name: "Home", icon: Home, path: "/" },
     { name: "Dispatch", icon: Truck, path: "/dispatch" },
@@ -25,19 +35,43 @@ export function Header({ className = "" }) {
               Vitalog
             </div>
           </div>
-          <nav className="hidden sm:flex sm:space-x-1">
-            {navItems.map((item) => (
-              <Link 
-                key={item.name}
-                to={item.path}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-md transition-all duration-300 relative group"
-              >
-                <item.icon className="w-4 h-4" />
-                <span>{item.name}</span>
-                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 rounded-md transition-opacity duration-300"></div>
-              </Link>
-            ))}
-          </nav>
+          
+          {isMobile ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-white">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {navItems.map((item) => (
+                  <DropdownMenuItem key={item.name} asChild>
+                    <Link 
+                      to={item.path}
+                      className="flex items-center gap-2 w-full px-2 py-1.5"
+                    >
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.name}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <nav className="hidden sm:flex sm:space-x-1">
+              {navItems.map((item) => (
+                <Link 
+                  key={item.name}
+                  to={item.path}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-md transition-all duration-300 relative group"
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span>{item.name}</span>
+                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 rounded-md transition-opacity duration-300"></div>
+                </Link>
+              ))}
+            </nav>
+          )}
         </div>
       </div>
     </header>
