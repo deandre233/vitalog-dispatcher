@@ -7,7 +7,6 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +26,7 @@ type Patient = Tables<"patients">;
 
 export const PatientDirectory = () => {
   const navigate = useNavigate();
+  const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
   
   const { data: patients, isLoading, error } = useQuery({
     queryKey: ['patients'],
@@ -52,6 +52,20 @@ export const PatientDirectory = () => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString();
   };
+
+  const handleSearchResults = useCallback((results: Patient[]) => {
+    setFilteredPatients(results);
+  }, []);
+
+  const searchFields: (keyof Patient)[] = [
+    'last_name',
+    'dob',
+    'address',
+    'city',
+    'state'
+  ];
+
+  const displayedPatients = filteredPatients.length > 0 ? filteredPatients : patients || [];
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -86,7 +100,13 @@ export const PatientDirectory = () => {
                       <Label htmlFor="search">Search:</Label>
                       <div className="flex gap-2 items-center">
                         <Database className="h-4 w-4 text-gray-500" />
-                        <Input id="search" placeholder="Search by name, ID, or insurance..." className="w-full" />
+                        <SearchBar
+                          items={patients || []}
+                          searchFields={searchFields}
+                          onResultsChange={handleSearchResults}
+                          placeholder="Search by last name, DOB, address, or facility..."
+                          className="w-full"
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -137,7 +157,7 @@ export const PatientDirectory = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {patients?.map((patient: Patient) => (
+                        {displayedPatients.map((patient: Patient) => (
                           <TableRow
                             key={patient.id}
                             className="cursor-pointer hover:bg-gray-50"
