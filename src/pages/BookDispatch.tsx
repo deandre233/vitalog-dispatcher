@@ -5,7 +5,7 @@ import { BookingForm } from "@/components/dispatch/BookingForm";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
-const CreateDispatch = () => {
+const BookDispatch = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -29,4 +29,4 @@ const CreateDispatch = () => {
   );
 };
 
-export default CreateDispatch;
+export default BookDispatch;

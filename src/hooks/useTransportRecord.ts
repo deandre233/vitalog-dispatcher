@@ -1,68 +1,69 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { TransportRecord } from '@/types/dispatch';
 
-export interface TransportRecord {
-  id: string;
-  patient_id: string | null;
-  dispatch_id: string;
-  pickup_location: string;
-  dropoff_location: string;
-  transport_date: string | null;
-  status: string;
-  crew_assigned: string | null;
-  notes: string | null;
-  created_at: string | null;
-  recurrence_type: string | null;
-  recurrence_day: string | null;
-  recurrence_frequency: string | null;
-  warnings: string[] | null;
-  pickup_type: string | null;
-  dropoff_type: string | null;
-  return_trip_id: string | null;
-  // Add the new fields that match our database schema
-  origin_address: string | null;
-  destination_address: string | null;
-  scheduled_time: string | null;
-  dispatch_status: 'Pending' | 'In Progress' | 'Completed' | null;
-}
+export type { TransportRecord };
 
-export function useTransportRecord(id: string | undefined) {
-  return useQuery({
+export function useTransportRecord(id?: string) {
+  const queryClient = useQueryClient();
+
+  const { data: transport, isLoading, error } = useQuery({
     queryKey: ['transport', id],
     queryFn: async () => {
+      if (!id) throw new Error('No transport ID provided');
+      
       const { data, error } = await supabase
         .from('transport_records')
         .select('*')
-        .eq('dispatch_id', id)
-        .maybeSingle();
+        .eq('id', id)
+        .single();
 
       if (error) throw error;
-      if (!data) {
-        toast.error("Transport record not found");
-        return null;
-      }
       return data as TransportRecord;
     },
+    enabled: !!id
   });
-}
 
-export function useUpdateTransport(id: string | undefined) {
-  return useMutation({
+  const updateTransport = useMutation({
     mutationFn: async (updates: Partial<TransportRecord>) => {
+      if (!id) throw new Error('No transport ID provided');
+
       const { error } = await supabase
         .from('transport_records')
         .update(updates)
-        .eq('dispatch_id', id);
+        .eq('id', id);
 
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Transport record updated successfully");
+      queryClient.invalidateQueries({ queryKey: ['transport', id] });
+    }
+  });
+
+  return {
+    transport,
+    isLoading,
+    error,
+    updateTransport
+  };
+}
+
+export function useUpdateTransport(id?: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updates: Partial<TransportRecord>) => {
+      if (!id) throw new Error('No transport ID provided');
+
+      const { error } = await supabase
+        .from('transport_records')
+        .update(updates)
+        .eq('id', id);
+
+      if (error) throw error;
     },
-    onError: (error) => {
-      toast.error("Failed to update transport record");
-      console.error("Update error:", error);
-    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transport', id] });
+    }
   });
 }

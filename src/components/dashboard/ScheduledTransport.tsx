@@ -291,25 +291,35 @@ export function ScheduledTransport() {
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-6">
         <div className="space-y-1">
-          <h2 className="text-2xl font-semibold text-medical-primary">
-            Scheduled Transports
+          <h2 className="text-2xl font-semibold text-medical-primary flex items-center gap-2">
+            <Truck className="w-6 h-6 text-medical-secondary" />
+            <span>Scheduled Transports</span>
           </h2>
           <p className="text-gray-500">
             Showing {activeTransports.length} scheduled transports
           </p>
         </div>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2 futuristic-card hover:bg-medical-secondary/10">
           <Calendar className="w-4 h-4" />
           <span>Schedule New</span>
         </Button>
       </div>
 
       {conflicts.length > 0 && (
-        <Alert variant="destructive" className="mb-4">
+        <Alert variant="destructive" className="mb-4 glass-panel border-red-300/50">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
             {conflicts.length} scheduling conflicts detected. 
             {conflicts.filter(c => c.severity === 'high').length} require immediate attention.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {utilization && utilization.peakLoadWarning && (
+        <Alert className="mb-4 glass-panel border-orange-300/50 bg-orange-50/50">
+          <Brain className="h-4 w-4 text-orange-500" />
+          <AlertDescription className="text-orange-700">
+            {utilization.peakLoadWarning}
           </AlertDescription>
         </Alert>
       )}
@@ -319,14 +329,16 @@ export function ScheduledTransport() {
           <div 
             key={transport.id}
             className={cn(
-              "border rounded-lg bg-white shadow-sm overflow-hidden",
-              conflicts.some(c => c.id === transport.id) ? "border-red-300" : ""
+              "futuristic-panel overflow-hidden transition-all duration-300",
+              conflicts.some(c => c.id === transport.id) ? "border-red-300/50 shadow-red-100" : "",
+              expandedRows.has(transport.id) ? "shadow-lg" : "hover:shadow-md"
             )}
           >
             <div 
               className={cn(
-                "p-4 cursor-pointer hover:bg-gray-50 transition-colors",
-                expandedRows.has(transport.id) ? "border-b" : ""
+                "p-4 cursor-pointer transition-colors duration-300",
+                expandedRows.has(transport.id) ? "border-b border-medical-secondary/20" : "",
+                "hover:bg-medical-accent/50"
               )}
               onClick={() => toggleRow(transport.id)}
             >
@@ -336,37 +348,38 @@ export function ScheduledTransport() {
                     <div className="flex items-center gap-2">
                       <Link 
                         to={`/transport/${transport.id}`}
-                        className="text-blue-600 hover:underline font-medium"
+                        className="text-medical-secondary hover:text-medical-primary hover:underline font-medium transition-colors"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {transport.id}
                       </Link>
                       <span className={cn(
-                        "px-2 py-1 rounded-full text-xs font-medium border",
+                        "px-2 py-1 rounded-full text-xs font-medium border glass-panel",
                         getStatusColor(transport.status)
                       )}>
                         {transport.status}
                       </span>
                     </div>
                     {transport.recurrence && (
-                      <span className="text-xs text-gray-500 mt-1">
+                      <span className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                        <ArrowRight className="w-3 h-3" />
                         {transport.recurrence}
                       </span>
                     )}
                   </div>
                   <div className="flex flex-col">
                     <div className={cn(
-                      "flex items-center gap-2",
+                      "flex items-center gap-2 transition-colors",
                       getTimeColor(transport.scheduledTime)
                     )}>
                       <Clock className="w-4 h-4" />
                       {format(new Date(transport.scheduledTime), "MMM d, yyyy h:mm a")}
                     </div>
                     <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-gray-500" />
+                      <User className="w-4 h-4 text-medical-secondary" />
                       <Link 
                         to={`/patient/${transport.patient}`}
-                        className="text-blue-600 hover:underline"
+                        className="text-medical-secondary hover:text-medical-primary hover:underline transition-colors"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {transport.patient}
@@ -375,26 +388,26 @@ export function ScheduledTransport() {
                   </div>
                 </div>
                 {expandedRows.has(transport.id) ? (
-                  <ChevronUp className="w-5 h-5 text-gray-500" />
+                  <ChevronUp className="w-5 h-5 text-medical-secondary" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                  <ChevronDown className="w-5 h-5 text-medical-secondary" />
                 )}
               </div>
             </div>
 
             {expandedRows.has(transport.id) && (
-              <div className="p-4 bg-gray-50 space-y-4">
+              <div className="p-4 bg-medical-accent/30 space-y-4 backdrop-blur-sm">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <div className="flex items-start gap-2">
-                      <Building className="w-4 h-4 text-gray-500 mt-1" />
+                      <Building className="w-4 h-4 text-medical-secondary mt-1" />
                       <div>
                         <span className="text-sm text-gray-600 block">Origin:</span>
                         <span className="font-medium">{transport.origin}</span>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 text-gray-500 mt-1" />
+                      <MapPin className="w-4 h-4 text-medical-secondary mt-1" />
                       <div>
                         <span className="text-sm text-gray-600 block">Destination:</span>
                         <span className="font-medium">{transport.destination}</span>
@@ -439,7 +452,7 @@ export function ScheduledTransport() {
                       <Button 
                         variant="default"
                         onClick={() => handleAssignCrew(transport.id)}
-                        className="flex-1"
+                        className="flex-1 bg-medical-secondary hover:bg-medical-secondary/90 text-white"
                       >
                         Assign Crew
                       </Button>
@@ -458,13 +471,16 @@ export function ScheduledTransport() {
                           <span>Progress</span>
                           <span>{transport.progress}%</span>
                         </div>
-                        <Progress value={transport.progress} className="h-2" />
+                        <Progress 
+                          value={transport.progress} 
+                          className="h-2 bg-medical-accent"
+                        />
                       </div>
                     )}
                     
                     {transport.unitAssigned && (
-                      <div className="p-3 bg-blue-50 rounded-md">
-                        <span className="text-sm text-blue-700">
+                      <div className="glass-panel p-3">
+                        <span className="text-sm text-medical-secondary">
                           Unit Assigned: {transport.unitAssigned}
                         </span>
                       </div>
