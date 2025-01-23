@@ -1,3 +1,4 @@
+<lov-code>
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -209,6 +210,7 @@ const EmployeeProfile = () => {
         <EmployeeDirectorySidebar />
         <div className="flex-1 p-6 overflow-auto">
           <div className="max-w-7xl mx-auto space-y-8">
+            {/* Profile Header Card */}
             <Card className="p-8 backdrop-blur-md bg-white/80 border-medical-secondary/20 shadow-glow hover:shadow-xl transition-all duration-300 rounded-xl">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-8">
@@ -245,87 +247,4 @@ const EmployeeProfile = () => {
                     />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold">{`${employee.first_name} ${employee.last_name}`}</h1>
-                    <p className="text-sm text-gray-500">{employee.employee_type || 'Employee'}</p>
-                  </div>
-                </div>
-                <Button variant="outline" onClick={() => setIsPayrollModalOpen(true)}>
-                  Update Payroll
-                </Button>
-              </div>
-              <Dialog open={isPayrollModalOpen} onOpenChange={setIsPayrollModalOpen}>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Update Payroll</DialogTitle>
-                  </DialogHeader>
-                  <div className="grid gap-4">
-                    <Label htmlFor="effective_date">Effective Date</Label>
-                    <Input
-                      id="effective_date"
-                      type="date"
-                      value={payrollData.effective_date}
-                      onChange={(e) => setPayrollData({ ...payrollData, effective_date: e.target.value })}
-                    />
-                    <Label htmlFor="employee_type">Employee Type</Label>
-                    <Select
-                      id="employee_type"
-                      value={payrollData.employee_type}
-                      onValueChange={(value) => setPayrollData({ ...payrollData, employee_type: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select employee type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="full_time">Full Time</SelectItem>
-                        <SelectItem value="part_time">Part Time</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Label htmlFor="pay_type">Pay Type</Label>
-                    <Select
-                      id="pay_type"
-                      value={payrollData.pay_type}
-                      onValueChange={(value) => setPayrollData({ ...payrollData, pay_type: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select pay type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="hourly">Hourly</SelectItem>
-                        <SelectItem value="salary">Salary</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Label htmlFor="pay_rate">Pay Rate</Label>
-                    <Input
-                      id="pay_rate"
-                      type="number"
-                      value={payrollData.pay_rate}
-                      onChange={(e) => setPayrollData({ ...payrollData, pay_rate: e.target.value })}
-                    />
-                    <Label htmlFor="access_codes">Access Codes</Label>
-                    <Input
-                      id="access_codes"
-                      value={payrollData.access_codes}
-                      onChange={(e) => setPayrollData({ ...payrollData, access_codes: e.target.value })}
-                    />
-                    <Label htmlFor="author">Author</Label>
-                    <Input
-                      id="author"
-                      value={payrollData.author}
-                      onChange={(e) => setPayrollData({ ...payrollData, author: e.target.value })}
-                    />
-                  </div>
-                  <DialogFooter>
-                    <Button onClick={handlePayrollUpdate}>Save</Button>
-                    <Button variant="outline" onClick={() => setIsPayrollModalOpen(false)}>Cancel</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default EmployeeProfile;
+                    <h1 className="text
