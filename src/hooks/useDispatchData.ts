@@ -21,8 +21,8 @@ export const useDispatchData = (dispatchId?: string) => {
       // Transform the data to match TransportRecord type
       const transformedData: TransportRecord = {
         ...data,
-        route_data: data.route_data ? JSON.parse(data.route_data) : {},
-        traffic_conditions: data.traffic_conditions ? JSON.parse(data.traffic_conditions) : {}
+        route_data: data.route_data ? JSON.parse(String(data.route_data)) : {},
+        traffic_conditions: data.traffic_conditions ? JSON.parse(String(data.traffic_conditions)) : {}
       };
       
       return transformedData;

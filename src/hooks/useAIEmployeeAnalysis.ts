@@ -1,60 +1,43 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-export interface AIEmployeeAnalysis {
+interface AIAnalysisResult {
   efficiency_score: number;
   communication_score: number;
   teamwork_score: number;
   technical_skills: number;
-  training_needs: string[];
-  growth_opportunities: string[];
-  performance_insights: string;
+  recommendations: string[];
+  insights: string[];
 }
 
 export const useAIEmployeeAnalysis = (employeeId: string) => {
   return useQuery({
-    queryKey: ['employee-analysis', employeeId],
-    queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from('employee_profiles')
-          .select('ai_performance_metrics, ai_recommendations')
-          .eq('employee_id', employeeId)
-          .maybeSingle();
+    queryKey: ["employee-analysis", employeeId],
+    queryFn: async (): Promise<AIAnalysisResult> => {
+      const { data, error } = await supabase
+        .from("employee_profiles")
+        .select("ai_performance_metrics, ai_recommendations")
+        .eq("employee_id", employeeId)
+        .single();
 
-        if (error) {
-          console.error('Error fetching employee analysis:', error);
-          toast({
-            title: "Error fetching analysis",
-            description: error.message,
-            variant: "destructive",
-          });
-          throw error;
-        }
+      if (error) throw error;
 
-        if (!data) {
-          return {
-            efficiency_score: 0,
-            communication_score: 0,
-            teamwork_score: 0,
-            technical_skills: 0,
-            training_needs: [],
-            growth_opportunities: [],
-            performance_insights: 'No analysis available'
-          } as AIEmployeeAnalysis;
-        }
+      const metrics = data?.ai_performance_metrics || {};
+      const recommendations = data?.ai_recommendations || {};
 
-        return {
-          ...data.ai_performance_metrics,
-          ...data.ai_recommendations
-        } as AIEmployeeAnalysis;
-      } catch (error) {
-        console.error('Error in useAIEmployeeAnalysis:', error);
-        throw error;
-      }
+      return {
+        efficiency_score: metrics.efficiency_score || 0,
+        communication_score: metrics.communication_score || 0,
+        teamwork_score: metrics.teamwork_score || 0,
+        technical_skills: metrics.technical_skills || 0,
+        recommendations: Array.isArray(recommendations.training_needs) 
+          ? recommendations.training_needs 
+          : [],
+        insights: Array.isArray(recommendations.growth_opportunities) 
+          ? recommendations.growth_opportunities 
+          : []
+      };
     },
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    retry: 2
+    enabled: !!employeeId
   });
 };
