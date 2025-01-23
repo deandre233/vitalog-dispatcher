@@ -12,7 +12,8 @@ import { getTrafficInfo } from "@/utils/aiDispatchUtils";
 import { 
   analyzeDispatchEfficiency, 
   monitorDispatchProgress, 
-  generateAIInsights 
+  generateAIInsights,
+  type DispatchAnalytics 
 } from "@/utils/aiDispatchAnalytics";
 import { 
   analyzeHistoricalData, 
@@ -23,12 +24,15 @@ import {
 } from "@/utils/aiLearningUtils";
 import { supabase } from "@/integrations/supabase/client";
 
+type CongestionLevel = "low" | "medium" | "high";
+type RiskLevel = "low" | "medium";
+
 interface DispatchBoardProps {
   priority?: string;
 }
 
 interface TrafficStatus {
-  congestionLevel: string;
+  congestionLevel: CongestionLevel;
   estimatedDelay: number;
   alternateRouteAvailable: boolean;
 }
@@ -54,7 +58,7 @@ const mockDispatches = [
       billing: "Insurance: Medicare",
       insights: ["Traffic conditions favorable", "ETA within normal range"],
       trafficStatus: {
-        congestionLevel: "low",
+        congestionLevel: "low" as CongestionLevel,
         estimatedDelay: 5,
         alternateRouteAvailable: false
       }
@@ -388,7 +392,7 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
       status = "transporting";
     }
 
-    const analytics = {
+    const analytics: DispatchAnalytics = {
       efficiency: 0,
       performanceMetrics: {
         responseTime: 0,
@@ -396,7 +400,7 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
         routeEfficiency: 0
       },
       suggestedActions: [] as string[],
-      riskLevel: "low"
+      riskLevel: "low" as RiskLevel
     };
 
     try {
@@ -432,7 +436,7 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
     }
 
     const trafficInfo: TrafficStatus = {
-      congestionLevel: Math.random() > 0.5 ? "medium" : "low",
+      congestionLevel: "low",
       estimatedDelay: 0,
       alternateRouteAvailable: false
     };
@@ -444,7 +448,7 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
       );
       
       if (traffic) {
-        trafficInfo.congestionLevel = traffic.congestionLevel;
+        trafficInfo.congestionLevel = traffic.congestionLevel as CongestionLevel;
         trafficInfo.estimatedDelay = traffic.delayMinutes || Math.floor(Math.random() * 15);
         trafficInfo.alternateRouteAvailable = traffic.alternateRouteAvailable || false;
       }
@@ -483,7 +487,7 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
       dispatches.map(d => ({
         efficiency: d.efficiency || 0,
         suggestedActions: [],
-        riskLevel: "low",
+        riskLevel: "low" as RiskLevel,
         performanceMetrics: {
           responseTime: 0,
           patientSatisfaction: 0,
