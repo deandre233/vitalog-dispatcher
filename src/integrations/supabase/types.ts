@@ -1096,39 +1096,6 @@ export type Database = {
         }
         Relationships: []
       }
-      notifications: {
-        Row: {
-          created_at: string | null
-          id: string
-          is_read: boolean | null
-          message: string
-          metadata: Json | null
-          title: string
-          type: Database["public"]["Enums"]["notification_type"]
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          message: string
-          metadata?: Json | null
-          title: string
-          type: Database["public"]["Enums"]["notification_type"]
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          message?: string
-          metadata?: Json | null
-          title?: string
-          type?: Database["public"]["Enums"]["notification_type"]
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       patients: {
         Row: {
           address: string | null
@@ -1540,36 +1507,6 @@ export type Database = {
           },
         ]
       }
-      user_preferences: {
-        Row: {
-          created_at: string | null
-          dashboard_layout: Json | null
-          id: string
-          notification_preferences: Json | null
-          theme: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          dashboard_layout?: Json | null
-          id?: string
-          notification_preferences?: Json | null
-          theme?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          dashboard_layout?: Json | null
-          id?: string
-          notification_preferences?: Json | null
-          theme?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
@@ -1631,12 +1568,6 @@ export type Database = {
         | "widowed"
         | "separated"
         | "other"
-      notification_type:
-        | "dispatch_update"
-        | "crew_assignment"
-        | "patient_update"
-        | "billing_alert"
-        | "system_alert"
       payment_method_type:
         | "credit_card"
         | "debit_card"
