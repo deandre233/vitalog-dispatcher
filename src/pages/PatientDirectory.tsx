@@ -17,6 +17,7 @@ export const PatientDirectory = () => {
   const { data: patients, isLoading, error } = useQuery({
     queryKey: ['patients'],
     queryFn: async () => {
+      console.log('Fetching patients...');
       const { data, error } = await supabase
         .from('patients')
         .select('*')
@@ -28,6 +29,7 @@ export const PatientDirectory = () => {
         throw error;
       }
 
+      console.log('Fetched patients:', data);
       return data || [];
     }
   });
