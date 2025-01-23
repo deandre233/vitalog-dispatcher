@@ -9,6 +9,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SearchBar } from "@/components/common/SearchBar";
@@ -18,7 +19,8 @@ import {
 } from "@/components/ui/table";
 import { 
   Database, Import, Files, FileText, 
-  Users, Download, CircuitBoard 
+  Users, Download, CircuitBoard, Plus,
+  FileSpreadsheet, Ambulance
 } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 
@@ -48,7 +50,15 @@ const mockPatients: Patient[] = [
     legacy_display_id: "PAT-12345",
     last_physical: "2023-11-15T14:30:00.000Z",
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
+    blood_type: "O+",
+    height: "5'10\"",
+    weight: "180",
+    marital_status: "Married",
+    occupation: "Engineer",
+    preferred_language: "English",
+    primary_care_physician: "Dr. Wilson",
+    usual_transport_mode: "Car"
   },
   {
     id: "2",
@@ -100,6 +110,22 @@ const mockPatients: Patient[] = [
   }
 ];
 
+// String constants
+const STRINGS = {
+  title: "Patient Directory",
+  searchPlaceholder: "Search by last name, DOB, address, or facility...",
+  hideInactive: "Hide inactive patients",
+  hideNotSeen: "Hide patients not seen in the past year",
+  addPatient: "Add New Patient",
+  viewReport: "View Report",
+  viewDispatch: "Last Dispatch",
+  import: "Import",
+  export: "Export",
+  loading: "Loading patients...",
+  error: "Error loading patients. Please try again later.",
+  noData: "No patients found"
+};
+
 export const PatientDirectory = () => {
   const navigate = useNavigate();
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
@@ -119,7 +145,6 @@ export const PatientDirectory = () => {
         throw error;
       }
 
-      // For development, combine real data with mock data if no real data exists
       const combinedData = data?.length ? data : mockPatients;
       console.log('Fetched patients:', combinedData);
       return combinedData;
@@ -134,6 +159,18 @@ export const PatientDirectory = () => {
   const handleSearchResults = useCallback((results: Patient[]) => {
     setFilteredPatients(results);
   }, []);
+
+  const handleAddPatient = () => {
+    navigate('/patient/new');
+  };
+
+  const handleViewReport = (patientId: string) => {
+    navigate(`/patient/${patientId}/report`);
+  };
+
+  const handleViewDispatch = (patientId: string) => {
+    navigate(`/patient/${patientId}/dispatch`);
+  };
 
   const searchFields: (keyof Patient)[] = [
     'last_name',
@@ -160,17 +197,24 @@ export const PatientDirectory = () => {
                     <div className="flex items-center gap-2">
                       <CircuitBoard className="h-6 w-6 text-medical-secondary animate-pulse" />
                       <h2 className="text-2xl font-semibold bg-gradient-to-r from-medical-primary to-medical-secondary bg-clip-text text-transparent">
-                        Patient Directory
+                        {STRINGS.title}
                       </h2>
                     </div>
                     <div className="flex gap-4">
+                      <Button 
+                        onClick={handleAddPatient}
+                        className="flex items-center gap-2 bg-medical-primary hover:bg-medical-primary/90 text-white"
+                      >
+                        <Plus className="h-4 w-4" />
+                        {STRINGS.addPatient}
+                      </Button>
                       <button className="flex items-center gap-2 px-4 py-2 text-sm text-medical-secondary hover:text-medical-primary transition-colors duration-300 glass-panel">
                         <Import className="h-4 w-4" />
-                        Import
+                        {STRINGS.import}
                       </button>
                       <button className="flex items-center gap-2 px-4 py-2 text-sm text-medical-secondary hover:text-medical-primary transition-colors duration-300 glass-panel">
                         <Download className="h-4 w-4" />
-                        Export
+                        {STRINGS.export}
                       </button>
                     </div>
                   </div>
@@ -184,7 +228,7 @@ export const PatientDirectory = () => {
                           items={patients || []}
                           searchFields={searchFields}
                           onResultsChange={handleSearchResults}
-                          placeholder="Search by last name, DOB, address, or facility..."
+                          placeholder={STRINGS.searchPlaceholder}
                           className="w-full glass-panel"
                         />
                       </div>
@@ -195,13 +239,13 @@ export const PatientDirectory = () => {
                         <div className="flex items-center space-x-2">
                           <Checkbox id="hideInactive" />
                           <label htmlFor="hideInactive" className="text-sm text-medical-primary/80">
-                            Hide inactive patients
+                            {STRINGS.hideInactive}
                           </label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Checkbox id="hideNotSeen" />
                           <label htmlFor="hideNotSeen" className="text-sm text-medical-primary/80">
-                            Hide patients not seen in the past year
+                            {STRINGS.hideNotSeen}
                           </label>
                         </div>
                       </div>
@@ -209,12 +253,12 @@ export const PatientDirectory = () => {
                   </div>
                   
                   {isLoading && (
-                    <div className="text-medical-secondary animate-pulse">Loading patients...</div>
+                    <div className="text-medical-secondary animate-pulse">{STRINGS.loading}</div>
                   )}
 
                   {error && (
                     <div className="text-red-500">
-                      Error loading patients. Please try again later.
+                      {STRINGS.error}
                     </div>
                   )}
 
@@ -234,6 +278,7 @@ export const PatientDirectory = () => {
                           <TableHead className="text-medical-secondary">DOB</TableHead>
                           <TableHead className="text-medical-secondary">Insurance</TableHead>
                           <TableHead className="text-medical-secondary">Last Seen</TableHead>
+                          <TableHead className="text-medical-secondary">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -267,6 +312,28 @@ export const PatientDirectory = () => {
                             </TableCell>
                             <TableCell>
                               {patient.last_physical ? formatDate(patient.last_physical) : 'N/A'}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleViewReport(patient.id)}
+                                  className="flex items-center gap-1"
+                                >
+                                  <FileSpreadsheet className="h-4 w-4" />
+                                  {STRINGS.viewReport}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleViewDispatch(patient.id)}
+                                  className="flex items-center gap-1"
+                                >
+                                  <Ambulance className="h-4 w-4" />
+                                  {STRINGS.viewDispatch}
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
