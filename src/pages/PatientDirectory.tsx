@@ -6,10 +6,19 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export const PatientDirectory = () => {
   const navigate = useNavigate();
@@ -34,6 +43,11 @@ export const PatientDirectory = () => {
     }
   });
 
+  const formatDate = (date: string | null) => {
+    if (!date) return 'N/A';
+    return new Date(date).toLocaleDateString();
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -44,56 +58,92 @@ export const PatientDirectory = () => {
             <DashboardHeader />
             <main className="p-6">
               <Card className="p-6">
-                <h2 className="text-2xl font-semibold mb-6">Patient Directory</h2>
-                
-                {isLoading && (
-                  <div className="text-gray-500">Loading patients...</div>
-                )}
-
-                {error && (
-                  <div className="text-red-500">
-                    Error loading patients. Please try again later.
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {patients?.map((patient) => (
-                    <Card 
-                      key={patient.id}
-                      className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
-                      onClick={() => navigate(`/patient/${patient.id}`)}
-                    >
-                      <div className="flex flex-col items-center space-y-4">
-                        <Avatar className="h-20 w-20">
-                          <AvatarFallback>
-                            {patient.first_name?.[0]}{patient.last_name?.[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="text-center">
-                          <h3 className="font-semibold">
-                            {patient.first_name} {patient.last_name}
-                          </h3>
-                          <p className="text-sm text-gray-500">
-                            DOB: {patient.dob ? new Date(patient.dob).toLocaleDateString() : 'N/A'}
-                          </p>
-                          {patient.medical_conditions && patient.medical_conditions.length > 0 && (
-                            <div className="mt-2 flex flex-wrap gap-1 justify-center">
-                              {patient.medical_conditions.slice(0, 2).map((condition, index) => (
-                                <Badge key={index} variant="outline">
-                                  {condition}
-                                </Badge>
-                              ))}
-                              {patient.medical_conditions.length > 2 && (
-                                <Badge variant="outline">
-                                  +{patient.medical_conditions.length - 2} more
-                                </Badge>
-                              )}
-                            </div>
-                          )}
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold">Patient Directory</h2>
+                    <div className="flex gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName">Last name:</Label>
+                        <div className="flex gap-2">
+                          <Input id="lastName" placeholder="Search by last name..." className="w-64" />
                         </div>
                       </div>
-                    </Card>
-                  ))}
+                      <div className="space-y-2">
+                        <Label>Filters:</Label>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox id="hideInactive" />
+                            <label htmlFor="hideInactive" className="text-sm">
+                              Hide inactive patients
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox id="hideNotSeen" />
+                            <label htmlFor="hideNotSeen" className="text-sm">
+                              Hide patients not seen in the past year
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {isLoading && (
+                    <div className="text-gray-500">Loading patients...</div>
+                  )}
+
+                  {error && (
+                    <div className="text-red-500">
+                      Error loading patients. Please try again later.
+                    </div>
+                  )}
+
+                  <div className="border rounded-lg">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>ID</TableHead>
+                          <TableHead>Last Name</TableHead>
+                          <TableHead>First Name</TableHead>
+                          <TableHead>DOB</TableHead>
+                          <TableHead>Insurance</TableHead>
+                          <TableHead>Last Seen</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {patients?.map((patient) => (
+                          <TableRow
+                            key={patient.id}
+                            className="cursor-pointer hover:bg-gray-50"
+                            onClick={() => navigate(`/patient/${patient.id}`)}
+                          >
+                            <TableCell className="font-medium">
+                              {patient.legacy_display_id || patient.id.slice(0, 8)}
+                            </TableCell>
+                            <TableCell>{patient.last_name}</TableCell>
+                            <TableCell>{patient.first_name}</TableCell>
+                            <TableCell>{formatDate(patient.dob)}</TableCell>
+                            <TableCell>
+                              <div className="space-y-1">
+                                {patient.primary_insurance && (
+                                  <div>{patient.primary_insurance}</div>
+                                )}
+                                {patient.secondary_insurance && (
+                                  <div className="text-sm text-gray-500">
+                                    {patient.secondary_insurance}
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {/* This would need to be added to the database schema */}
+                              N/A
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               </Card>
             </main>
