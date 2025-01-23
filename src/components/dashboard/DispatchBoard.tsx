@@ -345,11 +345,11 @@ const mockDispatches = [
   }
 ];
 
-export function DispatchBoard() {
+export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
   const [activeView, setActiveView] = useState<"active" | "scheduled">("active");
   const [dispatches, setDispatches] = useState(mockDispatches);
   const [isLoading, setIsLoading] = useState(false);
-  const [priority, setPriority] = useState<PriorityType>("low");
+  const [currentPriority, setCurrentPriority] = useState<PriorityType>(priority);
   const [aiPredictions, setAiPredictions] = useState<{
     maintenance: MaintenancePrediction[];
     staffing: StaffingPrediction;
