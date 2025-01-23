@@ -14,4 +14,6 @@ export interface Employee {
   uses_timeclock?: boolean;
   access_codes?: string;
   photo_url?: string;
+  pay_rate?: number;
+  pay_type?: string;
 }
