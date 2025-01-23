@@ -5,7 +5,7 @@ import { calculateDistance, type CrewMember, type Location } from "./crewRecomme
 export interface DispatchAnalytics {
   efficiency: number;
   suggestedActions: string[];
-  riskLevel: "low" | "medium" | "high";
+  riskLevel: "low" | "medium";
   performanceMetrics: {
     responseTime: number;
     patientSatisfaction: number;
@@ -18,7 +18,6 @@ export interface WeatherCondition {
   severity: "low" | "medium" | "high";
 }
 
-// Mock weather data - in real implementation, this would call a weather API
 export const getWeatherConditions = (location: Location): WeatherCondition => {
   const conditions = ["clear", "rain", "snow", "fog"] as const;
   const severities = ["low", "medium", "high"] as const;
@@ -38,42 +37,32 @@ export const analyzeDispatchEfficiency = (
   const weather = getWeatherConditions(origin);
   const distance = calculateDistance(origin, destination);
   
-  // Calculate base efficiency score
   let efficiency = 100;
   const suggestedActions: string[] = [];
   
-  // Traffic impact
-  if (trafficInfo.congestionLevel === "high") {
-    efficiency -= 20;
-    suggestedActions.push("Consider alternate route due to heavy traffic");
-  } else if (trafficInfo.congestionLevel === "medium") {
+  if (trafficInfo.congestionLevel === "medium") {
     efficiency -= 10;
     suggestedActions.push("Monitor traffic conditions for potential delays");
   }
   
-  // Weather impact
   if (weather.condition !== "clear") {
     const weatherImpact = weather.severity === "high" ? 15 : weather.severity === "medium" ? 10 : 5;
     efficiency -= weatherImpact;
     suggestedActions.push(`Adjust ETA for ${weather.condition} conditions`);
   }
   
-  // Distance efficiency
   if (distance > 20) {
     efficiency -= 5;
     suggestedActions.push("Consider closer crew assignment for long-distance dispatch");
   }
   
-  // Crew assignment check
   if (!assignedCrew) {
     efficiency -= 25;
     suggestedActions.push("Immediate crew assignment needed");
   }
   
-  // Calculate risk level
-  const riskLevel = efficiency > 80 ? "low" : efficiency > 60 ? "medium" : "high";
+  const riskLevel = efficiency > 80 ? "low" : "medium";
   
-  // Mock performance metrics
   const performanceMetrics = {
     responseTime: Math.round(distance * 2 + (trafficInfo.delayMinutes || 0)),
     patientSatisfaction: Math.round(efficiency),
@@ -119,8 +108,8 @@ export const generateAIInsights = (analytics: DispatchAnalytics): string[] => {
     insights.push("Response time above target threshold");
   }
   
-  if (analytics.riskLevel === "high") {
-    insights.push("High-risk dispatch detected - extra monitoring recommended");
+  if (analytics.riskLevel === "medium") {
+    insights.push("Medium-risk dispatch detected - extra monitoring recommended");
   }
   
   return insights;

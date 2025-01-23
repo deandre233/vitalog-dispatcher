@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Brain } from "lucide-react";
+import { Brain, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DispatchItem } from "./DispatchItem";
 import { DispatchFilters } from "./DispatchFilters";
@@ -385,7 +385,7 @@ export function DispatchBoard() {
         routeEfficiency: 0
       },
       suggestedActions: [] as string[],
-      riskLevel: "low" as "low" | "medium" | "high"
+      riskLevel: "low" as "low" | "medium"
     };
 
     try {
@@ -421,7 +421,7 @@ export function DispatchBoard() {
     }
 
     const trafficInfo = {
-      congestionLevel: 'low' as "low" | "medium" | "high",
+      congestionLevel: 'low' as "low" | "medium",
       delayMinutes: 0,
       alternateRouteAvailable: false
     };
@@ -534,7 +534,7 @@ export function DispatchBoard() {
     }
 
     const dispatchesWithTrafficIssues = dispatches.filter(
-      d => d.aiRecommendations.trafficStatus?.congestionLevel === "high"
+      d => d.aiRecommendations.trafficStatus?.congestionLevel === "medium"
     );
     if (dispatchesWithTrafficIssues.length > 0) {
       toast.warning(`Traffic alert for ${dispatchesWithTrafficIssues.length} dispatches`, {
@@ -586,6 +586,7 @@ export function DispatchBoard() {
 
       {aiPredictions.maintenance.some(p => p.maintenanceType === "urgent") && (
         <Alert variant="destructive" className="mb-4 border-red-200 bg-red-50">
+          <AlertTriangle className="h-4 w-4 text-red-600" />
           <AlertDescription className="text-red-800">
             Urgent maintenance required for some vehicles. Check maintenance dashboard for details.
           </AlertDescription>
