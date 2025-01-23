@@ -21,7 +21,7 @@ import { NotFoundView } from "./dispatch/NotFoundView";
 export function DispatchDetailView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data: transportRecord, isLoading } = useTransportRecord(id);
+  const { transport: transportRecord, isLoading } = useTransportRecord(id);
   const updateTransportMutation = useUpdateTransport(id);
 
   const handleWarningToggle = (warning: string) => {
