@@ -34,27 +34,27 @@ const routes = [
   {
     label: "Operations Map",
     icon: Map,
-    href: "/live-map",
+    href: "/operations-map", // Updated from /live-map
   },
   {
     label: "Shift Records & Checklists",
     icon: CheckSquare,
-    href: "/shifts",
+    href: "/shift-records", // Updated from /shifts
   },
   {
     label: "Smart Route Optimization",
     icon: Zap,
-    href: "/route-planner",
+    href: "/smart-route-optimization", // Updated from /route-planner
   },
   {
     label: "Verification Queue (11)",
     icon: Calendar,
-    href: "/confirmation-queue",
+    href: "/verification-queue", // Updated from /confirmation-queue
   },
   {
     label: "Schedule Overview",
     icon: Calendar,
-    href: "/calendar",
+    href: "/schedule-overview", // Updated from /calendar
   },
   {
     label: "Dispatch Page",
@@ -64,32 +64,32 @@ const routes = [
   {
     label: "Service Queue",
     icon: Phone,
-    href: "/request-queue",
+    href: "/service-queue", // Updated from /request-queue
   },
   {
     label: "Authorization Queue (10)",
     icon: FileCheck,
-    href: "/prior-auth-queue",
+    href: "/authorization-queue", // Updated from /prior-auth-queue
   },
   {
     label: "Authorizations on Record",
     icon: FileText,
-    href: "/prior-auths",
+    href: "/authorizations-on-record", // Updated from /prior-auths
   },
   {
     label: "Center List",
     icon: Building2,
-    href: "/facilities",
+    href: "/center-list", // Updated from /facilities
   },
   {
     label: "Partner List",
     icon: Bookmark,
-    href: "/affiliates",
+    href: "/partner-list", // Updated from /affiliates
   },
   {
     label: "Patient Directory",
     icon: User,
-    href: "/patients",
+    href: "/patient-directory", // Updated from /patients
   },
   {
     label: "Document Upload",
@@ -99,22 +99,22 @@ const routes = [
   {
     label: "Resource Library",
     icon: BookOpen,
-    href: "/librarian",
+    href: "/resource-library", // Updated from /librarian
   },
   {
     label: "Categories",
     icon: Tag,
-    href: "/tags",
+    href: "/categories", // Updated from /tags
   },
   {
     label: "Historical Entry",
     icon: Clock,
-    href: "/backdated-dispatch",
+    href: "/historical-entry", // Updated from /backdated-dispatch
   },
   {
     label: "External Link",
     icon: Link2,
-    href: "/custom-link-1",
+    href: "/external-link", // Updated from /custom-link-1
   },
 ];
 

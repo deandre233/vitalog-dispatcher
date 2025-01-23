@@ -32,6 +32,15 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Index />,
+    errorElement: (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Page Not Found</h1>
+        <p className="text-gray-600 mb-4">Sorry, we couldn't find the page you're looking for.</p>
+        <Button asChild variant="default">
+          <Link to="/">Return Home</Link>
+        </Button>
+      </div>
+    ),
   },
   {
     path: "/dispatch",
