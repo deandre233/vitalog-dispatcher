@@ -7,7 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
 
 export const PatientRecord = () => {
-  const { id } = useParams();
+  const { patientName } = useParams();
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -20,7 +20,7 @@ export const PatientRecord = () => {
             <main className="p-6">
               <Card className="p-6">
                 <h2 className="text-2xl font-semibold mb-6">Patient Record</h2>
-                <p className="text-gray-500">Record for patient: {id}</p>
+                <p className="text-gray-500">Record for patient: {patientName}</p>
               </Card>
             </main>
           </div>
