@@ -48,6 +48,12 @@ export const PatientDirectory = () => {
     return new Date(date).toLocaleDateString();
   };
 
+  // Function to mask SSN for privacy
+  const maskSSN = (ssn: string | null) => {
+    if (!ssn) return 'N/A';
+    return `XXX-XX-${ssn.slice(-4)}`;
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -105,6 +111,8 @@ export const PatientDirectory = () => {
                           <TableHead>ID</TableHead>
                           <TableHead>Last Name</TableHead>
                           <TableHead>First Name</TableHead>
+                          <TableHead>SSN</TableHead>
+                          <TableHead>Gender</TableHead>
                           <TableHead>DOB</TableHead>
                           <TableHead>Insurance</TableHead>
                           <TableHead>Last Seen</TableHead>
@@ -122,6 +130,8 @@ export const PatientDirectory = () => {
                             </TableCell>
                             <TableCell>{patient.last_name}</TableCell>
                             <TableCell>{patient.first_name}</TableCell>
+                            <TableCell>{maskSSN(patient.ssn)}</TableCell>
+                            <TableCell>{patient.gender || 'N/A'}</TableCell>
                             <TableCell>{formatDate(patient.dob)}</TableCell>
                             <TableCell>
                               <div className="space-y-1">
