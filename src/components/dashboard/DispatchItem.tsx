@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { format, formatDistanceToNow } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
+import { HospitalStatus } from "./HospitalStatus";
 
 interface Patient {
   name: string;
@@ -270,6 +271,13 @@ export function DispatchItem({
                 <MapPin className="h-4 w-4 text-gray-500" />
                 <span className="text-sm text-gray-600">To: {destination}</span>
               </div>
+              
+              {destination && (
+                <HospitalStatus 
+                  hospitalName={destination} 
+                  className="mt-2"
+                />
+              )}
             </div>
 
             <div className="space-y-2">

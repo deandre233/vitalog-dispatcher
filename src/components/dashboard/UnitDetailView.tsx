@@ -6,6 +6,7 @@ import { ArrowLeft, MapPin, Users, AlertCircle, Clock, Truck, AlertTriangle, Nav
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { HospitalStatus } from "./HospitalStatus";
 
 interface AIRecommendations {
   routeSuggestion: string;
@@ -208,6 +209,13 @@ export function UnitDetailView() {
               <p className="font-medium">{unitData.destination}</p>
             </div>
           </div>
+          
+          {unitData.destination && (
+            <HospitalStatus 
+              hospitalName={unitData.destination}
+              className="mt-2"
+            />
+          )}
         </section>
 
         <section className="space-y-4">
