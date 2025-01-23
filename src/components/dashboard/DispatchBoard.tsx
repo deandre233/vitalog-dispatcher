@@ -432,7 +432,7 @@ export function DispatchBoard() {
     }
 
     const trafficInfo: TrafficStatus = {
-      congestionLevel: "low",
+      congestionLevel: Math.random() > 0.5 ? "medium" : "low",
       estimatedDelay: 0,
       alternateRouteAvailable: false
     };
