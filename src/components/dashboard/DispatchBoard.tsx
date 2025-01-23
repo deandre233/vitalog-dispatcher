@@ -385,7 +385,7 @@ export function DispatchBoard() {
         routeEfficiency: 0
       },
       suggestedActions: [] as string[],
-      riskLevel: "low" as "low" | "medium"
+      riskLevel: "low" as const
     };
 
     try {
@@ -433,7 +433,7 @@ export function DispatchBoard() {
       );
       
       if (traffic) {
-        trafficInfo.congestionLevel = traffic.congestionLevel === 'medium' ? 'medium' : 'low';
+        trafficInfo.congestionLevel = traffic.congestionLevel === 'medium' ? ('medium' as const) : ('low' as const);
         trafficInfo.delayMinutes = traffic.delayMinutes || Math.floor(Math.random() * 15);
         trafficInfo.alternateRouteAvailable = traffic.alternateRouteAvailable || false;
       }
