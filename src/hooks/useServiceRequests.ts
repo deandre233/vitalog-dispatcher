@@ -12,6 +12,10 @@ export interface ServiceRequest {
   requested_date: string;
   service_date?: string;
   notes?: string;
+  patients?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export function useServiceRequests() {
@@ -49,7 +53,10 @@ export function useServiceRequests() {
     mutationFn: async (newRequest: Omit<ServiceRequest, 'id'>) => {
       const { data, error } = await supabase
         .from('service_requests')
-        .insert(newRequest)
+        .insert({
+          ...newRequest,
+          status: 'pending' // Add default status
+        })
         .select()
         .single();
 
