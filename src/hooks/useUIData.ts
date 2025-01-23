@@ -36,7 +36,6 @@ interface UIAction {
 export function useUIData(pageId?: string) {
   const queryClient = useQueryClient();
 
-  // Fetch page data
   const { data: page, isLoading: pageLoading } = useQuery({
     queryKey: ['page', pageId],
     queryFn: async () => {
@@ -139,7 +138,6 @@ export function useUIData(pageId?: string) {
   // Create panel with auto-linking
   const createPanel = useMutation({
     mutationFn: async (panelData: Partial<UIPanel>) => {
-      // Ensure required fields are present
       const panel = {
         name: panelData.name || 'New Panel',
         content: panelData.content || {},
@@ -149,7 +147,7 @@ export function useUIData(pageId?: string) {
 
       const { data, error } = await supabase
         .from('panels')
-        .insert([panel])
+        .insert(panel)
         .select()
         .single();
 
@@ -169,7 +167,6 @@ export function useUIData(pageId?: string) {
   // Create action with auto-linking
   const createAction = useMutation({
     mutationFn: async (actionData: Partial<UIAction>) => {
-      // Ensure required fields are present
       const action = {
         action_name: actionData.action_name || 'New Action',
         trigger_element: actionData.trigger_element || 'default-trigger',
@@ -179,7 +176,7 @@ export function useUIData(pageId?: string) {
 
       const { data, error } = await supabase
         .from('actions')
-        .insert([action])
+        .insert(action)
         .select()
         .single();
 
