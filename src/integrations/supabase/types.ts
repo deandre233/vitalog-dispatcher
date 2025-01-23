@@ -462,6 +462,54 @@ export type Database = {
           },
         ]
       }
+      dispatch_assignments: {
+        Row: {
+          assignment_reason: string | null
+          assignment_time: string | null
+          created_at: string | null
+          crew_member_id: string | null
+          id: string
+          transport_id: string | null
+          unassignment_time: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_reason?: string | null
+          assignment_time?: string | null
+          created_at?: string | null
+          crew_member_id?: string | null
+          id?: string
+          transport_id?: string | null
+          unassignment_time?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_reason?: string | null
+          assignment_time?: string | null
+          created_at?: string | null
+          crew_member_id?: string | null
+          id?: string
+          transport_id?: string | null
+          unassignment_time?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispatch_assignments_crew_member_id_fkey"
+            columns: ["crew_member_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispatch_assignments_transport_id_fkey"
+            columns: ["transport_id"]
+            isOneToOne: false
+            referencedRelation: "transport_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dispatch_locations: {
         Row: {
           address: string | null
@@ -1657,9 +1705,11 @@ export type Database = {
           breathing_problem: boolean | null
           caller_name: string | null
           caller_phone: string | null
+          completion_time: string | null
           confined_to_bed: boolean | null
           created_at: string | null
           crew_assigned: string | null
+          delay_reason: string | null
           destination_address: string | null
           destination_floor_room: string | null
           destination_type: string | null
@@ -1674,6 +1724,7 @@ export type Database = {
           hearing_impaired: boolean | null
           id: string
           language_barrier: boolean | null
+          mileage: number | null
           notes: string | null
           origin_address: string | null
           origin_floor_room: string | null
@@ -1700,17 +1751,20 @@ export type Database = {
           return_pickup_time: string | null
           return_precise_pickup: boolean | null
           return_trip_id: string | null
+          route_data: Json | null
           scheduled_time: string | null
           service_type: Database["public"]["Enums"]["service_type"] | null
           sight_impaired: boolean | null
           speech_impaired: boolean | null
           status: string
+          traffic_conditions: Json | null
           transport_date: string | null
           transport_type: string | null
           trip_type: Database["public"]["Enums"]["trip_type"] | null
           unstable_impaired: boolean | null
           vehicle_number: string | null
           warnings: string[] | null
+          weather_conditions: string | null
         }
         Insert: {
           actual_arrival?: string | null
@@ -1720,9 +1774,11 @@ export type Database = {
           breathing_problem?: boolean | null
           caller_name?: string | null
           caller_phone?: string | null
+          completion_time?: string | null
           confined_to_bed?: boolean | null
           created_at?: string | null
           crew_assigned?: string | null
+          delay_reason?: string | null
           destination_address?: string | null
           destination_floor_room?: string | null
           destination_type?: string | null
@@ -1739,6 +1795,7 @@ export type Database = {
           hearing_impaired?: boolean | null
           id?: string
           language_barrier?: boolean | null
+          mileage?: number | null
           notes?: string | null
           origin_address?: string | null
           origin_floor_room?: string | null
@@ -1765,17 +1822,20 @@ export type Database = {
           return_pickup_time?: string | null
           return_precise_pickup?: boolean | null
           return_trip_id?: string | null
+          route_data?: Json | null
           scheduled_time?: string | null
           service_type?: Database["public"]["Enums"]["service_type"] | null
           sight_impaired?: boolean | null
           speech_impaired?: boolean | null
           status: string
+          traffic_conditions?: Json | null
           transport_date?: string | null
           transport_type?: string | null
           trip_type?: Database["public"]["Enums"]["trip_type"] | null
           unstable_impaired?: boolean | null
           vehicle_number?: string | null
           warnings?: string[] | null
+          weather_conditions?: string | null
         }
         Update: {
           actual_arrival?: string | null
@@ -1785,9 +1845,11 @@ export type Database = {
           breathing_problem?: boolean | null
           caller_name?: string | null
           caller_phone?: string | null
+          completion_time?: string | null
           confined_to_bed?: boolean | null
           created_at?: string | null
           crew_assigned?: string | null
+          delay_reason?: string | null
           destination_address?: string | null
           destination_floor_room?: string | null
           destination_type?: string | null
@@ -1804,6 +1866,7 @@ export type Database = {
           hearing_impaired?: boolean | null
           id?: string
           language_barrier?: boolean | null
+          mileage?: number | null
           notes?: string | null
           origin_address?: string | null
           origin_floor_room?: string | null
@@ -1830,17 +1893,20 @@ export type Database = {
           return_pickup_time?: string | null
           return_precise_pickup?: boolean | null
           return_trip_id?: string | null
+          route_data?: Json | null
           scheduled_time?: string | null
           service_type?: Database["public"]["Enums"]["service_type"] | null
           sight_impaired?: boolean | null
           speech_impaired?: boolean | null
           status?: string
+          traffic_conditions?: Json | null
           transport_date?: string | null
           transport_type?: string | null
           trip_type?: Database["public"]["Enums"]["trip_type"] | null
           unstable_impaired?: boolean | null
           vehicle_number?: string | null
           warnings?: string[] | null
+          weather_conditions?: string | null
         }
         Relationships: [
           {

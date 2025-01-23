@@ -77,3 +77,67 @@ export interface DispatchFormData {
   dispatcher_notes: string;
   billing_notes: string;
 }
+
+export interface TransportRecord {
+  id: string;
+  patient_id?: string;
+  dispatch_id: string;
+  pickup_location: string;
+  dropoff_location: string;
+  transport_date?: string;
+  status: string;
+  crew_assigned?: string;
+  notes?: string;
+  created_at?: string;
+  recurrence_type?: string;
+  recurrence_day?: string;
+  recurrence_frequency?: string;
+  warnings?: string[];
+  pickup_type?: string;
+  dropoff_type?: string;
+  return_trip_id?: string;
+  origin_address?: string;
+  destination_address?: string;
+  scheduled_time?: string;
+  dispatch_status?: string;
+  estimated_arrival?: string;
+  actual_arrival?: string;
+  vehicle_number?: string;
+  transport_type?: string;
+  service_type?: ServiceType;
+  priority_level?: PriorityLevel;
+  trip_type?: TripType;
+  completion_time?: string;
+  delay_reason?: string;
+  mileage?: number;
+  route_data?: Record<string, unknown>;
+  weather_conditions?: string;
+  traffic_conditions?: Record<string, unknown>;
+}
+
+export interface DispatchAssignment {
+  id: string;
+  transport_id: string;
+  crew_member_id: string;
+  assignment_time: string;
+  unassignment_time?: string;
+  assignment_reason?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AIRecommendation {
+  suggested_crew: string;
+  estimated_duration: string;
+  priority_score: number;
+  route_optimization?: {
+    suggested_route: string[];
+    estimated_time: number;
+    traffic_conditions: string;
+  };
+  crew_matching?: {
+    best_match: string;
+    match_score: number;
+    reasons: string[];
+  };
+}
