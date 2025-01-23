@@ -2,6 +2,7 @@ export type PriorityLevel = "Critical" | "Emergency" | "Lower acuity" | "Schedul
 export type ServiceType = "WC" | "BLS" | "ALS" | "MICU";
 export type TripType = "One way" | "Wait-and-return" | "Round trip";
 export type RecurrenceType = "Disabled" | "Daily" | "Weekly" | "Monthly";
+export type DispatchStatus = "Pending" | "In Progress" | "Completed" | "Canceled";
 
 export interface DispatchFormData {
   caller_name: string;
@@ -99,7 +100,7 @@ export interface TransportRecord {
   origin_address?: string;
   destination_address?: string;
   scheduled_time?: string;
-  dispatch_status?: string;
+  dispatch_status?: DispatchStatus;
   estimated_arrival?: string;
   actual_arrival?: string;
   vehicle_number?: string;
@@ -115,29 +116,20 @@ export interface TransportRecord {
   traffic_conditions?: Record<string, unknown>;
 }
 
-export interface DispatchAssignment {
+export interface SearchableItem {
   id: string;
-  transport_id: string;
-  crew_member_id: string;
-  assignment_time: string;
-  unassignment_time?: string;
-  assignment_reason?: string;
-  created_at: string;
-  updated_at: string;
+  [key: string]: any;
 }
 
-export interface AIRecommendation {
-  suggested_crew: string;
-  estimated_duration: string;
-  priority_score: number;
-  route_optimization?: {
-    suggested_route: string[];
-    estimated_time: number;
-    traffic_conditions: string;
-  };
-  crew_matching?: {
-    best_match: string;
-    match_score: number;
-    reasons: string[];
-  };
+export interface InsuranceRecord extends SearchableItem {
+  patient_id?: string;
+  type: string;
+  carrier_type: string;
+  carrier_name: string;
+  policy_number: string;
+  phone?: string;
+  claims_zip?: string;
+  activation_date?: string;
+  created_at?: string;
+  updated_at?: string;
 }

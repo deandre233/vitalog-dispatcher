@@ -17,7 +17,15 @@ export const useDispatchData = (dispatchId?: string) => {
         .single();
 
       if (error) throw error;
-      return data;
+      
+      // Transform the data to match TransportRecord type
+      const transformedData: TransportRecord = {
+        ...data,
+        route_data: data.route_data ? JSON.parse(data.route_data) : {},
+        traffic_conditions: data.traffic_conditions ? JSON.parse(data.traffic_conditions) : {}
+      };
+      
+      return transformedData;
     },
     enabled: !!dispatchId
   });
@@ -57,52 +65,11 @@ export const useDispatchData = (dispatchId?: string) => {
     }
   });
 
-  const assignCrew = useMutation({
-    mutationFn: async ({ crewId, reason }: { crewId: string; reason?: string }) => {
-      if (!dispatchId) throw new Error("No dispatch ID provided");
-      
-      const { data, error } = await supabase
-        .from("dispatch_assignments")
-        .insert({
-          transport_id: dispatchId,
-          crew_member_id: crewId,
-          assignment_reason: reason
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["dispatch_assignments", dispatchId] });
-    }
-  });
-
-  const unassignCrew = useMutation({
-    mutationFn: async (assignmentId: string) => {
-      const { data, error } = await supabase
-        .from("dispatch_assignments")
-        .update({ unassignment_time: new Date().toISOString() })
-        .eq("id", assignmentId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["dispatch_assignments", dispatchId] });
-    }
-  });
-
   return {
     dispatch,
     assignments,
     isLoading,
     error,
-    updateDispatch,
-    assignCrew,
-    unassignCrew
+    updateDispatch
   };
 };
