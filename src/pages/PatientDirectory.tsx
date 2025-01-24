@@ -12,9 +12,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SearchBar } from "@/components/common/SearchBar";
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Table, TableBody, TableCell, TableHead, 
   TableHeader, TableRow 
@@ -27,18 +24,109 @@ import { Tables } from "@/integrations/supabase/types";
 
 type Patient = Tables<"patients">;
 
-type NameFilterType = 'begins' | 'sounds' | 'exact';
+// Mock data for development and testing
+const mockPatients: Patient[] = [
+  {
+    id: "1",
+    first_name: "John",
+    last_name: "Smith",
+    dob: "1985-03-15",
+    gender: "Male",
+    address: "123 Medical Center Dr",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30308",
+    phone: "(404) 555-0123",
+    email: "john.smith@email.com",
+    primary_insurance: "Blue Cross Blue Shield",
+    secondary_insurance: "Medicare",
+    medical_conditions: ["Hypertension", "Type 2 Diabetes"],
+    allergies: ["Penicillin"],
+    medications: ["Metformin", "Lisinopril"],
+    emergency_contact_name: "Jane Smith",
+    emergency_contact_phone: "(404) 555-0124",
+    legacy_display_id: "PAT-12345",
+    last_physical: "2023-11-15T14:30:00.000Z",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    blood_type: "O+",
+    height: "5'10\"",
+    weight: "180",
+    marital_status: "Married",
+    occupation: "Engineer",
+    preferred_language: "English",
+    primary_care_physician: "Dr. Johnson",
+    usual_transport_mode: "Car"
+  },
+  {
+    id: "2",
+    first_name: "Maria",
+    last_name: "Garcia",
+    dob: "1992-07-22",
+    gender: "Female",
+    address: "456 Healthcare Ave",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30309",
+    phone: "(404) 555-0125",
+    email: "maria.garcia@email.com",
+    primary_insurance: "Aetna",
+    secondary_insurance: null,
+    medical_conditions: ["Asthma"],
+    allergies: ["Latex", "Pollen"],
+    medications: ["Albuterol"],
+    emergency_contact_name: "Carlos Garcia",
+    emergency_contact_phone: "(404) 555-0126",
+    legacy_display_id: "PAT-12346",
+    last_physical: "2024-01-10T09:15:00.000Z",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    blood_type: "A+",
+    height: "5'4\"",
+    weight: "135",
+    marital_status: "Single",
+    occupation: "Teacher",
+    preferred_language: "Spanish",
+    primary_care_physician: "Dr. Martinez",
+    usual_transport_mode: "Bus"
+  },
+  {
+    id: "3",
+    first_name: "Robert",
+    last_name: "Johnson",
+    dob: "1978-11-30",
+    gender: "Male",
+    address: "789 Wellness Pkwy",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30310",
+    phone: "(404) 555-0127",
+    email: "robert.johnson@email.com",
+    primary_insurance: "United Healthcare",
+    secondary_insurance: "Medicaid",
+    medical_conditions: ["Arthritis", "High Cholesterol"],
+    allergies: ["Sulfa Drugs"],
+    medications: ["Lipitor", "Celebrex"],
+    emergency_contact_name: "Mary Johnson",
+    emergency_contact_phone: "(404) 555-0128",
+    legacy_display_id: "PAT-12347",
+    last_physical: "2023-12-20T11:45:00.000Z",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    blood_type: "B+",
+    height: "6'0\"",
+    weight: "200",
+    marital_status: "Divorced",
+    occupation: "Sales Manager",
+    preferred_language: "English",
+    primary_care_physician: "Dr. Williams",
+    usual_transport_mode: "Car"
+  }
+];
 
 export const PatientDirectory = () => {
   const navigate = useNavigate();
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
-  const [nameFilterType, setNameFilterType] = useState<NameFilterType>('begins');
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [selectedFacility, setSelectedFacility] = useState('');
-  const [hideNonContract, setHideNonContract] = useState(false);
-  const [hideInactive, setHideInactive] = useState(false);
-  const [hideNotSeen, setHideNotSeen] = useState(false);
-  const [hideAnonymous, setHideAnonymous] = useState(false);
   
   const { data: patients, isLoading, error } = useQuery({
     queryKey: ['patients'],
@@ -99,97 +187,6 @@ export const PatientDirectory = () => {
                   Error loading patients. Please try again later.
                 </div>
               )}
-
-              <div className="mb-6 space-y-4">
-                <div className="flex flex-wrap gap-6">
-                  <div className="space-y-2">
-                    <Label>Last Name</Label>
-                    <div className="flex gap-4 items-center">
-                      <RadioGroup 
-                        defaultValue="begins" 
-                        onValueChange={(value) => setNameFilterType(value as NameFilterType)}
-                        className="flex gap-4"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="begins" id="begins" />
-                          <Label htmlFor="begins">Begins with</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="sounds" id="sounds" />
-                          <Label htmlFor="sounds">Sounds like</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="exact" id="exact" />
-                          <Label htmlFor="exact">Is exactly</Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Date of Birth</Label>
-                    <Input 
-                      type="date" 
-                      value={dateOfBirth}
-                      onChange={(e) => setDateOfBirth(e.target.value)}
-                      className="w-[200px]"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Facility</Label>
-                    <div className="flex gap-2 items-center">
-                      <Select onValueChange={setSelectedFacility}>
-                        <SelectTrigger className="w-[300px]">
-                          <SelectValue placeholder="Any facility or street address" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Facilities</SelectItem>
-                          <SelectItem value="hospital">Main Hospital</SelectItem>
-                          <SelectItem value="clinic">Downtown Clinic</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="hideNonContract" 
-                          checked={hideNonContract}
-                          onCheckedChange={(checked) => setHideNonContract(checked as boolean)}
-                        />
-                        <Label htmlFor="hideNonContract">Hide non-contract facilities</Label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-6">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="hideInactive" 
-                      checked={hideInactive}
-                      onCheckedChange={(checked) => setHideInactive(checked as boolean)}
-                    />
-                    <Label htmlFor="hideInactive">Hide inactive or deceased patients</Label>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="hideNotSeen" 
-                      checked={hideNotSeen}
-                      onCheckedChange={(checked) => setHideNotSeen(checked as boolean)}
-                    />
-                    <Label htmlFor="hideNotSeen">Hide patients not seen in the past year</Label>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="hideAnonymous" 
-                      checked={hideAnonymous}
-                      onCheckedChange={(checked) => setHideAnonymous(checked as boolean)}
-                    />
-                    <Label htmlFor="hideAnonymous">Hide anonymous records</Label>
-                  </div>
-                </div>
-              </div>
 
               <div className="glass-panel rounded-lg border border-medical-secondary/20">
                 <Table>
