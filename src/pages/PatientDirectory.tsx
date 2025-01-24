@@ -257,7 +257,7 @@ export const PatientDirectory = () => {
                           <TableHead className="text-medical-secondary">Gender</TableHead>
                           <TableHead className="text-medical-secondary">DOB</TableHead>
                           <TableHead className="text-medical-secondary">Insurance</TableHead>
-                          <TableHead className="text-medical-secondary">Last Seen</TableHead>
+                          <TableHead className="text-medical-secondary">Last Activity</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -290,7 +290,29 @@ export const PatientDirectory = () => {
                               </div>
                             </TableCell>
                             <TableCell>
-                              {patient.last_physical ? formatDate(patient.last_physical) : 'N/A'}
+                              <div className="flex flex-col gap-1">
+                                <div>{patient.last_physical ? formatDate(patient.last_physical) : 'N/A'}</div>
+                                <div className="flex gap-2 text-sm">
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(`/dispatch/${patient.id}`);
+                                    }}
+                                    className="text-blue-500 hover:text-blue-700"
+                                  >
+                                    Dispatch
+                                  </button>
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(`/report/${patient.id}`);
+                                    }}
+                                    className="text-blue-500 hover:text-blue-700"
+                                  >
+                                    Report
+                                  </button>
+                                </div>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
