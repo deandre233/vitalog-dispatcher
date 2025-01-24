@@ -203,6 +203,7 @@ export const PatientDirectory = () => {
                       <TableHead className="text-medical-secondary">Gender</TableHead>
                       <TableHead className="text-medical-secondary">DOB</TableHead>
                       <TableHead className="text-medical-secondary">Insurance</TableHead>
+                      <TableHead className="text-medical-secondary">Home Facility</TableHead>
                       <TableHead className="text-medical-secondary">Last Activity</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -234,6 +235,9 @@ export const PatientDirectory = () => {
                               </div>
                             )}
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          {patient.usual_transport_mode || 'N/A'}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center justify-between gap-4">
