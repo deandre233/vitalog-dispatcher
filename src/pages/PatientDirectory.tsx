@@ -8,11 +8,13 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SearchBar } from "@/components/common/SearchBar";
-import { NameFilterRadioGroup, NameFilterType } from "@/components/filters/NameFilterRadioGroup";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Table, TableBody, TableCell, TableHead, 
   TableHeader, TableRow 
@@ -24,12 +26,20 @@ import {
 import { Tables } from "@/integrations/supabase/types";
 
 type Patient = Tables<"patients">;
+type NameFilterType = 'begins' | 'sounds' | 'exact';
 
 export const PatientDirectory = () => {
   const navigate = useNavigate();
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
-  const [nameFilter, setNameFilter] = useState<NameFilterType>("begins_with");
-  const [lastName, setLastName] = useState("");
+  const [nameFilterType, setNameFilterType] = useState<NameFilterType>('begins');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [selectedFacility, setSelectedFacility] = useState('');
+  const [hideNonContract, setHideNonContract] = useState(false);
+  const [hideInactive, setHideInactive] = useState(false);
+  const [hideNotSeen, setHideNotSeen] = useState(false);
+  const [hideAnonymous, setHideAnonymous] = useState(false);
   
   const { data: patients, isLoading, error } = useQuery({
     queryKey: ['patients'],
@@ -47,7 +57,7 @@ export const PatientDirectory = () => {
       }
 
       console.log('Fetched patients:', data);
-      return data || [];
+      return data;
     }
   });
 
@@ -60,36 +70,14 @@ export const PatientDirectory = () => {
     setFilteredPatients(results);
   }, []);
 
-  const filterPatients = useCallback(() => {
-    if (!patients) return;
-    
-    let filtered = [...patients];
-    
-    if (lastName) {
-      filtered = filtered.filter(patient => {
-        const patientLastName = patient.last_name.toLowerCase();
-        const searchLastName = lastName.toLowerCase();
-        
-        switch (nameFilter) {
-          case "begins_with":
-            return patientLastName.startsWith(searchLastName);
-          case "sounds_like":
-            // Simple phonetic matching - could be enhanced with a proper algorithm
-            return patientLastName.slice(0, 3) === searchLastName.slice(0, 3);
-          case "exact":
-            return patientLastName === searchLastName;
-          default:
-            return true;
-        }
-      });
-    }
-    
-    setFilteredPatients(filtered);
-  }, [patients, lastName, nameFilter]);
-
-  React.useEffect(() => {
-    filterPatients();
-  }, [filterPatients]);
+  const searchFields: (keyof Patient)[] = [
+    'last_name',
+    'first_name',
+    'dob',
+    'address',
+    'city',
+    'state'
+  ];
 
   const displayedPatients = filteredPatients.length > 0 ? filteredPatients : patients || [];
 
@@ -102,29 +90,6 @@ export const PatientDirectory = () => {
           <div className="flex-1 bg-medical-accent/5 backdrop-blur-sm overflow-auto">
             <DashboardHeader />
             <main className="p-6">
-              <Card className="p-6 mb-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="lastName" className="text-sm font-medium mb-2 block">
-                      Last Name
-                    </Label>
-                    <Input
-                      id="lastName"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      className="max-w-sm"
-                      placeholder="Enter last name..."
-                    />
-                  </div>
-                  <div>
-                    <NameFilterRadioGroup
-                      value={nameFilter}
-                      onChange={setNameFilter}
-                    />
-                  </div>
-                </div>
-              </Card>
-
               {isLoading && (
                 <div className="text-medical-secondary animate-pulse">Loading patients...</div>
               )}
@@ -134,6 +99,132 @@ export const PatientDirectory = () => {
                   Error loading patients. Please try again later.
                 </div>
               )}
+
+              <div className="mb-6">
+                <Card className="p-6 space-y-6">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="space-y-2">
+                        <Label>First Name</Label>
+                        <Input 
+                          type="text"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          placeholder="Enter first name..."
+                          className="w-full"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Last Name</Label>
+                        <div className="space-y-2">
+                          <Input 
+                            type="text"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            placeholder="Enter last name..."
+                            className="w-full"
+                          />
+                          <RadioGroup 
+                            defaultValue="begins" 
+                            onValueChange={(value) => setNameFilterType(value as NameFilterType)}
+                            className="flex gap-4"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="begins" id="begins" />
+                              <Label htmlFor="begins">Begins with</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="sounds" id="sounds" />
+                              <Label htmlFor="sounds">Sounds like</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="exact" id="exact" />
+                              <Label htmlFor="exact">Is exactly</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Search</Label>
+                        <SearchBar 
+                          items={patients || []}
+                          searchFields={searchFields}
+                          onResultsChange={handleSearchResults}
+                          placeholder="Search patients..."
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+
+                  <div className="space-y-2">
+                    <Label>Date of Birth</Label>
+                    <Input 
+                      type="date" 
+                      value={dateOfBirth}
+                      onChange={(e) => setDateOfBirth(e.target.value)}
+                      className="w-[200px]"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Facility</Label>
+                    <div className="flex gap-2 items-center">
+                      <Select onValueChange={setSelectedFacility}>
+                        <SelectTrigger className="w-[300px]">
+                          <SelectValue placeholder="Any facility or street address" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Facilities</SelectItem>
+                          <SelectItem value="hospital">Main Hospital</SelectItem>
+                          <SelectItem value="clinic">Downtown Clinic</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="hideNonContract" 
+                          checked={hideNonContract}
+                          onCheckedChange={(checked) => setHideNonContract(checked as boolean)}
+                        />
+                        <Label htmlFor="hideNonContract">Hide non-contract facilities</Label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-6">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="hideInactive" 
+                      checked={hideInactive}
+                      onCheckedChange={(checked) => setHideInactive(checked as boolean)}
+                    />
+                    <Label htmlFor="hideInactive">Hide inactive or deceased patients</Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="hideNotSeen" 
+                      checked={hideNotSeen}
+                      onCheckedChange={(checked) => setHideNotSeen(checked as boolean)}
+                    />
+                    <Label htmlFor="hideNotSeen">Hide patients not seen in the past year</Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="hideAnonymous" 
+                      checked={hideAnonymous}
+                      onCheckedChange={(checked) => setHideAnonymous(checked as boolean)}
+                    />
+                    <Label htmlFor="hideAnonymous">Hide anonymous records</Label>
+                  </div>
+                </div>
+
+                  </div>
+                </Card>
+              </div>
 
               <div className="glass-panel rounded-lg border border-medical-secondary/20">
                 <Table>
@@ -216,6 +307,7 @@ export const PatientDirectory = () => {
                   </TableBody>
                 </Table>
               </div>
+
             </main>
           </div>
         </SidebarProvider>

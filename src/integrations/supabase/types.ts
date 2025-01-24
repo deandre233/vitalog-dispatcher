@@ -9,83 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      action_definitions: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          name: string
-          requires_approval: boolean | null
-          type: Database["public"]["Enums"]["action_type"]
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          name: string
-          requires_approval?: boolean | null
-          type: Database["public"]["Enums"]["action_type"]
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          name?: string
-          requires_approval?: boolean | null
-          type?: Database["public"]["Enums"]["action_type"]
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      action_instances: {
-        Row: {
-          assigned_to: string | null
-          completed_at: string | null
-          created_at: string | null
-          created_by: string | null
-          definition_id: string | null
-          id: string
-          metadata: Json | null
-          started_at: string | null
-          status: Database["public"]["Enums"]["action_status"] | null
-          updated_at: string | null
-        }
-        Insert: {
-          assigned_to?: string | null
-          completed_at?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          definition_id?: string | null
-          id?: string
-          metadata?: Json | null
-          started_at?: string | null
-          status?: Database["public"]["Enums"]["action_status"] | null
-          updated_at?: string | null
-        }
-        Update: {
-          assigned_to?: string | null
-          completed_at?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          definition_id?: string | null
-          id?: string
-          metadata?: Json | null
-          started_at?: string | null
-          status?: Database["public"]["Enums"]["action_status"] | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "action_instances_definition_id_fkey"
-            columns: ["definition_id"]
-            isOneToOne: false
-            referencedRelation: "action_definitions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       actions: {
         Row: {
           action_name: string
@@ -2619,21 +2542,6 @@ export type Database = {
       }
     }
     Enums: {
-      action_status:
-        | "pending"
-        | "in_progress"
-        | "completed"
-        | "failed"
-        | "cancelled"
-      action_type:
-        | "create"
-        | "update"
-        | "delete"
-        | "view"
-        | "approve"
-        | "reject"
-        | "complete"
-        | "cancel"
       appointment_status: "scheduled" | "completed" | "cancelled" | "no_show"
       claim_status_type:
         | "pending"
