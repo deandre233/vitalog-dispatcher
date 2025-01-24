@@ -26,14 +26,13 @@ import {
 import { Tables } from "@/integrations/supabase/types";
 
 type Patient = Tables<"patients">;
+
 type NameFilterType = 'begins' | 'sounds' | 'exact';
 
 export const PatientDirectory = () => {
   const navigate = useNavigate();
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
   const [nameFilterType, setNameFilterType] = useState<NameFilterType>('begins');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [selectedFacility, setSelectedFacility] = useState('');
   const [hideNonContract, setHideNonContract] = useState(false);
@@ -56,8 +55,10 @@ export const PatientDirectory = () => {
         throw error;
       }
 
-      console.log('Fetched patients:', data);
-      return data;
+      // For development, combine real data with mock data if no real data exists
+      const combinedData = data?.length ? data : mockPatients;
+      console.log('Fetched patients:', combinedData);
+      return combinedData;
     }
   });
 
@@ -72,7 +73,6 @@ export const PatientDirectory = () => {
 
   const searchFields: (keyof Patient)[] = [
     'last_name',
-    'first_name',
     'dob',
     'address',
     'city',
@@ -100,63 +100,31 @@ export const PatientDirectory = () => {
                 </div>
               )}
 
-              <div className="mb-6">
-                <Card className="p-6 space-y-6">
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      <div className="space-y-2">
-                        <Label>First Name</Label>
-                        <Input 
-                          type="text"
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                          placeholder="Enter first name..."
-                          className="w-full"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Last Name</Label>
-                        <div className="space-y-2">
-                          <Input 
-                            type="text"
-                            value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
-                            placeholder="Enter last name..."
-                            className="w-full"
-                          />
-                          <RadioGroup 
-                            defaultValue="begins" 
-                            onValueChange={(value) => setNameFilterType(value as NameFilterType)}
-                            className="flex gap-4"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="begins" id="begins" />
-                              <Label htmlFor="begins">Begins with</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="sounds" id="sounds" />
-                              <Label htmlFor="sounds">Sounds like</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="exact" id="exact" />
-                              <Label htmlFor="exact">Is exactly</Label>
-                            </div>
-                          </RadioGroup>
+              <div className="mb-6 space-y-4">
+                <div className="flex flex-wrap gap-6">
+                  <div className="space-y-2">
+                    <Label>Last Name</Label>
+                    <div className="flex gap-4 items-center">
+                      <RadioGroup 
+                        defaultValue="begins" 
+                        onValueChange={(value) => setNameFilterType(value as NameFilterType)}
+                        className="flex gap-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="begins" id="begins" />
+                          <Label htmlFor="begins">Begins with</Label>
                         </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Search</Label>
-                        <SearchBar 
-                          items={patients || []}
-                          searchFields={searchFields}
-                          onResultsChange={handleSearchResults}
-                          placeholder="Search patients..."
-                          className="w-full"
-                        />
-                      </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="sounds" id="sounds" />
+                          <Label htmlFor="sounds">Sounds like</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="exact" id="exact" />
+                          <Label htmlFor="exact">Is exactly</Label>
+                        </div>
+                      </RadioGroup>
                     </div>
+                  </div>
 
                   <div className="space-y-2">
                     <Label>Date of Birth</Label>
@@ -221,9 +189,6 @@ export const PatientDirectory = () => {
                     <Label htmlFor="hideAnonymous">Hide anonymous records</Label>
                   </div>
                 </div>
-
-                  </div>
-                </Card>
               </div>
 
               <div className="glass-panel rounded-lg border border-medical-secondary/20">
@@ -307,7 +272,6 @@ export const PatientDirectory = () => {
                   </TableBody>
                 </Table>
               </div>
-
             </main>
           </div>
         </SidebarProvider>
