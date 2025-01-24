@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SearchBar } from "@/components/common/SearchBar";
+import { NameFilter } from "@/components/patient/NameFilter";
 import { 
   Table, TableBody, TableCell, TableHead, 
   TableHeader, TableRow 
@@ -124,9 +125,12 @@ const mockPatients: Patient[] = [
   }
 ];
 
-export const PatientDirectory = () => {
+export function PatientDirectory() {
   const navigate = useNavigate();
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
+  const [hideInactive, setHideInactive] = useState(false);
+  const [hideNotSeen, setHideNotSeen] = useState(false);
+  const [hideAnonymous, setHideAnonymous] = useState(false);
   
   const { data: patients, isLoading, error } = useQuery({
     queryKey: ['patients'],
@@ -143,31 +147,43 @@ export const PatientDirectory = () => {
         throw error;
       }
 
-      // For development, combine real data with mock data if no real data exists
       const combinedData = data?.length ? data : mockPatients;
       console.log('Fetched patients:', combinedData);
       return combinedData;
     }
   });
 
+  const handleNameFilter = useCallback(({ type, query }: { type: string; query: string }) => {
+    if (!patients) return;
+    
+    const filtered = patients.filter(patient => {
+      if (!query) return true;
+      
+      const lastName = patient.last_name.toLowerCase();
+      const searchQuery = query.toLowerCase();
+      
+      switch (type) {
+        case 'begins_with':
+          return lastName.startsWith(searchQuery);
+        case 'sounds_like':
+          // Simple phonetic matching - you might want to use a proper phonetic algorithm
+          return lastName.includes(searchQuery);
+        case 'is_exactly':
+          return lastName === searchQuery;
+        default:
+          return true;
+      }
+    });
+    
+    setFilteredPatients(filtered);
+  }, [patients]);
+
   const formatDate = (date: string | null) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString();
   };
 
-  const handleSearchResults = useCallback((results: Patient[]) => {
-    setFilteredPatients(results);
-  }, []);
-
-  const searchFields: (keyof Patient)[] = [
-    'last_name',
-    'dob',
-    'address',
-    'city',
-    'state'
-  ];
-
-  const displayedPatients = filteredPatients.length > 0 ? filteredPatients : patients || [];
+  const displayedPatients = filteredPatients.length > 0 ? filteredPatients : (patients || []);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-card-start to-medical-card-end">
@@ -177,7 +193,40 @@ export const PatientDirectory = () => {
           <AppSidebar />
           <div className="flex-1 bg-medical-accent/5 backdrop-blur-sm overflow-auto">
             <DashboardHeader />
-            <main className="p-6">
+            <main className="p-6 space-y-6">
+              <div className="space-y-4">
+                <NameFilter onFilterChange={handleNameFilter} />
+                
+                <Card className="p-4 space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="hideInactive"
+                      checked={hideInactive}
+                      onCheckedChange={(checked) => setHideInactive(!!checked)}
+                    />
+                    <Label htmlFor="hideInactive">Hide patients marked inactive or deceased</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="hideNotSeen"
+                      checked={hideNotSeen}
+                      onCheckedChange={(checked) => setHideNotSeen(!!checked)}
+                    />
+                    <Label htmlFor="hideNotSeen">Hide patients not seen in the past year</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="hideAnonymous"
+                      checked={hideAnonymous}
+                      onCheckedChange={(checked) => setHideAnonymous(!!checked)}
+                    />
+                    <Label htmlFor="hideAnonymous">Hide anonymous records, where no last name is on file</Label>
+                  </div>
+                </Card>
+              </div>
+
               {isLoading && (
                 <div className="text-medical-secondary animate-pulse">Loading patients...</div>
               )}
@@ -276,6 +325,6 @@ export const PatientDirectory = () => {
       <Footer />
     </div>
   );
-};
+}
 
 export default PatientDirectory;
