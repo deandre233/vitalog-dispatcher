@@ -8,10 +8,11 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SearchBar } from "@/components/common/SearchBar";
+import { NameFilterRadioGroup, NameFilterType } from "@/components/filters/NameFilterRadioGroup";
 import { 
   Table, TableBody, TableCell, TableHead, 
   TableHeader, TableRow 
@@ -24,109 +25,11 @@ import { Tables } from "@/integrations/supabase/types";
 
 type Patient = Tables<"patients">;
 
-// Mock data for development and testing
-const mockPatients: Patient[] = [
-  {
-    id: "1",
-    first_name: "John",
-    last_name: "Smith",
-    dob: "1985-03-15",
-    gender: "Male",
-    address: "123 Medical Center Dr",
-    city: "Atlanta",
-    state: "GA",
-    zip: "30308",
-    phone: "(404) 555-0123",
-    email: "john.smith@email.com",
-    primary_insurance: "Blue Cross Blue Shield",
-    secondary_insurance: "Medicare",
-    medical_conditions: ["Hypertension", "Type 2 Diabetes"],
-    allergies: ["Penicillin"],
-    medications: ["Metformin", "Lisinopril"],
-    emergency_contact_name: "Jane Smith",
-    emergency_contact_phone: "(404) 555-0124",
-    legacy_display_id: "PAT-12345",
-    last_physical: "2023-11-15T14:30:00.000Z",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    blood_type: "O+",
-    height: "5'10\"",
-    weight: "180",
-    marital_status: "Married",
-    occupation: "Engineer",
-    preferred_language: "English",
-    primary_care_physician: "Dr. Johnson",
-    usual_transport_mode: "Car"
-  },
-  {
-    id: "2",
-    first_name: "Maria",
-    last_name: "Garcia",
-    dob: "1992-07-22",
-    gender: "Female",
-    address: "456 Healthcare Ave",
-    city: "Atlanta",
-    state: "GA",
-    zip: "30309",
-    phone: "(404) 555-0125",
-    email: "maria.garcia@email.com",
-    primary_insurance: "Aetna",
-    secondary_insurance: null,
-    medical_conditions: ["Asthma"],
-    allergies: ["Latex", "Pollen"],
-    medications: ["Albuterol"],
-    emergency_contact_name: "Carlos Garcia",
-    emergency_contact_phone: "(404) 555-0126",
-    legacy_display_id: "PAT-12346",
-    last_physical: "2024-01-10T09:15:00.000Z",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    blood_type: "A+",
-    height: "5'4\"",
-    weight: "135",
-    marital_status: "Single",
-    occupation: "Teacher",
-    preferred_language: "Spanish",
-    primary_care_physician: "Dr. Martinez",
-    usual_transport_mode: "Bus"
-  },
-  {
-    id: "3",
-    first_name: "Robert",
-    last_name: "Johnson",
-    dob: "1978-11-30",
-    gender: "Male",
-    address: "789 Wellness Pkwy",
-    city: "Atlanta",
-    state: "GA",
-    zip: "30310",
-    phone: "(404) 555-0127",
-    email: "robert.johnson@email.com",
-    primary_insurance: "United Healthcare",
-    secondary_insurance: "Medicaid",
-    medical_conditions: ["Arthritis", "High Cholesterol"],
-    allergies: ["Sulfa Drugs"],
-    medications: ["Lipitor", "Celebrex"],
-    emergency_contact_name: "Mary Johnson",
-    emergency_contact_phone: "(404) 555-0128",
-    legacy_display_id: "PAT-12347",
-    last_physical: "2023-12-20T11:45:00.000Z",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    blood_type: "B+",
-    height: "6'0\"",
-    weight: "200",
-    marital_status: "Divorced",
-    occupation: "Sales Manager",
-    preferred_language: "English",
-    primary_care_physician: "Dr. Williams",
-    usual_transport_mode: "Car"
-  }
-];
-
 export const PatientDirectory = () => {
   const navigate = useNavigate();
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
+  const [nameFilter, setNameFilter] = useState<NameFilterType>("begins_with");
+  const [lastName, setLastName] = useState("");
   
   const { data: patients, isLoading, error } = useQuery({
     queryKey: ['patients'],
@@ -143,10 +46,8 @@ export const PatientDirectory = () => {
         throw error;
       }
 
-      // For development, combine real data with mock data if no real data exists
-      const combinedData = data?.length ? data : mockPatients;
-      console.log('Fetched patients:', combinedData);
-      return combinedData;
+      console.log('Fetched patients:', data);
+      return data || [];
     }
   });
 
@@ -159,13 +60,36 @@ export const PatientDirectory = () => {
     setFilteredPatients(results);
   }, []);
 
-  const searchFields: (keyof Patient)[] = [
-    'last_name',
-    'dob',
-    'address',
-    'city',
-    'state'
-  ];
+  const filterPatients = useCallback(() => {
+    if (!patients) return;
+    
+    let filtered = [...patients];
+    
+    if (lastName) {
+      filtered = filtered.filter(patient => {
+        const patientLastName = patient.last_name.toLowerCase();
+        const searchLastName = lastName.toLowerCase();
+        
+        switch (nameFilter) {
+          case "begins_with":
+            return patientLastName.startsWith(searchLastName);
+          case "sounds_like":
+            // Simple phonetic matching - could be enhanced with a proper algorithm
+            return patientLastName.slice(0, 3) === searchLastName.slice(0, 3);
+          case "exact":
+            return patientLastName === searchLastName;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    setFilteredPatients(filtered);
+  }, [patients, lastName, nameFilter]);
+
+  React.useEffect(() => {
+    filterPatients();
+  }, [filterPatients]);
 
   const displayedPatients = filteredPatients.length > 0 ? filteredPatients : patients || [];
 
@@ -178,6 +102,29 @@ export const PatientDirectory = () => {
           <div className="flex-1 bg-medical-accent/5 backdrop-blur-sm overflow-auto">
             <DashboardHeader />
             <main className="p-6">
+              <Card className="p-6 mb-6">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="lastName" className="text-sm font-medium mb-2 block">
+                      Last Name
+                    </Label>
+                    <Input
+                      id="lastName"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="max-w-sm"
+                      placeholder="Enter last name..."
+                    />
+                  </div>
+                  <div>
+                    <NameFilterRadioGroup
+                      value={nameFilter}
+                      onChange={setNameFilter}
+                    />
+                  </div>
+                </div>
+              </Card>
+
               {isLoading && (
                 <div className="text-medical-secondary animate-pulse">Loading patients...</div>
               )}
