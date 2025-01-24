@@ -134,7 +134,18 @@ export const PatientDirectory = () => {
       console.log('Fetching patients...');
       const { data, error } = await supabase
         .from('patients')
-        .select('*')
+        .select(`
+          *,
+          transport_records (
+            dispatch_id,
+            transport_date,
+            status
+          ),
+          medical_records (
+            record_date,
+            record_type
+          )
+        `)
         .order('last_name', { ascending: true });
 
       if (error) {
@@ -143,7 +154,6 @@ export const PatientDirectory = () => {
         throw error;
       }
 
-      // For development, combine real data with mock data if no real data exists
       const combinedData = data?.length ? data : mockPatients;
       console.log('Fetched patients:', combinedData);
       return combinedData;
@@ -153,6 +163,28 @@ export const PatientDirectory = () => {
   const formatDate = (date: string | null) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString();
+  };
+
+  const getLastActivity = (patient: any) => {
+    const lastPhysical = patient.last_physical;
+    const lastTransport = patient.transport_records?.[0]?.transport_date;
+    const lastReport = patient.medical_records?.[0]?.record_date;
+
+    let result = { date: null, type: '' };
+
+    if (lastPhysical) {
+      result = { date: new Date(lastPhysical), type: 'Physical' };
+    }
+
+    if (lastTransport && (!result.date || new Date(lastTransport) > result.date)) {
+      result = { date: new Date(lastTransport), type: 'Dispatch' };
+    }
+
+    if (lastReport && (!result.date || new Date(lastReport) > result.date)) {
+      result = { date: new Date(lastReport), type: 'Report' };
+    }
+
+    return result;
   };
 
   const handleSearchResults = useCallback((results: Patient[]) => {
@@ -257,43 +289,53 @@ export const PatientDirectory = () => {
                           <TableHead className="text-medical-secondary">Gender</TableHead>
                           <TableHead className="text-medical-secondary">DOB</TableHead>
                           <TableHead className="text-medical-secondary">Insurance</TableHead>
-                          <TableHead className="text-medical-secondary">Last Seen</TableHead>
+                          <TableHead className="text-medical-secondary">Last Activity</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {displayedPatients.map((patient: Patient) => (
-                          <TableRow
-                            key={patient.id}
-                            className="cursor-pointer hover:bg-medical-highlight transition-colors duration-300"
-                            onClick={() => navigate(`/patient/${patient.id}`)}
-                          >
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <Files className="h-4 w-4 text-medical-secondary" />
-                                {patient.legacy_display_id || patient.id.slice(0, 8)}
-                              </div>
-                            </TableCell>
-                            <TableCell>{patient.last_name}</TableCell>
-                            <TableCell>{patient.first_name}</TableCell>
-                            <TableCell>{patient.gender || 'N/A'}</TableCell>
-                            <TableCell>{formatDate(patient.dob)}</TableCell>
-                            <TableCell>
-                              <div className="space-y-1">
-                                {patient.primary_insurance && (
-                                  <div className="text-medical-primary">{patient.primary_insurance}</div>
-                                )}
-                                {patient.secondary_insurance && (
-                                  <div className="text-sm text-medical-secondary">
-                                    {patient.secondary_insurance}
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              {patient.last_physical ? formatDate(patient.last_physical) : 'N/A'}
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {displayedPatients.map((patient: any) => {
+                          const lastActivity = getLastActivity(patient);
+                          return (
+                            <TableRow
+                              key={patient.id}
+                              className="cursor-pointer hover:bg-medical-highlight transition-colors duration-300"
+                              onClick={() => navigate(`/patient/${patient.id}`)}
+                            >
+                              <TableCell className="font-medium">
+                                <div className="flex items-center gap-2">
+                                  <Files className="h-4 w-4 text-medical-secondary" />
+                                  {patient.legacy_display_id || patient.id.slice(0, 8)}
+                                </div>
+                              </TableCell>
+                              <TableCell>{patient.last_name}</TableCell>
+                              <TableCell>{patient.first_name}</TableCell>
+                              <TableCell>{patient.gender || 'N/A'}</TableCell>
+                              <TableCell>{formatDate(patient.dob)}</TableCell>
+                              <TableCell>
+                                <div className="space-y-1">
+                                  {patient.primary_insurance && (
+                                    <div className="text-medical-primary">{patient.primary_insurance}</div>
+                                  )}
+                                  {patient.secondary_insurance && (
+                                    <div className="text-sm text-medical-secondary">
+                                      {patient.secondary_insurance}
+                                    </div>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <span>{lastActivity.date ? formatDate(lastActivity.date.toISOString()) : 'N/A'}</span>
+                                  {lastActivity.type && (
+                                    <span className="text-xs px-2 py-1 rounded-full bg-medical-secondary/10">
+                                      {lastActivity.type}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>
