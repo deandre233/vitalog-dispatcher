@@ -19,7 +19,7 @@ export function useDispatchNavigation() {
     setViewState(prev => ({ ...prev, selectedDate: date }));
   };
 
-  const setFilterStatus = (status?: string) => {
+  const setFilterStatus = (status?: string[]) => {
     setViewState(prev => ({ ...prev, filterStatus: status }));
   };
 

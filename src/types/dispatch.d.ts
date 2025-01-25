@@ -122,8 +122,8 @@ export interface AIAnalysisResult {
 export interface DispatchViewState {
   activeTab: 'active' | 'schedule' | 'calendar';
   activeView: 'list' | 'map' | 'calendar';
-  selectedDate: Date | null;
-  filterStatus: string[];
+  selectedDate?: Date | null;
+  filterStatus?: string[];
 }
 
 export interface HospitalStatus {
