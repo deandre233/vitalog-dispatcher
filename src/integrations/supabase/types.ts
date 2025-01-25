@@ -819,6 +819,51 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_navigation_settings: {
+        Row: {
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          is_expanded: boolean | null
+          is_visible: boolean | null
+          navigation_item_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          is_expanded?: boolean | null
+          is_visible?: boolean | null
+          navigation_item_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          is_expanded?: boolean | null
+          is_visible?: boolean | null
+          navigation_item_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_navigation_settings_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_navigation_settings_navigation_item_id_fkey"
+            columns: ["navigation_item_id"]
+            isOneToOne: false
+            referencedRelation: "navigation_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_payroll_history: {
         Row: {
           access_codes: string | null
@@ -1651,6 +1696,50 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      navigation_items: {
+        Row: {
+          badge_count: number | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          parent_id: string | null
+          position: number | null
+          route: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          badge_count?: number | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          parent_id?: string | null
+          position?: number | null
+          route: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          badge_count?: number | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          parent_id?: string | null
+          position?: number | null
+          route?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "navigation_items_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "navigation_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
