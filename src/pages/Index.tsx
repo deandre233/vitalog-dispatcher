@@ -117,11 +117,10 @@ const menuItems = [
   }
 ];
 
-// Log menu items loaded
-console.log("Menu items loaded:", menuItems.length);
-
 const Index = () => {
+  // Log startup
   logStartup();
+  console.log("Menu items loaded:", menuItems.length);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -135,12 +134,12 @@ const Index = () => {
             Select a module to get started
           </p>
           
-          {/* Log before rendering menu items grid */}
-          {console.log("Starting to render menu items grid")}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {menuItems.slice(0, -2).map((item, index) => {
-              console.log(`Rendering menu item ${index + 1}:`, item.title);
-              return (
+            {(() => {
+              console.log("Starting to render menu items grid");
+              return menuItems.slice(0, -2).map((item, index) => {
+                console.log(`Rendering menu item ${index + 1}:`, item.title);
+                return (
                 <Link 
                   key={item.title} 
                   to={item.path}
@@ -184,12 +183,14 @@ const Index = () => {
                     </div>
                   </Card>
                 </Link>
-              );
-            })}
+                );
+              });
+            })()}
             
-            {menuItems.slice(-2).map((item, index) => {
-              console.log(`Rendering special panel ${index + 1}:`, item.title);
-              return (
+            {(() => {
+              return menuItems.slice(-2).map((item, index) => {
+                console.log(`Rendering special panel ${index + 1}:`, item.title);
+                return (
                 <Link 
                   key={item.title} 
                   to={item.path}
@@ -235,10 +236,10 @@ const Index = () => {
                     </div>
                   </Card>
                 </Link>
-              );
-            })}
+                );
+              });
+            })()}
           </div>
-          {console.log("Finished rendering menu items grid")}
         </main>
       </div>
       <Footer />
