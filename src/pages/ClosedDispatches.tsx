@@ -1,79 +1,118 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { DataTable } from "@/components/ui/data-table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { Search, Filter, Download } from "lucide-react";
+import { DispatchItem } from "@/components/dashboard/DispatchItem";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default function ClosedDispatches() {
-  const [searchQuery, setSearchQuery] = useState("");
+const ClosedDispatches = () => {
+  const { data: closedDispatches, isLoading } = useQuery({
+    queryKey: ['closed-dispatches'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('transport_records')
+        .select('*')
+        .in('dispatch_status', ['Completed', 'Canceled'])
+        .order('created_at', { ascending: false });
 
-  const columns = [
-    { header: "Dispatch ID", accessorKey: "id" },
-    { header: "Patient", accessorKey: "patient" },
-    { header: "Date", accessorKey: "date" },
-    { header: "Status", accessorKey: "status" },
-    { header: "Location", accessorKey: "location" },
-    { header: "Crew", accessorKey: "crew" }
-  ];
-
-  const data = [
-    {
-      id: "D-2023-001",
-      patient: "John Doe",
-      date: "2023-12-01",
-      status: "Completed",
-      location: "Memorial Hospital",
-      crew: "Team A"
+      if (error) throw error;
+      return data || [];
     },
-    {
-      id: "D-2023-002",
-      patient: "Jane Smith",
-      date: "2023-12-02",
-      status: "Cancelled",
-      location: "City Medical Center",
-      crew: "Team B"
-    }
-  ];
+  });
+
+  const completedDispatches = closedDispatches?.filter(
+    dispatch => dispatch.dispatch_status === 'Completed'
+  ) || [];
+
+  const canceledDispatches = closedDispatches?.filter(
+    dispatch => dispatch.dispatch_status === 'Canceled'
+  ) || [];
 
   return (
-    <div className="flex-1 bg-medical-accent/5 backdrop-blur-sm overflow-auto">
-      <DashboardHeader />
-      <main className="p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-medical-primary mb-6">
-          Closed Dispatches
-        </h1>
-        
-        <div className="flex justify-between items-center gap-4 flex-wrap">
-          <div className="flex gap-2 flex-1">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                placeholder="Search dispatches..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8"
-              />
-            </div>
-            <Button variant="outline" size="icon">
-              <Filter className="h-4 w-4" />
-            </Button>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <div className="flex-1 flex">
+        <SidebarProvider>
+          <AppSidebar />
+          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+            <DashboardHeader />
+            <main className="p-6">
+              <Card className="p-6">
+                <h2 className="text-2xl font-semibold mb-6">Closed Dispatches</h2>
+                <Tabs defaultValue="completed" className="space-y-4">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="completed">
+                      Completed ({completedDispatches.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="canceled">
+                      Canceled ({canceledDispatches.length})
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="completed" className="space-y-4">
+                    {completedDispatches.map((dispatch) => (
+                      <DispatchItem
+                        key={dispatch.id}
+                        id={dispatch.dispatch_id}
+                        activationTime={dispatch.transport_date}
+                        patient={{
+                          id: dispatch.patient_id || '',
+                          name: 'Loading...',
+                        }}
+                        serviceType="BLS"
+                        origin={dispatch.pickup_location}
+                        destination={dispatch.dropoff_location}
+                        status={dispatch.status}
+                        priority="medium"
+                        assignedTo={dispatch.crew_assigned || 'Unassigned'}
+                        aiRecommendations={{
+                          route: '',
+                          crew: '',
+                          billing: '',
+                        }}
+                        eta=""
+                      />
+                    ))}
+                  </TabsContent>
+                  
+                  <TabsContent value="canceled" className="space-y-4">
+                    {canceledDispatches.map((dispatch) => (
+                      <DispatchItem
+                        key={dispatch.id}
+                        id={dispatch.dispatch_id}
+                        activationTime={dispatch.transport_date}
+                        patient={{
+                          id: dispatch.patient_id || '',
+                          name: 'Loading...',
+                        }}
+                        serviceType="BLS"
+                        origin={dispatch.pickup_location}
+                        destination={dispatch.dropoff_location}
+                        status={dispatch.status}
+                        priority="medium"
+                        assignedTo={dispatch.crew_assigned || 'Unassigned'}
+                        aiRecommendations={{
+                          route: '',
+                          crew: '',
+                          billing: '',
+                        }}
+                        eta=""
+                      />
+                    ))}
+                  </TabsContent>
+                </Tabs>
+              </Card>
+            </main>
           </div>
-          <Button variant="outline" className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-        </div>
-
-        <div className="bg-white rounded-lg shadow">
-          <DataTable
-            columns={columns}
-            data={data}
-            searchKey="patient"
-            searchQuery={searchQuery}
-          />
-        </div>
-      </main>
+        </SidebarProvider>
+      </div>
+      <Footer />
     </div>
   );
-}
+};
+
+export default ClosedDispatches;

@@ -1,16 +1,28 @@
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DispatchBoard } from "@/components/dashboard/DispatchBoard";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
-export default function ActiveDispatches() {
+const ActiveDispatches = () => {
   return (
-    <div className="flex-1 bg-medical-accent/5 backdrop-blur-sm overflow-auto">
-      <DashboardHeader />
-      <main className="p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-medical-primary mb-6">
-          Active Dispatches
-        </h1>
-        <DispatchBoard />
-      </main>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <div className="flex-1 flex">
+        <SidebarProvider>
+          <AppSidebar />
+          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+            <DashboardHeader />
+            <main className="p-6">
+              <DispatchBoard />
+            </main>
+          </div>
+        </SidebarProvider>
+      </div>
+      <Footer />
     </div>
   );
-}
+};
+
+export default ActiveDispatches;

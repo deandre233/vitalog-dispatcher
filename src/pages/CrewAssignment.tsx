@@ -1,72 +1,78 @@
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Users } from "lucide-react";
 
-export default function CrewAssignment() {
+const CrewAssignment = () => {
+  const [selectedCrew, setSelectedCrew] = useState<string>("");
+
+  const handleAssignCrew = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCrew) {
+      toast.error("Please select a crew member");
+      return;
+    }
+    
+    toast.success(`Successfully assigned ${selectedCrew} to the dispatch`);
+  };
+
   return (
-    <div className="flex-1 bg-medical-accent/5 backdrop-blur-sm overflow-auto">
-      <DashboardHeader />
-      <main className="p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-medical-primary mb-6">
-          Crew Assignment
-        </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-medical-primary mb-4">Available Crew</h2>
-            <div className="space-y-4">
-              {/* List of available crew members would go here */}
-              <div className="p-3 border rounded-md hover:bg-medical-accent/5 cursor-pointer">
-                <p className="font-medium">John Smith</p>
-                <p className="text-sm text-gray-600">EMT - Available</p>
-              </div>
-              <div className="p-3 border rounded-md hover:bg-medical-accent/5 cursor-pointer">
-                <p className="font-medium">Sarah Johnson</p>
-                <p className="text-sm text-gray-600">Paramedic - Available</p>
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <div className="flex-1 flex">
+        <SidebarProvider>
+          <AppSidebar />
+          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+            <DashboardHeader />
+            <main className="p-6">
+              <Card className="max-w-2xl mx-auto p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <Users className="w-6 h-6 text-blue-600" />
+                  <h2 className="text-2xl font-semibold">Assign Crew</h2>
+                </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-medical-primary mb-4">Active Assignments</h2>
-            <div className="space-y-4">
-              {/* List of active assignments would go here */}
-              <div className="p-3 border rounded-md bg-medical-accent/5">
-                <p className="font-medium">Unit 127</p>
-                <p className="text-sm text-gray-600">Mike Wilson - Driver</p>
-                <p className="text-sm text-gray-600">Lisa Chen - EMT</p>
-              </div>
-            </div>
-          </div>
+                <form onSubmit={handleAssignCrew} className="space-y-6">
+                  <div className="space-y-2">
+                    <label htmlFor="crew-select" className="text-sm font-medium text-gray-700">
+                      Select Crew Member:
+                    </label>
+                    <Select onValueChange={setSelectedCrew} value={selectedCrew}>
+                      <SelectTrigger id="crew-select" className="w-full">
+                        <SelectValue placeholder="Select a crew member" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MED 1">MED 1</SelectItem>
+                        <SelectItem value="MED 2">MED 2</SelectItem>
+                        <SelectItem value="MED 3">MED 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-medical-primary mb-4">Upcoming Shifts</h2>
-            <div className="space-y-4">
-              {/* List of upcoming shifts would go here */}
-              <div className="p-3 border rounded-md">
-                <p className="font-medium">Night Shift</p>
-                <p className="text-sm text-gray-600">Starting in 2 hours</p>
-                <p className="text-sm text-gray-600">4 positions to fill</p>
-              </div>
-            </div>
+                  <Button type="submit" className="w-full">
+                    Assign Crew
+                  </Button>
+                </form>
+              </Card>
+            </main>
           </div>
-        </div>
-
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-semibold text-medical-primary mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button className="p-4 text-center border rounded-md hover:bg-medical-accent/5">
-              Assign Crew
-            </button>
-            <button className="p-4 text-center border rounded-md hover:bg-medical-accent/5">
-              Swap Shifts
-            </button>
-            <button className="p-4 text-center border rounded-md hover:bg-medical-accent/5">
-              Request Coverage
-            </button>
-            <button className="p-4 text-center border rounded-md hover:bg-medical-accent/5">
-              View Schedule
-            </button>
-          </div>
-        </div>
-      </main>
+        </SidebarProvider>
+      </div>
+      <Footer />
     </div>
   );
-}
+};
+
+export default CrewAssignment;

@@ -1,90 +1,80 @@
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { Card } from "@/components/ui/card";
+import { Brain, Clock, LineChart, TrendingUp } from "lucide-react";
 
-export default function Performance() {
+const Performance = () => {
   return (
-    <div className="flex-1 bg-medical-accent/5 backdrop-blur-sm overflow-auto">
-      <DashboardHeader />
-      <main className="p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-medical-primary mb-6">
-          Performance
-        </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-medical-primary mb-4">Response Times</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-500">Average Response Time</p>
-                <p className="text-2xl font-bold text-medical-primary">8.5 min</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">90th Percentile</p>
-                <p className="text-2xl font-bold text-medical-primary">12 min</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-medical-primary mb-4">Dispatch Efficiency</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-500">Successful Dispatches</p>
-                <p className="text-2xl font-bold text-medical-primary">94%</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">First Time Success Rate</p>
-                <p className="text-2xl font-bold text-medical-primary">87%</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-medical-primary mb-4">Resource Utilization</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-500">Active Units</p>
-                <p className="text-2xl font-bold text-medical-primary">18/20</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Efficiency Rate</p>
-                <p className="text-2xl font-bold text-medical-primary">92%</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 gap-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-medical-primary mb-4">Performance Trends</h2>
-            <div className="h-64 flex items-center justify-center border border-dashed border-gray-200 rounded-lg">
-              <p className="text-gray-500">Performance chart will be displayed here</p>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-medical-primary mb-4">Recent Performance Reports</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-medium text-medical-primary">Monthly Overview</p>
-                  <p className="text-sm text-gray-500">March 2024</p>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <div className="flex-1 flex">
+        <SidebarProvider>
+          <AppSidebar />
+          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+            <DashboardHeader />
+            <main className="p-6 space-y-6">
+              {/* AI Efficiency Card */}
+              <Card className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Brain className="w-6 h-6 text-blue-600" />
+                  <h2 className="text-2xl font-semibold">AI Efficiency Insights</h2>
                 </div>
-                <button className="text-medical-primary hover:text-medical-primary/80">
-                  Download PDF
-                </button>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-medium text-medical-primary">Weekly Summary</p>
-                  <p className="text-sm text-gray-500">Week 12, 2024</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-green-100 rounded-lg">
+                      <TrendingUp className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">AI Efficiency Score</p>
+                      <p className="text-xl font-semibold text-green-600">92%</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-blue-100 rounded-lg">
+                      <Clock className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Average Response Time</p>
+                      <p className="text-xl font-semibold">8.5 minutes</p>
+                    </div>
+                  </div>
                 </div>
-                <button className="text-medical-primary hover:text-medical-primary/80">
-                  Download PDF
-                </button>
-              </div>
-            </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Recommendations</h3>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2 text-gray-700">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      Consider adding more crew during morning peak hours
+                    </li>
+                    <li className="flex items-center gap-2 text-gray-700">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      Optimize route planning to reduce delays
+                    </li>
+                  </ul>
+                </div>
+              </Card>
+
+              {/* Additional Performance Metrics Card */}
+              <Card className="p-6">
+                <h2 className="text-2xl font-semibold mb-6">Performance Metrics</h2>
+                <div className="flex items-center gap-2">
+                  <LineChart className="w-6 h-6 text-gray-500" />
+                  <p className="text-gray-500">Additional performance tracking coming in next iteration</p>
+                </div>
+              </Card>
+            </main>
           </div>
-        </div>
-      </main>
+        </SidebarProvider>
+      </div>
+      <Footer />
     </div>
   );
-}
+};
+
+export default Performance;
