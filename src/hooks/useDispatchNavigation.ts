@@ -4,7 +4,9 @@ import { DispatchViewState } from '@/types/dispatch';
 export function useDispatchNavigation() {
   const [viewState, setViewState] = useState<DispatchViewState>({
     activeTab: 'active',
-    activeView: 'dispatches',
+    activeView: 'list', // Fixed from 'dispatches' to 'list' to match the type
+    selectedDate: null,
+    filterStatus: []
   });
 
   const setActiveTab = (tab: DispatchViewState['activeTab']) => {
