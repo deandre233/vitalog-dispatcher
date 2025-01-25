@@ -123,6 +123,13 @@ export interface AIAnalysisResult {
   performance_insights: string;
 }
 
+export interface DispatchViewState {
+  activeTab: 'active' | 'schedule' | 'calendar';
+  activeView: 'dispatches' | 'scheduled';
+  selectedDate?: Date;
+  filterStatus?: string;
+}
+
 export interface HospitalStatus {
   name: string;
   nedocs: number;
@@ -140,11 +147,4 @@ export interface AIInsight {
   message: string;
   severity: 'info' | 'warning' | 'error';
   timestamp: string;
-}
-
-export interface DispatchViewState {
-  activeTab: 'active' | 'schedule' | 'calendar';
-  activeView: 'dispatches' | 'scheduled';
-  selectedDate?: Date;
-  filterStatus?: string;
 }
