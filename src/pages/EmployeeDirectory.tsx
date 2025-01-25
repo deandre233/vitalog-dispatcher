@@ -1,6 +1,5 @@
 import { SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { EmployeeDirectorySidebar } from "@/components/navigation/EmployeeDirectorySidebar";
-import { Header } from "@/components/layout/Header";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
@@ -8,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { HRLayout } from "@/components/layout/HRLayout";
 
 interface Employee {
   id: string;
@@ -54,44 +54,35 @@ export function EmployeeDirectory() {
   }, [toast]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end">
-      <Header />
-      <div className="flex-1 flex">
-        <SidebarProvider defaultOpen={true}>
-          <div className="min-h-screen flex w-full">
-            <EmployeeDirectorySidebar />
-            <SidebarRail />
-            <div className="flex-1 overflow-auto p-6">
-              <h1 className="text-2xl font-bold text-white mb-6">Employee Directory</h1>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {employees.map((employee) => (
-                  <Card 
-                    key={employee.id}
-                    className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => navigate(`/employee/${employee.id}`)}
-                  >
-                    <div className="flex flex-col items-center space-y-4">
-                      <Avatar className="h-20 w-20">
-                        <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${employee.id}`} />
-                        <AvatarFallback>{employee.first_name?.[0]}{employee.last_name?.[0]}</AvatarFallback>
-                      </Avatar>
-                      <div className="text-center">
-                        <h3 className="font-semibold">{employee.first_name} {employee.last_name}</h3>
-                        <p className="text-sm text-gray-500">{employee.station || 'Unassigned'}</p>
-                        <Badge variant="outline" className="mt-2">
-                          {employee.certification_level || 'Uncertified'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+    <HRLayout>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-gray-900">Employee Directory</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {employees.map((employee) => (
+            <Card 
+              key={employee.id}
+              className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate(`/employee/${employee.id}`)}
+            >
+              <div className="flex flex-col items-center space-y-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${employee.id}`} />
+                  <AvatarFallback>{employee.first_name?.[0]}{employee.last_name?.[0]}</AvatarFallback>
+                </Avatar>
+                <div className="text-center">
+                  <h3 className="font-semibold">{employee.first_name} {employee.last_name}</h3>
+                  <p className="text-sm text-gray-500">{employee.station || 'Unassigned'}</p>
+                  <Badge variant="outline" className="mt-2">
+                    {employee.certification_level || 'Uncertified'}
+                  </Badge>
+                </div>
               </div>
-            </div>
-          </div>
-        </SidebarProvider>
+            </Card>
+          ))}
+        </div>
       </div>
-    </div>
+    </HRLayout>
   );
 }
 
