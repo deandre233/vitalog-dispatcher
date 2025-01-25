@@ -182,7 +182,6 @@ const Index = () => {
               );
             })}
             
-            {/* Support and Performance panels */}
             {menuItems.slice(-2).map((item, index) => {
               console.log(`Rendering special panel ${index + 1}:`, item.title);
               return (
