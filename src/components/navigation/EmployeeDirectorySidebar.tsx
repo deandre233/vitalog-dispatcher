@@ -19,14 +19,14 @@ export function EmployeeDirectorySidebar() {
               Employee Directory
             </h2>
             <div className="space-y-2">
-              <Link to="/employees" aria-label="View all employees">
+              <Link to="/employees" aria-label="View employee directory">
                 <Button 
                   variant="ghost" 
                   className="w-full justify-start gap-2"
                   role="menuitem"
                 >
                   <Users className="h-4 w-4" aria-hidden="true" />
-                  All Employees
+                  Employee Directory
                 </Button>
               </Link>
               <Link to="/employees/new" aria-label="Add new employee">

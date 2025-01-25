@@ -44,7 +44,7 @@ export function EmployeeDirectory() {
         console.error('Error fetching employees:', error);
         toast({
           title: "Error",
-          description: "Failed to load employees. Please try again later.",
+          description: "Failed to load employee directory. Please try again later.",
           variant: "destructive",
         });
       } finally {
@@ -64,7 +64,7 @@ export function EmployeeDirectory() {
     return (
       <HRLayout>
         <div className="flex items-center justify-center h-full">
-          <div className="animate-pulse text-gray-500">Loading employees...</div>
+          <div className="animate-pulse text-gray-500">Loading employee directory...</div>
         </div>
       </HRLayout>
     );
@@ -118,7 +118,7 @@ export function EmployeeDirectory() {
 
         {employees.length === 0 && (
           <div className="text-center py-10">
-            <p className="text-gray-500">No employees found</p>
+            <p className="text-gray-500">No employees found in directory</p>
           </div>
         )}
       </div>
