@@ -17,7 +17,10 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-console.log("Index component starting to render...");
+// Move console logs outside of the component
+const logStartup = () => {
+  console.log("Index component starting to render...");
+};
 
 const menuItems = [
   {
@@ -114,10 +117,11 @@ const menuItems = [
   }
 ];
 
+// Log menu items loaded
 console.log("Menu items loaded:", menuItems.length);
 
 const Index = () => {
-  console.log("Index component function execution started");
+  logStartup();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -131,6 +135,7 @@ const Index = () => {
             Select a module to get started
           </p>
           
+          {/* Log before rendering menu items grid */}
           {console.log("Starting to render menu items grid")}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {menuItems.slice(0, -2).map((item, index) => {
