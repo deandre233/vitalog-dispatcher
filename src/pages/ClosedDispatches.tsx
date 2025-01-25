@@ -3,11 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { DispatchItem } from "@/components/dashboard/DispatchItem";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DataTable } from "@/components/ui/data-table";
+import { DispatchItem } from "@/components/dashboard/DispatchItem";
 
 const ClosedDispatches = () => {
   const { data: closedDispatches, isLoading } = useQuery({
