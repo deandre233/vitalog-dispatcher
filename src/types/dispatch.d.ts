@@ -1,4 +1,5 @@
 import { Json } from '@/integrations/supabase/types';
+import { SearchableItem } from './common';
 
 export interface DispatchFormData {
   pickup_location: string;
@@ -92,11 +93,6 @@ export interface DispatchAssignment {
   assignment_time: string;
   unassignment_time?: string;
   assignment_reason?: string;
-}
-
-export interface SearchableItem {
-  id: string;
-  [key: string]: any;
 }
 
 export interface InsuranceRecord extends SearchableItem {
