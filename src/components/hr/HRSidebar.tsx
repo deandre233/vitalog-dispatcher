@@ -3,10 +3,25 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useMobile } from "@/hooks/use-mobile";
-import { Building2, ChevronLeft, Menu, Circle } from "lucide-react";
+import { Building2, ChevronLeft, Menu, Circle, Home, Megaphone, Users, Clock, Calculator, History, AlertTriangle, Calendar, UserX, Award, List, Link as LinkIcon, Settings, HelpCircle } from "lucide-react";
 import { HR_NAVIGATION_ITEMS } from "@/config/hr-navigation";
-import * as LucideIcons from "lucide-react";
-import { LucideIcon } from "lucide-react";
+
+const iconMap = {
+  home: Home,
+  megaphone: Megaphone,
+  users: Users,
+  clock: Clock,
+  calculator: Calculator,
+  history: History,
+  "alert-triangle": AlertTriangle,
+  calendar: Calendar,
+  "user-x": UserX,
+  award: Award,
+  list: List,
+  link: LinkIcon,
+  settings: Settings,
+  "help-circle": HelpCircle
+};
 
 export function HRSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -19,8 +34,8 @@ export function HRSidebar() {
     }
   }, [isMobile]);
 
-  const getIcon = (iconName: string): LucideIcon => {
-    return (LucideIcons as Record<string, LucideIcon>)[iconName] || Circle;
+  const getIcon = (iconName: string) => {
+    return iconMap[iconName as keyof typeof iconMap] || Circle;
   };
 
   return (
