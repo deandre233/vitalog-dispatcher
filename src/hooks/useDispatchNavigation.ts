@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { DispatchViewState } from '@/types/dispatch';
+import { DispatchViewState } from '@/types/dispatch';
 
 export function useDispatchNavigation() {
   const [viewState, setViewState] = useState<DispatchViewState>({
