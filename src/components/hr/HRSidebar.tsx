@@ -6,6 +6,7 @@ import { useMobile } from "@/hooks/use-mobile";
 import { Building2, ChevronLeft, Menu, Circle } from "lucide-react";
 import { HR_NAVIGATION_ITEMS } from "@/config/hr-navigation";
 import * as LucideIcons from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 export function HRSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -18,9 +19,8 @@ export function HRSidebar() {
     }
   }, [isMobile]);
 
-  const getIcon = (iconName: string) => {
-    const Icon = (LucideIcons as Record<string, React.ComponentType>)[iconName] || Circle;
-    return Icon;
+  const getIcon = (iconName: string): LucideIcon => {
+    return (LucideIcons as Record<string, LucideIcon>)[iconName] || Circle;
   };
 
   return (
