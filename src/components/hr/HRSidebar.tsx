@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useMobile } from "@/hooks/use-mobile";
-import * as Icons from "lucide-react";
+import { Building2, ChevronLeft, Menu, Circle } from "lucide-react";
 import { HR_NAVIGATION_ITEMS } from "@/config/hr-navigation";
+import * as LucideIcons from "lucide-react";
 
 export function HRSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -17,6 +18,11 @@ export function HRSidebar() {
     }
   }, [isMobile]);
 
+  const getIcon = (iconName: string) => {
+    const Icon = (LucideIcons as Record<string, React.ComponentType>)[iconName] || Circle;
+    return Icon;
+  };
+
   return (
     <div className={cn(
       "relative border-r bg-[#2B4B8C] text-white",
@@ -28,7 +34,7 @@ export function HRSidebar() {
         <div className="flex items-center justify-between p-4">
           {!isCollapsed && (
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Icons.Building2 className="h-5 w-5" />
+              <Building2 className="h-5 w-5" />
               HR Portal
             </h2>
           )}
@@ -39,8 +45,8 @@ export function HRSidebar() {
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? 
-              <Icons.Menu className="h-4 w-4" /> : 
-              <Icons.ChevronLeft className="h-4 w-4" />
+              <Menu className="h-4 w-4" /> : 
+              <ChevronLeft className="h-4 w-4" />
             }
           </Button>
         </div>
@@ -48,7 +54,7 @@ export function HRSidebar() {
         <nav className="flex-1 overflow-y-auto">
           <div className="space-y-1 p-2">
             {HR_NAVIGATION_ITEMS.map((item) => {
-              const Icon = Icons[item.icon as keyof typeof Icons] || Icons.Circle;
+              const IconComponent = getIcon(item.icon);
               return (
                 <div key={item.href}>
                   <Button
@@ -63,7 +69,7 @@ export function HRSidebar() {
                     asChild
                   >
                     <Link to={item.href} className="flex items-center">
-                      <Icon className={cn(
+                      <IconComponent className={cn(
                         "h-4 w-4 text-white",
                         !isCollapsed && "mr-2"
                       )} />
