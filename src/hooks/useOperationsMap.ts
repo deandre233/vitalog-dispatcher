@@ -52,15 +52,18 @@ export function useOperationsMap() {
         throw error;
       }
 
-      return data?.map(record => ({
-        id: record.id,
-        vehicleId: record.vehicle_number,
-        location: (record.route_data as unknown as RouteData)?.current_location || { lat: 33.7490, lng: -84.3880 },
-        status: 'active',
-        lastUpdated: new Date().toISOString(),
-        crew: record.crew_assigned ? [record.crew_assigned] : [],
-        currentDispatch: record.dispatch_id
-      })) as VehicleLocation[];
+      return data?.map(record => {
+        const routeData = record.route_data as unknown as RouteData;
+        return {
+          id: record.id,
+          vehicleId: record.vehicle_number,
+          location: routeData?.current_location || { lat: 33.7490, lng: -84.3880 },
+          status: 'active',
+          lastUpdated: new Date().toISOString(),
+          crew: record.crew_assigned ? [record.crew_assigned] : [],
+          currentDispatch: record.dispatch_id
+        };
+      }) as VehicleLocation[];
     }
   });
 
@@ -80,13 +83,16 @@ export function useOperationsMap() {
         throw error;
       }
 
-      return (data || []).map(insight => ({
-        type: ((insight.metadata as unknown as AIAnalysisMetadata)?.type) || 'traffic',
-        severity: ((insight.metadata as unknown as AIAnalysisMetadata)?.severity) || 'medium',
-        message: insight.recommendation || '',
-        location: ((insight.metadata as unknown as AIAnalysisMetadata)?.location),
-        recommendation: ((insight.metadata as unknown as AIAnalysisMetadata)?.recommendation)
-      })) as AIMapInsight[];
+      return (data || []).map(insight => {
+        const metadata = insight.metadata as unknown as AIAnalysisMetadata;
+        return {
+          type: metadata?.type || 'traffic',
+          severity: metadata?.severity || 'medium',
+          message: insight.recommendation || '',
+          location: metadata?.location,
+          recommendation: metadata?.recommendation
+        };
+      }) as AIMapInsight[];
     }
   });
 
