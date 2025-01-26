@@ -1,6 +1,6 @@
-import { NavItem } from "@/types/hr-navigation";
+import { HRNavigationItem } from "@/types/hr-navigation";
 
-export const HR_NAVIGATION_ITEMS: NavItem[] = [
+export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
   {
     label: "HR Home",
     href: "/hr",
