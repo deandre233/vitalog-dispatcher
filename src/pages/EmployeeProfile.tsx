@@ -1,5 +1,5 @@
-import { SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/navigation/AppSidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { HRSidebar } from "@/components/hr/HRSidebar";
 import { Header } from "@/components/layout/Header";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -21,36 +21,20 @@ import {
   Percent, Clock3, Landmark, FileSpreadsheet, CircleDollarSign, CalendarDays, BadgeDollarSign
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-
-interface Employee {
-  id: string;
-  first_name: string;
-  last_name: string;
-  middle_initial?: string;
-  suffix?: string;
-  mobile: string | null;
-  station: string | null;
-  status: string | null;
-  employee_type: string | null;
-  certification_level: string | null;
-  created_at: string | null;
-  readable_id: string | null;
-  nemsis_uuid?: string;
-  emergency_contact?: string;
-  login_name?: string;
-  last_login_attempt?: string;
-  last_login_success?: string;
-  beacon_token?: string;
-  latest_ping?: string;
-}
+import { useEmployeeData } from "@/hooks/useEmployeeData";
+import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
+import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
+import { useAIEmployeeAnalysis } from "@/hooks/useAIEmployeeAnalysis";
 
 export function EmployeeProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [employee, setEmployee] = useState<Employee | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  const { employee, isLoading: employeeLoading } = useEmployeeData(id);
+  const { roles, updateRole } = useEmployeeRoles(id);
+  const { privileges, updatePrivileges } = useEmployeePrivileges(id);
+  const { analysis } = useAIEmployeeAnalysis(id || '');
   
   const [smsNotifications, setSmsNotifications] = useState({
     dispatch: true,
@@ -60,221 +44,10 @@ export function EmployeeProfile() {
     supervisor: false,
     twoFactor: false
   });
-  const [roles, setRoles] = useState({
-    isCrew: false,
-    isSupervisor: false,
-    supervisorRole: '',
-    isBiller: false,
-    isDispatcher: false,
-    isQAReviewer: false,
-    isHR: false,
-    isMechanic: false,
-    isSalesperson: false,
-    isMedicalDirector: false,
-    isOnlooker: false,
-    onlookerFacility: '',
-    onlookerCity: '',
-    onlookerCounty: '',
-    canSeeNonEmergent: false,
-    isAdministrator: false,
-    isPrincipal: false,
-    isProvisional: false
-  });
-  const [privileges, setPrivileges] = useState({
-    canViewPatientInfo: false,
-    canEditPatientInfo: false,
-    canDeletePatientInfo: false,
-    canViewBillingInfo: false,
-    canEditBillingInfo: false,
-    canDeleteBillingInfo: false,
-    canViewDispatchInfo: false,
-    canEditDispatchInfo: false,
-    canDeleteDispatchInfo: false,
-    canViewReports: false,
-    canCreateReports: false,
-    canEditReports: false,
-    canDeleteReports: false,
-    canUseAIAssistance: false,
-  });
 
-  useEffect(() => {
-    const fetchEmployee = async () => {
-      try {
-        setIsLoading(true);
-        const { data, error } = await supabase
-          .from('employees')
-          .select('*')
-          .eq('id', id)
-          .single();
-
-        if (error) throw error;
-
-        setEmployee(data);
-      } catch (error) {
-        console.error('Error fetching employee:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load employee details",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchEmployee();
-    }
-  }, [id, toast]);
-
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('employee_roles')
-          .select('*')
-          .eq('employee_id', id)
-          .maybeSingle();
-
-        if (error) throw error;
-
-        if (data) {
-          setRoles({
-            isCrew: data.is_crew_member,
-            isSupervisor: data.is_supervisor,
-            supervisorRole: data.supervisor_role || '',
-            isBiller: data.is_biller,
-            isDispatcher: data.is_dispatcher,
-            isQAReviewer: data.is_qa_reviewer,
-            isHR: data.is_hr,
-            isMechanic: data.is_mechanic,
-            isSalesperson: data.is_salesperson,
-            isMedicalDirector: data.is_medical_director,
-            isOnlooker: data.is_onlooker,
-            onlookerFacility: data.onlooker_facility || '',
-            onlookerCity: data.onlooker_city || '',
-            onlookerCounty: data.onlooker_county || '',
-            canSeeNonEmergent: data.can_see_non_emergent,
-            isAdministrator: data.is_administrator,
-            isPrincipal: data.is_principal,
-            isProvisional: data.is_provisional
-          });
-        } else {
-          // Initialize with default values if no roles exist
-          console.log('No roles found for employee, using defaults');
-          setRoles({
-            isCrew: false,
-            isSupervisor: false,
-            supervisorRole: '',
-            isBiller: false,
-            isDispatcher: false,
-            isQAReviewer: false,
-            isHR: false,
-            isMechanic: false,
-            isSalesperson: false,
-            isMedicalDirector: false,
-            isOnlooker: false,
-            onlookerFacility: '',
-            onlookerCity: '',
-            onlookerCounty: '',
-            canSeeNonEmergent: false,
-            isAdministrator: false,
-            isPrincipal: false,
-            isProvisional: false
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching roles:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load employee roles",
-          variant: "destructive",
-        });
-      }
-    };
-
-    if (id) {
-      fetchRoles();
-    }
-  }, [id, toast]);
-
-  const handleRoleChange = async (field: string, value: boolean | string) => {
-    try {
-      const updates = {
-        employee_id: id,
-        [field]: value,
-      };
-
-      const { error } = await supabase
-        .from('employee_roles')
-        .upsert(updates)
-        .eq('employee_id', id);
-
-      if (error) throw error;
-
-      setRoles(prev => ({ ...prev, [field]: value }));
-      
-      toast({
-        title: "Success",
-        description: "Role updated successfully",
-      });
-    } catch (error) {
-      console.error('Error updating role:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update role",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handlePrivilegeChange = async (field: string, value: boolean) => {
-    try {
-      const updates = {
-        employee_id: id,
-        [field]: value,
-      };
-
-      const { error } = await supabase
-        .from('employee_privileges')
-        .upsert(updates)
-        .eq('employee_id', id);
-
-      if (error) throw error;
-
-      setPrivileges(prev => ({ ...prev, [field]: value }));
-      
-      toast({
-        title: "Success",
-        description: "Privilege updated successfully",
-      });
-    } catch (error) {
-      console.error('Error updating privilege:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update privilege",
-        variant: "destructive",
-      });
-    }
-  };
-
-  if (!employee) {
-    return null;
+  if (!employee || employeeLoading) {
+    return <div>Loading...</div>;
   }
-
-  const generateRandomPassword = () => {
-    toast({
-      title: "Password Generated",
-      description: "A new random password has been generated and sent to the employee's email.",
-    });
-  };
-
-  const handleAddPortrait = () => {
-    toast({
-      title: "Upload Portrait",
-      description: "Portrait upload functionality will be implemented soon.",
-    });
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end">
@@ -282,8 +55,7 @@ export function EmployeeProfile() {
       <div className="flex-1 flex">
         <SidebarProvider defaultOpen={true}>
           <div className="min-h-screen flex w-full">
-            <AppSidebar />
-            <SidebarRail />
+            <HRSidebar />
             <div className="flex-1 overflow-auto p-6 space-y-6">
               <div className="flex items-center justify-between mb-6">
                 <Button 
