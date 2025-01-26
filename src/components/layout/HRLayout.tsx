@@ -15,13 +15,11 @@ export const HRLayout = ({ children }: HRLayoutProps) => {
         <Header />
         <div className="flex-1 flex">
           <SidebarProvider>
-            <div className="min-h-screen flex w-full">
-              <HRSidebar />
-              <div className="flex-1 bg-[#f4f7fc] overflow-auto">
-                <main className="p-6">
-                  {children}
-                </main>
-              </div>
+            <HRSidebar />
+            <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+              <main className="p-6">
+                {children}
+              </main>
             </div>
           </SidebarProvider>
         </div>

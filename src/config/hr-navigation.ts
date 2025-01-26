@@ -1,75 +1,83 @@
-export const HR_NAVIGATION_ITEMS = [
+import { Home, Megaphone, Users, Clock, Calculator, History, AlertTriangle, Calendar, UserX, Award, List, Link as LinkIcon, Settings, HelpCircle } from "lucide-react";
+import { HRNavigationItem } from "@/types/hr-navigation";
+
+export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
   {
-    label: "Home",
+    label: "HR Home",
+    icon: Home,
     href: "/hr",
-    icon: "home"
   },
   {
-    label: "Announcements",
+    label: "Announcements Control",
+    icon: Megaphone,
     href: "/hr/announcements",
-    icon: "megaphone"
   },
   {
     label: "Employee Directory",
+    icon: Users,
     href: "/hr/employees",
-    icon: "users"
   },
   {
-    label: "Time & Attendance",
-    href: "/hr/attendance",
-    icon: "clock"
+    label: "Manual Clock-in",
+    icon: Clock,
+    href: "/hr/clock-in",
   },
   {
-    label: "Payroll",
+    label: "Payroll Calculator",
+    icon: Calculator,
     href: "/hr/payroll",
-    icon: "calculator"
   },
   {
-    label: "Historical Entry",
-    href: "/hr/history",
-    icon: "history"
+    label: "Employee Logon History",
+    icon: History,
+    href: "/hr/logon-history",
   },
   {
-    label: "Corrective Actions",
-    href: "/hr/corrective-actions",
-    icon: "alert-triangle"
+    label: "Incident System",
+    icon: AlertTriangle,
+    href: "/hr/incidents",
   },
   {
-    label: "Schedule Overview",
-    href: "/hr/schedule",
-    icon: "calendar"
+    label: "Schedule Requests",
+    icon: Calendar,
+    href: "/hr/schedule-requests",
   },
   {
-    label: "Shift Records",
-    href: "/hr/shifts",
-    icon: "user-x"
+    label: "Employees Missing HR Data",
+    icon: UserX,
+    href: "/hr/missing-data",
   },
   {
-    label: "Performance",
-    href: "/hr/performance",
-    icon: "award",
-    badge: {
-      text: "15 Days Remaining"
-    }
+    label: "Crew Certificates Overview",
+    icon: Award,
+    href: "/hr/certificates",
   },
   {
-    label: "Categories",
-    href: "/hr/categories",
-    icon: "list"
+    label: "Certificate Types List",
+    icon: List,
+    href: "/hr/certificate-types",
   },
   {
-    label: "External Link",
-    href: "/hr/external",
-    icon: "link"
+    label: "Custom Link 1",
+    icon: LinkIcon,
+    href: "/hr/custom-link",
   },
   {
-    label: "Settings",
+    label: "AngelTrack Settings",
+    icon: Settings,
     href: "/hr/settings",
-    icon: "settings"
   },
   {
-    label: "Help",
-    href: "/hr/help",
-    icon: "help-circle"
-  }
+    label: "15 Days Remaining",
+    icon: Calendar,
+    href: "/hr/remaining-days",
+    badge: {
+      text: "15 Days",
+    },
+  },
+  {
+    label: "Support",
+    icon: HelpCircle,
+    href: "/hr/support",
+  },
 ];

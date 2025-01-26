@@ -3,25 +3,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useMobile } from "@/hooks/use-mobile";
-import { Building2, ChevronLeft, Menu, Circle, Home, Megaphone, Users, Clock, Calculator, History, AlertTriangle, Calendar, UserX, Award, List, Link as LinkIcon, Settings, HelpCircle } from "lucide-react";
+import { Building2, ChevronLeft, Menu } from "lucide-react";
 import { HR_NAVIGATION_ITEMS } from "@/config/hr-navigation";
-
-const iconMap = {
-  home: Home,
-  megaphone: Megaphone,
-  users: Users,
-  clock: Clock,
-  calculator: Calculator,
-  history: History,
-  "alert-triangle": AlertTriangle,
-  calendar: Calendar,
-  "user-x": UserX,
-  award: Award,
-  list: List,
-  link: LinkIcon,
-  settings: Settings,
-  "help-circle": HelpCircle
-};
 
 export function HRSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -33,10 +16,6 @@ export function HRSidebar() {
       setIsCollapsed(true);
     }
   }, [isMobile]);
-
-  const getIcon = (iconName: string) => {
-    return iconMap[iconName as keyof typeof iconMap] || Circle;
-  };
 
   return (
     <div className={cn(
@@ -68,39 +47,37 @@ export function HRSidebar() {
         
         <nav className="flex-1 overflow-y-auto">
           <div className="space-y-1 p-2">
-            {HR_NAVIGATION_ITEMS.map((item) => {
-              const IconComponent = getIcon(item.icon);
-              return (
-                <div key={item.href}>
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start relative overflow-hidden group",
-                      "hover:bg-white/10",
-                      "transition-all duration-200 ease-in-out",
-                      pathname === item.href && "bg-white/20",
-                      isCollapsed ? "px-2" : "px-4"
-                    )}
-                    asChild
-                  >
-                    <Link to={item.href} className="flex items-center">
-                      <IconComponent className={cn(
-                        "h-4 w-4 text-white",
-                        !isCollapsed && "mr-2"
-                      )} />
-                      {!isCollapsed && (
-                        <span className="font-medium text-white">{item.label}</span>
-                      )}
-                      {!isCollapsed && item.badge && (
-                        <span className="ml-auto bg-white/20 text-xs rounded px-2 py-1">
-                          {item.badge.text}
-                        </span>
-                      )}
-                    </Link>
-                  </Button>
-                </div>
-              );
-            })}
+            {HR_NAVIGATION_ITEMS.map((item) => (
+              <Button
+                key={item.href}
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start relative overflow-hidden group",
+                  "hover:bg-white/10",
+                  "transition-all duration-200 ease-in-out",
+                  pathname === item.href && "bg-white/20",
+                  isCollapsed ? "px-2" : "px-4"
+                )}
+                asChild
+              >
+                <Link to={item.href} className="flex items-center">
+                  {item.icon && (
+                    <item.icon className={cn(
+                      "h-4 w-4 text-white",
+                      !isCollapsed && "mr-2"
+                    )} />
+                  )}
+                  {!isCollapsed && (
+                    <span className="font-medium text-white">{item.label}</span>
+                  )}
+                  {!isCollapsed && item.badge && (
+                    <span className="ml-auto bg-white/20 text-xs rounded px-2 py-1">
+                      {item.badge.text || item.badge.count}
+                    </span>
+                  )}
+                </Link>
+              </Button>
+            ))}
           </div>
         </nav>
       </div>
