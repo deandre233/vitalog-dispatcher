@@ -1,82 +1,81 @@
 import { HRNavigationItem } from "@/types/hr-navigation";
+import {
+  Users,
+  FileText,
+  Calendar,
+  ClipboardList,
+  Settings,
+  BarChart,
+  BookOpen,
+  Building2,
+  UserPlus,
+  GraduationCap,
+  AlertTriangle,
+  Bell,
+} from "lucide-react";
 
 export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
   {
     label: "HR Home",
     href: "/hr",
-    icon: "home"
-  },
-  {
-    label: "Announcements Control",
-    href: "/hr/announcements",
-    icon: "megaphone"
+    icon: Building2,
   },
   {
     label: "Employee Directory",
-    href: "/hr/employees",
-    icon: "users"
+    href: "/employees",
+    icon: Users,
   },
   {
-    label: "Manual Clock-in",
-    href: "/hr/clock-in",
-    icon: "clock"
+    label: "Documents",
+    href: "/hr/documents",
+    icon: FileText,
   },
   {
-    label: "Payroll Calculator",
-    href: "/hr/payroll",
-    icon: "calculator"
-  },
-  {
-    label: "Employee Logon History",
-    href: "/hr/logon-history",
-    icon: "history"
-  },
-  {
-    label: "Incident System",
-    href: "/hr/incidents",
-    icon: "alert-triangle"
-  },
-  {
-    label: "Schedule Requests",
+    label: "Schedule",
     href: "/hr/schedule",
-    icon: "calendar"
-  },
-  {
-    label: "Employees Missing HR Data",
-    href: "/hr/missing-data",
-    icon: "user-x"
-  },
-  {
-    label: "Crew Certificates Overview",
-    href: "/hr/certificates",
-    icon: "award"
-  },
-  {
-    label: "Certificate Types List",
-    href: "/hr/certificate-types",
-    icon: "list"
-  },
-  {
-    label: "Custom Link 1",
-    href: "/hr/custom-link",
-    icon: "link"
-  },
-  {
-    label: "AngelTrack Settings",
-    href: "/hr/settings",
-    icon: "settings"
-  },
-  {
-    label: "15 Days Remaining",
-    href: "/hr/subscription",
-    icon: "calendar",
+    icon: Calendar,
     badge: {
-      text: "15 Days"
+      text: "15 Days Remaining"
     }
   },
   {
-    label: "Support",
-    href: "/hr/support",
-    icon: "help-circle"
-  }
+    label: "Performance",
+    href: "/hr/performance",
+    icon: BarChart,
+  },
+  {
+    label: "Training",
+    href: "/hr/training",
+    icon: GraduationCap,
+  },
+  {
+    label: "Recruitment",
+    href: "/hr/recruitment",
+    icon: UserPlus,
+  },
+  {
+    label: "Resource Library",
+    href: "/hr/resources",
+    icon: BookOpen,
+  },
+  {
+    label: "Tasks",
+    href: "/hr/tasks",
+    icon: ClipboardList,
+  },
+  {
+    label: "Incidents",
+    href: "/hr/incidents",
+    icon: AlertTriangle,
+  },
+  {
+    label: "Announcements",
+    href: "/hr/announcements",
+    icon: Bell,
+  },
+  {
+    label: "Settings",
+    href: "/hr/settings",
+    icon: Settings,
+  },
 ];

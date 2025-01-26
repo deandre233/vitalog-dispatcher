@@ -1,13 +1,10 @@
+import { LucideIcon } from "lucide-react";
+
 export interface HRNavigationItem {
   label: string;
-  icon: string;
   href: string;
+  icon: LucideIcon;
   badge?: {
-    count?: number;
-    text?: string;
+    text: string;
   };
 }
-
-export type HRNavigationSection = {
-  items: HRNavigationItem[];
-};
