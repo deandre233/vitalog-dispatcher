@@ -1,6 +1,5 @@
 import { SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
-import { EmployeeDirectorySidebar } from "@/components/navigation/EmployeeDirectorySidebar";
 import { Header } from "@/components/layout/Header";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -285,7 +284,6 @@ export function EmployeeProfile() {
           <div className="min-h-screen flex w-full">
             <AppSidebar />
             <SidebarRail />
-            <EmployeeDirectorySidebar />
             <div className="flex-1 overflow-auto p-6 space-y-6">
               <div className="flex items-center justify-between mb-6">
                 <Button 
@@ -1459,3 +1457,4 @@ export function EmployeeProfile() {
 }
 
 export default EmployeeProfile;
+
