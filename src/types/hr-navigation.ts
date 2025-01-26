@@ -1,8 +1,6 @@
-import { LucideIcon } from "lucide-react";
-
 export interface HRNavigationItem {
   label: string;
-  icon: LucideIcon;
+  icon: string;
   href: string;
   badge?: {
     count?: number;
