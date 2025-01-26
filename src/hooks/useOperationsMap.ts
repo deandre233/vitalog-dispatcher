@@ -55,7 +55,7 @@ export function useOperationsMap() {
       return data?.map(record => ({
         id: record.id,
         vehicleId: record.vehicle_number,
-        location: (record.route_data as RouteData)?.current_location || { lat: 33.7490, lng: -84.3880 },
+        location: (record.route_data as unknown as RouteData)?.current_location || { lat: 33.7490, lng: -84.3880 },
         status: 'active',
         lastUpdated: new Date().toISOString(),
         crew: record.crew_assigned ? [record.crew_assigned] : [],
@@ -81,11 +81,11 @@ export function useOperationsMap() {
       }
 
       return (data || []).map(insight => ({
-        type: (insight.metadata as AIAnalysisMetadata)?.type || 'traffic',
-        severity: (insight.metadata as AIAnalysisMetadata)?.severity || 'medium',
+        type: ((insight.metadata as unknown as AIAnalysisMetadata)?.type) || 'traffic',
+        severity: ((insight.metadata as unknown as AIAnalysisMetadata)?.severity) || 'medium',
         message: insight.recommendation || '',
-        location: (insight.metadata as AIAnalysisMetadata)?.location,
-        recommendation: (insight.metadata as AIAnalysisMetadata)?.recommendation
+        location: ((insight.metadata as unknown as AIAnalysisMetadata)?.location),
+        recommendation: ((insight.metadata as unknown as AIAnalysisMetadata)?.recommendation)
       })) as AIMapInsight[];
     }
   });
