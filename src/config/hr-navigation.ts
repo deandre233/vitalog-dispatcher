@@ -1,82 +1,75 @@
-import { HRNavigationItem } from "@/types/hr-navigation";
-
-export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
+export const HR_NAVIGATION_ITEMS = [
   {
-    label: "HR Home",
-    icon: "home",
+    label: "Home",
     href: "/hr",
+    icon: "home"
   },
   {
-    label: "Announcements Control",
-    icon: "megaphone",
+    label: "Announcements",
     href: "/hr/announcements",
+    icon: "megaphone"
   },
   {
     label: "Employee Directory",
-    icon: "users",
     href: "/hr/employees",
+    icon: "users"
   },
   {
-    label: "Manual Clock-in",
-    icon: "clock",
-    href: "/hr/clock-in",
+    label: "Time & Attendance",
+    href: "/hr/attendance",
+    icon: "clock"
   },
   {
-    label: "Payroll Calculator",
-    icon: "calculator",
+    label: "Payroll",
     href: "/hr/payroll",
+    icon: "calculator"
   },
   {
-    label: "Employee Logon History",
-    icon: "history",
-    href: "/hr/logon-history",
+    label: "Historical Entry",
+    href: "/hr/history",
+    icon: "history"
   },
   {
-    label: "Incident System",
-    icon: "alert-triangle",
-    href: "/hr/incidents",
+    label: "Corrective Actions",
+    href: "/hr/corrective-actions",
+    icon: "alert-triangle"
   },
   {
-    label: "Schedule Requests",
-    icon: "calendar",
-    href: "/hr/schedule-requests",
+    label: "Schedule Overview",
+    href: "/hr/schedule",
+    icon: "calendar"
   },
   {
-    label: "Employees Missing HR Data",
-    icon: "user-x",
-    href: "/hr/missing-data",
+    label: "Shift Records",
+    href: "/hr/shifts",
+    icon: "user-x"
   },
   {
-    label: "Crew Certificates Overview",
+    label: "Performance",
+    href: "/hr/performance",
     icon: "award",
-    href: "/hr/certificates",
-  },
-  {
-    label: "Certificate Types List",
-    icon: "list",
-    href: "/hr/certificate-types",
-  },
-  {
-    label: "Custom Link 1",
-    icon: "link",
-    href: "/hr/custom-link",
-  },
-  {
-    label: "AngelTrack Settings",
-    icon: "settings",
-    href: "/hr/settings",
-  },
-  {
-    label: "15 Days Remaining",
-    icon: "calendar",
-    href: "/hr/remaining-days",
     badge: {
-      text: "15 Days",
-    },
+      text: "15 Days Remaining"
+    }
   },
   {
-    label: "Support",
-    icon: "help-circle",
-    href: "/hr/support",
+    label: "Categories",
+    href: "/hr/categories",
+    icon: "list"
   },
+  {
+    label: "External Link",
+    href: "/hr/external",
+    icon: "link"
+  },
+  {
+    label: "Settings",
+    href: "/hr/settings",
+    icon: "settings"
+  },
+  {
+    label: "Help",
+    href: "/hr/help",
+    icon: "help-circle"
+  }
 ];
