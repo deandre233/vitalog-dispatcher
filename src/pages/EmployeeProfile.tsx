@@ -161,6 +161,7 @@ export function EmployeeProfile() {
             isProvisional: data.is_provisional
           });
         } else {
+          // Initialize with default values if no roles exist
           console.log('No roles found for employee, using defaults');
           setRoles({
             isCrew: false,
