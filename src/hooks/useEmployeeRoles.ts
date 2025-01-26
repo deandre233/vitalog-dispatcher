@@ -3,19 +3,40 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { EmployeeRole } from "@/types/employee";
 
+const defaultRole: EmployeeRole = {
+  isCrew: false,
+  isSupervisor: false,
+  supervisorRole: "Call-taker / Self-dispatch",
+  isBiller: false,
+  isDispatcher: false,
+  isQAReviewer: false,
+  isHR: false,
+  isMechanic: false,
+  isSalesperson: false,
+  isMedicalDirector: false,
+  isOnlooker: false,
+  onlookerFacility: "",
+  onlookerCity: "",
+  onlookerCounty: "",
+  canSeeNonEmergent: false,
+  isAdministrator: false,
+  isPrincipal: false,
+  isProvisional: false
+};
+
 export const useEmployeeRoles = (employeeId?: string) => {
   const queryClient = useQueryClient();
 
-  const { data: roles, isLoading, error } = useQuery({
+  const { data: roles = defaultRole, isLoading, error } = useQuery({
     queryKey: ["employee_roles", employeeId],
-    queryFn: async (): Promise<EmployeeRole> => {
-      if (!employeeId) throw new Error("Employee ID is required");
+    queryFn: async () => {
+      if (!employeeId) return defaultRole;
 
       const { data, error } = await supabase
         .from("employee_roles")
         .select("*")
         .eq("employee_id", employeeId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching employee roles:', error);
@@ -27,29 +48,7 @@ export const useEmployeeRoles = (employeeId?: string) => {
         throw error;
       }
 
-      // Return default role object if no data
-      if (!data) {
-        return {
-          isCrew: false,
-          isSupervisor: false,
-          supervisorRole: "Call-taker / Self-dispatch",
-          isBiller: false,
-          isDispatcher: false,
-          isQAReviewer: false,
-          isHR: false,
-          isMechanic: false,
-          isSalesperson: false,
-          isMedicalDirector: false,
-          isOnlooker: false,
-          onlookerFacility: "",
-          onlookerCity: "",
-          onlookerCounty: "",
-          canSeeNonEmergent: false,
-          isAdministrator: false,
-          isPrincipal: false,
-          isProvisional: false
-        };
-      }
+      if (!data) return defaultRole;
 
       return {
         isCrew: data.is_crew_member,
@@ -103,8 +102,7 @@ export const useEmployeeRoles = (employeeId?: string) => {
 
       const { error } = await supabase
         .from("employee_roles")
-        .update(dbUpdates)
-        .eq("employee_id", employeeId);
+        .upsert({ employee_id: employeeId, ...dbUpdates });
 
       if (error) {
         console.error('Error updating employee roles:', error);
@@ -126,7 +124,7 @@ export const useEmployeeRoles = (employeeId?: string) => {
   });
 
   return {
-    roles: roles || {}, // Provide empty object as fallback
+    roles,
     isLoading,
     error,
     updateRole
