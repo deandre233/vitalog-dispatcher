@@ -18,12 +18,13 @@ export interface Employee {
   last_login_success?: string;
   beacon_token?: string;
   latest_ping?: string;
+  photo_url?: string;
 }
 
 export interface EmployeeRole {
   isCrew: boolean;
   isSupervisor: boolean;
-  supervisorRole: string;
+  supervisorRole: "Captain" | "Lieutenant" | "Full privileges" | "Call-taker / Self-dispatch";
   isBiller: boolean;
   isDispatcher: boolean;
   isQAReviewer: boolean;
