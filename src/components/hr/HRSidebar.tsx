@@ -93,7 +93,7 @@ export function HRSidebar() {
                       )}
                       {!isCollapsed && item.badge && (
                         <span className="ml-auto bg-white/20 text-xs rounded px-2 py-1">
-                          {item.badge.text || item.badge.count}
+                          {item.badge.text}
                         </span>
                       )}
                     </Link>

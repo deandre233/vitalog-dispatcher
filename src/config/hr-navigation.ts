@@ -1,82 +1,82 @@
-import { HRNavigationItem } from "@/types/hr-navigation";
+import { NavItem } from "@/types/hr-navigation";
 
-export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
+export const HR_NAVIGATION_ITEMS: NavItem[] = [
   {
     label: "HR Home",
-    icon: "home",
     href: "/hr",
+    icon: "home"
   },
   {
     label: "Announcements Control",
-    icon: "megaphone",
     href: "/hr/announcements",
+    icon: "megaphone"
   },
   {
     label: "Employee Directory",
-    icon: "users",
     href: "/hr/employees",
+    icon: "users"
   },
   {
     label: "Manual Clock-in",
-    icon: "clock",
     href: "/hr/clock-in",
+    icon: "clock"
   },
   {
     label: "Payroll Calculator",
-    icon: "calculator",
     href: "/hr/payroll",
+    icon: "calculator"
   },
   {
     label: "Employee Logon History",
-    icon: "history",
     href: "/hr/logon-history",
+    icon: "history"
   },
   {
     label: "Incident System",
-    icon: "alert-triangle",
     href: "/hr/incidents",
+    icon: "alert-triangle"
   },
   {
     label: "Schedule Requests",
-    icon: "calendar",
-    href: "/hr/schedule-requests",
+    href: "/hr/schedule",
+    icon: "calendar"
   },
   {
     label: "Employees Missing HR Data",
-    icon: "user-x",
     href: "/hr/missing-data",
+    icon: "user-x"
   },
   {
     label: "Crew Certificates Overview",
-    icon: "award",
     href: "/hr/certificates",
+    icon: "award"
   },
   {
     label: "Certificate Types List",
-    icon: "list",
     href: "/hr/certificate-types",
+    icon: "list"
   },
   {
     label: "Custom Link 1",
-    icon: "link",
     href: "/hr/custom-link",
+    icon: "link"
   },
   {
     label: "AngelTrack Settings",
-    icon: "settings",
     href: "/hr/settings",
+    icon: "settings"
   },
   {
     label: "15 Days Remaining",
+    href: "/hr/subscription",
     icon: "calendar",
-    href: "/hr/remaining-days",
     badge: {
-      text: "15 Days",
-    },
+      text: "15 Days"
+    }
   },
   {
     label: "Support",
-    icon: "help-circle",
     href: "/hr/support",
-  },
+    icon: "help-circle"
+  }
 ];
