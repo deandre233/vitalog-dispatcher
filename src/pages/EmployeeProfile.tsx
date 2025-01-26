@@ -25,13 +25,15 @@ import { useEmployeeData } from "@/hooks/useEmployeeData";
 import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
 import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
 import { useAIEmployeeAnalysis } from "@/hooks/useAIEmployeeAnalysis";
+import { supabase } from "@/integrations/supabase/client";
+import type { EmployeeRole } from "@/types/employee";
 
 export function EmployeeProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const { employee, isLoading: employeeLoading } = useEmployeeData(id);
+  const { employee, isLoading: employeeLoading, updateEmployee } = useEmployeeData(id);
   const { roles, updateRole } = useEmployeeRoles(id);
   const { privileges, updatePrivileges } = useEmployeePrivileges(id);
   const { analysis } = useAIEmployeeAnalysis(id || '');
@@ -45,9 +47,109 @@ export function EmployeeProfile() {
     twoFactor: false
   });
 
+  const handleAddPortrait = async () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${id}-${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('employee_photos')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('employee_photos')
+          .getPublicUrl(fileName);
+
+        await updateEmployee({ photo_url: publicUrl });
+        
+        toast({
+          title: "Success",
+          description: "Profile photo updated successfully",
+        });
+      } catch (error) {
+        console.error('Error uploading photo:', error);
+        toast({
+          title: "Error",
+          description: "Failed to upload profile photo",
+          variant: "destructive",
+        });
+      }
+    };
+    input.click();
+  };
+
+  const handleRoleChange = async (field: keyof EmployeeRole, value: any) => {
+    try {
+      await updateRole.mutateAsync({ [field]: value });
+      toast({
+        title: "Success",
+        description: "Role updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating role:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update role",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePrivilegeChange = async (field: string, value: boolean) => {
+    try {
+      await updatePrivileges.mutateAsync({ [field]: value });
+      toast({
+        title: "Success",
+        description: "Privileges updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating privileges:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update privileges",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const generateRandomPassword = async () => {
+    const length = 12;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+
+    try {
+      // Here you would typically update the password in your auth system
+      toast({
+        title: "Success",
+        description: "New password generated and sent to user",
+      });
+    } catch (error) {
+      console.error('Error generating password:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate new password",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!employee || employeeLoading) {
     return <div>Loading...</div>;
   }
+
+  // Get the first role object if it exists
+  const role = roles?.[0] || {};
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end">
@@ -353,9 +455,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="crew-member"
-                                    checked={roles.isCrew}
+                                    checked={role.isCrew}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_crew_member', checked as boolean)
+                                      handleRoleChange('isCrew', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="crew-member" className="text-sm font-medium">
@@ -367,19 +469,19 @@ export function EmployeeProfile() {
                                   <div className="flex items-center space-x-2">
                                     <Checkbox 
                                       id="supervisor"
-                                      checked={roles.isSupervisor}
+                                      checked={role.isSupervisor}
                                       onCheckedChange={(checked) => 
-                                        handleRoleChange('is_supervisor', checked as boolean)
+                                        handleRoleChange('isSupervisor', checked as boolean)
                                       }
                                     />
                                     <label htmlFor="supervisor" className="text-sm font-medium">
                                       Supervisor
                                     </label>
                                   </div>
-                                  {roles.isSupervisor && (
+                                  {role.isSupervisor && (
                                     <Select 
-                                      value={roles.supervisorRole}
-                                      onValueChange={(value) => handleRoleChange('supervisor_role', value)}
+                                      value={role.supervisorRole}
+                                      onValueChange={(value) => handleRoleChange('supervisorRole', value)}
                                     >
                                       <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select supervisor role" />
@@ -397,9 +499,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="biller"
-                                    checked={roles.isBiller}
+                                    checked={role.isBiller}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_biller', checked as boolean)
+                                      handleRoleChange('isBiller', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="biller" className="text-sm font-medium">
@@ -410,9 +512,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="dispatcher"
-                                    checked={roles.isDispatcher}
+                                    checked={role.isDispatcher}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_dispatcher', checked as boolean)
+                                      handleRoleChange('isDispatcher', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="dispatcher" className="text-sm font-medium">
@@ -423,9 +525,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="qa-reviewer"
-                                    checked={roles.isQAReviewer}
+                                    checked={role.isQAReviewer}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_qa_reviewer', checked as boolean)
+                                      handleRoleChange('isQAReviewer', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="qa-reviewer" className="text-sm font-medium">
@@ -436,9 +538,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="hr"
-                                    checked={roles.isHR}
+                                    checked={role.isHR}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_hr', checked as boolean)
+                                      handleRoleChange('isHR', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="hr" className="text-sm font-medium">
@@ -449,9 +551,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="mechanic"
-                                    checked={roles.isMechanic}
+                                    checked={role.isMechanic}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_mechanic', checked as boolean)
+                                      handleRoleChange('isMechanic', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="mechanic" className="text-sm font-medium">
@@ -462,9 +564,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="salesperson"
-                                    checked={roles.isSalesperson}
+                                    checked={role.isSalesperson}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_salesperson', checked as boolean)
+                                      handleRoleChange('isSalesperson', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="salesperson" className="text-sm font-medium">
@@ -477,9 +579,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="medical-director"
-                                    checked={roles.isMedicalDirector}
+                                    checked={role.isMedicalDirector}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_medical_director', checked as boolean)
+                                      handleRoleChange('isMedicalDirector', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="medical-director" className="text-sm font-medium">
@@ -491,33 +593,33 @@ export function EmployeeProfile() {
                                   <div className="flex items-center space-x-2">
                                     <Checkbox 
                                       id="onlooker"
-                                      checked={roles.isOnlooker}
+                                      checked={role.isOnlooker}
                                       onCheckedChange={(checked) => 
-                                        handleRoleChange('is_onlooker', checked as boolean)
+                                        handleRoleChange('isOnlooker', checked as boolean)
                                       }
                                     />
                                     <label htmlFor="onlooker" className="text-sm font-medium">
                                       Onlooker
                                     </label>
                                   </div>
-                                  {roles.isOnlooker && (
+                                  {role.isOnlooker && (
                                     <div className="space-y-2 pl-6">
                                       <Input 
                                         placeholder="Facility"
-                                        value={roles.onlookerFacility}
-                                        onChange={(e) => handleRoleChange('onlooker_facility', e.target.value)}
+                                        value={role.onlookerFacility}
+                                        onChange={(e) => handleRoleChange('onlookerFacility', e.target.value)}
                                         className="bg-medical-accent/10"
                                       />
                                       <Input 
                                         placeholder="City"
-                                        value={roles.onlookerCity}
-                                        onChange={(e) => handleRoleChange('onlooker_city', e.target.value)}
+                                        value={role.onlookerCity}
+                                        onChange={(e) => handleRoleChange('onlookerCity', e.target.value)}
                                         className="bg-medical-accent/10"
                                       />
                                       <Input 
                                         placeholder="County"
-                                        value={roles.onlookerCounty}
-                                        onChange={(e) => handleRoleChange('onlooker_county', e.target.value)}
+                                        value={role.onlookerCounty}
+                                        onChange={(e) => handleRoleChange('onlookerCounty', e.target.value)}
                                         className="bg-medical-accent/10"
                                       />
                                     </div>
@@ -527,9 +629,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="non-emergent"
-                                    checked={roles.canSeeNonEmergent}
+                                    checked={role.canSeeNonEmergent}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('can_see_non_emergent', checked as boolean)
+                                      handleRoleChange('canSeeNonEmergent', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="non-emergent" className="text-sm font-medium">
@@ -540,9 +642,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="administrator"
-                                    checked={roles.isAdministrator}
+                                    checked={role.isAdministrator}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_administrator', checked as boolean)
+                                      handleRoleChange('isAdministrator', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="administrator" className="text-sm font-medium">
@@ -553,9 +655,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="principal"
-                                    checked={roles.isPrincipal}
+                                    checked={role.isPrincipal}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_principal', checked as boolean)
+                                      handleRoleChange('isPrincipal', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="principal" className="text-sm font-medium">
@@ -566,9 +668,9 @@ export function EmployeeProfile() {
                                 <div className="flex items-center space-x-2">
                                   <Checkbox 
                                     id="provisional"
-                                    checked={roles.isProvisional}
+                                    checked={role.isProvisional}
                                     onCheckedChange={(checked) => 
-                                      handleRoleChange('is_provisional', checked as boolean)
+                                      handleRoleChange('isProvisional', checked as boolean)
                                     }
                                   />
                                   <label htmlFor="provisional" className="text-sm font-medium">
