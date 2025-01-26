@@ -1,74 +1,75 @@
+import { Home, Megaphone, Users, Clock, Calculator, History, AlertTriangle, Calendar, UserX, Award, List, Link as LinkIcon, Settings, HelpCircle } from "lucide-react";
 import { HRNavigationItem } from "@/types/hr-navigation";
 
 export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
   {
     label: "HR Home",
-    icon: "home",
+    icon: Home,
     href: "/hr",
   },
   {
     label: "Announcements Control",
-    icon: "megaphone",
+    icon: Megaphone,
     href: "/hr/announcements",
   },
   {
     label: "Employee Directory",
-    icon: "users",
+    icon: Users,
     href: "/hr/employees",
   },
   {
     label: "Manual Clock-in",
-    icon: "clock",
+    icon: Clock,
     href: "/hr/clock-in",
   },
   {
     label: "Payroll Calculator",
-    icon: "calculator",
+    icon: Calculator,
     href: "/hr/payroll",
   },
   {
     label: "Employee Logon History",
-    icon: "history",
+    icon: History,
     href: "/hr/logon-history",
   },
   {
     label: "Incident System",
-    icon: "alert-triangle",
+    icon: AlertTriangle,
     href: "/hr/incidents",
   },
   {
     label: "Schedule Requests",
-    icon: "calendar",
+    icon: Calendar,
     href: "/hr/schedule-requests",
   },
   {
     label: "Employees Missing HR Data",
-    icon: "user-x",
+    icon: UserX,
     href: "/hr/missing-data",
   },
   {
     label: "Crew Certificates Overview",
-    icon: "award",
+    icon: Award,
     href: "/hr/certificates",
   },
   {
     label: "Certificate Types List",
-    icon: "list",
+    icon: List,
     href: "/hr/certificate-types",
   },
   {
     label: "Custom Link 1",
-    icon: "link",
+    icon: LinkIcon,
     href: "/hr/custom-link",
   },
   {
     label: "AngelTrack Settings",
-    icon: "settings",
+    icon: Settings,
     href: "/hr/settings",
   },
   {
     label: "15 Days Remaining",
-    icon: "calendar",
+    icon: Calendar,
     href: "/hr/remaining-days",
     badge: {
       text: "15 Days",
@@ -76,7 +77,7 @@ export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
   },
   {
     label: "Support",
-    icon: "help-circle",
+    icon: HelpCircle,
     href: "/hr/support",
   },
 ];
