@@ -12,7 +12,7 @@ export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
     href: "/hr/announcements",
   },
   {
-    label: "Employees List",
+    label: "Employee Directory",
     icon: "users",
     href: "/hr/employees",
   },
