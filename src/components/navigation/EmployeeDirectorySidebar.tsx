@@ -26,7 +26,7 @@ export function EmployeeDirectorySidebar() {
                   role="menuitem"
                 >
                   <Users className="h-4 w-4" aria-hidden="true" />
-                  View Directory
+                  Employee Directory
                 </Button>
               </Link>
               <Link to="/employees/new" aria-label="Add new employee">
