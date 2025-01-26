@@ -4,6 +4,23 @@ import { supabase } from '@/integrations/supabase/client';
 import type { VehicleLocation, MapFilters, AIMapInsight } from '@/types/operations-map';
 import { toast } from 'sonner';
 
+interface RouteData {
+  current_location: {
+    lat: number;
+    lng: number;
+  };
+}
+
+interface AIAnalysisMetadata {
+  type: 'traffic' | 'weather' | 'coverage' | 'demand';
+  severity: 'low' | 'medium' | 'high';
+  location?: {
+    lat: number;
+    lng: number;
+  };
+  recommendation?: string;
+}
+
 export function useOperationsMap() {
   const [filters, setFilters] = useState<MapFilters>({
     showActiveVehicles: true,
@@ -38,7 +55,7 @@ export function useOperationsMap() {
       return data?.map(record => ({
         id: record.id,
         vehicleId: record.vehicle_number,
-        location: record.route_data?.current_location || { lat: 33.7490, lng: -84.3880 },
+        location: (record.route_data as RouteData)?.current_location || { lat: 33.7490, lng: -84.3880 },
         status: 'active',
         lastUpdated: new Date().toISOString(),
         crew: record.crew_assigned ? [record.crew_assigned] : [],
@@ -64,11 +81,11 @@ export function useOperationsMap() {
       }
 
       return (data || []).map(insight => ({
-        type: insight.metadata?.type || 'traffic',
-        severity: insight.metadata?.severity || 'medium',
+        type: (insight.metadata as AIAnalysisMetadata)?.type || 'traffic',
+        severity: (insight.metadata as AIAnalysisMetadata)?.severity || 'medium',
         message: insight.recommendation || '',
-        location: insight.metadata?.location,
-        recommendation: insight.metadata?.recommendation
+        location: (insight.metadata as AIAnalysisMetadata)?.location,
+        recommendation: (insight.metadata as AIAnalysisMetadata)?.recommendation
       })) as AIMapInsight[];
     }
   });
