@@ -1,6 +1,11 @@
-import { LimitDepth } from './utility-types';
+export interface ShiftFilter {
+  startDate?: Date;
+  endDate?: Date;
+  vehicle?: string;
+  station?: string;
+}
 
-export interface BaseShiftRecord {
+export interface ShiftRecord {
   id: string;
   employee_id?: string;
   shift_date: string;
@@ -11,8 +16,8 @@ export interface BaseShiftRecord {
   notes?: string;
   created_at?: string;
   updated_at?: string;
-  ai_analysis?: any;
-  performance_metrics?: any;
+  ai_analysis?: Record<string, unknown>;
+  performance_metrics?: Record<string, unknown>;
   safety_score?: number;
   fatigue_indicators?: string[];
   shift_pattern_analysis?: string;
@@ -23,17 +28,4 @@ export interface BaseShiftRecord {
   distance?: number;
   primary_checklist_completed?: boolean;
   secondary_checklist_completed?: boolean;
-  employees?: {
-    first_name: string;
-    last_name: string;
-  } | null;
-}
-
-export type ShiftRecord = LimitDepth<BaseShiftRecord>;
-
-export interface ShiftFilter {
-  startDate?: Date;
-  endDate?: Date;
-  vehicle?: string;
-  station?: string;
 }
