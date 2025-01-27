@@ -31,7 +31,7 @@ export const shiftRecordsService = {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data as ShiftRecord[];
+      return (data || []) as ShiftRecord[];
     } catch (error) {
       logger.error('Error fetching shift records:', error);
       throw error;
@@ -47,7 +47,13 @@ export const shiftRecordsService = {
         .from('shift_records')
         .update(updates)
         .eq('id', id)
-        .select()
+        .select(`
+          *,
+          employees (
+            first_name,
+            last_name
+          )
+        `)
         .single();
 
       if (error) throw error;
