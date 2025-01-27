@@ -276,6 +276,7 @@ export type Database = {
           id: string
           insurance_id: string | null
           patient_id: string | null
+          priority: string | null
           requested_by: string | null
           service_type: string
           status: string | null
@@ -290,6 +291,7 @@ export type Database = {
           id?: string
           insurance_id?: string | null
           patient_id?: string | null
+          priority?: string | null
           requested_by?: string | null
           service_type: string
           status?: string | null
@@ -304,6 +306,7 @@ export type Database = {
           id?: string
           insurance_id?: string | null
           patient_id?: string | null
+          priority?: string | null
           requested_by?: string | null
           service_type?: string
           status?: string | null

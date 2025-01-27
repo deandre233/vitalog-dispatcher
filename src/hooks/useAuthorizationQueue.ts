@@ -35,7 +35,7 @@ export const useAuthorizationQueue = () => {
         throw error;
       }
 
-      return data;
+      return data as AuthorizationRequest[];
     },
   });
 

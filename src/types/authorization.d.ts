@@ -5,21 +5,22 @@ export type PriorityLevel = "critical" | "high" | "medium" | "low";
 
 export interface AuthorizationRequest {
   id: string;
-  patientId: string;
-  serviceType: string;
+  patient_id: string;
+  service_type: string;
   status: AuthorizationStatus;
   priority: PriorityLevel;
-  requestedBy: string;
-  requestedAt: string;
-  expiresAt?: string;
-  notes?: string;
-  patient?: {
-    firstName: string;
-    lastName: string;
+  requested_by: string;
+  created_at: string;
+  valid_from?: string;
+  valid_until?: string;
+  authorization_number?: string;
+  patients?: {
+    first_name: string;
+    last_name: string;
   };
-  insuranceDetails?: {
-    provider: string;
-    policyNumber: string;
+  insurance_records?: {
+    carrier_name: string;
+    policy_number: string;
   };
 }
 
