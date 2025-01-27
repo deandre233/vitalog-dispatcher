@@ -4,13 +4,14 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Building2, MapPin, Phone, Mail, Search, Filter, Activity } from "lucide-react";
 import { useState } from "react";
 import { Json } from "@/integrations/supabase/types";
 
-// TypeScript interfaces for better type safety
 interface AIRecommendations {
   usage_pattern: string;
   efficiency_score: number;
@@ -37,11 +38,24 @@ interface RawCenter extends Omit<Center, 'ai_recommendations'> {
   ai_recommendations: Json;
 }
 
+interface FilterState {
+  nameFilter: string;
+  addressFilter: string;
+  locationType: string;
+  minDispatches: number;
+  hideInactive: boolean;
+  hideNonContract: boolean;
+}
+
 export const CenterList = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState<string>("all");
-  const [sortField, setSortField] = useState<keyof Center>("name");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [filters, setFilters] = useState<FilterState>({
+    nameFilter: "",
+    addressFilter: "",
+    locationType: "all",
+    minDispatches: 10,
+    hideInactive: false,
+    hideNonContract: false
+  });
 
   const { data: centers, isLoading, error } = useQuery({
     queryKey: ['centers'],
@@ -65,17 +79,26 @@ export const CenterList = () => {
   });
 
   const filteredCenters = centers?.filter(center => {
-    const matchesSearch = 
-      center.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      center.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      center.city.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === "all" || center.type === filterType;
-    return matchesSearch && matchesType;
-  }).sort((a, b) => {
-    const aValue = a[sortField];
-    const bValue = b[sortField];
-    const direction = sortDirection === "asc" ? 1 : -1;
-    return aValue < bValue ? -1 * direction : aValue > bValue ? 1 * direction : 0;
+    if (filters.nameFilter && !center.name.toLowerCase().includes(filters.nameFilter.toLowerCase())) {
+      return false;
+    }
+    if (filters.addressFilter && !center.address.toLowerCase().includes(filters.addressFilter.toLowerCase())) {
+      return false;
+    }
+    if (filters.locationType !== "all" && center.type !== filters.locationType) {
+      return false;
+    }
+    if (center.dispatch_count < filters.minDispatches) {
+      return false;
+    }
+    if (filters.hideInactive && center.status !== "active") {
+      return false;
+    }
+    // Note: This is a placeholder condition since we don't have contract status in the data model
+    if (filters.hideNonContract && center.status === "non-contract") {
+      return false;
+    }
+    return true;
   });
 
   if (error) {
@@ -112,30 +135,90 @@ export const CenterList = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-medical-primary">Medical Centers</h1>
-        <div className="flex gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+      </div>
+
+      <Card className="p-4 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="nameFilter">Name contains</Label>
             <Input
-              placeholder="Search centers..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              id="nameFilter"
+              value={filters.nameFilter}
+              onChange={(e) => setFilters(prev => ({ ...prev, nameFilter: e.target.value }))}
+              className="w-full"
             />
           </div>
-          <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="hospital">Hospital</SelectItem>
-              <SelectItem value="clinic">Clinic</SelectItem>
-              <SelectItem value="urgent_care">Urgent Care</SelectItem>
-              <SelectItem value="specialty">Specialty Center</SelectItem>
-            </SelectContent>
-          </Select>
+
+          <div className="space-y-2">
+            <Label htmlFor="addressFilter">Street address contains</Label>
+            <Input
+              id="addressFilter"
+              value={filters.addressFilter}
+              onChange={(e) => setFilters(prev => ({ ...prev, addressFilter: e.target.value }))}
+              className="w-full"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="locationType">Location type</Label>
+            <Select
+              value={filters.locationType}
+              onValueChange={(value) => setFilters(prev => ({ ...prev, locationType: value }))}>
+              <SelectTrigger id="locationType">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="hospital">Hospital</SelectItem>
+                <SelectItem value="clinic">Clinic</SelectItem>
+                <SelectItem value="skilled_nursing">Skilled Nursing Facility (SNF)</SelectItem>
+                <SelectItem value="urgent_care">Urgent Care</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="minDispatches">Minimum dispatches</Label>
+            <Select
+              value={filters.minDispatches.toString()}
+              onValueChange={(value) => setFilters(prev => ({ ...prev, minDispatches: parseInt(value) }))}>
+              <SelectTrigger id="minDispatches">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2 col-span-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="hideInactive"
+                checked={filters.hideInactive}
+                onCheckedChange={(checked) => 
+                  setFilters(prev => ({ ...prev, hideInactive: checked as boolean }))
+                }
+              />
+              <Label htmlFor="hideInactive">Hide inactive facilities</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="hideNonContract"
+                checked={filters.hideNonContract}
+                onCheckedChange={(checked) => 
+                  setFilters(prev => ({ ...prev, hideNonContract: checked as boolean }))
+                }
+              />
+              <Label htmlFor="hideNonContract">Hide non-contract facilities</Label>
+            </div>
+          </div>
         </div>
-      </div>
+      </Card>
 
       <Table>
         <TableHeader>
