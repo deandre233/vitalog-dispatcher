@@ -1,17 +1,17 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { ShiftRecord, ShiftFilter } from "@/types/shift-records";
 
-// Helper type to avoid deep recursion
-type BasicShiftRecord = Omit<ShiftRecord, 'ai_analysis' | 'performance_metrics'> & {
-  ai_analysis: Record<string, unknown>;
-  performance_metrics: Record<string, unknown>;
-};
-
 export const shiftRecordsService = {
-  getShiftRecords: async (filters?: ShiftFilter): Promise<BasicShiftRecord[]> => {
+  getShiftRecords: async (filters?: ShiftFilter): Promise<ShiftRecord[]> => {
     let query = supabase
       .from('shift_records')
-      .select('*')
+      .select(`
+        *,
+        employees (
+          first_name,
+          last_name
+        )
+      `)
       .order('created_at', { ascending: false });
 
     if (filters?.startDate) {
@@ -33,13 +33,13 @@ export const shiftRecordsService = {
     const { data, error } = await query;
 
     if (error) throw error;
-    return (data || []) as BasicShiftRecord[];
+    return (data || []) as ShiftRecord[];
   },
 
   updateShiftChecklist: async (
     shiftId: string,
-    updates: Partial<ShiftRecord>
-  ): Promise<BasicShiftRecord> => {
+    updates: Partial<Pick<ShiftRecord, 'primary_checklist_completed' | 'secondary_checklist_completed'>>
+  ): Promise<ShiftRecord> => {
     const { data, error } = await supabase
       .from('shift_records')
       .update(updates)
@@ -48,6 +48,6 @@ export const shiftRecordsService = {
       .single();
 
     if (error) throw error;
-    return data as BasicShiftRecord;
+    return data as ShiftRecord;
   }
 };

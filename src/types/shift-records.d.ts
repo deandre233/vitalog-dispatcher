@@ -16,8 +16,8 @@ export interface ShiftRecord {
   notes?: string;
   created_at?: string;
   updated_at?: string;
-  ai_analysis?: Record<string, unknown>;
-  performance_metrics?: Record<string, unknown>;
+  ai_analysis?: Record<string, any>;
+  performance_metrics?: Record<string, any>;
   safety_score?: number;
   fatigue_indicators?: string[];
   shift_pattern_analysis?: string;
@@ -28,4 +28,8 @@ export interface ShiftRecord {
   distance?: number;
   primary_checklist_completed?: boolean;
   secondary_checklist_completed?: boolean;
+  employees?: {
+    first_name: string;
+    last_name: string;
+  };
 }
