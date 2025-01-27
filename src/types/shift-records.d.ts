@@ -1,3 +1,5 @@
+import type { Json } from "@/integrations/supabase/types";
+
 export interface ShiftRecord {
   id: string;
   employee_id: string | null;
@@ -10,8 +12,8 @@ export interface ShiftRecord {
   created_at: string | null;
   updated_at: string | null;
   uuid: string;
-  ai_analysis: any;
-  performance_metrics: any;
+  ai_analysis: Json | null;
+  performance_metrics: Json | null;
   safety_score: number | null;
   fatigue_indicators: string[] | null;
   shift_pattern_analysis: string | null;

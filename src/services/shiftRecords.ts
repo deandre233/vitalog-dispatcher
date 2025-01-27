@@ -13,8 +13,7 @@ export const shiftRecordsService = {
             first_name,
             last_name
           )
-        `)
-        .order('created_at', { ascending: false });
+        `);
 
       if (filters?.startDate) {
         query = query.gte('shift_date', filters.startDate.toISOString());
@@ -39,7 +38,7 @@ export const shiftRecordsService = {
     }
   },
 
-  async updateShiftChecklist(id: string, updates: Partial<ShiftRecord>): Promise<ShiftRecord> {
+  async updateShiftChecklist(id: string, updates: { primary_checklist_completed?: boolean; secondary_checklist_completed?: boolean }): Promise<ShiftRecord> {
     try {
       const { data, error } = await supabase
         .from('shift_records')
