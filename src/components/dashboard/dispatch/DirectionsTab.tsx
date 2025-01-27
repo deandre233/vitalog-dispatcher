@@ -71,6 +71,7 @@ export function DirectionsTab({ transportRecord }: DirectionsTabProps) {
                 
                 // Update route data in transport record if needed
                 if (leg) {
+                  // Format route data as a plain object to match Supabase's Json type
                   const routeData = {
                     distance: leg.distance?.text || "",
                     duration: leg.duration?.text || "",
@@ -82,7 +83,7 @@ export function DirectionsTab({ transportRecord }: DirectionsTabProps) {
                       lat: leg.end_location.lat(),
                       lng: leg.end_location.lng()
                     }
-                  };
+                  } as const;
 
                   // Store route data in Supabase
                   supabase

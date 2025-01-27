@@ -1,49 +1,44 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { ShiftRecord, ShiftFilter } from "@/types/shift-records";
 import { logger } from "@/utils/logger";
-import { Database } from "@/integrations/supabase/types";
 
 export const shiftRecordsService = {
   async getShiftRecords(filters?: ShiftFilter) {
     try {
       let query = supabase
         .from('shift_records')
-        .select(`
-          *,
-          employees (
-            first_name,
-            last_name
-          )
-        `);
+        .select('*');
 
-      if (filters?.startDate) {
-        query = query.gte('shift_date', filters.startDate.toISOString());
-      }
-      if (filters?.endDate) {
-        query = query.lte('shift_date', filters.endDate.toISOString());
-      }
-      if (filters?.vehicle) {
-        query = query.eq('vehicle_id', filters.vehicle);
-      }
-      if (filters?.station) {
-        query = query.eq('station', filters.station);
+      if (filters) {
+        if (filters.employeeId) {
+          query = query.eq('employee_id', filters.employeeId);
+        }
+        if (filters.startDate) {
+          query = query.gte('shift_date', filters.startDate);
+        }
+        if (filters.endDate) {
+          query = query.lte('shift_date', filters.endDate);
+        }
+        if (filters.shiftType) {
+          query = query.eq('shift_type', filters.shiftType);
+        }
       }
 
       const { data, error } = await query;
 
       if (error) throw error;
-      return data as ShiftRecord[];
+      return (data || []) as ShiftRecord[];
     } catch (error) {
       logger.error('Error fetching shift records:', error);
       throw error;
     }
   },
 
-  async updateShiftChecklist(id: string, updates: { primary_checklist_completed?: boolean; secondary_checklist_completed?: boolean }) {
+  async updateShiftChecklist(id: string, checklistCompleted: boolean): Promise<ShiftRecord> {
     try {
       const { data, error } = await supabase
         .from('shift_records')
-        .update(updates)
+        .update({ checklist_completed: checklistCompleted })
         .eq('id', id)
         .select()
         .single();
