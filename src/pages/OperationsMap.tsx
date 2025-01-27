@@ -3,7 +3,6 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useOperationsMap } from '@/hooks/useOperationsMap';
 import { MapPin, AlertTriangle, Cloud, Car, Activity } from 'lucide-react';
@@ -21,9 +20,9 @@ export function OperationsMap() {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const { vehicles, insights, filters, setFilters, isLoading } = useOperationsMap();
   const [mapLoading, setMapLoading] = useState(true);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   const handleSearch = (filters: SearchFilters) => {
-    // Implement search logic here
     console.log('Search filters:', filters);
     toast.success('Search filters updated');
   };
@@ -31,6 +30,7 @@ export function OperationsMap() {
   // Initialize map
   useEffect(() => {
     let isMounted = true;
+    let mapInstance: mapboxgl.Map | null = null;
 
     const initializeMap = async () => {
       if (!mapContainer.current || !isMounted) return;
@@ -46,7 +46,7 @@ export function OperationsMap() {
         
         if (!isMounted) return;
 
-        map.current = new mapboxgl.Map({
+        mapInstance = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
           center: [-84.3880, 33.7490],
@@ -54,12 +54,14 @@ export function OperationsMap() {
           pitch: 45,
         });
 
-        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        map.current = mapInstance;
 
-        map.current.on('style.load', () => {
-          if (!isMounted || !map.current) return;
+        mapInstance.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+        mapInstance.on('style.load', () => {
+          if (!isMounted || !mapInstance) return;
           
-          map.current.setFog({
+          mapInstance.setFog({
             'color': 'rgb(255, 255, 255)',
             'high-color': 'rgb(200, 200, 225)',
             'horizon-blend': 0.2,
@@ -69,6 +71,8 @@ export function OperationsMap() {
 
       } catch (error) {
         console.error('Error initializing map:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to initialize map';
+        setMapError(errorMessage);
         if (isMounted) {
           toast.error('Failed to initialize map. Please try again later.');
           setMapLoading(false);
@@ -80,10 +84,15 @@ export function OperationsMap() {
 
     return () => {
       isMounted = false;
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
+      // Clean up markers
+      markersRef.current.forEach(marker => marker.remove());
+      markersRef.current = [];
+      
+      // Clean up map instance
+      if (mapInstance) {
+        mapInstance.remove();
       }
+      map.current = null;
     };
   }, []);
 
@@ -91,13 +100,15 @@ export function OperationsMap() {
   useEffect(() => {
     if (!map.current || !vehicles) return;
 
+    const currentMap = map.current;
+
     // Clear existing markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
     // Add new markers
     vehicles.forEach(vehicle => {
-      if (!map.current) return;
+      if (!currentMap) return;
 
       const el = document.createElement('div');
       el.className = 'vehicle-marker';
@@ -122,7 +133,7 @@ export function OperationsMap() {
               </div>
             `)
         )
-        .addTo(map.current);
+        .addTo(currentMap);
 
       markersRef.current.push(marker);
     });
@@ -216,6 +227,16 @@ export function OperationsMap() {
                 <div className="flex flex-col items-center gap-2">
                   <LoadingSpinner size={32} />
                   <p className="text-lg font-semibold">Loading map data...</p>
+                </div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {mapError && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center">
+                <div className="flex flex-col items-center gap-2 text-red-500">
+                  <AlertTriangle size={32} />
+                  <p className="text-lg font-semibold">{mapError}</p>
                 </div>
               </div>
             )}
