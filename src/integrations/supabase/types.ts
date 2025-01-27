@@ -2203,6 +2203,53 @@ export type Database = {
         }
         Relationships: []
       }
+      schedule_recommendations: {
+        Row: {
+          confidence_score: number
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          original_time: string
+          reason: string
+          recommended_time: string
+          status: string | null
+          transport_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          confidence_score: number
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          original_time: string
+          reason: string
+          recommended_time: string
+          status?: string | null
+          transport_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          confidence_score?: number
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          original_time?: string
+          reason?: string
+          recommended_time?: string
+          status?: string | null
+          transport_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_recommendations_transport_id_fkey"
+            columns: ["transport_id"]
+            isOneToOne: false
+            referencedRelation: "transport_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_requests: {
         Row: {
           created_at: string | null
@@ -2345,6 +2392,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      traffic_analysis: {
+        Row: {
+          average_duration: number
+          confidence_score: number
+          created_at: string | null
+          day_of_week: string
+          historical_data: Json | null
+          hour_of_day: number
+          id: string
+          last_updated: string | null
+          route_end_location: string
+          route_start_location: string
+          traffic_level: Database["public"]["Enums"]["traffic_severity"]
+        }
+        Insert: {
+          average_duration: number
+          confidence_score: number
+          created_at?: string | null
+          day_of_week: string
+          historical_data?: Json | null
+          hour_of_day: number
+          id?: string
+          last_updated?: string | null
+          route_end_location: string
+          route_start_location: string
+          traffic_level: Database["public"]["Enums"]["traffic_severity"]
+        }
+        Update: {
+          average_duration?: number
+          confidence_score?: number
+          created_at?: string | null
+          day_of_week?: string
+          historical_data?: Json | null
+          hour_of_day?: number
+          id?: string
+          last_updated?: string | null
+          route_end_location?: string
+          route_start_location?: string
+          traffic_level?: Database["public"]["Enums"]["traffic_severity"]
+        }
+        Relationships: []
       }
       transport_records: {
         Row: {
@@ -2841,6 +2930,7 @@ export type Database = {
         | "Lieutenant"
         | "Full privileges"
         | "Call-taker / Self-dispatch"
+      traffic_severity: "low" | "medium" | "high" | "severe"
       trip_type: "One way" | "Wait-and-return" | "Round trip"
       user_access_level: "admin" | "user" | "guest"
       user_role: "admin" | "doctor" | "nurse" | "billing" | "receptionist"
