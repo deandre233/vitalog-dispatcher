@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { AIInsight } from "@/types/ai";
+import type { AuthorizationRequest, AuthorizationStatus } from "@/types/authorization";
 import { toast } from "sonner";
 
 interface UseAuthorizationRecordsParams {
@@ -26,6 +27,7 @@ interface AuthorizationRecord {
   created_at: string;
   updated_at: string;
   priority: string;
+  destination_type?: string;
   patients?: {
     first_name: string;
     last_name: string;
@@ -86,6 +88,12 @@ export const useAuthorizationRecords = ({
         throw error;
       }
 
+      // Map database records to the expected AuthorizationRequest type
+      const mappedRecords = (records || []).map(record => ({
+        ...record,
+        status: record.status as AuthorizationStatus // Type assertion since we know the values match
+      }));
+
       // Simulate AI insights based on the data
       const aiInsights: AIInsight[] = [
         {
@@ -109,7 +117,7 @@ export const useAuthorizationRecords = ({
       ];
 
       return {
-        records: records || [],
+        records: mappedRecords,
         aiInsights
       };
     }
