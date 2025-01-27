@@ -6,11 +6,11 @@ import ActiveDispatches from "@/pages/ActiveDispatches";
 import ClosedDispatches from "@/pages/ClosedDispatches";
 import CreateDispatch from "@/pages/CreateDispatch";
 import DispatchSettings from "@/pages/DispatchSettings";
-import { Reports } from "@/pages/Reports";
-import { OperationsMap } from "@/pages/OperationsMap";
-import { ServiceQueue } from "@/pages/ServiceQueue";
-import { AuthorizationQueue } from "@/pages/AuthorizationQueue";
-import { AuthorizationsOnRecord } from "@/pages/AuthorizationsOnRecord";
+import Reports from "@/pages/Reports";
+import OperationsMap from "@/pages/OperationsMap";
+import ServiceQueue from "@/pages/ServiceQueue";
+import AuthorizationQueue from "@/pages/AuthorizationQueue";
+import AuthorizationsOnRecord from "@/pages/AuthorizationsOnRecord";
 
 const queryClient = new QueryClient();
 
@@ -28,7 +28,7 @@ function App() {
           <Route path="/operations-map" element={<OperationsMap />} />
           <Route path="/service-queue" element={<ServiceQueue />} />
           <Route path="/authorization-queue" element={<AuthorizationQueue />} />
-          <Route path="/authorizations" element={<AuthorizationsOnRecord />} />
+          <Route path="/authorizations-on-record" element={<AuthorizationsOnRecord />} />
         </Routes>
         <Toaster />
       </Router>
