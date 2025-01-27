@@ -1,66 +1,44 @@
+import { ShiftRecord } from "@/types/shift-records";
 import { supabase } from "@/integrations/supabase/client";
-import type { ShiftRecord, ShiftFilter } from "@/types/shift-records";
-import { logger } from "@/utils/logger";
 
-export const shiftRecordsService = {
-  async getShiftRecords(filters?: ShiftFilter): Promise<ShiftRecord[]> {
-    try {
-      let query = supabase
-        .from('shift_records')
-        .select(`
-          *,
-          employees (
-            first_name,
-            last_name
-          )
-        `);
+export const getShiftRecords = async (): Promise<ShiftRecord[]> => {
+  const { data, error } = await supabase
+    .from("shift_records")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-      if (filters?.startDate) {
-        query = query.gte('shift_date', filters.startDate.toISOString());
-      }
-      if (filters?.endDate) {
-        query = query.lte('shift_date', filters.endDate.toISOString());
-      }
-      if (filters?.vehicle) {
-        query = query.eq('vehicle_id', filters.vehicle);
-      }
-      if (filters?.station) {
-        query = query.eq('station', filters.station);
-      }
+  if (error) throw error;
+  return data;
+};
 
-      const { data, error } = await query;
+export const createShiftRecord = async (record: ShiftRecord): Promise<ShiftRecord> => {
+  const { data, error } = await supabase
+    .from("shift_records")
+    .insert(record)
+    .select()
+    .single();
 
-      if (error) throw error;
-      return data as ShiftRecord[];
-    } catch (error) {
-      logger.error('Error fetching shift records:', error);
-      throw error;
-    }
-  },
+  if (error) throw error;
+  return data;
+};
 
-  async updateShiftChecklist(id: string, updates: { 
-    primary_checklist_completed?: boolean; 
-    secondary_checklist_completed?: boolean 
-  }): Promise<ShiftRecord> {
-    try {
-      const { data, error } = await supabase
-        .from('shift_records')
-        .update(updates)
-        .eq('id', id)
-        .select(`
-          *,
-          employees (
-            first_name,
-            last_name
-          )
-        `)
-        .single();
+export const updateShiftRecord = async (id: string, updates: Partial<ShiftRecord>): Promise<ShiftRecord> => {
+  const { data, error } = await supabase
+    .from("shift_records")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
 
-      if (error) throw error;
-      return data as ShiftRecord;
-    } catch (error) {
-      logger.error('Error updating shift checklist:', error);
-      throw error;
-    }
-  }
+  if (error) throw error;
+  return data;
+};
+
+export const deleteShiftRecord = async (id: string): Promise<void> => {
+  const { error } = await supabase
+    .from("shift_records")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw error;
 };
