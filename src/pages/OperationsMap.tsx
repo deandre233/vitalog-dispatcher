@@ -16,38 +16,42 @@ import { toast } from 'sonner';
 export function OperationsMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
   const { vehicles, insights, filters, setFilters, isLoading } = useOperationsMap();
   const [mapLoading, setMapLoading] = useState(true);
 
+  // Initialize map
   useEffect(() => {
+    let isMounted = true;
+
     const initializeMap = async () => {
-      if (!mapContainer.current) return;
+      if (!mapContainer.current || !isMounted) return;
 
       try {
-        // Get Mapbox token from Supabase Edge Function
-        const { data: { GOOGLE_MAPS_API_KEY: mapboxToken }, error } = await supabase
-          .functions.invoke('get-google-maps-key');
-
-        if (error || !mapboxToken) {
+        const { data, error } = await supabase.functions.invoke('get-google-maps-key');
+        
+        if (error || !data?.GOOGLE_MAPS_API_KEY) {
           throw new Error('Failed to get map API key');
         }
 
-        // Initialize map
-        mapboxgl.accessToken = mapboxToken;
+        mapboxgl.accessToken = data.GOOGLE_MAPS_API_KEY;
+        
+        if (!isMounted) return;
+
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
-          center: [-84.3880, 33.7490], // Atlanta coordinates
+          center: [-84.3880, 33.7490],
           zoom: 10,
           pitch: 45,
         });
 
-        // Add navigation controls
         map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-        // Add atmosphere and fog effects
         map.current.on('style.load', () => {
-          map.current?.setFog({
+          if (!isMounted || !map.current) return;
+          
+          map.current.setFog({
             'color': 'rgb(255, 255, 255)',
             'high-color': 'rgb(200, 200, 225)',
             'horizon-blend': 0.2,
@@ -57,28 +61,33 @@ export function OperationsMap() {
 
       } catch (error) {
         console.error('Error initializing map:', error);
-        toast.error('Failed to initialize map. Please try again later.');
-        setMapLoading(false);
+        if (isMounted) {
+          toast.error('Failed to initialize map. Please try again later.');
+          setMapLoading(false);
+        }
       }
     };
 
     initializeMap();
 
     return () => {
-      map.current?.remove();
+      isMounted = false;
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     };
   }, []);
 
+  // Handle vehicle markers
   useEffect(() => {
     if (!map.current || !vehicles) return;
 
     // Clear existing markers
-    const markers = document.getElementsByClassName('vehicle-marker');
-    while (markers[0]) {
-      markers[0].parentNode?.removeChild(markers[0]);
-    }
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
 
-    // Add vehicle markers
+    // Add new markers
     vehicles.forEach(vehicle => {
       if (!map.current) return;
 
@@ -92,7 +101,7 @@ export function OperationsMap() {
         </div>
       `;
 
-      new mapboxgl.Marker(el)
+      const marker = new mapboxgl.Marker(el)
         .setLngLat([vehicle.location.lng, vehicle.location.lat])
         .setPopup(
           new mapboxgl.Popup({ offset: 25 })
@@ -106,7 +115,14 @@ export function OperationsMap() {
             `)
         )
         .addTo(map.current);
+
+      markersRef.current.push(marker);
     });
+
+    return () => {
+      markersRef.current.forEach(marker => marker.remove());
+      markersRef.current = [];
+    };
   }, [vehicles]);
 
   return (
