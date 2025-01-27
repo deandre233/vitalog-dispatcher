@@ -103,7 +103,7 @@ export const CenterList = () => {
               <SelectValue placeholder="Filter by type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="hospital">Hospital</SelectItem>
               <SelectItem value="clinic">Clinic</SelectItem>
               <SelectItem value="urgent_care">Urgent Care</SelectItem>
