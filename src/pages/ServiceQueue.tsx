@@ -30,7 +30,7 @@ export const ServiceQueue = () => {
     console.log("Opening new request modal");
   };
 
-  const getPriorityColor = (priority: ServiceRequest['priority']) => {
+  const getPriorityColor = (priority: 'low' | 'medium' | 'high') => {
     switch (priority) {
       case 'high':
         return 'bg-red-100 text-red-700';

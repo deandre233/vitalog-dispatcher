@@ -2260,8 +2260,11 @@ export type Database = {
           request_type: string
           requested_by: string | null
           requested_date: string | null
+          route: string | null
           service_date: string | null
+          service_type: string | null
           status: string | null
+          trip_type: string | null
           updated_at: string | null
         }
         Insert: {
@@ -2273,8 +2276,11 @@ export type Database = {
           request_type: string
           requested_by?: string | null
           requested_date?: string | null
+          route?: string | null
           service_date?: string | null
+          service_type?: string | null
           status?: string | null
+          trip_type?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -2286,8 +2292,11 @@ export type Database = {
           request_type?: string
           requested_by?: string | null
           requested_date?: string | null
+          route?: string | null
           service_date?: string | null
+          service_type?: string | null
           status?: string | null
+          trip_type?: string | null
           updated_at?: string | null
         }
         Relationships: [

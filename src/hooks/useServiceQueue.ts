@@ -34,8 +34,8 @@ export function useServiceQueue() {
         requestedDate: request.requested_date,
         serviceDate: request.service_date,
         scheduledTime: new Date(request.service_date).toLocaleTimeString(),
-        priority: request.priority || 'medium',
-        status: request.status || 'pending',
+        priority: request.priority as 'low' | 'medium' | 'high',
+        status: request.status as 'pending' | 'inProgress' | 'completed',
         tripType: request.trip_type || 'One way',
         service: request.service_type || 'Standard',
         route: request.route || 'Default',
@@ -51,7 +51,6 @@ export function useServiceQueue() {
     }
   });
 
-  // AI Insights generation
   const aiInsights: AIInsight[] = [
     {
       type: 'optimization',
@@ -73,7 +72,6 @@ export function useServiceQueue() {
     }
   ];
 
-  // Queue metrics calculation
   const metrics: QueueMetrics = {
     activeRequests: requests?.inProgress?.length || 0,
     avgResponseTime: "28 mins",
@@ -82,7 +80,6 @@ export function useServiceQueue() {
     efficiency: 89
   };
 
-  // Real-time updates subscription
   useEffect(() => {
     const channel = supabase
       .channel('service_requests_changes')
@@ -117,6 +114,9 @@ export function useServiceQueue() {
           service_date: newRequest.serviceDate,
           priority: newRequest.priority,
           status: 'pending',
+          trip_type: newRequest.tripType,
+          service_type: newRequest.service,
+          route: newRequest.route,
           notes: newRequest.notes
         })
         .select()
