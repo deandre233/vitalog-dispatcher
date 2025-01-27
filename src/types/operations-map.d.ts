@@ -1,27 +1,24 @@
-import type { Location } from "@/utils/crewRecommendation";
-
-export interface VehicleLocation {
-  id: string;
-  vehicleId: string;
-  location: Location;
-  status: 'active' | 'inactive' | 'maintenance';
-  lastUpdated: string;
-  crew?: string[];
-  currentDispatch?: string;
+export interface RouteData {
+  distance: string;
+  duration: string;
+  start_location: {
+    lat: number;
+    lng: number;
+  };
+  end_location: {
+    lat: number;
+    lng: number;
+  };
 }
 
-export interface MapFilters {
-  showActiveVehicles: boolean;
-  showInactiveVehicles: boolean;
-  showMaintenanceVehicles: boolean;
-  showTrafficLayer: boolean;
-  showWeatherLayer: boolean;
+export interface MapLocation {
+  lat: number;
+  lng: number;
 }
 
-export interface AIMapInsight {
-  type: 'traffic' | 'weather' | 'coverage' | 'demand';
-  severity: 'low' | 'medium' | 'high';
-  message: string;
-  location?: Location;
-  recommendation?: string;
+export interface RouteOptions {
+  optimizeWaypoints?: boolean;
+  avoidTolls?: boolean;
+  avoidHighways?: boolean;
+  departureTime?: Date;
 }

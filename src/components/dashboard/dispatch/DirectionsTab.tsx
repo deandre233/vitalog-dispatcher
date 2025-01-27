@@ -1,133 +1,93 @@
-import { useEffect, useRef } from "react";
-import { MapPin } from "lucide-react";
-import { TransportRecord } from "@/hooks/useTransportRecord";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useEffect, useState } from 'react';
+import { Card } from "@/components/ui/card";
+import { getRouteDetails, geocodeAddress } from '@/services/googleMaps';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import type { RouteData } from '@/types/operations-map';
 
 interface DirectionsTabProps {
-  transportRecord: TransportRecord;
+  transportId: string;
+  pickupLocation: string;
+  dropoffLocation: string;
 }
 
-export function DirectionsTab({ transportRecord }: DirectionsTabProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<google.maps.Map | null>(null);
-  const directionsRenderer = useRef<google.maps.DirectionsRenderer | null>(null);
+export const DirectionsTab: React.FC<DirectionsTabProps> = ({
+  transportId,
+  pickupLocation,
+  dropoffLocation,
+}) => {
+  const [mapElement, setMapElement] = useState<HTMLDivElement | null>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer | null>(null);
 
   useEffect(() => {
-    const initMap = async () => {
+    if (!mapElement) return;
+
+    const newMap = new google.maps.Map(mapElement, {
+      zoom: 12,
+      center: { lat: 0, lng: 0 },
+    });
+
+    const renderer = new google.maps.DirectionsRenderer({ map: newMap });
+    setMap(newMap);
+    setDirectionsRenderer(renderer);
+
+    return () => {
+      if (directionsRenderer) {
+        directionsRenderer.setMap(null);
+      }
+    };
+  }, [mapElement]);
+
+  useEffect(() => {
+    const calculateRoute = async () => {
+      if (!pickupLocation || !dropoffLocation) return;
+
       try {
-        if (!mapRef.current) return;
-
-        // Initialize the map
-        const { data: { GOOGLE_MAPS_API_KEY }, error } = await supabase.functions.invoke('get-google-maps-key');
+        const routeDetails = await getRouteDetails(pickupLocation, dropoffLocation);
         
-        if (error) {
-          console.error('Error fetching Google Maps API key:', error);
-          return;
-        }
-
-        // Load Google Maps script
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places,directions`;
-        script.async = true;
-        script.defer = true;
-        
-        script.onload = () => {
-          const origin = transportRecord.origin_address || transportRecord.pickup_location;
-          const destination = transportRecord.destination_address || transportRecord.dropoff_location;
-
-          // Create map instance
-          mapInstance.current = new google.maps.Map(mapRef.current, {
-            zoom: 12,
-            center: { lat: 33.7490, lng: -84.3880 }, // Default to Atlanta
-            mapTypeId: google.maps.MapTypeId.ROADMAP,
-            mapTypeControl: true,
-            streetViewControl: true,
-            fullscreenControl: true,
-          });
-
-          // Initialize DirectionsService and DirectionsRenderer
-          const directionsService = new google.maps.DirectionsService();
-          directionsRenderer.current = new google.maps.DirectionsRenderer({
-            map: mapInstance.current,
-            suppressMarkers: false,
-            preserveViewport: false,
-          });
-
-          // Calculate and display route
-          directionsService.route(
-            {
-              origin,
-              destination,
-              travelMode: google.maps.TravelMode.DRIVING,
-              optimizeWaypoints: true,
-            },
-            (result, status) => {
-              if (status === google.maps.DirectionsStatus.OK && result) {
-                directionsRenderer.current?.setDirections(result);
-                
-                // Get route details
-                const route = result.routes[0];
-                const leg = route.legs[0];
-                
-                // Update route data in transport record if needed
-                if (leg) {
-                  // Format route data as a plain object to match Supabase's Json type
-                  const routeData = {
-                    distance: leg.distance?.text || "",
-                    duration: leg.duration?.text || "",
-                    start_location: {
-                      lat: leg.start_location.lat(),
-                      lng: leg.start_location.lng()
-                    },
-                    end_location: {
-                      lat: leg.end_location.lat(),
-                      lng: leg.end_location.lng()
-                    }
-                  } as const;
-
-                  // Store route data in Supabase
-                  supabase
-                    .from('transport_records')
-                    .update({ route_data: routeData })
-                    .eq('id', transportRecord.id)
-                    .then(({ error }) => {
-                      if (error) console.error('Error updating route data:', error);
-                    });
-                }
-              } else {
-                console.error('Error calculating route:', status);
+        if (directionsRenderer && routeDetails.route) {
+          directionsRenderer.setDirections(routeDetails.route);
+          
+          const leg = routeDetails.route.routes[0]?.legs[0];
+          if (leg) {
+            const routeData: RouteData = {
+              distance: leg.distance?.text || "",
+              duration: leg.duration?.text || "",
+              start_location: {
+                lat: leg.start_location.lat(),
+                lng: leg.start_location.lng()
+              },
+              end_location: {
+                lat: leg.end_location.lat(),
+                lng: leg.end_location.lng()
               }
-            }
-          );
-        };
+            };
 
-        document.head.appendChild(script);
-
-        return () => {
-          // Cleanup
-          if (directionsRenderer.current) {
-            directionsRenderer.current.setMap(null);
+            await supabase
+              .from('transport_records')
+              .update({
+                route_data: routeData
+              })
+              .eq('id', transportId);
           }
-        };
+        }
       } catch (error) {
-        console.error('Error initializing map:', error);
+        console.error('Error calculating route:', error);
+        toast.error('Failed to calculate route');
       }
     };
 
-    initMap();
-  }, [transportRecord]);
+    calculateRoute();
+  }, [pickupLocation, dropoffLocation, directionsRenderer, transportId]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <MapPin className="h-5 w-5 text-gray-500" />
-        <h3 className="text-lg font-semibold">Route Details</h3>
-      </div>
-      <div className="pl-7 space-y-2">
-        <p>From: {transportRecord.origin_address || transportRecord.pickup_location}</p>
-        <p>To: {transportRecord.destination_address || transportRecord.dropoff_location}</p>
-      </div>
-      <div ref={mapRef} className="w-full h-[400px] rounded-lg border border-gray-200 shadow-sm" />
-    </div>
+    <Card className="p-4">
+      <div 
+        ref={setMapElement}
+        style={{ width: '100%', height: '400px' }}
+        className="rounded-lg overflow-hidden"
+      />
+    </Card>
   );
-}
+};

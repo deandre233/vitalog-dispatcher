@@ -7,21 +7,25 @@ export const shiftRecordsService = {
     try {
       let query = supabase
         .from('shift_records')
-        .select('*');
+        .select(`
+          *,
+          employees (
+            first_name,
+            last_name
+          )
+        `);
 
-      if (filters) {
-        if (filters.employeeId) {
-          query = query.eq('employee_id', filters.employeeId);
-        }
-        if (filters.startDate) {
-          query = query.gte('shift_date', filters.startDate);
-        }
-        if (filters.endDate) {
-          query = query.lte('shift_date', filters.endDate);
-        }
-        if (filters.shiftType) {
-          query = query.eq('shift_type', filters.shiftType);
-        }
+      if (filters?.startDate) {
+        query = query.gte('shift_date', filters.startDate.toISOString());
+      }
+      if (filters?.endDate) {
+        query = query.lte('shift_date', filters.endDate.toISOString());
+      }
+      if (filters?.vehicle) {
+        query = query.eq('vehicle_id', filters.vehicle);
+      }
+      if (filters?.station) {
+        query = query.eq('station', filters.station);
       }
 
       const { data, error } = await query;
@@ -34,11 +38,11 @@ export const shiftRecordsService = {
     }
   },
 
-  async updateShiftChecklist(id: string, checklistCompleted: boolean): Promise<ShiftRecord> {
+  async updateShiftChecklist(id: string, updates: { primary_checklist_completed?: boolean; secondary_checklist_completed?: boolean }): Promise<ShiftRecord> {
     try {
       const { data, error } = await supabase
         .from('shift_records')
-        .update({ checklist_completed: checklistCompleted })
+        .update(updates)
         .eq('id', id)
         .select()
         .single();
