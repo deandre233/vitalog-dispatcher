@@ -3,7 +3,7 @@ import type { ShiftRecord, ShiftFilter } from "@/types/shift-records";
 import { logger } from "@/utils/logger";
 
 export const shiftRecordsService = {
-  async getShiftRecords(filters?: ShiftFilter) {
+  async getShiftRecords(filters?: ShiftFilter): Promise<ShiftRecord[]> {
     try {
       let query = supabase
         .from('shift_records')
@@ -39,7 +39,7 @@ export const shiftRecordsService = {
     }
   },
 
-  async updateShiftChecklist(id: string, updates: Partial<ShiftRecord>) {
+  async updateShiftChecklist(id: string, updates: Partial<ShiftRecord>): Promise<ShiftRecord> {
     try {
       const { data, error } = await supabase
         .from('shift_records')

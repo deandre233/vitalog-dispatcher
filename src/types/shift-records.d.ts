@@ -33,6 +33,4 @@ export interface ShiftFilter {
   endDate?: Date;
   vehicle?: string;
   station?: string;
-  crewMember?: string;
-  status?: string;
 }
