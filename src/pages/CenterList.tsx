@@ -9,6 +9,12 @@ import { Building2, Mail, MapPin, Phone, Search } from "lucide-react";
 import { useState } from "react";
 import { Json } from "@/integrations/supabase/types";
 
+interface AIRecommendations {
+  usage_pattern: string;
+  efficiency_score: number;
+  suggested_improvements: string[];
+}
+
 interface Center {
   id: string;
   name: string;
@@ -20,11 +26,7 @@ interface Center {
   phone: string;
   email: string;
   status: string;
-  ai_recommendations: {
-    usage_pattern: string;
-    efficiency_score: number;
-    suggested_improvements: string[];
-  };
+  ai_recommendations: AIRecommendations;
   efficiency_score: number;
   dispatch_count: number;
   created_at: string;
