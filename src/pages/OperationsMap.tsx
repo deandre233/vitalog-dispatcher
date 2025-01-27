@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useOperationsMap } from '@/hooks/useOperationsMap';
 import { MapPin, AlertTriangle, Cloud, Car, Activity } from 'lucide-react';
+import { OperationsSearch } from '@/components/operations/OperationsSearch';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/integrations/supabase/client';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { toast } from 'sonner';
+import type { SearchFilters } from '@/types/search';
 
 export function OperationsMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -19,6 +21,12 @@ export function OperationsMap() {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const { vehicles, insights, filters, setFilters, isLoading } = useOperationsMap();
   const [mapLoading, setMapLoading] = useState(true);
+
+  const handleSearch = (filters: SearchFilters) => {
+    // Implement search logic here
+    console.log('Search filters:', filters);
+    toast.success('Search filters updated');
+  };
 
   // Initialize map
   useEffect(() => {
@@ -135,8 +143,13 @@ export function OperationsMap() {
             {/* Map Container */}
             <div ref={mapContainer} className="absolute inset-0" />
 
+            {/* Search Bar Overlay */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-full max-w-2xl px-4">
+              <OperationsSearch onSearch={handleSearch} />
+            </div>
+
             {/* Controls Overlay */}
-            <div className="absolute top-4 left-4 z-10 space-y-4">
+            <div className="absolute top-20 left-4 z-10 space-y-4">
               <Card className="p-4 w-80 bg-white/90 backdrop-blur-sm shadow-lg">
                 <h2 className="text-lg font-semibold mb-4">Map Controls</h2>
                 <div className="space-y-3">
