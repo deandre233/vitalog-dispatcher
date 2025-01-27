@@ -39,7 +39,7 @@ interface RawCenter extends Omit<Center, 'ai_recommendations'> {
 
 export const CenterList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState<string>("");
+  const [filterType, setFilterType] = useState<string>("all");
 
   const { data: centers, isLoading } = useQuery({
     queryKey: ['centers'],
@@ -51,7 +51,6 @@ export const CenterList = () => {
 
       if (error) throw error;
 
-      // Transform the raw data to match our Center interface
       return (data as RawCenter[]).map(center => ({
         ...center,
         ai_recommendations: {
@@ -66,7 +65,7 @@ export const CenterList = () => {
   const filteredCenters = centers?.filter(center => {
     const matchesSearch = center.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       center.address.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = !filterType || center.type === filterType;
+    const matchesType = filterType === "all" || center.type === filterType;
     return matchesSearch && matchesType;
   });
 
