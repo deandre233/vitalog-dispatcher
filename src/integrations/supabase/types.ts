@@ -433,10 +433,14 @@ export type Database = {
       centers: {
         Row: {
           address: string | null
+          ai_recommendations: Json | null
           city: string | null
           created_at: string | null
+          dispatch_count: number | null
+          efficiency_score: number | null
           email: string | null
           id: string
+          last_ai_analysis: string | null
           name: string
           phone: string | null
           state: string | null
@@ -447,10 +451,14 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          ai_recommendations?: Json | null
           city?: string | null
           created_at?: string | null
+          dispatch_count?: number | null
+          efficiency_score?: number | null
           email?: string | null
           id?: string
+          last_ai_analysis?: string | null
           name: string
           phone?: string | null
           state?: string | null
@@ -461,10 +469,14 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          ai_recommendations?: Json | null
           city?: string | null
           created_at?: string | null
+          dispatch_count?: number | null
+          efficiency_score?: number | null
           email?: string | null
           id?: string
+          last_ai_analysis?: string | null
           name?: string
           phone?: string | null
           state?: string | null

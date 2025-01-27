@@ -39,7 +39,7 @@ interface AuthorizationRecord {
 }
 
 interface AuthorizationResponse {
-  records: AuthorizationRecord[];
+  records: AuthorizationRequest[];
   aiInsights: AIInsight[];
 }
 
@@ -92,7 +92,7 @@ export const useAuthorizationRecords = ({
       const mappedRecords = (records || []).map(record => ({
         ...record,
         status: record.status as AuthorizationStatus // Type assertion since we know the values match
-      }));
+      })) as AuthorizationRequest[];
 
       // Simulate AI insights based on the data
       const aiInsights: AIInsight[] = [
