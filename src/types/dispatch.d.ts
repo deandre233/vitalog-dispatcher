@@ -69,6 +69,8 @@ export interface DispatchFormData {
   patient_first_name?: string;
   patient_last_name?: string;
   patient_dob?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
 }
 
 export interface TransportRecord {
