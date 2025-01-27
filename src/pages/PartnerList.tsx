@@ -6,13 +6,12 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { SearchBar } from "@/components/common/SearchBar";
 import { useToast } from "@/components/ui/use-toast";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { PartnerTable } from "@/components/partner/PartnerTable";
 import { PartnerMetrics } from "@/components/partner/PartnerMetrics";
 import { PartnerInsights } from "@/components/partner/PartnerInsights";
+import { PartnerAdvancedSearch } from "@/components/partner/PartnerAdvancedSearch";
 import { Tables } from "@/integrations/supabase/types";
 import { api } from "@/services/api";
 
@@ -46,8 +45,28 @@ export const PartnerList = () => {
     }
   };
 
-  const handleSearch = (results: Partner[]) => {
-    setFilteredPartners(results);
+  const handleNameFilter = ({ type, query }: { type: string; query: string }) => {
+    if (!partners) return;
+    
+    const filtered = partners.filter(partner => {
+      if (!query) return true;
+      
+      const name = partner.name.toLowerCase();
+      const searchQuery = query.toLowerCase();
+      
+      switch (type) {
+        case 'contains':
+          return name.includes(searchQuery);
+        case 'starts_with':
+          return name.startsWith(searchQuery);
+        case 'exact_match':
+          return name === searchQuery;
+        default:
+          return true;
+      }
+    });
+    
+    setFilteredPartners(filtered);
   };
 
   return (
@@ -85,30 +104,11 @@ export const PartnerList = () => {
                             </Button>
                           </div>
 
-                          <div className="flex items-center space-x-4">
-                            <div className="flex-1">
-                              <SearchBar
-                                items={partners}
-                                searchFields={["name", "contact_name", "partnership_type"]}
-                                onResultsChange={handleSearch}
-                                placeholder="Search partners..."
-                                className="w-full"
-                              />
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox
-                                id="show-inactive"
-                                checked={showInactive}
-                                onCheckedChange={(checked) => setShowInactive(!!checked)}
-                              />
-                              <label
-                                htmlFor="show-inactive"
-                                className="text-sm text-gray-600"
-                              >
-                                Show inactive
-                              </label>
-                            </div>
-                          </div>
+                          <PartnerAdvancedSearch
+                            onNameFilterChange={handleNameFilter}
+                            onHideInactiveChange={setShowInactive}
+                            hideInactive={showInactive}
+                          />
 
                           <PartnerTable
                             partners={filteredPartners}
