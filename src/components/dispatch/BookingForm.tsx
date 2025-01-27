@@ -1,20 +1,24 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { CallerSection } from "./form-sections/CallerSection";
-import { PatientSection } from "./form-sections/PatientSection";
-import { EmergencyContactSection } from "./form-sections/EmergencyContactSection";
-import { type DispatchFormData } from "@/types/dispatch";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Clock, Bot } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { type DispatchFormData } from "@/types/dispatch";
+import { supabase } from "@/integrations/supabase/client";
+import { Bot, MapPin, Search, UserCircle2, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const serviceComplaints = [
   "Transfer / Palliative care",
@@ -60,6 +64,7 @@ const affiliates = [
   "AccentCare"
 ];
 
+// Add mock calls data
 const mockCalls = [
   {
     caller_name: "John Smith",
@@ -184,9 +189,7 @@ export function BookingForm() {
       service_complaint: '',
       patient_id: '',
       dispatcher_notes: '',
-      billing_notes: '',
-      emergency_contact_name: '',
-      emergency_contact_phone: '',
+      billing_notes: ''
     }
   });
 
@@ -298,7 +301,7 @@ export function BookingForm() {
         patientId = newPatient.id;
       }
 
-      // Create the transport record with emergency contact info
+      // Create the initial transport record
       const transportRecord = {
         patient_id: patientId,
         status: 'pending',
@@ -336,9 +339,7 @@ export function BookingForm() {
         language_barrier: data.language_barrier,
         fresh_prepared: data.fresh_prepared,
         dispatcher_notes: data.dispatcher_notes,
-        billing_notes: data.billing_notes,
-        emergency_contact_name: data.emergency_contact_name,
-        emergency_contact_phone: data.emergency_contact_phone,
+        billing_notes: data.billing_notes
       };
 
       // Insert the initial transport record
@@ -503,18 +504,110 @@ export function BookingForm() {
         </Button>
       </div>
 
-      <CallerSection register={register} />
-      
-      <PatientSection
-        register={register}
-        watch={watch}
-        foundPatient={foundPatient}
-        isSearchingPatient={isSearchingPatient}
-        handlePatientSearch={handlePatientSearch}
-        handleCreatePatient={handleCreatePatient}
-      />
+      {/* Caller Information */}
+      <Card className="p-6 border-l-4 border-l-[#9b87f5] bg-gradient-to-br from-white to-[#F1F0FB] shadow-lg hover:shadow-xl transition-all duration-300">
+        <h3 className="text-lg font-semibold mb-4 text-[#7E69AB] flex items-center gap-2">
+          <UserCircle2 className="w-5 h-5" />
+          Caller Information
+        </h3>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="caller_name">Caller Name</Label>
+              <Input
+                id="caller_name"
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+                {...register("caller_name", { required: true })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="caller_phone">Phone</Label>
+              <Input
+                id="caller_phone"
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+                placeholder="###-###-####"
+                {...register("caller_phone", { required: true })}
+              />
+            </div>
+          </div>
+        </div>
+      </Card>
 
-      <EmergencyContactSection register={register} />
+      {/* Patient/Customer Section */}
+      <Card className="p-6 border-l-4 border-l-[#D946EF] bg-gradient-to-br from-white to-[#FFDEE2] shadow-lg hover:shadow-xl transition-all duration-300">
+        <h3 className="text-lg font-semibold mb-4 text-[#D946EF] flex items-center gap-2">
+          <UserCircle2 className="w-5 h-5" />
+          Patient / Customer Information
+        </h3>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="patient_last_name">Last Name</Label>
+              <div className="relative">
+                <Input
+                  id="patient_last_name"
+                  {...register("patient_last_name")}
+                  className="border-medical-secondary/30 focus:border-medical-secondary"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="patient_first_name">First Name</Label>
+              <Input
+                id="patient_first_name"
+                {...register("patient_first_name")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+              />
+            </div>
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="flex-1">
+              {foundPatient && (
+                <Link 
+                  to={`/patient/${encodeURIComponent(`${foundPatient.last_name}, ${foundPatient.first_name} (PAT-${foundPatient.id.slice(0, 5)})`)}` }
+                  className="text-medical-secondary hover:text-medical-secondary/80 font-medium flex items-center gap-2"
+                >
+                  <UserCircle2 className="w-4 h-4" />
+                  View {foundPatient.first_name} {foundPatient.last_name}'s Profile
+                </Link>
+              )}
+            </div>
+            <Button
+              type="button"
+              onClick={handlePatientSearch}
+              disabled={isSearchingPatient}
+              className="flex items-center gap-2 bg-medical-secondary text-white hover:bg-medical-secondary/90"
+            >
+              <Search className="w-4 h-4" />
+              {isSearchingPatient ? "Searching..." : "Search Patient"}
+            </Button>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="patient_dob">Date of Birth</Label>
+            <Input
+              id="patient_dob"
+              type="date"
+              {...register("patient_dob")}
+              className="border-medical-secondary/30 focus:border-medical-secondary"
+            />
+          </div>
+          {!foundPatient && (
+            <>
+              <p className="text-sm text-gray-500 italic">
+                A new patient record will be created when you save this dispatch.
+              </p>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleCreatePatient}
+                className="w-full bg-medical-highlight text-medical-primary hover:bg-medical-highlight/90"
+              >
+                Create Patient Record Now
+              </Button>
+            </>
+          )}
+        </div>
+      </Card>
 
       {/* Origin Location */}
       <Card className="p-6 border-l-4 border-l-[#0EA5E9] bg-gradient-to-br from-white to-[#D3E4FD] shadow-lg hover:shadow-xl transition-all duration-300">
