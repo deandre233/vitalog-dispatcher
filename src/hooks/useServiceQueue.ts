@@ -2,24 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-
-interface ServiceRequest {
-  id: string;
-  patientName: string;
-  scheduledDate: string;
-  scheduledTime: string;
-  priority: 'low' | 'medium' | 'high';
-  status: 'pending' | 'inProgress' | 'completed';
-  facilityId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface QueueMetrics {
-  activeRequests: number;
-  avgResponseTime: string;
-  completionRate: number;
-}
+import { ServiceRequest, QueueMetrics, AIInsight } from '@/types/service-queue';
 
 export function useServiceQueue() {
   const queryClient = useQueryClient();
@@ -30,35 +13,73 @@ export function useServiceQueue() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('service_requests')
-        .select('*')
+        .select(`
+          *,
+          patients (
+            first_name,
+            last_name
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Group requests by status
-      const grouped = {
-        pending: data.filter(r => r.status === 'pending'),
-        inProgress: data.filter(r => r.status === 'inProgress'),
-        completed: data.filter(r => r.status === 'completed')
-      };
+      // Transform the data to match our ServiceRequest interface
+      const transformedData = data.map(request => ({
+        id: request.id,
+        requestType: request.request_type,
+        patientId: request.patient_id,
+        patientName: `${request.patients.first_name} ${request.patients.last_name}`,
+        requestedBy: request.requested_by,
+        requestedDate: request.requested_date,
+        serviceDate: request.service_date,
+        scheduledTime: new Date(request.service_date).toLocaleTimeString(),
+        priority: request.priority || 'medium',
+        status: request.status || 'pending',
+        tripType: request.trip_type || 'One way',
+        service: request.service_type || 'Standard',
+        route: request.route || 'Default',
+        notes: request.notes
+      }));
 
-      return grouped;
+      // Group requests by status
+      return {
+        pending: transformedData.filter(r => r.status === 'pending'),
+        inProgress: transformedData.filter(r => r.status === 'inProgress'),
+        completed: transformedData.filter(r => r.status === 'completed')
+      };
     }
   });
 
   // AI Insights generation
-  const aiInsights = [
-    "Peak transport hours detected between 8-10 AM, suggesting optimal staffing adjustments",
-    "Weather conditions may impact 30% of scheduled transports tomorrow",
-    "Resource utilization trending 15% higher than last week",
-    "Recommended route optimizations could reduce wait times by 20%"
+  const aiInsights: AIInsight[] = [
+    {
+      type: 'optimization',
+      message: "Peak transport hours detected between 8-10 AM, suggesting optimal staffing adjustments",
+      confidence: 0.92,
+      impact: 'high'
+    },
+    {
+      type: 'warning',
+      message: "Weather conditions may impact 30% of scheduled transports tomorrow",
+      confidence: 0.85,
+      impact: 'medium'
+    },
+    {
+      type: 'prediction',
+      message: "Resource utilization trending 15% higher than last week",
+      confidence: 0.88,
+      impact: 'medium'
+    }
   ];
 
   // Queue metrics calculation
   const metrics: QueueMetrics = {
     activeRequests: requests?.inProgress?.length || 0,
     avgResponseTime: "28 mins",
-    completionRate: 94
+    completionRate: 94,
+    predictedLoad: 78,
+    efficiency: 89
   };
 
   // Real-time updates subscription
@@ -74,7 +95,6 @@ export function useServiceQueue() {
         (payload) => {
           console.log('Real-time update received:', payload);
           queryClient.invalidateQueries({ queryKey: ['service-requests'] });
-          
           toast.info('Queue updated');
         }
       )
@@ -87,10 +107,18 @@ export function useServiceQueue() {
 
   // Add new request mutation
   const addRequest = useMutation({
-    mutationFn: async (newRequest: Omit<ServiceRequest, 'id' | 'createdAt' | 'updatedAt'>) => {
+    mutationFn: async (newRequest: Omit<ServiceRequest, 'id'>) => {
       const { data, error } = await supabase
         .from('service_requests')
-        .insert(newRequest)
+        .insert({
+          request_type: newRequest.requestType,
+          patient_id: newRequest.patientId,
+          requested_by: newRequest.requestedBy,
+          service_date: newRequest.serviceDate,
+          priority: newRequest.priority,
+          status: 'pending',
+          notes: newRequest.notes
+        })
         .select()
         .single();
 
@@ -107,35 +135,11 @@ export function useServiceQueue() {
     }
   });
 
-  // Update request mutation
-  const updateRequest = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<ServiceRequest> & { id: string }) => {
-      const { data, error } = await supabase
-        .from('service_requests')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['service-requests'] });
-      toast.success('Request updated successfully');
-    },
-    onError: (error) => {
-      console.error('Error updating request:', error);
-      toast.error('Failed to update request');
-    }
-  });
-
   return {
     requests,
     isLoading,
     aiInsights,
     metrics,
-    addRequest,
-    updateRequest
+    addRequest
   };
 }
