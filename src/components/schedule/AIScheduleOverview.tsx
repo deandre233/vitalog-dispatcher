@@ -9,6 +9,7 @@ import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import { useTransportRecords } from "@/hooks/useTransportRecords";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 export function AIScheduleOverview() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -32,9 +33,8 @@ export function AIScheduleOverview() {
   });
 
   useEffect(() => {
-    // Calculate resource utilization
     if (transportRecords) {
-      const totalCapacity = 100; // Example capacity
+      const totalCapacity = 100;
       const utilization = (transportRecords.length / totalCapacity) * 100;
       setResourceUtilization(utilization);
     }
@@ -43,6 +43,9 @@ export function AIScheduleOverview() {
   const handleOptimizeSchedule = () => {
     toast.success("Schedule optimization in progress");
   };
+
+  // Generate time slots for the timeline
+  const timeSlots = Array.from({ length: 24 }, (_, i) => i);
 
   return (
     <div className="space-y-6 p-6">
@@ -108,21 +111,59 @@ export function AIScheduleOverview() {
       </div>
 
       {/* Schedule Timeline */}
-      <Card className="p-4">
+      <Card className="p-4 overflow-x-auto">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold flex items-center gap-2">
             <Users className="h-5 w-5 text-medical-secondary" />
-            Crew Assignments
+            Schedule Timeline
           </h3>
-          <Button variant="outline" size="sm">
-            <ArrowUpDown className="h-4 w-4 mr-2" />
-            Sort
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setSelectedDate(new Date(selectedDate.setDate(selectedDate.getDate() - 1)))}>
+              Previous Day
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setSelectedDate(new Date(selectedDate.setDate(selectedDate.getDate() + 1)))}>
+              Next Day
+            </Button>
+          </div>
         </div>
-        
-        {/* Add timeline visualization here */}
-        <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-          <p className="text-gray-500">Timeline visualization coming soon</p>
+
+        <div className="min-w-[800px]">
+          {/* Timeline Header */}
+          <div className="flex border-b">
+            <div className="w-32 p-2 font-semibold">Shift</div>
+            <div className="flex-1 flex">
+              {timeSlots.map((hour) => (
+                <div key={hour} className="flex-1 p-2 text-center text-sm font-medium border-l">
+                  {hour}:00
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Timeline Content */}
+          <div className="relative">
+            {transportRecords?.map((record, index) => (
+              <div key={record.id} className="flex border-b hover:bg-gray-50">
+                <div className="w-32 p-2 font-medium">
+                  Shift {index + 1}
+                </div>
+                <div className="flex-1 flex relative">
+                  {/* Render transport blocks */}
+                  {record.scheduled_time && (
+                    <div 
+                      className="absolute h-8 bg-blue-500 rounded-md text-white text-sm flex items-center px-2"
+                      style={{
+                        left: `${(new Date(record.scheduled_time).getHours() / 24) * 100}%`,
+                        width: '120px'
+                      }}
+                    >
+                      {record.dispatch_id}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </Card>
 
