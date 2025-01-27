@@ -1,18 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Building2, MapPin, Phone, Mail, Search, Filter, Activity, Brain } from "lucide-react";
+import { Brain, Building2 } from "lucide-react";
 import { useState } from "react";
 import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
 import { AIInsight } from "@/types/ai";
 import { Json } from "@/integrations/supabase/types";
+import { CenterTable } from "@/components/center/CenterTable";
 
 interface AIRecommendations {
   usage_pattern: string;
@@ -20,7 +19,7 @@ interface AIRecommendations {
   suggested_improvements: string[];
 }
 
-interface Center {
+export interface Center {
   id: string;
   name: string;
   type: string;
@@ -63,7 +62,6 @@ export const CenterList = () => {
   const generateAIInsights = (center: Center): AIInsight[] => {
     const insights: AIInsight[] = [];
     
-    // Efficiency-based insight
     if (center.efficiency_score < 70) {
       insights.push({
         type: 'optimization',
@@ -73,7 +71,6 @@ export const CenterList = () => {
       });
     }
 
-    // Dispatch volume insight
     if (center.dispatch_count > 100) {
       insights.push({
         type: 'prediction',
@@ -83,7 +80,6 @@ export const CenterList = () => {
       });
     }
 
-    // Status-based insight
     if (center.status !== 'active') {
       insights.push({
         type: 'warning',
@@ -133,7 +129,6 @@ export const CenterList = () => {
     if (filters.hideInactive && center.status !== "active") {
       return false;
     }
-    // Note: This is a placeholder condition since we don't have contract status in the data model
     if (filters.hideNonContract && center.status === "non-contract") {
       return false;
     }
@@ -156,24 +151,13 @@ export const CenterList = () => {
     );
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'inactive': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getEfficiencyColor = (score: number) => {
-    if (score >= 80) return 'bg-green-100 text-green-800';
-    if (score >= 60) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
-  };
-
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-medical-primary">Medical Centers</h1>
+        <div className="flex items-center gap-2">
+          <Building2 className="h-6 w-6 text-medical-primary" />
+          <h1 className="text-2xl font-bold text-medical-primary">Medical Centers</h1>
+        </div>
         <div className="flex items-center gap-2">
           <Brain className="h-5 w-5 text-blue-500" />
           <span className="text-sm text-gray-600">AI-Powered Insights Active</span>
@@ -265,52 +249,7 @@ export const CenterList = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[300px]">Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Efficiency</TableHead>
-                <TableHead>Dispatches</TableHead>
-                <TableHead>Contact</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCenters?.map((center) => (
-                <TableRow key={center.id} className="hover:bg-medical-highlight/50">
-                  <TableCell className="font-medium">{center.name}</TableCell>
-                  <TableCell>{center.type}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-gray-500" />
-                      <span>{center.address}, {center.city}, {center.state}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(center.status)}>{center.status}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getEfficiencyColor(center.efficiency_score)}>
-                      {center.efficiency_score}%
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{center.dispatch_count}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <a href={`tel:${center.phone}`} className="text-blue-500 hover:text-blue-700">
-                        <Phone className="h-4 w-4" />
-                      </a>
-                      <a href={`mailto:${center.email}`} className="text-blue-500 hover:text-blue-700">
-                        <Mail className="h-4 w-4" />
-                      </a>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {filteredCenters && <CenterTable centers={filteredCenters} />}
         </div>
         
         <div className="lg:col-span-1">
