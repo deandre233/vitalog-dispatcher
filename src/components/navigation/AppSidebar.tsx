@@ -22,7 +22,8 @@ import {
   Tag,
   Clock,
   Link2,
-  Menu
+  Menu,
+  Settings
 } from "lucide-react";
 
 const routes = [
@@ -115,6 +116,11 @@ const routes = [
     label: "External Link",
     icon: Link2,
     href: "/external-link", // Updated from /custom-link-1
+  },
+  {
+    label: "Dispatch Settings",
+    icon: Settings,
+    href: "/dispatch-settings",
   },
 ];
 
