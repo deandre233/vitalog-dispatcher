@@ -36,5 +36,25 @@ export const shiftRecordsService = {
       logger.error('Error fetching shift records:', error);
       throw error;
     }
+  },
+
+  async updateShiftChecklist(id: string, updates: { 
+    primary_checklist_completed?: boolean; 
+    secondary_checklist_completed?: boolean 
+  }): Promise<ShiftRecord> {
+    try {
+      const { data, error } = await supabase
+        .from('shift_records')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as ShiftRecord;
+    } catch (error) {
+      logger.error('Error updating shift checklist:', error);
+      throw error;
+    }
   }
 };
