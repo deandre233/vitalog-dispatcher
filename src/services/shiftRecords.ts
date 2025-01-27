@@ -2,6 +2,13 @@ import { supabase } from "@/integrations/supabase/client";
 import type { ShiftRecord, ShiftFilter } from "@/types/shift-records";
 import { logger } from "@/utils/logger";
 
+type ShiftRecordResponse = Omit<ShiftRecord, 'employees'> & {
+  employees: {
+    first_name: string;
+    last_name: string;
+  } | null;
+};
+
 export const shiftRecordsService = {
   async getShiftRecords(filters?: ShiftFilter): Promise<ShiftRecord[]> {
     try {

@@ -24,7 +24,7 @@ export interface ShiftRecord {
   employees?: {
     first_name: string;
     last_name: string;
-  };
+  } | null;
 }
 
 export interface ShiftFilter {
