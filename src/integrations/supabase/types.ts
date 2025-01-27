@@ -1871,6 +1871,7 @@ export type Database = {
       }
       partners: {
         Row: {
+          ai_recommendations: Json | null
           contact_email: string | null
           contact_name: string | null
           contact_phone: string | null
@@ -1878,12 +1879,18 @@ export type Database = {
           contract_start_date: string | null
           created_at: string | null
           id: string
+          last_interaction: string | null
           name: string
+          next_review_date: string | null
+          partnership_score: number | null
           partnership_type: string
+          performance_metrics: Json | null
+          risk_assessment: string | null
           status: string | null
           updated_at: string | null
         }
         Insert: {
+          ai_recommendations?: Json | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -1891,12 +1898,18 @@ export type Database = {
           contract_start_date?: string | null
           created_at?: string | null
           id?: string
+          last_interaction?: string | null
           name: string
+          next_review_date?: string | null
+          partnership_score?: number | null
           partnership_type: string
+          performance_metrics?: Json | null
+          risk_assessment?: string | null
           status?: string | null
           updated_at?: string | null
         }
         Update: {
+          ai_recommendations?: Json | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -1904,8 +1917,13 @@ export type Database = {
           contract_start_date?: string | null
           created_at?: string | null
           id?: string
+          last_interaction?: string | null
           name?: string
+          next_review_date?: string | null
+          partnership_score?: number | null
           partnership_type?: string
+          performance_metrics?: Json | null
+          risk_assessment?: string | null
           status?: string | null
           updated_at?: string | null
         }
