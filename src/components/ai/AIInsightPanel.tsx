@@ -1,4 +1,4 @@
-import { Brain, AlertTriangle, CheckCircle } from "lucide-react";
+import { Brain, CheckCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { AIAnalysisResult } from "@/utils/aiAnalysis";
@@ -22,22 +22,6 @@ export function AIInsightPanel({ analysis, className }: AIInsightPanelProps) {
           {Math.round(analysis.confidence * 100)}% confidence
         </Badge>
       </div>
-
-      {analysis.warnings.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="font-medium text-yellow-500 flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4" />
-            Warnings
-          </h4>
-          <ul className="space-y-1">
-            {analysis.warnings.map((warning, index) => (
-              <li key={index} className="text-sm text-yellow-600">
-                {warning}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {analysis.suggestions.length > 0 && (
         <div className="space-y-2">
