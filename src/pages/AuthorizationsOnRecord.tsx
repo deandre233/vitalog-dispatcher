@@ -7,13 +7,14 @@ import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuthorizationRecords } from "@/hooks/useAuthorizationRecords";
 import { AuthorizationTable } from "@/components/authorization/AuthorizationTable";
 import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
 import { Button } from "@/components/ui/button";
 import { Calendar, Filter, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { Label } from "@/components/ui/label";
 
 export const AuthorizationsOnRecord = () => {
   const [showExpired, setShowExpired] = useState(false);
@@ -23,7 +24,7 @@ export const AuthorizationsOnRecord = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedFacility, setSelectedFacility] = useState<string>("");
 
-  const { data: authorizations, isLoading, refetch, aiInsights } = useAuthorizationRecords({
+  const { data, isLoading, refetch } = useAuthorizationRecords({
     showExpired,
     showUpcoming,
     showOneShot,
@@ -66,56 +67,71 @@ export const AuthorizationsOnRecord = () => {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <Checkbox
-                      checked={showExpired}
-                      onCheckedChange={(checked) => setShowExpired(checked as boolean)}
-                      label="Include recent expirations"
-                    />
-                    <Checkbox
-                      checked={showUpcoming}
-                      onCheckedChange={(checked) => setShowUpcoming(checked as boolean)}
-                      label="Include upcoming documents"
-                    />
-                    <Checkbox
-                      checked={showOneShot}
-                      onCheckedChange={(checked) => setShowOneShot(checked as boolean)}
-                      label="Hide one-shot documents attached directly to dispatches"
-                    />
-                    <Checkbox
-                      checked={showDeleted}
-                      onCheckedChange={(checked) => setShowDeleted(checked as boolean)}
-                      label="Hide deleted documents"
-                    />
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="expired"
+                        checked={showExpired}
+                        onCheckedChange={(checked) => setShowExpired(checked as boolean)}
+                      />
+                      <Label htmlFor="expired">Include recent expirations</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="upcoming"
+                        checked={showUpcoming}
+                        onCheckedChange={(checked) => setShowUpcoming(checked as boolean)}
+                      />
+                      <Label htmlFor="upcoming">Include upcoming documents</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="oneshot"
+                        checked={showOneShot}
+                        onCheckedChange={(checked) => setShowOneShot(checked as boolean)}
+                      />
+                      <Label htmlFor="oneshot">Hide one-shot documents</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="deleted"
+                        checked={showDeleted}
+                        onCheckedChange={(checked) => setShowDeleted(checked as boolean)}
+                      />
+                      <Label htmlFor="deleted">Hide deleted documents</Label>
+                    </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <Filter className="h-5 w-5 text-gray-500" />
                   <span className="text-sm font-medium">Destination facility is:</span>
-                  <Select
-                    value={selectedFacility}
-                    onValueChange={setSelectedFacility}
-                    options={[
-                      { label: "All Facilities", value: "" },
-                      { label: "Emory Dialysis At Candler", value: "candler" },
-                      { label: "Emory Dialysis At Northside", value: "northside" },
-                      { label: "Emory Dialysis At North Decatur", value: "north-decatur" },
-                      { label: "Atlanta Airport Dialysis", value: "airport" }
-                    ]}
-                    className="w-64"
-                  />
+                  <Select value={selectedFacility} onValueChange={setSelectedFacility}>
+                    <SelectTrigger className="w-64">
+                      <SelectValue placeholder="All Facilities" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All Facilities</SelectItem>
+                      <SelectItem value="candler">Emory Dialysis At Candler</SelectItem>
+                      <SelectItem value="northside">Emory Dialysis At Northside</SelectItem>
+                      <SelectItem value="north-decatur">Emory Dialysis At North Decatur</SelectItem>
+                      <SelectItem value="airport">Atlanta Airport Dialysis</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </Card>
 
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-3">
                   <AuthorizationTable 
-                    authorizations={authorizations} 
+                    authorizations={data?.records || []} 
                     isLoading={isLoading} 
                   />
                 </div>
                 <div className="lg:col-span-1">
-                  <AIInsightsPanel insights={aiInsights} />
+                  <AIInsightsPanel insights={data?.aiInsights || []} />
                 </div>
               </div>
             </main>

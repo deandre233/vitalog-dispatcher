@@ -12,6 +12,35 @@ interface UseAuthorizationRecordsParams {
   facility?: string;
 }
 
+interface AuthorizationRecord {
+  id: string;
+  patient_id: string;
+  service_type: string;
+  status: string;
+  insurance_id: string;
+  requested_by: string;
+  authorized_by: string;
+  authorization_number: string;
+  valid_from: string;
+  valid_until: string;
+  created_at: string;
+  updated_at: string;
+  priority: string;
+  patients?: {
+    first_name: string;
+    last_name: string;
+  };
+  insurance_records?: {
+    carrier_name: string;
+    policy_number: string;
+  };
+}
+
+interface AuthorizationResponse {
+  records: AuthorizationRecord[];
+  aiInsights: AIInsight[];
+}
+
 export const useAuthorizationRecords = ({
   showExpired,
   showUpcoming,
@@ -20,7 +49,7 @@ export const useAuthorizationRecords = ({
   date,
   facility
 }: UseAuthorizationRecordsParams) => {
-  return useQuery({
+  return useQuery<AuthorizationResponse, Error>({
     queryKey: ['authorization_records', { showExpired, showUpcoming, showOneShot, showDeleted, date, facility }],
     queryFn: async () => {
       let query = supabase
@@ -50,7 +79,7 @@ export const useAuthorizationRecords = ({
         query = query.ilike('destination_type', `%${facility}%`);
       }
 
-      const { data, error } = await query;
+      const { data: records, error } = await query;
 
       if (error) {
         toast.error("Failed to fetch authorization records");
@@ -80,7 +109,7 @@ export const useAuthorizationRecords = ({
       ];
 
       return {
-        records: data || [],
+        records: records || [],
         aiInsights
       };
     }

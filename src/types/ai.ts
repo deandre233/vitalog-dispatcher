@@ -1,9 +1,6 @@
-export interface AIRecommendation {
-  id: string;
-  suggestions: string[];
-  confidence_score: number;
-  created_at: string;
-  metadata: Record<string, any>;
-  prediction?: string;
-  recommendation?: string;
+export interface AIInsight {
+  type: 'optimization' | 'warning' | 'prediction';
+  message: string;
+  confidence: number;
+  impact: 'high' | 'medium' | 'low';
 }
