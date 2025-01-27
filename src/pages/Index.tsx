@@ -4,7 +4,11 @@ import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
 import { HospitalStatus } from "@/components/dashboard/HospitalStatus";
 import { DispatchBoard } from "@/components/dashboard/DispatchBoard";
 
-const Index = () => {
+interface IndexProps {
+  hospitalName: string;
+}
+
+const Index = ({ hospitalName }: IndexProps) => {
   return (
     <div className="p-6 space-y-6">
       <WelcomeBanner />
@@ -14,7 +18,7 @@ const Index = () => {
           <DispatchBoard />
         </div>
         <div>
-          <HospitalStatus />
+          <HospitalStatus hospitalName={hospitalName} />
         </div>
       </div>
     </div>
