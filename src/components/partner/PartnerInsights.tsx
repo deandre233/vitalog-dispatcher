@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Brain, TrendingUp, AlertTriangle, Signal, Robot } from "lucide-react";
+import { Brain, TrendingUp, AlertTriangle, Signal, Bot } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -108,7 +108,7 @@ export const PartnerInsights = () => {
   };
 
   const getIcon = (type: PartnerInsight["type"], source?: string) => {
-    if (source === "ai") return <Robot className="h-5 w-5 text-purple-500" />;
+    if (source === "ai") return <Bot className="h-5 w-5 text-purple-500" />;
     
     switch (type) {
       case "recommendation":
