@@ -72,10 +72,16 @@ export function DirectionsTab({ transportRecord }: DirectionsTabProps) {
                 // Update route data in transport record if needed
                 if (leg) {
                   const routeData = {
-                    distance: leg.distance?.text,
-                    duration: leg.duration?.text,
-                    start_location: leg.start_location.toJSON(),
-                    end_location: leg.end_location.toJSON(),
+                    distance: leg.distance?.text || "",
+                    duration: leg.duration?.text || "",
+                    start_location: {
+                      lat: leg.start_location.lat(),
+                      lng: leg.start_location.lng()
+                    },
+                    end_location: {
+                      lat: leg.end_location.lat(),
+                      lng: leg.end_location.lng()
+                    }
                   };
 
                   // Store route data in Supabase
@@ -113,8 +119,8 @@ export function DirectionsTab({ transportRecord }: DirectionsTabProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <MapPin className="w-5 h-5 text-gray-500" />
-        <span className="font-medium">Route Details</span>
+        <MapPin className="h-5 w-5 text-gray-500" />
+        <h3 className="text-lg font-semibold">Route Details</h3>
       </div>
       <div className="pl-7 space-y-2">
         <p>From: {transportRecord.origin_address || transportRecord.pickup_location}</p>
