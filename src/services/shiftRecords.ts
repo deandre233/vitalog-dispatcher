@@ -30,7 +30,7 @@ export const shiftRecordsService = {
     const { data, error } = await query;
 
     if (error) throw error;
-    return data as ShiftRecord[];
+    return (data || []) as ShiftRecord[];
   },
 
   updateShiftChecklist: async (
@@ -48,6 +48,6 @@ export const shiftRecordsService = {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as ShiftRecord;
   }
 };

@@ -13,7 +13,18 @@ export function useAIRecommendations() {
         .limit(5);
 
       if (error) throw error;
-      return data as AIRecommendation[];
+      
+      // Map the database fields to match our AIRecommendation interface
+      return data.map(item => ({
+        id: item.id,
+        type: item.analysis_type,
+        prediction: item.prediction,
+        confidence_score: item.confidence_score,
+        metadata: item.metadata,
+        created_at: item.created_at,
+        recommendation: item.recommendation,
+        suggestions: item.suggestions
+      })) as AIRecommendation[];
     }
   });
 }
