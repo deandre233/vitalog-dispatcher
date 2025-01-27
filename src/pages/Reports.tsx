@@ -53,8 +53,9 @@ export function Reports() {
         type: insight.analysis_type as 'optimization' | 'warning' | 'prediction',
         message: insight.prediction || '',
         confidence: insight.confidence_score,
-        impact: insight.confidence_score > 0.8 ? 'high' : insight.confidence_score > 0.6 ? 'medium' : 'low'
-      })) || [];
+        impact: insight.confidence_score > 0.8 ? 'high' : 
+                insight.confidence_score > 0.6 ? 'medium' : 'low'
+      })) as AIInsight[] || [];
     }
   });
 
