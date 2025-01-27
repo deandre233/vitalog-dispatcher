@@ -15,6 +15,7 @@ import { CalendarIcon, Upload, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { PatientSearch } from "./PatientSearch";
+import type { Database } from "@/integrations/supabase/types";
 
 interface DocumentUploadFormProps {
   onSuccess?: () => void;
@@ -80,7 +81,7 @@ export function DocumentUploadForm({ onSuccess }: DocumentUploadFormProps) {
           directive_type: Object.entries(directives)
             .filter(([_, value]) => value)
             .map(([key]) => key),
-        });
+        } as Database['public']['Tables']['patient_documents']['Insert']);
 
       if (dbError) throw dbError;
 
