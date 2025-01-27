@@ -11,8 +11,8 @@ export interface BaseShiftRecord {
   notes?: string;
   created_at?: string;
   updated_at?: string;
-  ai_analysis?: Record<string, any>;
-  performance_metrics?: Record<string, any>;
+  ai_analysis?: any;
+  performance_metrics?: any;
   safety_score?: number;
   fatigue_indicators?: string[];
   shift_pattern_analysis?: string;
