@@ -2,6 +2,8 @@ export interface Employee {
   id: string;
   first_name: string;
   last_name: string;
+  middle_initial?: string;
+  suffix?: string;
   mobile?: string;
   station?: string;
   status: string;
@@ -16,6 +18,13 @@ export interface Employee {
   uses_timeclock?: boolean;
   access_codes?: string;
   photo_url?: string;
+  emergency_contact?: string;
+  nemsis_uuid?: string;
+  login_name?: string;
+  last_login_attempt?: string;
+  last_login_success?: string;
+  beacon_token?: string;
+  latest_ping?: string;
 }
 
 export interface EmployeeRole {

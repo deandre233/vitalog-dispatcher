@@ -30,3 +30,10 @@ export interface AuthMetrics {
   averageResponseTime: string;
   criticalRequests: number;
 }
+
+export interface AIRecommendation {
+  confidence: number;
+  suggestion: string;
+  impact: 'high' | 'medium' | 'low';
+  reasoning: string;
+}
