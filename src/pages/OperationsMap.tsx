@@ -21,6 +21,7 @@ export function OperationsMap() {
   const { vehicles, insights, filters, setFilters, isLoading } = useOperationsMap();
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
 
   const handleSearch = (filters: SearchFilters) => {
     console.log('Search filters:', filters);
@@ -36,16 +37,19 @@ export function OperationsMap() {
       if (!mapContainer.current || !isMounted) return;
 
       try {
-        const { data, error } = await supabase.functions.invoke('get-google-maps-key');
+        // Get Mapbox token from Edge Function
+        const { data: { MAPBOX_PUBLIC_TOKEN }, error } = await supabase.functions.invoke('get-mapbox-token');
         
-        if (error || !data?.GOOGLE_MAPS_API_KEY) {
-          throw new Error('Failed to get map API key');
+        if (error || !MAPBOX_PUBLIC_TOKEN) {
+          throw new Error('Failed to get Mapbox token');
         }
 
-        mapboxgl.accessToken = data.GOOGLE_MAPS_API_KEY;
+        setMapboxToken(MAPBOX_PUBLIC_TOKEN);
         
         if (!isMounted) return;
 
+        mapboxgl.accessToken = MAPBOX_PUBLIC_TOKEN;
+        
         mapInstance = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',

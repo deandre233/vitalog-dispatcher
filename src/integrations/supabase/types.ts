@@ -2262,40 +2262,79 @@ export type Database = {
       }
       shift_records: {
         Row: {
+          ai_analysis: Json | null
           checklist_completed: boolean | null
+          compliance_status: string | null
           created_at: string | null
+          distance: number | null
           employee_id: string | null
           end_time: string | null
+          ending_odometer: number | null
+          fatigue_indicators: string[] | null
           id: string
           notes: string | null
+          performance_metrics: Json | null
+          primary_checklist_completed: boolean | null
+          safety_score: number | null
+          secondary_checklist_completed: boolean | null
           shift_date: string
+          shift_pattern_analysis: string | null
           shift_type: string
           start_time: string | null
+          starting_odometer: number | null
           updated_at: string | null
+          uuid: string
+          vehicle_id: string | null
         }
         Insert: {
+          ai_analysis?: Json | null
           checklist_completed?: boolean | null
+          compliance_status?: string | null
           created_at?: string | null
+          distance?: number | null
           employee_id?: string | null
           end_time?: string | null
+          ending_odometer?: number | null
+          fatigue_indicators?: string[] | null
           id?: string
           notes?: string | null
+          performance_metrics?: Json | null
+          primary_checklist_completed?: boolean | null
+          safety_score?: number | null
+          secondary_checklist_completed?: boolean | null
           shift_date: string
+          shift_pattern_analysis?: string | null
           shift_type: string
           start_time?: string | null
+          starting_odometer?: number | null
           updated_at?: string | null
+          uuid?: string
+          vehicle_id?: string | null
         }
         Update: {
+          ai_analysis?: Json | null
           checklist_completed?: boolean | null
+          compliance_status?: string | null
           created_at?: string | null
+          distance?: number | null
           employee_id?: string | null
           end_time?: string | null
+          ending_odometer?: number | null
+          fatigue_indicators?: string[] | null
           id?: string
           notes?: string | null
+          performance_metrics?: Json | null
+          primary_checklist_completed?: boolean | null
+          safety_score?: number | null
+          secondary_checklist_completed?: boolean | null
           shift_date?: string
+          shift_pattern_analysis?: string | null
           shift_type?: string
           start_time?: string | null
+          starting_odometer?: number | null
           updated_at?: string | null
+          uuid?: string
+          vehicle_id?: string | null
         }
         Relationships: [
           {
