@@ -1,4 +1,6 @@
-export interface ShiftRecord {
+import { LimitDepth } from './utility-types';
+
+export interface BaseShiftRecord {
   id: string;
   employee_id?: string;
   shift_date: string;
@@ -26,6 +28,8 @@ export interface ShiftRecord {
     last_name: string;
   } | null;
 }
+
+export type ShiftRecord = LimitDepth<BaseShiftRecord>;
 
 export interface ShiftFilter {
   startDate?: Date;
