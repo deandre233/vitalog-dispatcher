@@ -8,8 +8,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Building2, MapPin, Phone, Mail, Search, Filter, Activity } from "lucide-react";
+import { Building2, MapPin, Phone, Mail, Search, Filter, Activity, Brain } from "lucide-react";
 import { useState } from "react";
+import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
+import { AIInsight } from "@/types/ai";
 import { Json } from "@/integrations/supabase/types";
 
 interface AIRecommendations {
@@ -56,6 +58,43 @@ export const CenterList = () => {
     hideInactive: false,
     hideNonContract: false
   });
+
+  // Generate AI insights based on center data
+  const generateAIInsights = (center: Center): AIInsight[] => {
+    const insights: AIInsight[] = [];
+    
+    // Efficiency-based insight
+    if (center.efficiency_score < 70) {
+      insights.push({
+        type: 'optimization',
+        message: `${center.name}'s efficiency score is below target. Consider reviewing operational procedures.`,
+        confidence: 0.85,
+        impact: 'high'
+      });
+    }
+
+    // Dispatch volume insight
+    if (center.dispatch_count > 100) {
+      insights.push({
+        type: 'prediction',
+        message: `High dispatch volume detected. Consider allocating additional resources.`,
+        confidence: 0.92,
+        impact: 'medium'
+      });
+    }
+
+    // Status-based insight
+    if (center.status !== 'active') {
+      insights.push({
+        type: 'warning',
+        message: `Inactive status may impact service delivery. Review activation requirements.`,
+        confidence: 0.95,
+        impact: 'high'
+      });
+    }
+
+    return insights;
+  };
 
   const { data: centers, isLoading, error } = useQuery({
     queryKey: ['centers'],
@@ -135,6 +174,10 @@ export const CenterList = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-medical-primary">Medical Centers</h1>
+        <div className="flex items-center gap-2">
+          <Brain className="h-5 w-5 text-blue-500" />
+          <span className="text-sm text-gray-600">AI-Powered Insights Active</span>
+        </div>
       </div>
 
       <Card className="p-4 space-y-4">
@@ -220,52 +263,65 @@ export const CenterList = () => {
         </div>
       </Card>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[300px]">Name</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Efficiency</TableHead>
-            <TableHead>Dispatches</TableHead>
-            <TableHead>Contact</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredCenters?.map((center) => (
-            <TableRow key={center.id} className="hover:bg-medical-highlight/50">
-              <TableCell className="font-medium">{center.name}</TableCell>
-              <TableCell>{center.type}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-gray-500" />
-                  <span>{center.address}, {center.city}, {center.state}</span>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Badge className={getStatusColor(center.status)}>{center.status}</Badge>
-              </TableCell>
-              <TableCell>
-                <Badge className={getEfficiencyColor(center.efficiency_score)}>
-                  {center.efficiency_score}%
-                </Badge>
-              </TableCell>
-              <TableCell>{center.dispatch_count}</TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <a href={`tel:${center.phone}`} className="text-blue-500 hover:text-blue-700">
-                    <Phone className="h-4 w-4" />
-                  </a>
-                  <a href={`mailto:${center.email}`} className="text-blue-500 hover:text-blue-700">
-                    <Mail className="h-4 w-4" />
-                  </a>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[300px]">Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Efficiency</TableHead>
+                <TableHead>Dispatches</TableHead>
+                <TableHead>Contact</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredCenters?.map((center) => (
+                <TableRow key={center.id} className="hover:bg-medical-highlight/50">
+                  <TableCell className="font-medium">{center.name}</TableCell>
+                  <TableCell>{center.type}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-gray-500" />
+                      <span>{center.address}, {center.city}, {center.state}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(center.status)}>{center.status}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getEfficiencyColor(center.efficiency_score)}>
+                      {center.efficiency_score}%
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{center.dispatch_count}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <a href={`tel:${center.phone}`} className="text-blue-500 hover:text-blue-700">
+                        <Phone className="h-4 w-4" />
+                      </a>
+                      <a href={`mailto:${center.email}`} className="text-blue-500 hover:text-blue-700">
+                        <Mail className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        
+        <div className="lg:col-span-1">
+          {filteredCenters && filteredCenters.length > 0 && (
+            <AIInsightsPanel
+              insights={generateAIInsights(filteredCenters[0])}
+              className="sticky top-6"
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };
