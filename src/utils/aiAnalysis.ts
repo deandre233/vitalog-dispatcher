@@ -4,7 +4,6 @@ import { toast } from "sonner";
 export interface AIAnalysisResult {
   confidence: number;
   suggestions: string[];
-  warnings: string[];
   prediction: string;
 }
 
@@ -23,7 +22,6 @@ export async function analyzePatientData(patientId: string): Promise<AIAnalysisR
     return {
       confidence: result.confidence_score,
       suggestions: result.suggestions || [],
-      warnings: result.warnings || [],
       prediction: result.prediction || ''
     };
   } catch (error) {
