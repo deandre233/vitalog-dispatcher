@@ -184,85 +184,84 @@ export const CenterList = () => {
             </div>
 
             <Card className="p-4 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="nameFilter">Name contains</Label>
-            <Input
-              id="nameFilter"
-              value={filters.nameFilter}
-              onChange={(e) => setFilters(prev => ({ ...prev, nameFilter: e.target.value }))}
-              className="w-full"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="nameFilter">Name contains</Label>
+                <Input
+                  id="nameFilter"
+                  value={filters.nameFilter}
+                  onChange={(e) => setFilters(prev => ({ ...prev, nameFilter: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="addressFilter">Street address contains</Label>
-            <Input
-              id="addressFilter"
-              value={filters.addressFilter}
-              onChange={(e) => setFilters(prev => ({ ...prev, addressFilter: e.target.value }))}
-              className="w-full"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="addressFilter">Street address contains</Label>
+                <Input
+                  id="addressFilter"
+                  value={filters.addressFilter}
+                  onChange={(e) => setFilters(prev => ({ ...prev, addressFilter: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="locationType">Location type</Label>
-            <Select
-              value={filters.locationType}
-              onValueChange={(value) => setFilters(prev => ({ ...prev, locationType: value }))}>
-              <SelectTrigger id="locationType">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="hospital">Hospital</SelectItem>
-                <SelectItem value="clinic">Clinic</SelectItem>
-                <SelectItem value="skilled_nursing">Skilled Nursing Facility (SNF)</SelectItem>
-                <SelectItem value="urgent_care">Urgent Care</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="locationType">Location type</Label>
+                <Select
+                  value={filters.locationType}
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, locationType: value }))}>
+                  <SelectTrigger id="locationType">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="hospital">Hospital</SelectItem>
+                    <SelectItem value="clinic">Clinic</SelectItem>
+                    <SelectItem value="skilled_nursing">Skilled Nursing Facility (SNF)</SelectItem>
+                    <SelectItem value="urgent_care">Urgent Care</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="minDispatches">Minimum dispatches</Label>
-            <Select
-              value={filters.minDispatches.toString()}
-              onValueChange={(value) => setFilters(prev => ({ ...prev, minDispatches: parseInt(value) }))}>
-              <SelectTrigger id="minDispatches">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5">5</SelectItem>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="minDispatches">Minimum dispatches</Label>
+                <Select
+                  value={filters.minDispatches.toString()}
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, minDispatches: parseInt(value) }))}>
+                  <SelectTrigger id="minDispatches">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="space-y-2 col-span-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="hideInactive"
-                checked={filters.hideInactive}
-                onCheckedChange={(checked) => 
-                  setFilters(prev => ({ ...prev, hideInactive: checked as boolean }))
-                }
-              />
-              <Label htmlFor="hideInactive">Hide inactive facilities</Label>
-            </div>
+              <div className="space-y-2 col-span-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hideInactive"
+                    checked={filters.hideInactive}
+                    onCheckedChange={(checked) => 
+                      setFilters(prev => ({ ...prev, hideInactive: checked as boolean }))
+                    }
+                  />
+                  <Label htmlFor="hideInactive">Hide inactive facilities</Label>
+                </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="hideNonContract"
-                checked={filters.hideNonContract}
-                onCheckedChange={(checked) => 
-                  setFilters(prev => ({ ...prev, hideNonContract: checked as boolean }))
-                }
-              />
-              <Label htmlFor="hideNonContract">Hide non-contract facilities</Label>
-            </div>
-          </div>
-            </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hideNonContract"
+                    checked={filters.hideNonContract}
+                    onCheckedChange={(checked) => 
+                      setFilters(prev => ({ ...prev, hideNonContract: checked as boolean }))
+                    }
+                  />
+                  <Label htmlFor="hideNonContract">Hide non-contract facilities</Label>
+                </div>
+              </div>
             </Card>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
