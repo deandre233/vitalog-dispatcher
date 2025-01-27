@@ -21,6 +21,10 @@ export interface ShiftRecord {
   distance?: number;
   primary_checklist_completed?: boolean;
   secondary_checklist_completed?: boolean;
+  employees?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export interface ShiftFilter {

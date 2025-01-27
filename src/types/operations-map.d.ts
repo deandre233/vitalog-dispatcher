@@ -3,6 +3,13 @@ export interface Location {
   lng: number;
 }
 
+export interface RouteData {
+  distance: string;
+  duration: string;
+  start_location: Location;
+  end_location: Location;
+}
+
 export interface VehicleLocation {
   id: string;
   vehicleId: string;
