@@ -3,7 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/services/api";
+import { shiftRecordsService } from "@/services/shiftRecords";
 import {
   Table,
   TableBody,
@@ -18,32 +18,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Plus, FileCheck } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-
-interface ShiftRecord {
-  id: string;
-  employee_id: string | null;
-  shift_date: string;
-  shift_type: string;
-  start_time: string | null;
-  end_time: string | null;
-  primary_checklist_completed: boolean;
-  secondary_checklist_completed: boolean;
-  notes: string | null;
-  compliance_status: string;
-}
+import { ShiftFilters } from "@/components/shifts/ShiftFilters";
+import type { ShiftFilter, ShiftRecord } from "@/types/shift-records";
 
 export const ShiftRecords = () => {
   const { toast } = useToast();
-  const [selectedShift, setSelectedShift] = useState<string | null>(null);
+  const [filters, setFilters] = useState<ShiftFilter>({});
 
   const { data: shiftRecords, isLoading } = useQuery({
-    queryKey: ["shiftRecords"],
-    queryFn: async () => {
-      return api.get<ShiftRecord>("shift_records", {
-        select: "*",
-        orderBy: "shift_date",
-      });
-    },
+    queryKey: ["shiftRecords", filters],
+    queryFn: () => shiftRecordsService.getShiftRecords(filters),
   });
 
   const handleChecklistToggle = async (shiftId: string, type: 'primary' | 'secondary') => {
@@ -54,7 +38,7 @@ export const ShiftRecords = () => {
       const field = type === 'primary' ? 'primary_checklist_completed' : 'secondary_checklist_completed';
       const currentValue = shift[field];
 
-      await api.update<ShiftRecord>("shift_records", shiftId, {
+      await shiftRecordsService.updateShiftChecklist(shiftId, {
         [field]: !currentValue
       });
 
@@ -86,6 +70,8 @@ export const ShiftRecords = () => {
               </Button>
             </div>
 
+            <ShiftFilters onFilterChange={setFilters} />
+
             <div className="bg-white rounded-lg shadow">
               {isLoading ? (
                 <div className="p-8 text-center">Loading shift records...</div>
@@ -97,30 +83,38 @@ export const ShiftRecords = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Shift Type</TableHead>
-                      <TableHead>Time</TableHead>
+                      <TableHead>Station</TableHead>
+                      <TableHead>Start Time</TableHead>
+                      <TableHead>End Time</TableHead>
+                      <TableHead>Hours</TableHead>
+                      <TableHead>Trips</TableHead>
+                      <TableHead>Callsign</TableHead>
+                      <TableHead>Service</TableHead>
+                      <TableHead>Crew Members</TableHead>
                       <TableHead>Primary Checklist</TableHead>
                       <TableHead>Secondary Checklist</TableHead>
-                      <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {shiftRecords.map((record) => (
                       <TableRow key={record.id}>
+                        <TableCell>{record.station}</TableCell>
                         <TableCell>
-                          {format(new Date(record.shift_date), "MMM dd, yyyy")}
+                          {format(new Date(record.start_time), "yyyy MMM dd HH:mm")}
                         </TableCell>
-                        <TableCell className="capitalize">{record.shift_type}</TableCell>
                         <TableCell>
-                          {record.start_time && record.end_time
-                            ? `${format(new Date(record.start_time), "HH:mm")} - ${format(
-                                new Date(record.end_time),
-                                "HH:mm"
-                              )}`
-                            : "Not set"}
+                          {format(new Date(record.end_time), "yyyy MMM dd HH:mm")}
                         </TableCell>
+                        <TableCell>{record.hours}</TableCell>
+                        <TableCell>{record.trips}</TableCell>
+                        <TableCell>{record.callsign}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">
+                            {record.service}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{record.crew_members.join(", ")}</TableCell>
                         <TableCell>
                           <Checkbox
                             checked={record.primary_checklist_completed}
@@ -132,13 +126,6 @@ export const ShiftRecords = () => {
                             checked={record.secondary_checklist_completed}
                             onCheckedChange={() => handleChecklistToggle(record.id, 'secondary')}
                           />
-                        </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={record.compliance_status === 'pending' ? 'secondary' : 'success'}
-                          >
-                            {record.compliance_status}
-                          </Badge>
                         </TableCell>
                         <TableCell>
                           <Button variant="ghost" size="sm">
