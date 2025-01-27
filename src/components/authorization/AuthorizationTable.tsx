@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { FileText, Plus } from "lucide-react";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { format } from "date-fns";
+import type { AuthorizationRequest } from "@/types/authorization";
 
 interface AuthorizationTableProps {
-  authorizations: any[];
+  authorizations: AuthorizationRequest[];
   isLoading: boolean;
 }
 
@@ -25,6 +26,10 @@ export const AuthorizationTable = ({ authorizations, isLoading }: AuthorizationT
         return 'bg-green-100 text-green-800';
       case 'expired':
         return 'bg-red-100 text-red-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'denied':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -62,9 +67,9 @@ export const AuthorizationTable = ({ authorizations, isLoading }: AuthorizationT
                 </TableCell>
                 <TableCell>{auth.service_type}</TableCell>
                 <TableCell>{auth.destination_type}</TableCell>
-                <TableCell>{format(new Date(auth.valid_from), 'yyyy MMM dd')}</TableCell>
-                <TableCell>{format(new Date(auth.valid_until), 'yyyy MMM dd')}</TableCell>
-                <TableCell>{getRemainingDays(auth.valid_until)} days</TableCell>
+                <TableCell>{auth.valid_from ? format(new Date(auth.valid_from), 'yyyy MMM dd') : '-'}</TableCell>
+                <TableCell>{auth.valid_until ? format(new Date(auth.valid_until), 'yyyy MMM dd') : '-'}</TableCell>
+                <TableCell>{auth.valid_until ? `${getRemainingDays(auth.valid_until)} days` : '-'}</TableCell>
                 <TableCell>
                   <Button variant="ghost" size="sm" className="gap-2">
                     <FileText className="h-4 w-4" />

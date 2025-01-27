@@ -16,6 +16,13 @@ import { Calendar, Filter, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 
+const FACILITIES = [
+  { value: "candler", label: "Emory Dialysis At Candler" },
+  { value: "northside", label: "Emory Dialysis At Northside" },
+  { value: "north-decatur", label: "Emory Dialysis At North Decatur" },
+  { value: "airport", label: "Atlanta Airport Dialysis" }
+] as const;
+
 export const AuthorizationsOnRecord = () => {
   const [showExpired, setShowExpired] = useState(false);
   const [showUpcoming, setShowUpcoming] = useState(true);
@@ -113,11 +120,12 @@ export const AuthorizationsOnRecord = () => {
                       <SelectValue placeholder="All Facilities" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Facilities</SelectItem>
-                      <SelectItem value="candler">Emory Dialysis At Candler</SelectItem>
-                      <SelectItem value="northside">Emory Dialysis At Northside</SelectItem>
-                      <SelectItem value="north-decatur">Emory Dialysis At North Decatur</SelectItem>
-                      <SelectItem value="airport">Atlanta Airport Dialysis</SelectItem>
+                      <SelectItem value="all">All Facilities</SelectItem>
+                      {FACILITIES.map((facility) => (
+                        <SelectItem key={facility.value} value={facility.value}>
+                          {facility.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

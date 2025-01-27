@@ -1,4 +1,4 @@
-export type AuthorizationStatus = 'pending' | 'approved' | 'denied' | 'expired';
+export type AuthorizationStatus = 'pending' | 'approved' | 'denied' | 'expired' | 'active';
 
 export interface AuthorizationRequest {
   id: string;
@@ -14,6 +14,7 @@ export interface AuthorizationRequest {
   priority: string;
   created_at: string;
   updated_at: string;
+  destination_type?: string;
   patients?: {
     first_name: string;
     last_name: string;
