@@ -13,6 +13,7 @@ import { AIInsight } from "@/types/ai";
 import { Json } from "@/integrations/supabase/types";
 import { CenterTable } from "@/components/center/CenterTable";
 import { BillingSidebar } from "@/components/navigation/BillingSidebar";
+import { Header } from "@/components/layout/Header";
 
 interface AIRecommendations {
   usage_pattern: string;
@@ -138,10 +139,13 @@ export const CenterList = () => {
 
   if (error) {
     return (
-      <div className="flex h-screen">
-        <BillingSidebar />
-        <div className="flex-1 flex justify-center items-center">
-          <p className="text-red-500">Error loading centers: {error.message}</p>
+      <div className="flex flex-col h-screen">
+        <Header />
+        <div className="flex flex-1">
+          <BillingSidebar />
+          <div className="flex-1 flex justify-center items-center">
+            <p className="text-red-500">Error loading centers: {error.message}</p>
+          </div>
         </div>
       </div>
     );
@@ -149,33 +153,37 @@ export const CenterList = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen">
-        <BillingSidebar />
-        <div className="flex-1 flex justify-center items-center">
-          <LoadingSpinner size={32} />
+      <div className="flex flex-col h-screen">
+        <Header />
+        <div className="flex flex-1">
+          <BillingSidebar />
+          <div className="flex-1 flex justify-center items-center">
+            <LoadingSpinner size={32} />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen">
-      <BillingSidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="container mx-auto p-6 space-y-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-6 w-6 text-medical-primary" />
-              <h1 className="text-2xl font-bold text-medical-primary">Medical Centers</h1>
+    <div className="flex flex-col h-screen">
+      <Header />
+      <div className="flex flex-1">
+        <BillingSidebar />
+        <div className="flex-1 overflow-auto">
+          <div className="container mx-auto p-6 space-y-6">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-6 w-6 text-medical-primary" />
+                <h1 className="text-2xl font-bold text-medical-primary">Medical Centers</h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-blue-500" />
+                <span className="text-sm text-gray-600">AI-Powered Insights Active</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-blue-500" />
-              <span className="text-sm text-gray-600">AI-Powered Insights Active</span>
-            </div>
-          </div>
 
-          <Card className="p-4 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card className="p-4 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="nameFilter">Name contains</Label>
             <Input
@@ -255,20 +263,21 @@ export const CenterList = () => {
             </div>
           </div>
             </div>
-          </Card>
+            </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-3">
-              {filteredCenters && <CenterTable centers={filteredCenters} />}
-            </div>
-            
-            <div className="lg:col-span-1">
-              {filteredCenters && filteredCenters.length > 0 && (
-                <AIInsightsPanel
-                  insights={generateAIInsights(filteredCenters[0])}
-                  className="sticky top-6"
-                />
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="lg:col-span-3">
+                {filteredCenters && <CenterTable centers={filteredCenters} />}
+              </div>
+              
+              <div className="lg:col-span-1">
+                {filteredCenters && filteredCenters.length > 0 && (
+                  <AIInsightsPanel
+                    insights={generateAIInsights(filteredCenters[0])}
+                    className="sticky top-6"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
