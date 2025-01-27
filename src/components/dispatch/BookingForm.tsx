@@ -6,6 +6,15 @@ import { PatientSection } from "./form-sections/PatientSection";
 import { EmergencyContactSection } from "./form-sections/EmergencyContactSection";
 import { type DispatchFormData } from "@/types/dispatch";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { MapPin, Clock, Bot } from "lucide-react";
 
 const serviceComplaints = [
   "Transfer / Palliative care",

@@ -6,11 +6,11 @@ import ActiveDispatches from "@/pages/ActiveDispatches";
 import ClosedDispatches from "@/pages/ClosedDispatches";
 import CreateDispatch from "@/pages/CreateDispatch";
 import DispatchSettings from "@/pages/DispatchSettings";
-import Reports from "@/pages/Reports";
-import OperationsMap from "@/pages/OperationsMap";
-import ServiceQueue from "@/pages/ServiceQueue";
-import AuthorizationQueue from "@/pages/AuthorizationQueue";
-import AuthorizationsOnRecord from "@/pages/AuthorizationsOnRecord";
+import { Reports } from "@/pages/Reports";
+import { OperationsMap } from "@/pages/OperationsMap";
+import { ServiceQueue } from "@/pages/ServiceQueue";
+import { AuthorizationQueue } from "@/pages/AuthorizationQueue";
+import { AuthorizationsOnRecord } from "@/pages/AuthorizationsOnRecord";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +19,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Index hospitalName="General Hospital" />} />
           <Route path="/active-dispatches" element={<ActiveDispatches />} />
           <Route path="/closed-dispatches" element={<ClosedDispatches />} />
           <Route path="/create-dispatch" element={<CreateDispatch />} />
