@@ -13,6 +13,7 @@ import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useState } from "react";
 import { toast } from "sonner";
+import { AIInsight } from "@/types/service-queue";
 
 export function Reports() {
   const [dateRange, setDateRange] = useState<Date>(new Date());

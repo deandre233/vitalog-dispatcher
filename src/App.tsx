@@ -1,16 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Index from "@/pages/Index";
-import ActiveDispatches from "@/pages/ActiveDispatches";
-import ClosedDispatches from "@/pages/ClosedDispatches";
-import CreateDispatch from "@/pages/CreateDispatch";
-import DispatchSettings from "@/pages/DispatchSettings";
-import Reports from "@/pages/Reports";
-import OperationsMap from "@/pages/OperationsMap";
-import ServiceQueue from "@/pages/ServiceQueue";
-import AuthorizationQueue from "@/pages/AuthorizationQueue";
-import AuthorizationsOnRecord from "@/pages/AuthorizationsOnRecord";
+import { Index } from "@/pages/Index";
+import { ActiveDispatches } from "@/pages/ActiveDispatches";
+import { ClosedDispatches } from "@/pages/ClosedDispatches";
+import { CreateDispatch } from "@/pages/CreateDispatch";
+import { DispatchSettings } from "@/pages/DispatchSettings";
+import { Reports } from "@/pages/Reports";
+import { OperationsMap } from "@/pages/OperationsMap";
+import { ServiceQueue } from "@/pages/ServiceQueue";
+import { AuthorizationQueue } from "@/pages/AuthorizationQueue";
+import { AuthorizationsOnRecord } from "@/pages/AuthorizationsOnRecord";
 
 const queryClient = new QueryClient();
 
