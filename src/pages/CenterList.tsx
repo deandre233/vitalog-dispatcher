@@ -5,10 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { Building2, Mail, MapPin, Phone, Search } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Building2, MapPin, Phone, Mail, Search, Filter, Activity } from "lucide-react";
 import { useState } from "react";
 import { Json } from "@/integrations/supabase/types";
 
+// TypeScript interfaces for better type safety
 interface AIRecommendations {
   usage_pattern: string;
   efficiency_score: number;
@@ -29,8 +31,6 @@ interface Center {
   ai_recommendations: AIRecommendations;
   efficiency_score: number;
   dispatch_count: number;
-  created_at: string;
-  updated_at: string;
 }
 
 interface RawCenter extends Omit<Center, 'ai_recommendations'> {
@@ -40,8 +40,10 @@ interface RawCenter extends Omit<Center, 'ai_recommendations'> {
 export const CenterList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
+  const [sortField, setSortField] = useState<keyof Center>("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const { data: centers, isLoading } = useQuery({
+  const { data: centers, isLoading, error } = useQuery({
     queryKey: ['centers'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -63,11 +65,26 @@ export const CenterList = () => {
   });
 
   const filteredCenters = centers?.filter(center => {
-    const matchesSearch = center.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      center.address.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = 
+      center.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      center.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      center.city.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = filterType === "all" || center.type === filterType;
     return matchesSearch && matchesType;
+  }).sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    const direction = sortDirection === "asc" ? 1 : -1;
+    return aValue < bValue ? -1 * direction : aValue > bValue ? 1 * direction : 0;
   });
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-red-500">Error loading centers: {error.message}</p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -77,16 +94,24 @@ export const CenterList = () => {
     );
   }
 
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'inactive': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   const getEfficiencyColor = (score: number) => {
-    if (score >= 80) return "bg-green-100 text-green-800";
-    if (score >= 60) return "bg-yellow-100 text-yellow-800";
-    return "bg-red-100 text-red-800";
+    if (score >= 80) return 'bg-green-100 text-green-800';
+    if (score >= 60) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-red-100 text-red-800';
   };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Medical Centers</h1>
+        <h1 className="text-2xl font-bold text-medical-primary">Medical Centers</h1>
         <div className="flex gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -112,50 +137,52 @@ export const CenterList = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCenters?.map((center) => (
-          <Card key={center.id} className="p-6 space-y-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-lg font-semibold">{center.name}</h3>
-                <p className="text-sm text-gray-500">{center.type}</p>
-              </div>
-              <Badge className={getEfficiencyColor(center.efficiency_score)}>
-                {center.efficiency_score}% Efficient
-              </Badge>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <MapPin className="h-4 w-4" />
-                <span>{center.address}, {center.city}, {center.state} {center.zip}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Phone className="h-4 w-4" />
-                <span>{center.phone}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Mail className="h-4 w-4" />
-                <span>{center.email}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Building2 className="h-4 w-4" />
-                <span>{center.dispatch_count} Dispatches</span>
-              </div>
-            </div>
-
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-2">AI Insights</h4>
-              <p className="text-sm text-blue-800">{center.ai_recommendations.usage_pattern}</p>
-              <ul className="mt-2 space-y-1">
-                {center.ai_recommendations.suggested_improvements.map((improvement, index) => (
-                  <li key={index} className="text-sm text-blue-700">• {improvement}</li>
-                ))}
-              </ul>
-            </div>
-          </Card>
-        ))}
-      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[300px]">Name</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Location</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Efficiency</TableHead>
+            <TableHead>Dispatches</TableHead>
+            <TableHead>Contact</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredCenters?.map((center) => (
+            <TableRow key={center.id} className="hover:bg-medical-highlight/50">
+              <TableCell className="font-medium">{center.name}</TableCell>
+              <TableCell>{center.type}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  <span>{center.address}, {center.city}, {center.state}</span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge className={getStatusColor(center.status)}>{center.status}</Badge>
+              </TableCell>
+              <TableCell>
+                <Badge className={getEfficiencyColor(center.efficiency_score)}>
+                  {center.efficiency_score}%
+                </Badge>
+              </TableCell>
+              <TableCell>{center.dispatch_count}</TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <a href={`tel:${center.phone}`} className="text-blue-500 hover:text-blue-700">
+                    <Phone className="h-4 w-4" />
+                  </a>
+                  <a href={`mailto:${center.email}`} className="text-blue-500 hover:text-blue-700">
+                    <Mail className="h-4 w-4" />
+                  </a>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };
