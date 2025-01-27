@@ -1,22 +1,31 @@
 export interface ShiftRecord {
   id: string;
-  station: string;
-  start_time: string;
-  end_time: string;
-  hours: number;
-  trips: number;
-  callsign: string;
-  service: string;
-  crew_members: string[];
-  starting_odometer?: number;
-  ending_odometer?: number;
-  distance?: number;
-  primary_checklist_completed: boolean;
-  secondary_checklist_completed: boolean;
-  vehicle_id?: string;
-  status: 'active' | 'completed' | 'pending';
-  created_at: string;
-  updated_at: string;
+  employee_id: string | null;
+  shift_date: string;
+  shift_type: string;
+  start_time: string | null;
+  end_time: string | null;
+  checklist_completed: boolean | null;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  uuid: string;
+  ai_analysis: any;
+  performance_metrics: any;
+  safety_score: number | null;
+  fatigue_indicators: string[] | null;
+  shift_pattern_analysis: string | null;
+  compliance_status: string | null;
+  vehicle_id: string | null;
+  starting_odometer: number | null;
+  ending_odometer: number | null;
+  distance: number | null;
+  primary_checklist_completed: boolean | null;
+  secondary_checklist_completed: boolean | null;
+  employees?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export interface ShiftFilter {

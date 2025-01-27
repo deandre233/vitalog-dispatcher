@@ -55,6 +55,13 @@ export const ShiftRecords = () => {
     }
   };
 
+  const getEmployeeName = (record: ShiftRecord) => {
+    if (record.employees) {
+      return `${record.employees.first_name} ${record.employees.last_name}`;
+    }
+    return 'N/A';
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -83,14 +90,11 @@ export const ShiftRecords = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Station</TableHead>
+                      <TableHead>Employee</TableHead>
                       <TableHead>Start Time</TableHead>
                       <TableHead>End Time</TableHead>
-                      <TableHead>Hours</TableHead>
-                      <TableHead>Trips</TableHead>
-                      <TableHead>Callsign</TableHead>
-                      <TableHead>Service</TableHead>
-                      <TableHead>Crew Members</TableHead>
+                      <TableHead>Vehicle ID</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Primary Checklist</TableHead>
                       <TableHead>Secondary Checklist</TableHead>
                       <TableHead>Actions</TableHead>
@@ -99,31 +103,28 @@ export const ShiftRecords = () => {
                   <TableBody>
                     {shiftRecords.map((record) => (
                       <TableRow key={record.id}>
-                        <TableCell>{record.station}</TableCell>
+                        <TableCell>{getEmployeeName(record)}</TableCell>
                         <TableCell>
-                          {format(new Date(record.start_time), "yyyy MMM dd HH:mm")}
+                          {record.start_time ? format(new Date(record.start_time), "yyyy MMM dd HH:mm") : 'N/A'}
                         </TableCell>
                         <TableCell>
-                          {format(new Date(record.end_time), "yyyy MMM dd HH:mm")}
+                          {record.end_time ? format(new Date(record.end_time), "yyyy MMM dd HH:mm") : 'N/A'}
                         </TableCell>
-                        <TableCell>{record.hours}</TableCell>
-                        <TableCell>{record.trips}</TableCell>
-                        <TableCell>{record.callsign}</TableCell>
+                        <TableCell>{record.vehicle_id || 'N/A'}</TableCell>
                         <TableCell>
                           <Badge variant="secondary">
-                            {record.service}
+                            {record.compliance_status || 'Pending'}
                           </Badge>
                         </TableCell>
-                        <TableCell>{record.crew_members.join(", ")}</TableCell>
                         <TableCell>
                           <Checkbox
-                            checked={record.primary_checklist_completed}
+                            checked={record.primary_checklist_completed || false}
                             onCheckedChange={() => handleChecklistToggle(record.id, 'primary')}
                           />
                         </TableCell>
                         <TableCell>
                           <Checkbox
-                            checked={record.secondary_checklist_completed}
+                            checked={record.secondary_checklist_completed || false}
                             onCheckedChange={() => handleChecklistToggle(record.id, 'secondary')}
                           />
                         </TableCell>
