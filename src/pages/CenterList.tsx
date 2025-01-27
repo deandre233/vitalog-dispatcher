@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { Building2, Mail, MapPin, Phone, Search } from "lucide-react";
 import { useState } from "react";
+import { Json } from "@/integrations/supabase/types";
 
 interface Center {
   id: string;
@@ -30,6 +31,10 @@ interface Center {
   updated_at: string;
 }
 
+interface RawCenter extends Omit<Center, 'ai_recommendations'> {
+  ai_recommendations: Json;
+}
+
 export const CenterList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("");
@@ -43,7 +48,16 @@ export const CenterList = () => {
         .order('name');
 
       if (error) throw error;
-      return data as Center[];
+
+      // Transform the raw data to match our Center interface
+      return (data as RawCenter[]).map(center => ({
+        ...center,
+        ai_recommendations: {
+          usage_pattern: (center.ai_recommendations as any)?.usage_pattern || "No pattern available",
+          efficiency_score: (center.ai_recommendations as any)?.efficiency_score || 0,
+          suggested_improvements: (center.ai_recommendations as any)?.suggested_improvements || []
+        }
+      })) as Center[];
     }
   });
 
