@@ -51,7 +51,7 @@ export const DirectionsTab: React.FC<DirectionsTabProps> = ({
           
           const leg = routeDetails.route.routes[0]?.legs[0];
           if (leg) {
-            const routeData: RouteData = {
+            const routeData = {
               distance: leg.distance?.text || "",
               duration: leg.duration?.text || "",
               start_location: {
@@ -67,7 +67,7 @@ export const DirectionsTab: React.FC<DirectionsTabProps> = ({
             await supabase
               .from('transport_records')
               .update({
-                route_data: routeData
+                route_data: routeData as any // Type assertion needed for Supabase Json type
               })
               .eq('id', transportId);
           }
