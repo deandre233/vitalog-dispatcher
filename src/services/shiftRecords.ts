@@ -3,7 +3,7 @@ import type { ShiftRecord, ShiftFilter } from "@/types/shift-records";
 import { logger } from "@/utils/logger";
 
 export const shiftRecordsService = {
-  async getShiftRecords(filters?: ShiftFilter): Promise<ShiftRecord[]> {
+  async getShiftRecords(filters?: ShiftFilter) {
     try {
       let query = supabase
         .from('shift_records')
@@ -31,14 +31,14 @@ export const shiftRecordsService = {
       const { data, error } = await query;
 
       if (error) throw error;
-      return (data || []) as ShiftRecord[];
+      return data as unknown as ShiftRecord[];
     } catch (error) {
       logger.error('Error fetching shift records:', error);
       throw error;
     }
   },
 
-  async updateShiftChecklist(id: string, updates: { primary_checklist_completed?: boolean; secondary_checklist_completed?: boolean }): Promise<ShiftRecord> {
+  async updateShiftChecklist(id: string, updates: { primary_checklist_completed?: boolean; secondary_checklist_completed?: boolean }) {
     try {
       const { data, error } = await supabase
         .from('shift_records')
@@ -48,7 +48,7 @@ export const shiftRecordsService = {
         .single();
 
       if (error) throw error;
-      return data as ShiftRecord;
+      return data as unknown as ShiftRecord;
     } catch (error) {
       logger.error('Error updating shift checklist:', error);
       throw error;
