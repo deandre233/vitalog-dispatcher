@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 export function AIScheduleOverview() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const { data: aiRecommendations } = useAIRecommendations();
-  const { data: transportRecords } = useTransportRecords();
+  const { transportRecords } = useTransportRecords();
   const [resourceUtilization, setResourceUtilization] = useState(0);
 
   // Fetch AI analysis results
