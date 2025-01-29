@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings, User, Menu } from "lucide-react";
+import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings, User, Menu, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,14 +26,26 @@ export function Header({ className = "" }) {
     <header className={`bg-gradient-to-r from-[#ea384c] to-[#ff6b81] backdrop-blur-sm border-b border-red-600/20 shadow-lg ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Heart className="w-6 h-6 text-white animate-pulse" />
-              <div className="absolute inset-0 bg-white/20 blur-sm rounded-full animate-pulse"></div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Heart className="w-6 h-6 text-white animate-pulse" />
+                <div className="absolute inset-0 bg-white/20 blur-sm rounded-full animate-pulse"></div>
+              </div>
+              <div className="text-xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
+                Vitalog
+              </div>
             </div>
-            <div className="text-xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
-              Vitalog
-            </div>
+            <Link to="/create">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-white hover:bg-white/20 gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                New Dispatch
+              </Button>
+            </Link>
           </div>
           
           {isMobile ? (
