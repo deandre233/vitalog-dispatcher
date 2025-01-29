@@ -20,16 +20,14 @@ interface ScheduleTabProps {
 }
 
 export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
-  // Debug log to check the value
+  // Debug logs
   console.log("Trip type:", transportRecord?.trip_type);
-  console.log("Full transport record:", transportRecord); // Additional debug log
+  console.log("Full transport record:", transportRecord);
   
   // Check if trip type matches either condition
-  const showReturnSection = 
-    transportRecord?.trip_type === "Round trip" || 
-    transportRecord?.trip_type === "Wait-and-return";
+  const showReturnSection = transportRecord?.trip_type === "Round trip" || transportRecord?.trip_type === "Wait-and-return";
 
-  console.log("Show return section:", showReturnSection); // Debug log
+  console.log("Show return section:", showReturnSection);
 
   return (
     <div className="space-y-4">
@@ -134,7 +132,7 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             <RadioGroup
               value={transportRecord?.trip_type || 'One way'}
               onValueChange={(value: 'One way' | 'Wait-and-return' | 'Round trip') => {
-                console.log("Selected trip type:", value); // Debug log
+                console.log("Selected trip type:", value);
                 onUpdate({ 
                   trip_type: value,
                   // Reset return-related fields when switching to One way
@@ -162,7 +160,7 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </RadioGroup>
           </div>
 
-          {/* Return Trip Section - Only show when trip type is Round trip or Wait-and-return */}
+          {/* Return Trip Section */}
           {showReturnSection && (
             <div className="space-y-4 mt-4 bg-gradient-to-r from-rose-50 to-red-50 p-4 rounded-lg shadow-sm">
               <div className="flex items-center gap-2">
