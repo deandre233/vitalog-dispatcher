@@ -6,6 +6,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TransportRecord } from "@/hooks/useTransportRecord";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ScheduleTabProps {
   transportRecord: TransportRecord;
@@ -24,7 +31,6 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
       
       <Card className="p-4 border-l-4 border-l-medical-secondary bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="space-y-4">
-          {/* Activation Section */}
           <div className="space-y-2 bg-white/80 p-4 rounded-lg shadow-sm">
             <Label className="text-medical-primary">Activate</Label>
             <div className="flex items-center gap-4">
@@ -52,7 +58,6 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </div>
           </div>
 
-          {/* Pickup Section */}
           <div className="space-y-2 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg shadow-sm">
             <Label className="text-medical-primary">Pickup</Label>
             <div className="flex items-center gap-4">
@@ -91,7 +96,6 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </div>
           </div>
 
-          {/* Dropoff Section */}
           <div className="space-y-2 bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg shadow-sm">
             <Label className="text-medical-primary">Dropoff</Label>
             <div className="flex items-center gap-4">
@@ -116,7 +120,6 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </div>
           </div>
 
-          {/* Trip Type */}
           <div className="space-y-2 bg-gradient-to-r from-amber-50 to-yellow-50 p-4 rounded-lg shadow-sm">
             <Label className="text-medical-primary">Trip Type</Label>
             <RadioGroup
@@ -150,83 +153,108 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
               
               <div className="space-y-4">
                 {/* Return Activation Time */}
-                <div className="space-y-2">
-                  <Label className="text-medical-primary">Activate at</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="datetime-local"
-                      className="flex-1 border-medical-secondary/30 focus:border-medical-secondary bg-white"
-                      onChange={(e) => onUpdate({ return_activation_time: e.target.value })}
-                      value={transportRecord?.return_activation_time || ''}
-                    />
-                    <button 
-                      onClick={() => onUpdate({ return_activation_time: '' })}
-                      className="text-gray-500 hover:text-gray-700"
-                      type="button"
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Return Pickup Time */}
-                <div className="space-y-2">
-                  <Label className="text-medical-primary">Pick back up at</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="time"
-                      className="flex-1 border-medical-secondary/30 focus:border-medical-secondary bg-white"
-                      onChange={(e) => onUpdate({ return_pickup_time: e.target.value })}
-                      value={transportRecord?.return_pickup_time || ''}
-                    />
-                    <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <Label className="min-w-[100px]">Return trip:</Label>
+                  <div className="flex-1">
+                    <Label className="text-sm text-gray-600">Activate at:</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="datetime-local"
+                        className="flex-1 border-medical-secondary/30 focus:border-medical-secondary bg-white"
+                        value={transportRecord?.return_activation_time || ''}
+                        onChange={(e) => onUpdate({ return_activation_time: e.target.value })}
+                      />
                       <button 
-                        onClick={() => {
-                          const currentTime = new Date();
-                          currentTime.setMinutes(currentTime.getMinutes() + 1);
-                          onUpdate({ 
-                            return_pickup_time: format(currentTime, 'HH:mm')
-                          });
-                        }}
-                        className="text-xs bg-blue-100 hover:bg-blue-200 p-1 rounded"
+                        onClick={() => onUpdate({ return_activation_time: '' })}
+                        className="text-gray-500 hover:text-gray-700 px-2"
                         type="button"
                       >
-                        ▲
-                      </button>
-                      <button 
-                        onClick={() => {
-                          const currentTime = new Date();
-                          currentTime.setMinutes(currentTime.getMinutes() - 1);
-                          onUpdate({ 
-                            return_pickup_time: format(currentTime, 'HH:mm')
-                          });
-                        }}
-                        className="text-xs bg-blue-100 hover:bg-blue-200 p-1 rounded"
-                        type="button"
-                      >
-                        ▼
+                        ×
                       </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Checkbox
-                      id="precise-return"
-                      className="border-medical-secondary/30"
-                      checked={transportRecord?.return_precise_pickup || false}
-                      onCheckedChange={(checked) => {
-                        if (typeof checked === 'boolean') {
-                          onUpdate({ return_precise_pickup: checked });
-                        }
-                      }}
-                    />
-                    <Label htmlFor="precise-return" className="text-sm">Precise</Label>
+                </div>
+
+                {/* Return Pickup Time */}
+                <div className="flex items-center gap-2">
+                  <Label className="min-w-[100px]"></Label>
+                  <div className="flex-1">
+                    <Label className="text-sm text-gray-600">Pick back up at:</Label>
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={transportRecord?.return_pickup_time || ''}
+                        onValueChange={(value) => onUpdate({ return_pickup_time: value })}
+                      >
+                        <SelectTrigger className="w-[180px] bg-white">
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 24 * 4 }).map((_, i) => {
+                            const hour = Math.floor(i / 4);
+                            const minute = (i % 4) * 15;
+                            const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                            const ampm = hour >= 12 ? 'PM' : 'AM';
+                            const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+                            const display = `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
+                            return (
+                              <SelectItem key={time} value={time}>
+                                {display}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      <div className="flex flex-col gap-1">
+                        <button 
+                          onClick={() => {
+                            const [hours, minutes] = (transportRecord?.return_pickup_time || '00:00').split(':');
+                            const date = new Date();
+                            date.setHours(parseInt(hours));
+                            date.setMinutes(parseInt(minutes) + 15);
+                            onUpdate({ 
+                              return_pickup_time: format(date, 'HH:mm')
+                            });
+                          }}
+                          className="text-xs bg-blue-100 hover:bg-blue-200 p-1 rounded"
+                          type="button"
+                        >
+                          ▲
+                        </button>
+                        <button 
+                          onClick={() => {
+                            const [hours, minutes] = (transportRecord?.return_pickup_time || '00:00').split(':');
+                            const date = new Date();
+                            date.setHours(parseInt(hours));
+                            date.setMinutes(parseInt(minutes) - 15);
+                            onUpdate({ 
+                              return_pickup_time: format(date, 'HH:mm')
+                            });
+                          }}
+                          className="text-xs bg-blue-100 hover:bg-blue-200 p-1 rounded"
+                          type="button"
+                        >
+                          ▼
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Checkbox
+                        id="precise-return"
+                        checked={transportRecord?.return_precise_pickup || false}
+                        onCheckedChange={(checked) => {
+                          if (typeof checked === 'boolean') {
+                            onUpdate({ return_precise_pickup: checked });
+                          }
+                        }}
+                      />
+                      <Label htmlFor="precise-return" className="text-sm">Precise</Label>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Timeline Visualization */}
           <div className="mt-6">
             <div className="h-8 bg-gradient-to-r from-gray-50 to-slate-100 rounded-lg flex overflow-hidden shadow-inner">
               {Array.from({ length: 24 }).map((_, i) => (
