@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
 
-export const ExternalLink = () => {
+const ExternalLink = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -27,3 +27,5 @@ export const ExternalLink = () => {
     </div>
   );
 }
+
+export default ExternalLink;
