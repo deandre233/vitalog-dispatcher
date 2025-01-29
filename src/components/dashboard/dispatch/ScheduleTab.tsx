@@ -20,6 +20,7 @@ interface ScheduleTabProps {
 }
 
 export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
+  // Explicitly check for these specific values
   const showReturnSection = transportRecord?.trip_type === 'Round trip' || transportRecord?.trip_type === 'Wait-and-return';
 
   return (
@@ -143,7 +144,7 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </RadioGroup>
           </div>
 
-          {/* Return Trip Section */}
+          {/* Return Trip Section - Only show when trip type is Round trip or Wait-and-return */}
           {showReturnSection && (
             <div className="space-y-4 mt-4 bg-gradient-to-r from-rose-50 to-red-50 p-4 rounded-lg shadow-sm">
               <div className="flex items-center gap-2">
