@@ -498,8 +498,7 @@ export function BookingForm() {
     const autocomplete = new google.maps.places.Autocomplete(inputElement, {
       types: ['address'],
       componentRestrictions: { country: 'US' },
-      fields: ['address_components', 'formatted_address', 'geometry'],
-      minLength: 3 // Only show suggestions after 3 characters
+      fields: ['address_components', 'formatted_address', 'geometry']
     });
 
     if (type === 'origin') {
@@ -570,6 +569,16 @@ export function BookingForm() {
     if (pac_container) {
       pac_container.classList.add('z-50', 'rounded-md', 'shadow-lg', 'bg-white', 'border', 'border-gray-200');
     }
+
+    // Add input event listener to handle minimum character requirement
+    inputElement.addEventListener('input', (e) => {
+      const input = e.target as HTMLInputElement;
+      if (input.value.length < 3) {
+        autocomplete.set('types', []); // Disable suggestions
+      } else {
+        autocomplete.set('types', ['address']); // Enable suggestions
+      }
+    });
   };
 
   return (
