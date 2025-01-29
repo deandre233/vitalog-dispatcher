@@ -13,9 +13,10 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Search } from "lucide-react";
+import { Calendar, Search, Database, CircuitBoard, Atom, Network, Bot, Scan } from "lucide-react";
 import { format } from "date-fns";
 import { useResourceDocuments } from "@/hooks/useResourceDocuments";
+import { cn } from "@/lib/utils";
 
 interface DocumentType {
   id: string;
@@ -94,31 +95,42 @@ export const ResourceLibrary = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-gradient-start via-medical-gradient-middle to-medical-gradient-end">
       <Header />
       <div className="flex-1 flex">
         <SidebarProvider>
           <AppSidebar />
-          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+          <div className="flex-1 overflow-auto backdrop-blur-sm">
             <DashboardHeader />
-            <main className="p-6">
-              <Card className="p-6">
-                <h2 className="text-2xl font-semibold mb-6">Patient Document Librarian</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <Label htmlFor="lastName">Patient last name:</Label>
+            <main className="p-6 space-y-6">
+              <div className="flex items-center space-x-4">
+                <CircuitBoard className="h-8 w-8 text-medical-secondary animate-pulse" />
+                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-medical-secondary to-medical-primary">
+                  Patient Document Librarian
+                </h1>
+              </div>
+
+              <Card className="futuristic-panel p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName" className="flex items-center space-x-2">
+                      <Database className="h-4 w-4" />
+                      <span>Patient last name</span>
+                    </Label>
                     <Input
                       id="lastName"
                       value={patientLastName}
                       onChange={(e) => setPatientLastName(e.target.value)}
-                      className="mt-1"
+                      className="glass-panel border-medical-secondary/20"
                     />
                   </div>
                   
-                  <div>
-                    <Label htmlFor="dob">Patient date of birth:</Label>
-                    <div className="flex items-center mt-1">
+                  <div className="space-y-2">
+                    <Label htmlFor="dob" className="flex items-center space-x-2">
+                      <Calendar className="h-4 w-4" />
+                      <span>Patient date of birth</span>
+                    </Label>
+                    <div className="flex items-center space-x-2">
                       <DatePicker
                         date={patientDOB}
                         onDateChange={setPatientDOB}
@@ -127,7 +139,7 @@ export const ResourceLibrary = () => {
                         variant="ghost"
                         size="icon"
                         onClick={() => setPatientDOB(undefined)}
-                        className="ml-2"
+                        className="hover:bg-medical-secondary/20"
                       >
                         <Calendar className="h-4 w-4" />
                       </Button>
@@ -135,18 +147,19 @@ export const ResourceLibrary = () => {
                   </div>
                 </div>
 
-                <div className="mb-6">
-                  <Label>Find documents collected on or before:</Label>
-                  <div className="flex items-center mt-1">
-                    <DatePicker
-                      date={beforeDate}
-                      onDateChange={setBeforeDate}
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center space-x-2">
+                    <Network className="h-4 w-4" />
+                    <span>Find documents collected on or before</span>
+                  </Label>
+                  <DatePicker
+                    date={beforeDate}
+                    onDateChange={setBeforeDate}
+                  />
                 </div>
 
-                <div className="space-y-4 mb-6">
-                  <div className="flex items-center space-x-2">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2 hover:bg-medical-secondary/10 p-2 rounded-lg transition-colors">
                     <Checkbox
                       id="hideDeleted"
                       checked={hideDeleted}
@@ -155,14 +168,14 @@ export const ResourceLibrary = () => {
                     <Label htmlFor="hideDeleted">Hide deleted documents</Label>
                   </div>
 
-                  <div className="flex items-center space-x-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 glass-panel rounded-lg">
                     <div className="flex items-center space-x-2">
                       <input
                         type="radio"
                         id="youngest"
                         checked={returnYoungest}
                         onChange={() => setReturnYoungest(true)}
-                        className="rounded-full"
+                        className="text-medical-secondary"
                       />
                       <Label htmlFor="youngest">Return only the youngest document of each selected type</Label>
                     </div>
@@ -172,37 +185,60 @@ export const ResourceLibrary = () => {
                         id="all"
                         checked={!returnYoungest}
                         onChange={() => setReturnYoungest(false)}
-                        className="rounded-full"
+                        className="text-medical-secondary"
                       />
                       <Label htmlFor="all">Return all documents of each selected type</Label>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-                  {selectedTypes.map((type) => (
-                    <div key={type.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={type.id}
-                        checked={type.checked}
-                        onCheckedChange={() => toggleDocumentType(type.id)}
-                      />
-                      <Label htmlFor={type.id}>{type.name}</Label>
-                    </div>
-                  ))}
-                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Atom className="h-5 w-5 text-medical-secondary animate-spin-slow" />
+                    <h3 className="text-lg font-semibold">Document Types</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {selectedTypes.map((type) => (
+                      <div key={type.id} 
+                        className={cn(
+                          "flex items-center space-x-2 p-2 rounded-lg transition-all duration-300",
+                          type.checked ? "bg-medical-secondary/20 shadow-glow" : "hover:bg-medical-secondary/10"
+                        )}
+                      >
+                        <Checkbox
+                          id={type.id}
+                          checked={type.checked}
+                          onCheckedChange={() => toggleDocumentType(type.id)}
+                        />
+                        <Label htmlFor={type.id}>{type.name}</Label>
+                      </div>
+                    ))}
+                  </div>
 
-                <div className="flex space-x-4 mb-6">
-                  <Button onClick={handleSelectAll} variant="outline">Select all</Button>
-                  <Button onClick={handleSelectNone} variant="outline">Select none</Button>
+                  <div className="flex space-x-4">
+                    <Button onClick={handleSelectAll} variant="outline" 
+                      className="hover:bg-medical-secondary/20 transition-colors">
+                      <Bot className="mr-2 h-4 w-4" />
+                      Select all
+                    </Button>
+                    <Button onClick={handleSelectNone} variant="outline"
+                      className="hover:bg-medical-secondary/20 transition-colors">
+                      <Scan className="mr-2 h-4 w-4" />
+                      Select none
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="mt-6">
-                  <h3 className="text-lg font-semibold mb-4">Matching documents:</h3>
-                  <ScrollArea className="h-[400px] border rounded-md">
+                  <h3 className="text-lg font-semibold flex items-center space-x-2 mb-4">
+                    <Search className="h-5 w-5 text-medical-secondary" />
+                    <span>Matching documents:</span>
+                  </h3>
+                  <ScrollArea className="h-[400px] border rounded-md glass-panel">
                     <Table>
                       <TableHeader>
-                        <TableRow>
+                        <TableRow className="hover:bg-medical-secondary/10">
                           <TableHead>ID</TableHead>
                           <TableHead>Patient</TableHead>
                           <TableHead>Document Type</TableHead>
@@ -217,12 +253,15 @@ export const ResourceLibrary = () => {
                         {isLoading ? (
                           <TableRow>
                             <TableCell colSpan={8} className="text-center">
-                              Loading...
+                              <div className="flex items-center justify-center space-x-2">
+                                <CircuitBoard className="h-5 w-5 animate-spin" />
+                                <span>Loading...</span>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ) : documents && documents.length > 0 ? (
                           documents.map((doc) => (
-                            <TableRow key={doc.id}>
+                            <TableRow key={doc.id} className="hover:bg-medical-secondary/10 transition-colors">
                               <TableCell>{doc.id}</TableCell>
                               <TableCell>{doc.patient}</TableCell>
                               <TableCell>{doc.documentType}</TableCell>
