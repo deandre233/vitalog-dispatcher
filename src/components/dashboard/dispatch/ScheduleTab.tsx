@@ -22,6 +22,7 @@ interface ScheduleTabProps {
 export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
   // Debug log to check the value
   console.log("Trip type:", transportRecord?.trip_type);
+  console.log("Full transport record:", transportRecord); // Additional debug log
   
   // Check if trip type matches either condition
   const showReturnSection = 
@@ -134,7 +135,15 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
               value={transportRecord?.trip_type || 'One way'}
               onValueChange={(value: 'One way' | 'Wait-and-return' | 'Round trip') => {
                 console.log("Selected trip type:", value); // Debug log
-                onUpdate({ trip_type: value });
+                onUpdate({ 
+                  trip_type: value,
+                  // Reset return-related fields when switching to One way
+                  ...(value === 'One way' ? {
+                    return_activation_time: null,
+                    return_pickup_time: null,
+                    return_precise_pickup: false
+                  } : {})
+                });
               }}
               className="flex items-center space-x-4"
             >
