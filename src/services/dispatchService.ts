@@ -45,26 +45,23 @@ export class DispatchService {
 
       if (error) {
         console.error('Error creating dispatch:', error);
-        toast({
-          title: "Error",
-          description: "Failed to create dispatch. Please try again.",
-          variant: "destructive"
+        toast("Failed to create dispatch. Please try again.", {
+          description: error.message,
+          duration: 5000,
         });
         return null;
       }
 
-      toast({
-        title: "Success",
-        description: "Dispatch created successfully",
+      toast("Dispatch created successfully", {
+        duration: 3000,
       });
 
       return newDispatch;
     } catch (error) {
       console.error('Error in createDispatch:', error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
+      toast("An unexpected error occurred. Please try again.", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
       });
       return null;
     }
