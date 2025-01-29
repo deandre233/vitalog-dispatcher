@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { BackdatedDispatchFormData } from "@/types/historical-entry";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Calendar, User, Ambulance, FileText, AlertTriangle } from "lucide-react";
+import { MapPin, Calendar, User, Ambulance, FileText } from "lucide-react";
 
 export const BackdatedDispatchForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,14 +21,33 @@ export const BackdatedDispatchForm = () => {
     try {
       setIsSubmitting(true);
       
+      // Transform form data to match transport_records schema
+      const transportRecord = {
+        dispatch_id: `HIST-${Date.now()}`, // Generate a unique historical dispatch ID
+        pickup_location: data.origin_name,
+        dropoff_location: data.destination_name,
+        origin_address: data.origin_address,
+        origin_floor_room: data.origin_floor_room,
+        origin_type: data.origin_type,
+        destination_address: data.destination_address,
+        destination_floor_room: data.destination_floor_room,
+        destination_type: data.destination_type,
+        patient_id: data.patient_id,
+        service_type: data.service_type,
+        priority_level: data.priority,
+        status: 'completed',
+        created_at: new Date().toISOString(),
+        billing_notes: data.billing_notes,
+        dispatcher_notes: data.dispatcher_notes,
+        requires_o2: data.requires_o2,
+        requires_ventilator: data.requires_ventilator,
+        requires_isolation: data.requires_isolation,
+        requires_bariatric: data.requires_bariatric
+      };
+
       const { error } = await supabase
         .from('transport_records')
-        .insert([{
-          ...data,
-          created_at: new Date().toISOString(),
-          status: 'completed',
-          is_historical: true
-        }]);
+        .insert(transportRecord);
 
       if (error) throw error;
       
@@ -114,7 +133,7 @@ export const BackdatedDispatchForm = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Service Type</Label>
-                <Select>
+                <Select onValueChange={(value) => register("service_type").onChange({ target: { value } })}>
                   <SelectTrigger className="glass-panel">
                     <SelectValue placeholder="Select service type" />
                   </SelectTrigger>
@@ -128,7 +147,7 @@ export const BackdatedDispatchForm = () => {
               </div>
               <div className="space-y-2">
                 <Label>Priority</Label>
-                <Select>
+                <Select onValueChange={(value) => register("priority").onChange({ target: { value } })}>
                   <SelectTrigger className="glass-panel">
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
