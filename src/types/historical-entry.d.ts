@@ -43,6 +43,10 @@ export interface BackdatedDispatchFormData {
   requires_bariatric: boolean;
   requires_ventilator: boolean;
   
+  // Caller Information
+  caller_name: string;
+  caller_phone: string;
+  
   // Notes
   dispatcher_notes: string;
   billing_notes: string;

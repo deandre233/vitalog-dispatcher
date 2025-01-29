@@ -16,7 +16,8 @@ import { PhoneInput } from "@/components/common/PhoneInput";
 
 export const BackdatedDispatchForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm<BackdatedDispatchFormData>();
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<BackdatedDispatchFormData>();
+  const callerPhone = watch("caller_phone");
 
   const onSubmit = async (data: BackdatedDispatchFormData) => {
     try {
@@ -76,8 +77,8 @@ export const BackdatedDispatchForm = () => {
             <div className="space-y-2">
               <Label>Caller Phone</Label>
               <PhoneInput
-                value={register("caller_phone").value || ""}
-                onChange={(value) => register("caller_phone").onChange({ target: { value } })}
+                value={callerPhone || ""}
+                onChange={(value) => setValue("caller_phone", value)}
                 className="glass-panel"
               />
             </div>
