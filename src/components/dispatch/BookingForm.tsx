@@ -564,12 +564,6 @@ export function BookingForm() {
       toast.success(`${type === 'origin' ? 'Pickup' : 'Dropoff'} address details filled automatically`);
     });
 
-    // Add styles to improve the appearance of suggestions
-    const pac_container = document.querySelector('.pac-container');
-    if (pac_container) {
-      pac_container.classList.add('z-50', 'rounded-md', 'shadow-lg', 'bg-white', 'border', 'border-gray-200');
-    }
-
     // Add input event listener to handle minimum character requirement
     inputElement.addEventListener('input', (e) => {
       const input = e.target as HTMLInputElement;
