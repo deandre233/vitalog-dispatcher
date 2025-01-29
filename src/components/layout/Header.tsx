@@ -40,7 +40,16 @@ export function Header({ className = "" }) {
               <Button 
                 variant="ghost" 
                 size="sm"
-                className="text-white hover:bg-white/20 gap-2"
+                className="relative overflow-hidden bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-white 
+                          hover:from-[#7C3AED] hover:to-[#C026D3] 
+                          shadow-[0_0_15px_rgba(139,92,246,0.5)]
+                          hover:shadow-[0_0_25px_rgba(139,92,246,0.7)]
+                          transition-all duration-300 gap-2
+                          before:absolute before:inset-0 
+                          before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent
+                          before:translate-x-[-200%] before:transition-transform before:duration-[1.5s]
+                          hover:before:translate-x-[200%]
+                          rounded-full border-none"
               >
                 <Plus className="w-4 h-4" />
                 New Dispatch
