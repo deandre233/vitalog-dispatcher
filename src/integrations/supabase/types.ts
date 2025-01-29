@@ -1929,6 +1929,65 @@ export type Database = {
         }
         Relationships: []
       }
+      patient_documents: {
+        Row: {
+          comments: string | null
+          created_at: string
+          directive_type: string[] | null
+          document_date: string
+          document_type: string
+          extracted_data: Json | null
+          extraction_status: string | null
+          file_name: string
+          file_path: string
+          id: string
+          is_active: boolean | null
+          patient_id: string | null
+          provider: string | null
+          updated_at: string
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string
+          directive_type?: string[] | null
+          document_date: string
+          document_type: string
+          extracted_data?: Json | null
+          extraction_status?: string | null
+          file_name: string
+          file_path: string
+          id?: string
+          is_active?: boolean | null
+          patient_id?: string | null
+          provider?: string | null
+          updated_at?: string
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string
+          directive_type?: string[] | null
+          document_date?: string
+          document_type?: string
+          extracted_data?: Json | null
+          extraction_status?: string | null
+          file_name?: string
+          file_path?: string
+          id?: string
+          is_active?: boolean | null
+          patient_id?: string | null
+          provider?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_documents_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           address: string | null
@@ -2500,6 +2559,7 @@ export type Database = {
           dnr_order: boolean | null
           dropoff_location: string
           dropoff_type: string | null
+          efficiency: number | null
           estimated_arrival: string | null
           fresh_prepared: boolean | null
           hearing_impaired: boolean | null
@@ -2571,6 +2631,7 @@ export type Database = {
           dnr_order?: boolean | null
           dropoff_location: string
           dropoff_type?: string | null
+          efficiency?: number | null
           estimated_arrival?: string | null
           fresh_prepared?: boolean | null
           hearing_impaired?: boolean | null
@@ -2642,6 +2703,7 @@ export type Database = {
           dnr_order?: boolean | null
           dropoff_location?: string
           dropoff_type?: string | null
+          efficiency?: number | null
           estimated_arrival?: string | null
           fresh_prepared?: boolean | null
           hearing_impaired?: boolean | null
@@ -2972,6 +3034,7 @@ export type Database = {
         | "Lieutenant"
         | "Full privileges"
         | "Call-taker / Self-dispatch"
+      traffic_level_enum: "low" | "medium" | "high"
       traffic_severity: "low" | "medium" | "high" | "severe"
       trip_type: "One way" | "Wait-and-return" | "Round trip"
       user_access_level: "admin" | "user" | "guest"
