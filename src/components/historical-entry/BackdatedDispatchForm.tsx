@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { BackdatedDispatchFormData } from "@/types/historical-entry";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Calendar, User, Ambulance, FileText } from "lucide-react";
+import { MapPin, Calendar, User, Ambulance, FileText, Phone } from "lucide-react";
+import { PhoneInput } from "@/components/common/PhoneInput";
 
 export const BackdatedDispatchForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,9 +22,8 @@ export const BackdatedDispatchForm = () => {
     try {
       setIsSubmitting(true);
       
-      // Transform form data to match transport_records schema
       const transportRecord = {
-        dispatch_id: `HIST-${Date.now()}`, // Generate a unique historical dispatch ID
+        dispatch_id: `HIST-${Date.now()}`,
         pickup_location: data.origin_name,
         dropoff_location: data.destination_name,
         origin_address: data.origin_address,
@@ -42,7 +42,9 @@ export const BackdatedDispatchForm = () => {
         requires_o2: data.requires_o2,
         requires_ventilator: data.requires_ventilator,
         requires_isolation: data.requires_isolation,
-        requires_bariatric: data.requires_bariatric
+        requires_bariatric: data.requires_bariatric,
+        caller_name: data.caller_name,
+        caller_phone: data.caller_phone
       };
 
       const { error } = await supabase
@@ -63,6 +65,25 @@ export const BackdatedDispatchForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <Card className="p-6 bg-gradient-to-br from-medical-card-start to-medical-card-end border-medical-secondary/20">
+        {/* Caller Information */}
+        <div className="mb-6 space-y-4">
+          <h3 className="text-lg font-semibold text-medical-primary">Caller Information</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Caller Name</Label>
+              <Input {...register("caller_name")} className="glass-panel" placeholder="Enter caller name" />
+            </div>
+            <div className="space-y-2">
+              <Label>Caller Phone</Label>
+              <PhoneInput
+                value={register("caller_phone").value || ""}
+                onChange={(value) => register("caller_phone").onChange({ target: { value } })}
+                className="glass-panel"
+              />
+            </div>
+          </div>
+        </div>
+
         <Tabs defaultValue="origin" className="w-full">
           <TabsList className="grid w-full grid-cols-5 bg-medical-accent rounded-lg">
             <TabsTrigger value="origin" className="flex items-center gap-2">
