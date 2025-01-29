@@ -20,6 +20,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Bot, MapPin, Search, UserCircle2, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { initGoogleMaps } from "@/services/googleMaps";
+import { Card } from "@/components/ui/card";
+import { DirectionsTab } from "@/components/dashboard/dispatch/DirectionsTab";
 
 const serviceComplaints = [
   "Transfer / Palliative care",
@@ -796,6 +798,23 @@ export function BookingForm() {
           </Button>
         </div>
       </Card>
+
+      {/* Map Visualization */}
+      {watch('pickup_location') && watch('dropoff_location') && (
+        <Card className="p-6 border-l-4 border-l-[#4B5563] bg-gradient-to-br from-white to-[#F3F4F6] shadow-lg hover:shadow-xl transition-all duration-300">
+          <h3 className="text-lg font-semibold mb-4 text-[#4B5563] flex items-center gap-2">
+            <MapPin className="w-5 h-5" />
+            Route Preview
+          </h3>
+          <div className="w-full h-[400px] rounded-lg overflow-hidden">
+            <DirectionsTab
+              transportId=""
+              pickupLocation={watch('pickup_location')}
+              dropoffLocation={watch('dropoff_location')}
+            />
+          </div>
+        </Card>
+      )}
 
       {/* Destination Location */}
       <Card className="p-6 border-l-4 border-l-[#F97316] bg-gradient-to-br from-white to-[#FEC6A1] shadow-lg hover:shadow-xl transition-all duration-300">
