@@ -20,37 +20,7 @@ interface ScheduleTabProps {
 }
 
 export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
-  // Enhanced debug logging
-  console.log("Current transport record:", transportRecord);
-  console.log("Current trip type:", transportRecord?.trip_type);
-  
-  // Explicitly check trip type
-  const tripType = transportRecord?.trip_type;
-  const showReturnSection = tripType === "Round trip" || tripType === "Wait-and-return";
-  
-  console.log("Trip type check:", {
-    tripType,
-    isRoundTrip: tripType === "Round trip",
-    isWaitAndReturn: tripType === "Wait-and-return",
-    showReturnSection
-  });
-
-  const handleTripTypeChange = (value: 'One way' | 'Wait-and-return' | 'Round trip') => {
-    console.log("Changing trip type to:", value);
-    
-    const updates: Partial<TransportRecord> = {
-      trip_type: value
-    };
-
-    // Reset return-related fields when switching to One way
-    if (value === 'One way') {
-      updates.return_activation_time = null;
-      updates.return_pickup_time = null;
-      updates.return_precise_pickup = false;
-    }
-
-    onUpdate(updates);
-  };
+  const showReturnSection = transportRecord?.trip_type === 'Round trip' || transportRecord?.trip_type === 'Wait-and-return';
 
   return (
     <div className="space-y-4">
@@ -61,7 +31,6 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
       
       <Card className="p-4 border-l-4 border-l-medical-secondary bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="space-y-4">
-          {/* Activate Section */}
           <div className="space-y-2 bg-white/80 p-4 rounded-lg shadow-sm">
             <Label className="text-medical-primary">Activate</Label>
             <div className="flex items-center gap-4">
@@ -89,7 +58,6 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </div>
           </div>
 
-          {/* Pickup Section */}
           <div className="space-y-2 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg shadow-sm">
             <Label className="text-medical-primary">Pickup</Label>
             <div className="flex items-center gap-4">
@@ -128,7 +96,6 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </div>
           </div>
 
-          {/* Dropoff Section */}
           <div className="space-y-2 bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg shadow-sm">
             <Label className="text-medical-primary">Dropoff</Label>
             <div className="flex items-center gap-4">
@@ -153,12 +120,12 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </div>
           </div>
 
-          {/* Trip Type Section */}
           <div className="space-y-2 bg-gradient-to-r from-amber-50 to-yellow-50 p-4 rounded-lg shadow-sm">
             <Label className="text-medical-primary">Trip Type</Label>
             <RadioGroup
-              value={tripType || 'One way'}
-              onValueChange={handleTripTypeChange}
+              value={transportRecord?.trip_type || 'One way'}
+              onValueChange={(value: 'One way' | 'Wait-and-return' | 'Round trip') => 
+                onUpdate({ trip_type: value })}
               className="flex items-center space-x-4"
             >
               <div className="flex items-center space-x-2">
@@ -288,7 +255,6 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </div>
           )}
 
-          {/* Time Slot Visualization */}
           <div className="mt-6">
             <div className="h-8 bg-gradient-to-r from-gray-50 to-slate-100 rounded-lg flex overflow-hidden shadow-inner">
               {Array.from({ length: 24 }).map((_, i) => (

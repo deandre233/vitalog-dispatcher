@@ -1,3 +1,6 @@
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/navigation/AppSidebar";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
@@ -6,14 +9,20 @@ export const ExternalLink = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <Card className="p-6">
-          <h1 className="text-2xl font-bold mb-4">External Link</h1>
-          <p className="text-gray-600">
-            This page will handle external link functionality.
-          </p>
-        </Card>
-      </main>
+      <div className="flex-1 flex">
+        <SidebarProvider>
+          <AppSidebar />
+          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+            <DashboardHeader />
+            <main className="p-6">
+              <Card className="p-6">
+                <h2 className="text-2xl font-semibold mb-6">External Link</h2>
+                <p className="text-gray-500">External link implementation coming in next iteration</p>
+              </Card>
+            </main>
+          </div>
+        </SidebarProvider>
+      </div>
       <Footer />
     </div>
   );
