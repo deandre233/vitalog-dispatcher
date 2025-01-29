@@ -498,7 +498,8 @@ export function BookingForm() {
     const autocomplete = new google.maps.places.Autocomplete(inputElement, {
       types: ['address'],
       componentRestrictions: { country: 'US' },
-      fields: ['address_components', 'formatted_address', 'geometry']
+      fields: ['address_components', 'formatted_address', 'geometry'],
+      minLength: 3 // Only show suggestions after 3 characters
     });
 
     if (type === 'origin') {
@@ -507,6 +508,7 @@ export function BookingForm() {
       setDestinationAutocomplete(autocomplete);
     }
 
+    // Add the place_changed event listener
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
       if (!place.address_components) return;
@@ -562,6 +564,12 @@ export function BookingForm() {
 
       toast.success(`${type === 'origin' ? 'Pickup' : 'Dropoff'} address details filled automatically`);
     });
+
+    // Add styles to improve the appearance of suggestions
+    const pac_container = document.querySelector('.pac-container');
+    if (pac_container) {
+      pac_container.classList.add('z-50', 'rounded-md', 'shadow-lg', 'bg-white', 'border', 'border-gray-200');
+    }
   };
 
   return (
@@ -694,14 +702,16 @@ export function BookingForm() {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Location Name</Label>
-            <Input 
-              {...register("pickup_location")} 
-              className="border-medical-secondary/30 focus:border-medical-secondary"
-              ref={(input) => {
-                if (input) initializeAutocomplete(input, 'origin');
-              }}
-              placeholder="Start typing address..."
-            />
+            <div className="relative">
+              <Input 
+                {...register("pickup_location")} 
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+                ref={(input) => {
+                  if (input) initializeAutocomplete(input, 'origin');
+                }}
+                placeholder="Type at least 3 characters to see suggestions..."
+              />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -790,14 +800,16 @@ export function BookingForm() {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Location Name</Label>
-            <Input 
-              {...register("dropoff_location")}
-              className="border-medical-secondary/30 focus:border-medical-secondary"
-              ref={(input) => {
-                if (input) initializeAutocomplete(input, 'destination');
-              }}
-              placeholder="Start typing address..."
-            />
+            <div className="relative">
+              <Input 
+                {...register("dropoff_location")}
+                className="border-medical-secondary/30 focus:border-medical-secondary"
+                ref={(input) => {
+                  if (input) initializeAutocomplete(input, 'destination');
+                }}
+                placeholder="Type at least 3 characters to see suggestions..."
+              />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
