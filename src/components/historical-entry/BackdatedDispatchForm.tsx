@@ -85,6 +85,115 @@ export const BackdatedDispatchForm = () => {
           </div>
         </div>
 
+        {/* Origin Information */}
+        <div className="mb-6 space-y-4">
+          <h3 className="text-lg font-semibold text-medical-primary">Origin</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Name</Label>
+              <div className="flex gap-2">
+                <Input {...register("origin_name")} className="glass-panel" />
+                <Button variant="outline" size="icon">
+                  <MapPin className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Floor/Room</Label>
+              <Input {...register("origin_floor_room")} className="glass-panel" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Type</Label>
+            <Select onValueChange={(value) => setValue("origin_type", value)}>
+              <SelectTrigger className="glass-panel">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hospital">Hospital</SelectItem>
+                <SelectItem value="residence">Residence</SelectItem>
+                <SelectItem value="nursing_home">Nursing Home</SelectItem>
+                <SelectItem value="clinic">Clinic</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Address</Label>
+            <div className="flex gap-2">
+              <Input {...register("origin_address")} className="glass-panel" />
+              <Button variant="outline" size="icon">
+                <MapPin className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>City</Label>
+              <Input {...register("origin_city")} className="glass-panel" />
+            </div>
+            <div className="space-y-2">
+              <Label>ZIP</Label>
+              <Input {...register("origin_zip")} className="glass-panel" placeholder="#####" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>State</Label>
+              <Select onValueChange={(value) => setValue("origin_state", value)} defaultValue="GA">
+                <SelectTrigger className="glass-panel">
+                  <SelectValue placeholder="Select state" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="GA">Georgia</SelectItem>
+                  {/* Add other states as needed */}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>County</Label>
+              <Select onValueChange={(value) => setValue("origin_county", value)}>
+                <SelectTrigger className="glass-panel">
+                  <SelectValue placeholder="Select county" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="not_recorded">Not recorded</SelectItem>
+                  {/* Add counties as needed */}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Telephone</Label>
+            <PhoneInput
+              value={watch("origin_phone") || ""}
+              onChange={(value) => setValue("origin_phone", value)}
+              className="glass-panel"
+            />
+          </div>
+        </div>
+
+        {/* Destination Information */}
+        <div className="mb-6 space-y-4">
+          <h3 className="text-lg font-semibold text-medical-primary">Destination (if known)</h3>
+          {/* Mirror the origin fields for destination */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Name</Label>
+              <div className="flex gap-2">
+                <Input {...register("destination_name")} className="glass-panel" />
+                <Button variant="outline" size="icon">
+                  <MapPin className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Floor/Room</Label>
+              <Input {...register("destination_floor_room")} className="glass-panel" />
+            </div>
+          </div>
+          {/* ... Mirror other origin fields for destination ... */}
+        </div>
+
         <Tabs defaultValue="origin" className="w-full">
           <TabsList className="grid w-full grid-cols-5 bg-medical-accent rounded-lg">
             <TabsTrigger value="origin" className="flex items-center gap-2">
