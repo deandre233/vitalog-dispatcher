@@ -579,6 +579,9 @@ export function BookingForm() {
         autocomplete.set('types', ['address']); // Enable suggestions
       }
     });
+
+    // Initially disable suggestions until 3 characters are typed
+    autocomplete.set('types', []);
   };
 
   return (
