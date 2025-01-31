@@ -9,7 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/common/PhoneInput";
 import { Separator } from "@/components/ui/separator";
 import type { EmployeeRole, EmployeePrivileges } from "@/types/employee";
 
@@ -26,30 +29,17 @@ const EmployeeProfile = () => {
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-4 w-32" />
         </div>
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card className="p-6">
-            <Skeleton className="h-6 w-32 mb-6" />
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex justify-between items-center">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-6 w-10" />
-                </div>
-              ))}
-            </div>
-          </Card>
-          <Card className="p-6">
-            <Skeleton className="h-6 w-32 mb-6" />
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex justify-between items-center">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-6 w-10" />
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
+        <Card className="p-6">
+          <Skeleton className="h-6 w-32 mb-6" />
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex justify-between items-center">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-6 w-10" />
+              </div>
+            ))}
+          </div>
+        </Card>
       </div>
     );
   }
@@ -84,8 +74,8 @@ const EmployeeProfile = () => {
   };
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex justify-between items-start">
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="flex justify-between items-start mb-8">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold">{employee.first_name} {employee.last_name}</h1>
@@ -95,15 +85,104 @@ const EmployeeProfile = () => {
           </div>
           <p className="text-gray-600 mt-1">{employee.readable_id}</p>
         </div>
-        <div className="text-right">
-          <p className="font-medium">{employee.employee_type}</p>
-          <p className="text-sm text-gray-600 mt-1">Since {new Date(employee.first_hired_date || '').toLocaleDateString()}</p>
-        </div>
+        <Button variant="outline">Add Portrait</Button>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-6">Roles</h2>
+      <Tabs defaultValue="identity" className="space-y-6">
+        <TabsList className="bg-muted/50 p-1">
+          <TabsTrigger value="identity">Identity</TabsTrigger>
+          <TabsTrigger value="roles">Roles</TabsTrigger>
+          <TabsTrigger value="privileges">Privileges</TabsTrigger>
+          <TabsTrigger value="demographics">Demographics</TabsTrigger>
+          <TabsTrigger value="incidents">Incidents</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="identity" className="space-y-6">
+          <Card className="p-6">
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>Name</Label>
+                  <div className="flex gap-4">
+                    <Input value={employee.last_name} readOnly placeholder="Last name" />
+                    <Input value={employee.first_name} readOnly placeholder="First name" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mobile number</Label>
+                  <PhoneInput value={employee.mobile || ''} onChange={() => {}} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Station</Label>
+                  <Select value={employee.station} onValueChange={() => {}}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select station" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="float">Float</SelectItem>
+                      <SelectItem value="station1">Station 1</SelectItem>
+                      <SelectItem value="station2">Station 2</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Employee ID</Label>
+                  <Input value={employee.readable_id || ''} readOnly />
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <h3 className="font-semibold">Login Information</h3>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Username</Label>
+                    <Input value={employee.readable_id?.toLowerCase() || ''} readOnly />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Password</Label>
+                    <div className="flex gap-2">
+                      <Input type="password" value="********" readOnly />
+                      <Button variant="outline">Generate New Password</Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <h3 className="font-semibold">Messaging Settings</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label>Dispatch notifications</Label>
+                    <Switch checked={true} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label>Schedule notifications</Label>
+                    <Switch checked={true} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label>Incident notifications</Label>
+                    <Switch checked={true} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label>Clock in/out notifications</Label>
+                    <Switch checked={true} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="roles">
+          <Card className="p-6">
           <div className="space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -271,10 +350,11 @@ const EmployeeProfile = () => {
               </div>
             </div>
           </div>
-        </Card>
+          </Card>
+        </TabsContent>
 
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-6">Privileges</h2>
+        <TabsContent value="privileges">
+          <Card className="p-6">
           <div className="space-y-6">
             <div className="space-y-4">
               <h3 className="font-medium text-gray-700">Patient Information</h3>
@@ -396,8 +476,30 @@ const EmployeeProfile = () => {
               </div>
             </div>
           </div>
-        </Card>
-      </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="demographics">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-6">Demographics</h2>
+            <p className="text-gray-600">Coming soon...</p>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="incidents">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-6">Incidents</h2>
+            <p className="text-gray-600">Coming soon...</p>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="documents">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-6">Documents</h2>
+            <p className="text-gray-600">Coming soon...</p>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {id && <EmployeeAIInsights employeeId={id} />}
     </div>
