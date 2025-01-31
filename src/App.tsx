@@ -1,72 +1,160 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as SonnerToaster } from "sonner";
-import Index from "@/pages/Index";
-import CreateDispatch from "@/pages/CreateDispatch";
-import EmployeeDirectory from "@/pages/EmployeeDirectory";
-import EmployeeProfile from "@/pages/EmployeeProfile";
-import OperationsMap from "@/pages/OperationsMap";
-import ShiftRecords from "@/pages/ShiftRecords";
-import SmartRouteOptimization from "@/pages/SmartRouteOptimization";
-import VerificationQueue from "@/pages/VerificationQueue";
-import ScheduleOverview from "@/pages/ScheduleOverview";
-import ServiceQueue from "@/pages/ServiceQueue";
-import AuthorizationQueue from "@/pages/AuthorizationQueue";
-import AuthorizationsOnRecord from "@/pages/AuthorizationsOnRecord";
-import CenterList from "@/pages/CenterList";
-import PartnerList from "@/pages/PartnerList";
-import PatientDirectory from "@/pages/PatientDirectory";
-import DocumentUpload from "@/pages/DocumentUpload";
-import ResourceLibrary from "@/pages/ResourceLibrary";
-import Categories from "@/pages/Categories";
-import HistoricalEntry from "@/pages/HistoricalEntry";
-import ExternalLink from "@/pages/ExternalLink";
-import PatientRecord from "@/pages/PatientRecord";
-import Performance from "@/pages/Performance";
-import Billing from "@/pages/Billing";
-import ManageRoutes from "@/pages/ManageRoutes";
-import AlertsConfig from "@/pages/AlertsConfig";
-import CrewAssignment from "@/pages/CrewAssignment";
-import ActiveDispatches from "@/pages/ActiveDispatches";
-import ClosedDispatches from "@/pages/ClosedDispatches";
+import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
+import { Button } from "./components/ui/button";
+import Index from "./pages/Index";
+import ActiveDispatches from "./pages/ActiveDispatches";
+import ClosedDispatches from "./pages/ClosedDispatches";
+import CreateDispatch from "./pages/CreateDispatch";
+import CrewAssignment from "./pages/CrewAssignment";
+import ManageRoutes from "./pages/ManageRoutes";
+import Performance from "./pages/Performance";
+import AlertsConfig from "./pages/AlertsConfig";
+import Billing from "./pages/Billing";
+import { EmployeeDirectory } from "./pages/EmployeeDirectory";
+import EmployeeProfile from "./pages/EmployeeProfile";
+import { PatientRecord } from "./pages/PatientRecord";
+import { OperationsMap } from "./pages/OperationsMap";
+import { ShiftRecords } from "./pages/ShiftRecords";
+import { SmartRouteOptimization } from "./pages/SmartRouteOptimization";
+import { VerificationQueue } from "./pages/VerificationQueue";
+import { ScheduleOverview } from "./pages/ScheduleOverview";
+import { ServiceQueue } from "./pages/ServiceQueue";
+import { AuthorizationQueue } from "./pages/AuthorizationQueue";
+import { AuthorizationsOnRecord } from "./pages/AuthorizationsOnRecord";
+import { CenterList } from "./pages/CenterList";
+import { PartnerList } from "./pages/PartnerList";
+import { PatientDirectory } from "./pages/PatientDirectory";
+import { DocumentUpload } from "./pages/DocumentUpload";
+import { ResourceLibrary } from "./pages/ResourceLibrary";
+import { Categories } from "./pages/Categories";
+import { HistoricalEntry } from "./pages/HistoricalEntry";
+import { ExternalLink } from "./pages/ExternalLink";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Index />,
+    errorElement: (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Page Not Found</h1>
+        <p className="text-gray-600 mb-4">Sorry, we couldn't find the page you're looking for.</p>
+        <Button asChild variant="default">
+          <Link to="/">Return Home</Link>
+        </Button>
+      </div>
+    ),
+  },
+  {
+    path: "/dispatch",
+    element: <ActiveDispatches />,
+  },
+  {
+    path: "/closed",
+    element: <ClosedDispatches />,
+  },
+  {
+    path: "/create",
+    element: <CreateDispatch />,
+  },
+  {
+    path: "/crew",
+    element: <CrewAssignment />,
+  },
+  {
+    path: "/routes",
+    element: <ManageRoutes />,
+  },
+  {
+    path: "/performance",
+    element: <Performance />,
+  },
+  {
+    path: "/alerts",
+    element: <AlertsConfig />,
+  },
+  {
+    path: "/billing",
+    element: <Billing />,
+  },
+  {
+    path: "/employees",
+    element: <EmployeeDirectory />,
+  },
+  {
+    path: "/employee/:id",
+    element: <EmployeeProfile />,
+  },
+  {
+    path: "/patient/:id",
+    element: <PatientRecord />,
+  },
+  {
+    path: "/operations-map",
+    element: <OperationsMap />,
+  },
+  {
+    path: "/shift-records",
+    element: <ShiftRecords />,
+  },
+  {
+    path: "/smart-route-optimization",
+    element: <SmartRouteOptimization />,
+  },
+  {
+    path: "/verification-queue",
+    element: <VerificationQueue />,
+  },
+  {
+    path: "/schedule-overview",
+    element: <ScheduleOverview />,
+  },
+  {
+    path: "/service-queue",
+    element: <ServiceQueue />,
+  },
+  {
+    path: "/authorization-queue",
+    element: <AuthorizationQueue />,
+  },
+  {
+    path: "/authorizations-on-record",
+    element: <AuthorizationsOnRecord />,
+  },
+  {
+    path: "/center-list",
+    element: <CenterList />,
+  },
+  {
+    path: "/partner-list",
+    element: <PartnerList />,
+  },
+  {
+    path: "/patient-directory",
+    element: <PatientDirectory />,
+  },
+  {
+    path: "/document-upload",
+    element: <DocumentUpload />,
+  },
+  {
+    path: "/resource-library",
+    element: <ResourceLibrary />,
+  },
+  {
+    path: "/categories",
+    element: <Categories />,
+  },
+  {
+    path: "/historical-entry",
+    element: <HistoricalEntry />,
+  },
+  {
+    path: "/external-link",
+    element: <ExternalLink />,
+  }
+]);
 
 function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/dispatch/new" element={<CreateDispatch />} />
-        <Route path="/employees" element={<EmployeeDirectory />} />
-        <Route path="/employee/:id" element={<EmployeeProfile />} />
-        <Route path="/operations-map" element={<OperationsMap />} />
-        <Route path="/shift-records" element={<ShiftRecords />} />
-        <Route path="/smart-route-optimization" element={<SmartRouteOptimization />} />
-        <Route path="/verification-queue" element={<VerificationQueue />} />
-        <Route path="/schedule-overview" element={<ScheduleOverview />} />
-        <Route path="/service-queue" element={<ServiceQueue />} />
-        <Route path="/authorization-queue" element={<AuthorizationQueue />} />
-        <Route path="/authorizations-on-record" element={<AuthorizationsOnRecord />} />
-        <Route path="/center-list" element={<CenterList />} />
-        <Route path="/partner-list" element={<PartnerList />} />
-        <Route path="/patient-directory" element={<PatientDirectory />} />
-        <Route path="/document-upload" element={<DocumentUpload />} />
-        <Route path="/resource-library" element={<ResourceLibrary />} />
-        <Route path="/categories" element={<Categories />} />
-        <Route path="/historical-entry" element={<HistoricalEntry />} />
-        <Route path="/external-link" element={<ExternalLink />} />
-        <Route path="/patient/:id" element={<PatientRecord />} />
-        <Route path="/performance" element={<Performance />} />
-        <Route path="/billing" element={<Billing />} />
-        <Route path="/manage-routes" element={<ManageRoutes />} />
-        <Route path="/alerts-config" element={<AlertsConfig />} />
-        <Route path="/crew-assignment" element={<CrewAssignment />} />
-        <Route path="/active-dispatches" element={<ActiveDispatches />} />
-        <Route path="/closed-dispatches" element={<ClosedDispatches />} />
-      </Routes>
-      <Toaster />
-      <SonnerToaster position="top-right" />
-    </Router>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
