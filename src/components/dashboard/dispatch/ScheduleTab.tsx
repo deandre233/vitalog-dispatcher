@@ -20,7 +20,15 @@ interface ScheduleTabProps {
 }
 
 export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
-  const showReturnSection = transportRecord?.trip_type === 'Round trip' || transportRecord?.trip_type === 'Wait-and-return';
+  // Debug log to check the value
+  console.log("Trip type:", transportRecord?.trip_type);
+  
+  // Check if trip type matches either condition
+  const showReturnSection = 
+    transportRecord?.trip_type === "Round trip" || 
+    transportRecord?.trip_type === "Wait-and-return";
+
+  console.log("Show return section:", showReturnSection); // Debug log
 
   return (
     <div className="space-y-4">
@@ -124,8 +132,10 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             <Label className="text-medical-primary">Trip Type</Label>
             <RadioGroup
               value={transportRecord?.trip_type || 'One way'}
-              onValueChange={(value: 'One way' | 'Wait-and-return' | 'Round trip') => 
-                onUpdate({ trip_type: value })}
+              onValueChange={(value: 'One way' | 'Wait-and-return' | 'Round trip') => {
+                console.log("Selected trip type:", value); // Debug log
+                onUpdate({ trip_type: value });
+              }}
               className="flex items-center space-x-4"
             >
               <div className="flex items-center space-x-2">
@@ -143,7 +153,7 @@ export function ScheduleTab({ transportRecord, onUpdate }: ScheduleTabProps) {
             </RadioGroup>
           </div>
 
-          {/* Return Trip Section */}
+          {/* Return Trip Section - Only show when trip type is Round trip or Wait-and-return */}
           {showReturnSection && (
             <div className="space-y-4 mt-4 bg-gradient-to-r from-rose-50 to-red-50 p-4 rounded-lg shadow-sm">
               <div className="flex items-center gap-2">
