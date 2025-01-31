@@ -6,12 +6,11 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: true, // Listen on all available network interfaces
+    host: "::",
     port: 8080,
     hmr: {
       overlay: true,
-      clientPort: 443, // Use 443 for secure WebSocket connections
-      host: process.env.VITE_DEV_SERVER_HOST || 'localhost'
+      clientPort: 8080,
     },
   },
   plugins: [

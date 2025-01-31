@@ -158,11 +158,7 @@ export function DispatchDetailView() {
         </TabsContent>
 
         <TabsContent value="directions">
-          <DirectionsTab 
-            transportId={id || ''}
-            pickupLocation={transportRecord.pickup_location}
-            dropoffLocation={transportRecord.dropoff_location}
-          />
+          <DirectionsTab transportRecord={transportRecord} />
         </TabsContent>
 
         <TabsContent value="schedule">

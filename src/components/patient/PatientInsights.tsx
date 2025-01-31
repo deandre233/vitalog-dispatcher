@@ -1,85 +1,107 @@
-import { useEffect, useState } from 'react';
-import { Card } from "@/components/ui/card";
-import { Bot, TrendingUp, AlertTriangle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useEffect, useState } from 'react'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { AlertTriangle, CheckCircle, Info } from 'lucide-react'
+import { supabase } from '@/integrations/supabase/client'
 
-interface AIInsight {
-  type: string;
-  message: string;
-  confidence: number;
+interface PatientInsightsProps {
+  patientId: string
 }
 
-export function PatientInsights() {
-  const [insights, setInsights] = useState<AIInsight[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Analysis {
+  completeness: {
+    demographic: 'complete' | 'incomplete'
+    contact: 'complete' | 'incomplete'
+    insurance: 'complete' | 'incomplete'
+    medical: 'complete' | 'incomplete'
+  }
+  suggestions: string[]
+  warnings: string[]
+}
+
+export const PatientInsights = ({ patientId }: PatientInsightsProps) => {
+  const [analysis, setAnalysis] = useState<Analysis | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const fetchInsights = async () => {
+    const fetchAnalysis = async () => {
       try {
-        const { data: aiResults, error } = await supabase
-          .from('ai_analysis_results')
-          .select('*')
-          .eq('analysis_type', 'patient_demographics')
-          .order('created_at', { ascending: false })
-          .limit(5);
+        const { data, error } = await supabase.functions.invoke('analyze-demographics', {
+          body: { patientId }
+        })
 
-        if (error) throw error;
-
-        // Transform the results into insights
-        const formattedInsights = aiResults.map(result => ({
-          type: 'ai',
-          message: result.recommendation || '',
-          confidence: result.confidence_score || 0
-        }));
-
-        setInsights(formattedInsights);
+        if (error) throw error
+        setAnalysis(data)
       } catch (error) {
-        console.error('Error fetching insights:', error);
-        toast.error('Failed to load AI insights');
+        console.error('Error fetching analysis:', error)
       } finally {
-        setLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    fetchInsights();
-  }, []);
+    if (patientId) {
+      fetchAnalysis()
+    }
+  }, [patientId])
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <Card className="p-4 w-full max-w-md animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+      <Card className="p-4">
+        <div className="animate-pulse space-y-2">
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        </div>
       </Card>
-    );
+    )
   }
 
+  if (!analysis) return null
+
   return (
-    <Card className="p-4 space-y-4 w-full max-w-md bg-white/50 backdrop-blur-sm border-medical-secondary/20">
-      <div className="flex items-center gap-2 text-medical-primary">
-        <Bot className="h-5 w-5" />
-        <h3 className="font-semibold">AI Insights</h3>
-      </div>
+    <Card className="p-4 space-y-4">
+      <h3 className="text-lg font-semibold flex items-center gap-2">
+        <Info className="h-5 w-5" />
+        Profile Insights
+      </h3>
 
-      <div className="space-y-3">
-        {insights.map((insight, index) => (
-          <div
-            key={index}
-            className="flex items-start gap-2 p-2 rounded-md bg-white/30 backdrop-blur-sm"
-          >
-            {insight.confidence > 0.8 ? (
-              <TrendingUp className="h-4 w-4 text-green-500 mt-1" />
-            ) : (
-              <AlertTriangle className="h-4 w-4 text-yellow-500 mt-1" />
-            )}
-            <p className="text-sm text-gray-700">{insight.message}</p>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <h4 className="text-sm font-medium mb-2">Profile Completeness</h4>
+          <div className="space-y-2">
+            {Object.entries(analysis.completeness).map(([key, value]) => (
+              <div key={key} className="flex items-center justify-between">
+                <span className="text-sm capitalize">{key}</span>
+                <Badge variant={value === 'complete' ? 'default' : 'secondary'}>
+                  {value === 'complete' ? (
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                  ) : (
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                  )}
+                  {value}
+                </Badge>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
 
-        {insights.length === 0 && (
-          <p className="text-sm text-gray-500 italic">No insights available</p>
-        )}
+        <div>
+          <h4 className="text-sm font-medium mb-2">Suggestions & Warnings</h4>
+          <div className="space-y-2">
+            {analysis.warnings.map((warning, index) => (
+              <div key={index} className="flex items-start gap-2 text-destructive">
+                <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <span className="text-sm">{warning}</span>
+              </div>
+            ))}
+            {analysis.suggestions.map((suggestion, index) => (
+              <div key={index} className="flex items-start gap-2 text-muted-foreground">
+                <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <span className="text-sm">{suggestion}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </Card>
-  );
+  )
 }

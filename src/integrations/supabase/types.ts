@@ -276,7 +276,6 @@ export type Database = {
           id: string
           insurance_id: string | null
           patient_id: string | null
-          priority: string | null
           requested_by: string | null
           service_type: string
           status: string | null
@@ -291,7 +290,6 @@ export type Database = {
           id?: string
           insurance_id?: string | null
           patient_id?: string | null
-          priority?: string | null
           requested_by?: string | null
           service_type: string
           status?: string | null
@@ -306,7 +304,6 @@ export type Database = {
           id?: string
           insurance_id?: string | null
           patient_id?: string | null
-          priority?: string | null
           requested_by?: string | null
           service_type?: string
           status?: string | null
@@ -433,14 +430,10 @@ export type Database = {
       centers: {
         Row: {
           address: string | null
-          ai_recommendations: Json | null
           city: string | null
           created_at: string | null
-          dispatch_count: number | null
-          efficiency_score: number | null
           email: string | null
           id: string
-          last_ai_analysis: string | null
           name: string
           phone: string | null
           state: string | null
@@ -451,14 +444,10 @@ export type Database = {
         }
         Insert: {
           address?: string | null
-          ai_recommendations?: Json | null
           city?: string | null
           created_at?: string | null
-          dispatch_count?: number | null
-          efficiency_score?: number | null
           email?: string | null
           id?: string
-          last_ai_analysis?: string | null
           name: string
           phone?: string | null
           state?: string | null
@@ -469,14 +458,10 @@ export type Database = {
         }
         Update: {
           address?: string | null
-          ai_recommendations?: Json | null
           city?: string | null
           created_at?: string | null
-          dispatch_count?: number | null
-          efficiency_score?: number | null
           email?: string | null
           id?: string
-          last_ai_analysis?: string | null
           name?: string
           phone?: string | null
           state?: string | null
@@ -1871,7 +1856,6 @@ export type Database = {
       }
       partners: {
         Row: {
-          ai_recommendations: Json | null
           contact_email: string | null
           contact_name: string | null
           contact_phone: string | null
@@ -1879,18 +1863,12 @@ export type Database = {
           contract_start_date: string | null
           created_at: string | null
           id: string
-          last_interaction: string | null
           name: string
-          next_review_date: string | null
-          partnership_score: number | null
           partnership_type: string
-          performance_metrics: Json | null
-          risk_assessment: string | null
           status: string | null
           updated_at: string | null
         }
         Insert: {
-          ai_recommendations?: Json | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -1898,18 +1876,12 @@ export type Database = {
           contract_start_date?: string | null
           created_at?: string | null
           id?: string
-          last_interaction?: string | null
           name: string
-          next_review_date?: string | null
-          partnership_score?: number | null
           partnership_type: string
-          performance_metrics?: Json | null
-          risk_assessment?: string | null
           status?: string | null
           updated_at?: string | null
         }
         Update: {
-          ai_recommendations?: Json | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -1917,76 +1889,12 @@ export type Database = {
           contract_start_date?: string | null
           created_at?: string | null
           id?: string
-          last_interaction?: string | null
           name?: string
-          next_review_date?: string | null
-          partnership_score?: number | null
           partnership_type?: string
-          performance_metrics?: Json | null
-          risk_assessment?: string | null
           status?: string | null
           updated_at?: string | null
         }
         Relationships: []
-      }
-      patient_documents: {
-        Row: {
-          comments: string | null
-          created_at: string
-          directive_type: string[] | null
-          document_date: string
-          document_type: string
-          extracted_data: Json | null
-          extraction_status: string | null
-          file_name: string
-          file_path: string
-          id: string
-          is_active: boolean | null
-          patient_id: string | null
-          provider: string | null
-          updated_at: string
-        }
-        Insert: {
-          comments?: string | null
-          created_at?: string
-          directive_type?: string[] | null
-          document_date: string
-          document_type: string
-          extracted_data?: Json | null
-          extraction_status?: string | null
-          file_name: string
-          file_path: string
-          id?: string
-          is_active?: boolean | null
-          patient_id?: string | null
-          provider?: string | null
-          updated_at?: string
-        }
-        Update: {
-          comments?: string | null
-          created_at?: string
-          directive_type?: string[] | null
-          document_date?: string
-          document_type?: string
-          extracted_data?: Json | null
-          extraction_status?: string | null
-          file_name?: string
-          file_path?: string
-          id?: string
-          is_active?: boolean | null
-          patient_id?: string | null
-          provider?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "patient_documents_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "patients"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       patients: {
         Row: {
@@ -2188,33 +2096,6 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string
-          first_name: string | null
-          id: string
-          last_name: string | null
-          updated_at: string
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          first_name?: string | null
-          id: string
-          last_name?: string | null
-          updated_at?: string
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string
-          first_name?: string | null
-          id?: string
-          last_name?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       resources: {
         Row: {
           category: string | null
@@ -2295,53 +2176,6 @@ export type Database = {
         }
         Relationships: []
       }
-      schedule_recommendations: {
-        Row: {
-          confidence_score: number
-          created_at: string | null
-          id: string
-          metadata: Json | null
-          original_time: string
-          reason: string
-          recommended_time: string
-          status: string | null
-          transport_id: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          confidence_score: number
-          created_at?: string | null
-          id?: string
-          metadata?: Json | null
-          original_time: string
-          reason: string
-          recommended_time: string
-          status?: string | null
-          transport_id?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          confidence_score?: number
-          created_at?: string | null
-          id?: string
-          metadata?: Json | null
-          original_time?: string
-          reason?: string
-          recommended_time?: string
-          status?: string | null
-          transport_id?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "schedule_recommendations_transport_id_fkey"
-            columns: ["transport_id"]
-            isOneToOne: false
-            referencedRelation: "transport_records"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       service_requests: {
         Row: {
           created_at: string | null
@@ -2352,11 +2186,8 @@ export type Database = {
           request_type: string
           requested_by: string | null
           requested_date: string | null
-          route: string | null
           service_date: string | null
-          service_type: string | null
           status: string | null
-          trip_type: string | null
           updated_at: string | null
         }
         Insert: {
@@ -2368,11 +2199,8 @@ export type Database = {
           request_type: string
           requested_by?: string | null
           requested_date?: string | null
-          route?: string | null
           service_date?: string | null
-          service_type?: string | null
           status?: string | null
-          trip_type?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -2384,11 +2212,8 @@ export type Database = {
           request_type?: string
           requested_by?: string | null
           requested_date?: string | null
-          route?: string | null
           service_date?: string | null
-          service_type?: string | null
           status?: string | null
-          trip_type?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -2410,79 +2235,40 @@ export type Database = {
       }
       shift_records: {
         Row: {
-          ai_analysis: Json | null
           checklist_completed: boolean | null
-          compliance_status: string | null
           created_at: string | null
-          distance: number | null
           employee_id: string | null
           end_time: string | null
-          ending_odometer: number | null
-          fatigue_indicators: string[] | null
           id: string
           notes: string | null
-          performance_metrics: Json | null
-          primary_checklist_completed: boolean | null
-          safety_score: number | null
-          secondary_checklist_completed: boolean | null
           shift_date: string
-          shift_pattern_analysis: string | null
           shift_type: string
           start_time: string | null
-          starting_odometer: number | null
           updated_at: string | null
-          uuid: string
-          vehicle_id: string | null
         }
         Insert: {
-          ai_analysis?: Json | null
           checklist_completed?: boolean | null
-          compliance_status?: string | null
           created_at?: string | null
-          distance?: number | null
           employee_id?: string | null
           end_time?: string | null
-          ending_odometer?: number | null
-          fatigue_indicators?: string[] | null
           id?: string
           notes?: string | null
-          performance_metrics?: Json | null
-          primary_checklist_completed?: boolean | null
-          safety_score?: number | null
-          secondary_checklist_completed?: boolean | null
           shift_date: string
-          shift_pattern_analysis?: string | null
           shift_type: string
           start_time?: string | null
-          starting_odometer?: number | null
           updated_at?: string | null
-          uuid?: string
-          vehicle_id?: string | null
         }
         Update: {
-          ai_analysis?: Json | null
           checklist_completed?: boolean | null
-          compliance_status?: string | null
           created_at?: string | null
-          distance?: number | null
           employee_id?: string | null
           end_time?: string | null
-          ending_odometer?: number | null
-          fatigue_indicators?: string[] | null
           id?: string
           notes?: string | null
-          performance_metrics?: Json | null
-          primary_checklist_completed?: boolean | null
-          safety_score?: number | null
-          secondary_checklist_completed?: boolean | null
           shift_date?: string
-          shift_pattern_analysis?: string | null
           shift_type?: string
           start_time?: string | null
-          starting_odometer?: number | null
           updated_at?: string | null
-          uuid?: string
-          vehicle_id?: string | null
         }
         Relationships: [
           {
@@ -2493,48 +2279,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      traffic_analysis: {
-        Row: {
-          average_duration: number
-          confidence_score: number
-          created_at: string | null
-          day_of_week: string
-          historical_data: Json | null
-          hour_of_day: number
-          id: string
-          last_updated: string | null
-          route_end_location: string
-          route_start_location: string
-          traffic_level: Database["public"]["Enums"]["traffic_severity"]
-        }
-        Insert: {
-          average_duration: number
-          confidence_score: number
-          created_at?: string | null
-          day_of_week: string
-          historical_data?: Json | null
-          hour_of_day: number
-          id?: string
-          last_updated?: string | null
-          route_end_location: string
-          route_start_location: string
-          traffic_level: Database["public"]["Enums"]["traffic_severity"]
-        }
-        Update: {
-          average_duration?: number
-          confidence_score?: number
-          created_at?: string | null
-          day_of_week?: string
-          historical_data?: Json | null
-          hour_of_day?: number
-          id?: string
-          last_updated?: string | null
-          route_end_location?: string
-          route_start_location?: string
-          traffic_level?: Database["public"]["Enums"]["traffic_severity"]
-        }
-        Relationships: []
       }
       transport_records: {
         Row: {
@@ -2559,7 +2303,6 @@ export type Database = {
           dnr_order: boolean | null
           dropoff_location: string
           dropoff_type: string | null
-          efficiency: number | null
           estimated_arrival: string | null
           fresh_prepared: boolean | null
           hearing_impaired: boolean | null
@@ -2631,7 +2374,6 @@ export type Database = {
           dnr_order?: boolean | null
           dropoff_location: string
           dropoff_type?: string | null
-          efficiency?: number | null
           estimated_arrival?: string | null
           fresh_prepared?: boolean | null
           hearing_impaired?: boolean | null
@@ -2703,7 +2445,6 @@ export type Database = {
           dnr_order?: boolean | null
           dropoff_location?: string
           dropoff_type?: string | null
-          efficiency?: number | null
           estimated_arrival?: string | null
           fresh_prepared?: boolean | null
           hearing_impaired?: boolean | null
@@ -3034,8 +2775,6 @@ export type Database = {
         | "Lieutenant"
         | "Full privileges"
         | "Call-taker / Self-dispatch"
-      traffic_level_enum: "low" | "medium" | "high"
-      traffic_severity: "low" | "medium" | "high" | "severe"
       trip_type: "One way" | "Wait-and-return" | "Round trip"
       user_access_level: "admin" | "user" | "guest"
       user_role: "admin" | "doctor" | "nurse" | "billing" | "receptionist"

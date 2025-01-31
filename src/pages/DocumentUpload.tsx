@@ -3,7 +3,7 @@ import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { DocumentUploadForm } from "@/components/document/DocumentUploadForm";
+import { Card } from "@/components/ui/card";
 
 export const DocumentUpload = () => {
   return (
@@ -15,7 +15,10 @@ export const DocumentUpload = () => {
           <div className="flex-1 bg-[#f4f7fc] overflow-auto">
             <DashboardHeader />
             <main className="p-6">
-              <DocumentUploadForm />
+              <Card className="p-6">
+                <h2 className="text-2xl font-semibold mb-6">Document Upload</h2>
+                <p className="text-gray-500">Document upload implementation coming in next iteration</p>
+              </Card>
             </main>
           </div>
         </SidebarProvider>
@@ -23,4 +26,4 @@ export const DocumentUpload = () => {
       <Footer />
     </div>
   );
-};
+}

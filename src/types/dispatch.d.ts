@@ -1,5 +1,4 @@
 import { Json } from '@/integrations/supabase/types';
-import { SearchableItem } from './common';
 
 export interface DispatchFormData {
   pickup_location: string;
@@ -95,6 +94,11 @@ export interface DispatchAssignment {
   assignment_reason?: string;
 }
 
+export interface SearchableItem {
+  id: string;
+  [key: string]: any;
+}
+
 export interface InsuranceRecord extends SearchableItem {
   id: string;
   patient_id?: string;
@@ -119,13 +123,6 @@ export interface AIAnalysisResult {
   performance_insights: string;
 }
 
-export interface DispatchViewState {
-  activeTab: 'active' | 'schedule' | 'calendar';
-  activeView: 'list' | 'map' | 'calendar';
-  selectedDate?: Date | null;
-  filterStatus?: string[];
-}
-
 export interface HospitalStatus {
   name: string;
   nedocs: number;
@@ -143,4 +140,11 @@ export interface AIInsight {
   message: string;
   severity: 'info' | 'warning' | 'error';
   timestamp: string;
+}
+
+export interface DispatchViewState {
+  activeTab: 'active' | 'schedule' | 'calendar';
+  activeView: 'dispatches' | 'scheduled';
+  selectedDate?: Date;
+  filterStatus?: string;
 }
