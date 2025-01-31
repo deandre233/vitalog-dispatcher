@@ -8,10 +8,12 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: true,
     port: 8080,
+    https: true,
     hmr: {
       clientPort: 443,
       host: process.env.VITE_DEV_SERVER_HOST || 'localhost',
-      protocol: 'wss'
+      protocol: 'wss',
+      timeout: 120000
     },
   },
   plugins: [
