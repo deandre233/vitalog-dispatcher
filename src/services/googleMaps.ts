@@ -9,7 +9,6 @@ export interface Location {
 export interface RouteDetails {
   distance: string;
   duration: string;
-  trafficDuration?: string;
   route: google.maps.DirectionsResult;
 }
 
@@ -80,11 +79,7 @@ export const getRouteDetails = async (
     drivingOptions: {
       departureTime: new Date(),
       trafficModel: google.maps.TrafficModel.BEST_GUESS
-    },
-    optimizeWaypoints: true,
-    provideRouteAlternatives: true,
-    avoidHighways: false,
-    avoidTolls: false
+    }
   };
   
   return new Promise((resolve, reject) => {
@@ -94,7 +89,6 @@ export const getRouteDetails = async (
         resolve({
           distance: leg.distance?.text || '',
           duration: leg.duration?.text || '',
-          trafficDuration: leg.duration_in_traffic?.text,
           route: result
         });
       } else {
@@ -121,45 +115,4 @@ export const geocodeAddress = async (address: string): Promise<Location> => {
       }
     });
   });
-};
-
-export const analyzeTrafficConditions = async (
-  origin: Location | string,
-  destination: Location | string
-): Promise<{
-  severity: 'low' | 'medium' | 'high';
-  delay: number;
-  alternateRoutes: boolean;
-}> => {
-  try {
-    const routeDetails = await getRouteDetails(origin, destination);
-    const leg = routeDetails.route.routes[0].legs[0];
-    
-    const normalDuration = leg.duration?.value || 0;
-    const trafficDuration = leg.duration_in_traffic?.value || normalDuration;
-    const delay = trafficDuration - normalDuration;
-    
-    // Calculate traffic severity based on delay percentage
-    const delayPercentage = (delay / normalDuration) * 100;
-    let severity: 'low' | 'medium' | 'high' = 'low';
-    
-    if (delayPercentage > 50) {
-      severity = 'high';
-    } else if (delayPercentage > 25) {
-      severity = 'medium';
-    }
-    
-    return {
-      severity,
-      delay: Math.round(delay / 60), // Convert to minutes
-      alternateRoutes: routeDetails.route.routes.length > 1
-    };
-  } catch (error) {
-    console.error('Error analyzing traffic:', error);
-    return {
-      severity: 'low',
-      delay: 0,
-      alternateRoutes: false
-    };
-  }
 };
