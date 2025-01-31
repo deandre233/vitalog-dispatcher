@@ -22,7 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AuthorizationRequest, AIRecommendation } from "@/types/authorization";
 import { cn } from "@/lib/utils";
 
-const AuthorizationQueue = () => {
+export const AuthorizationQueue = () => {
   const { requests, isLoading, updateRequest, metrics, aiRecommendations } = useAuthorizationQueue();
   const [searchTerm, setSearchTerm] = useState("");
 
