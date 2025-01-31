@@ -1,4 +1,4 @@
 export interface SearchableItem {
   id: string;
-  [key: string]: any; // Allow additional properties
+  [key: string]: any;
 }

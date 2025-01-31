@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import type { DispatchViewState } from '@/types/dispatch';
+import { DispatchViewState } from '@/types/dispatch';
 
 export function useDispatchNavigation() {
   const [viewState, setViewState] = useState<DispatchViewState>({
     activeTab: 'active',
-    activeView: 'dispatches',
+    activeView: 'list', // Fixed from 'dispatches' to 'list' to match the type
+    selectedDate: null,
+    filterStatus: []
   });
 
   const setActiveTab = (tab: DispatchViewState['activeTab']) => {
@@ -19,7 +21,7 @@ export function useDispatchNavigation() {
     setViewState(prev => ({ ...prev, selectedDate: date }));
   };
 
-  const setFilterStatus = (status?: string) => {
+  const setFilterStatus = (status?: string[]) => {
     setViewState(prev => ({ ...prev, filterStatus: status }));
   };
 

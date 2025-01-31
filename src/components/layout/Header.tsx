@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings, User, Menu } from "lucide-react";
+import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings, User, Menu, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,14 +26,35 @@ export function Header({ className = "" }) {
     <header className={`bg-gradient-to-r from-[#ea384c] to-[#ff6b81] backdrop-blur-sm border-b border-red-600/20 shadow-lg ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Heart className="w-6 h-6 text-white animate-pulse" />
-              <div className="absolute inset-0 bg-white/20 blur-sm rounded-full animate-pulse"></div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Heart className="w-6 h-6 text-white animate-pulse" />
+                <div className="absolute inset-0 bg-white/20 blur-sm rounded-full animate-pulse"></div>
+              </div>
+              <div className="text-xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
+                Vitalog
+              </div>
             </div>
-            <div className="text-xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
-              Vitalog
-            </div>
+            <Link to="/create">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="relative overflow-hidden bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-white 
+                          hover:from-[#7C3AED] hover:to-[#C026D3] 
+                          shadow-[0_0_15px_rgba(139,92,246,0.5)]
+                          hover:shadow-[0_0_25px_rgba(139,92,246,0.7)]
+                          transition-all duration-300 gap-2
+                          before:absolute before:inset-0 
+                          before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent
+                          before:translate-x-[-200%] before:transition-transform before:duration-[1.5s]
+                          hover:before:translate-x-[200%]
+                          rounded-full border-none"
+              >
+                <Plus className="w-4 h-4" />
+                New Dispatch
+              </Button>
+            </Link>
           </div>
           
           {isMobile ? (
