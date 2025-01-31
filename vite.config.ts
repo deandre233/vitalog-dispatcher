@@ -8,7 +8,9 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: true,
     port: 8080,
-    https: true,
+    https: {
+      // Using default certificates provided by Vite
+    },
     hmr: {
       clientPort: 443,
       host: process.env.VITE_DEV_SERVER_HOST || 'localhost',
