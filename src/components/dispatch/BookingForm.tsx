@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -552,14 +553,14 @@ export function BookingForm() {
         setValue('origin_state', state);
         setValue('origin_zip', zip);
         setValue('origin_county', county);
-        setValue('pickup_location', place.formatted_address || address);
+        setValue('pickup_location', address);
       } else {
         setValue('destination_address', address);
         setValue('destination_city', city);
         setValue('destination_state', state);
         setValue('destination_zip', zip);
         setValue('destination_county', county);
-        setValue('dropoff_location', place.formatted_address || address);
+        setValue('dropoff_location', address);
       }
 
       toast.success(`${type === 'origin' ? 'Pickup' : 'Dropoff'} address details filled automatically`);
