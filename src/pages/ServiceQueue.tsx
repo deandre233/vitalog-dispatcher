@@ -15,6 +15,33 @@ import { useServiceQueue } from "@/hooks/useServiceQueue";
 import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
 import { ServiceRequest } from "@/types/service-queue";
 
+const mockInsights: AIInsight[] = [
+  {
+    type: 'optimization',
+    message: 'Queue optimization opportunity',
+    confidence: 88,
+    impact: 'high',
+    recommendation: 'Reorder queue based on priority and wait time',
+    timeEstimate: '1 hour'
+  },
+  {
+    type: 'warning',
+    message: 'High priority requests increasing',
+    confidence: 76,
+    impact: 'medium',
+    recommendation: 'Add additional staff during peak hours',
+    timeEstimate: '1 day'
+  },
+  {
+    type: 'prediction',
+    message: 'Service bottleneck predicted',
+    confidence: 82,
+    impact: 'high',
+    recommendation: 'Implement express lane for routine requests',
+    timeEstimate: '2-3 days'
+  }
+];
+
 export const ServiceQueue = () => {
   const [selectedTab, setSelectedTab] = useState("pending");
   const { 
@@ -44,7 +71,7 @@ export const ServiceQueue = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="container mx-auto p-6">
       <Header />
       <div className="flex-1 flex">
         <SidebarProvider>
@@ -132,9 +159,7 @@ export const ServiceQueue = () => {
                 {/* AI Insights & Metrics Section */}
                 <div className="space-y-6">
                   <Card className="p-6">
-                    <AIInsightsPanel 
-                      insights={aiInsights}
-                    />
+                    <AIInsightsPanel insights={mockInsights} />
                   </Card>
 
                   <Card className="p-6">

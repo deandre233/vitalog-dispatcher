@@ -1,125 +1,107 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import type { AIInsight } from "@/types/ai";
-import type { AuthorizationRequest, AuthorizationStatus } from "@/types/authorization";
-import { toast } from "sonner";
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import type { AIInsight } from '@/types/ai';
 
-interface UseAuthorizationRecordsParams {
-  showExpired: boolean;
-  showUpcoming: boolean;
-  showOneShot: boolean;
-  showDeleted: boolean;
-  date: Date;
-  facility?: string;
-}
-
-interface AuthorizationRecord {
+export interface AuthorizationRecord {
   id: string;
   patient_id: string;
-  service_type: string;
-  status: string;
   insurance_id: string;
-  requested_by: string;
-  authorized_by: string;
-  authorization_number: string;
-  valid_from: string;
-  valid_until: string;
-  created_at: string;
-  updated_at: string;
-  priority: string;
-  destination_type?: string;
-  patients?: {
-    first_name: string;
-    last_name: string;
-  };
-  insurance_records?: {
-    carrier_name: string;
-    policy_number: string;
-  };
+  request_date: string;
+  status: 'pending' | 'approved' | 'denied' | 'expired';
+  notes?: string;
+  [key: string]: any;
 }
 
-interface AuthorizationResponse {
-  records: AuthorizationRequest[];
+export interface AuthorizationStats {
+  totalAuthorizations: number;
+  pendingAuthorizations: number;
+  approvedAuthorizations: number;
+  deniedAuthorizations: number;
   aiInsights: AIInsight[];
 }
 
-export const useAuthorizationRecords = ({
-  showExpired,
-  showUpcoming,
-  showOneShot,
-  showDeleted,
-  date,
-  facility
-}: UseAuthorizationRecordsParams) => {
-  return useQuery<AuthorizationResponse, Error>({
-    queryKey: ['authorization_records', { showExpired, showUpcoming, showOneShot, showDeleted, date, facility }],
-    queryFn: async () => {
-      let query = supabase
-        .from('authorization_requests')
-        .select(`
-          *,
-          patients (
-            first_name,
-            last_name
-          ),
-          insurance_records (
-            carrier_name,
-            policy_number
-          )
-        `)
-        .order('created_at', { ascending: false });
+export const useAuthorizationRecords = () => {
+  const [authorizations, setAuthorizations] = useState<AuthorizationRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [stats, setStats] = useState<AuthorizationStats | null>(null);
 
-      if (!showExpired) {
-        query = query.gt('valid_until', new Date().toISOString());
-      }
-      
-      if (!showUpcoming) {
-        query = query.lte('valid_from', new Date().toISOString());
-      }
+  useEffect(() => {
+    const fetchAuthorizations = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('authorization_records')
+          .select('*');
 
-      if (facility) {
-        query = query.ilike('destination_type', `%${facility}%`);
-      }
-
-      const { data: records, error } = await query;
-
-      if (error) {
-        toast.error("Failed to fetch authorization records");
-        throw error;
-      }
-
-      // Map database records to the expected AuthorizationRequest type
-      const mappedRecords = (records || []).map(record => ({
-        ...record,
-        status: record.status as AuthorizationStatus // Type assertion since we know the values match
-      })) as AuthorizationRequest[];
-
-      // Simulate AI insights based on the data
-      const aiInsights: AIInsight[] = [
-        {
-          type: 'optimization',
-          message: 'Consider renewing authorizations for 3 patients expiring next week',
-          confidence: 0.95,
-          impact: 'high'
-        },
-        {
-          type: 'warning',
-          message: '2 patients have missing insurance information',
-          confidence: 0.88,
-          impact: 'medium'
-        },
-        {
-          type: 'prediction',
-          message: 'Based on historical data, expect 5 new authorization requests next week',
-          confidence: 0.82,
-          impact: 'medium'
+        if (error) {
+          setError(error);
+        } else {
+          setAuthorizations(data || []);
         }
-      ];
+      } catch (err: any) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      return {
-        records: mappedRecords,
+    fetchAuthorizations();
+  }, []);
+
+  useEffect(() => {
+    if (authorizations.length > 0) {
+      const totalAuthorizations = authorizations.length;
+      const pendingAuthorizations = authorizations.filter(auth => auth.status === 'pending').length;
+      const approvedAuthorizations = authorizations.filter(auth => auth.status === 'approved').length;
+      const deniedAuthorizations = authorizations.filter(auth => auth.status === 'denied').length;
+
+      const aiInsights = generateAIInsights(authorizations);
+
+      setStats({
+        totalAuthorizations,
+        pendingAuthorizations,
+        approvedAuthorizations,
+        deniedAuthorizations,
         aiInsights
-      };
+      });
     }
-  });
+  }, [authorizations]);
+
+  const generateAIInsights = (data: any[]): AIInsight[] => {
+    const insights: AIInsight[] = [
+      {
+        type: 'optimization',
+        message: 'Authorization flow can be expedited',
+        confidence: 89,
+        impact: 'high',
+        recommendation: 'Consider implementing auto-renewal for recurring authorizations',
+        timeEstimate: '1-2 weeks'
+      },
+      {
+        type: 'warning',
+        message: 'Potential expiration risk',
+        confidence: 75,
+        impact: 'medium',
+        recommendation: 'Review and renew 12 authorizations expiring in the next 30 days',
+        timeEstimate: '2-3 days'
+      },
+      {
+        type: 'prediction',
+        message: 'Upcoming volume increase',
+        confidence: 82,
+        impact: 'medium',
+        recommendation: 'Prepare for 15% increase in authorization requests next month',
+        timeEstimate: '1 week'
+      }
+    ];
+    return insights;
+  };
+
+  return {
+    authorizations,
+    loading,
+    error,
+    stats
+  };
 };

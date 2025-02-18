@@ -60,38 +60,33 @@ export const CenterList = () => {
     hideNonContract: false
   });
 
-  // Generate AI insights based on center data
-  const generateAIInsights = (center: Center): AIInsight[] => {
-    const insights: AIInsight[] = [];
-    
-    if (center.efficiency_score < 70) {
-      insights.push({
+  const generateInsights = (): AIInsight[] => {
+    return [
+      {
         type: 'optimization',
-        message: `${center.name}'s efficiency score is below target. Consider reviewing operational procedures.`,
-        confidence: 0.85,
-        impact: 'high'
-      });
-    }
-
-    if (center.dispatch_count > 100) {
-      insights.push({
+        message: 'Resource allocation can be improved',
+        confidence: 92,
+        impact: 'high',
+        recommendation: 'Redistribute staff during peak hours between 2-5 PM',
+        timeEstimate: '1 week'
+      },
+      {
         type: 'prediction',
-        message: `High dispatch volume detected. Consider allocating additional resources.`,
-        confidence: 0.92,
-        impact: 'medium'
-      });
-    }
-
-    if (center.status !== 'active') {
-      insights.push({
+        message: 'Patient volume trend detected',
+        confidence: 85,
+        impact: 'medium',
+        recommendation: 'Prepare for 20% increase in weekend appointments',
+        timeEstimate: '2 weeks'
+      },
+      {
         type: 'warning',
-        message: `Inactive status may impact service delivery. Review activation requirements.`,
-        confidence: 0.95,
-        impact: 'high'
-      });
-    }
-
-    return insights;
+        message: 'Equipment maintenance needed',
+        confidence: 78,
+        impact: 'high',
+        recommendation: 'Schedule preventive maintenance for 3 transport units',
+        timeEstimate: '3 days'
+      }
+    ];
   };
 
   const { data: centers, isLoading, error } = useQuery({
@@ -271,10 +266,7 @@ export const CenterList = () => {
               
               <div className="lg:col-span-1">
                 {filteredCenters && filteredCenters.length > 0 && (
-                  <AIInsightsPanel
-                    insights={generateAIInsights(filteredCenters[0])}
-                    className="sticky top-6"
-                  />
+                  <AIInsightsPanel insights={generateInsights()} />
                 )}
               </div>
             </div>
