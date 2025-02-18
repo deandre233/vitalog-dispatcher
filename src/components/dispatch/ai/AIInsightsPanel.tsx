@@ -1,75 +1,67 @@
-import { AlertTriangle, Brain, TrendingUp, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AIInsight } from "@/types/service-queue";
-import { cn } from "@/lib/utils";
+
+import { Card } from "@/components/ui/card";
+import { Brain, TrendingUp, AlertTriangle, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AIInsightsPanelProps {
-  insights: AIInsight[];
-  error?: string;
-  className?: string;
+  insights: {
+    recommendation: string;
+    confidence: number;
+    impact: "high" | "medium" | "low";
+    timeEstimate: string;
+  }[];
 }
 
-export function AIInsightsPanel({ insights, error, className }: AIInsightsPanelProps) {
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    );
-  }
-
-  const getInsightIcon = (type: AIInsight['type']) => {
-    switch (type) {
-      case 'optimization':
-        return <TrendingUp className="h-4 w-4 text-green-500" />;
-      case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'prediction':
-        return <Brain className="h-4 w-4 text-blue-500" />;
-      default:
-        return <AlertCircle className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.9) return 'text-green-600';
-    if (confidence >= 0.7) return 'text-yellow-600';
-    return 'text-red-600';
-  };
-
+export function AIInsightsPanel({ insights }: AIInsightsPanelProps) {
   return (
-    <div className={cn("space-y-4", className)}>
-      <div className="flex items-center gap-2 mb-2">
-        <Brain className="h-5 w-5 text-blue-500" />
-        <h4 className="font-medium text-lg">AI Insights</h4>
+    <Card className="p-4 bg-black/5 backdrop-blur-lg border-none">
+      <div className="flex items-center gap-2 mb-4">
+        <Brain className="w-5 h-5 text-purple-500" />
+        <h3 className="text-lg font-semibold">AI Dispatch Insights</h3>
       </div>
-      <div className="space-y-3">
+      
+      <div className="space-y-4">
         {insights.map((insight, index) => (
-          <div
-            key={index}
-            className="p-3 rounded-lg bg-white/50 backdrop-blur-sm border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
-          >
+          <Card key={index} className="p-3 bg-white/50 backdrop-blur border-none hover:bg-white/60 transition-all">
             <div className="flex items-start gap-3">
-              {getInsightIcon(insight.type)}
+              {insight.impact === "high" && <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />}
+              {insight.impact === "medium" && <TrendingUp className="w-5 h-5 text-yellow-500 shrink-0" />}
+              {insight.impact === "low" && <Clock className="w-5 h-5 text-blue-500 shrink-0" />}
+              
               <div className="flex-1">
-                <p className="text-sm text-gray-700">{insight.message}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className={cn(
-                    "text-xs font-medium",
-                    getConfidenceColor(insight.confidence)
-                  )}>
-                    {Math.round(insight.confidence * 100)}% confidence
-                  </span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                    {insight.impact} impact
-                  </span>
+                <p className="text-sm text-gray-700">{insight.recommendation}</p>
+                <div className="flex items-center gap-4 mt-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div className="flex items-center gap-1">
+                          <div className="h-2 w-16 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-purple-500" 
+                              style={{ width: `${insight.confidence}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-500">{insight.confidence}%</span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>AI Confidence Score</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  
+                  <span className="text-xs text-gray-500">Est. Time: {insight.timeEstimate}</span>
                 </div>
               </div>
+              
+              <Button variant="ghost" size="sm" className="shrink-0">
+                Apply
+              </Button>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
