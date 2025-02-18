@@ -30,19 +30,22 @@ export const useServiceQueue = (): UseServiceQueueResult => {
         const formattedRequests = data.map(item => ({
           id: item.id,
           patient_id: item.patient_id,
-          patient_name: item.patient_name,
+          patientName: item.patient_name || 'Unknown',
           status: item.status as 'pending' | 'in-progress' | 'completed',
           priority: item.priority as 'high' | 'medium' | 'low',
           request_type: item.request_type,
           requested_by: item.requested_by,
           requested_date: item.requested_date,
-          route: item.route,
-          service_date: item.service_date,
+          requestTime: new Date(item.requested_date).toLocaleTimeString(),
+          serviceDate: new Date(item.service_date).toLocaleDateString(),
           service_type: item.service_type,
-          trip_type: item.trip_type,
+          tripType: item.trip_type,
           notes: item.notes,
           created_at: item.created_at,
-          updated_at: item.updated_at
+          updated_at: item.updated_at,
+          origin: item.origin || '',
+          destination: item.destination || '',
+          warnings: item.warnings || []
         }));
 
         setRequests(formattedRequests);

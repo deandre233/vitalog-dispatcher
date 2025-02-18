@@ -1,22 +1,24 @@
-
 import type { AIInsight } from './ai';
 
 export interface ServiceRequest {
   id: string;
   patient_id: string;
-  patient_name?: string;
+  patientName: string;
   status: 'pending' | 'in-progress' | 'completed';
   priority: 'high' | 'medium' | 'low';
   request_type: string;
   requested_by: string;
   requested_date: string;
-  route: string;
-  service_date: string;
+  requestTime: string;
+  serviceDate: string;
   service_type: string;
-  trip_type: string;
+  tripType: string;
   notes?: string;
   created_at: string;
   updated_at: string;
+  origin?: string;
+  destination?: string;
+  warnings?: string[];
 }
 
 export interface QueueMetrics {
