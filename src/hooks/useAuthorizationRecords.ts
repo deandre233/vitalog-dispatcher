@@ -1,6 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { AIInsight } from '@/types/ai';
+import { useQuery } from '@tanstack/react-query';
 
 export interface AuthorizationRecord {
   id: string;
@@ -9,7 +11,16 @@ export interface AuthorizationRecord {
   request_date: string;
   status: 'pending' | 'approved' | 'denied' | 'expired';
   notes?: string;
-  [key: string]: any;
+  priority: string;
+  request_type: string;
+  requested_by: string;
+  requested_date: string;
+  route: string;
+  service_date: string;
+  service_type: string;
+  trip_type: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AuthorizationStats {
@@ -21,54 +32,19 @@ export interface AuthorizationStats {
 }
 
 export const useAuthorizationRecords = () => {
-  const [authorizations, setAuthorizations] = useState<AuthorizationRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [stats, setStats] = useState<AuthorizationStats | null>(null);
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['authorization_requests'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('authorization_requests')
+        .select('*');
 
-  useEffect(() => {
-    const fetchAuthorizations = async () => {
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('authorization_records')
-          .select('*');
-
-        if (error) {
-          setError(error);
-        } else {
-          setAuthorizations(data || []);
-        }
-      } catch (err: any) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAuthorizations();
-  }, []);
-
-  useEffect(() => {
-    if (authorizations.length > 0) {
-      const totalAuthorizations = authorizations.length;
-      const pendingAuthorizations = authorizations.filter(auth => auth.status === 'pending').length;
-      const approvedAuthorizations = authorizations.filter(auth => auth.status === 'approved').length;
-      const deniedAuthorizations = authorizations.filter(auth => auth.status === 'denied').length;
-
-      const aiInsights = generateAIInsights(authorizations);
-
-      setStats({
-        totalAuthorizations,
-        pendingAuthorizations,
-        approvedAuthorizations,
-        deniedAuthorizations,
-        aiInsights
-      });
+      if (error) throw error;
+      return data as AuthorizationRecord[];
     }
-  }, [authorizations]);
+  });
 
-  const generateAIInsights = (data: any[]): AIInsight[] => {
+  const generateAIInsights = (data: AuthorizationRecord[]): AIInsight[] => {
     const insights: AIInsight[] = [
       {
         type: 'optimization',
@@ -98,10 +74,19 @@ export const useAuthorizationRecords = () => {
     return insights;
   };
 
+  const stats: AuthorizationStats | null = data ? {
+    totalAuthorizations: data.length,
+    pendingAuthorizations: data.filter(auth => auth.status === 'pending').length,
+    approvedAuthorizations: data.filter(auth => auth.status === 'approved').length,
+    deniedAuthorizations: data.filter(auth => auth.status === 'denied').length,
+    aiInsights: generateAIInsights(data)
+  } : null;
+
   return {
-    authorizations,
-    loading,
+    authorizations: data || [],
+    isLoading,
     error,
-    stats
+    stats,
+    refetch
   };
 };
