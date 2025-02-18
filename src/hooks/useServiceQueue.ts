@@ -12,6 +12,27 @@ interface UseServiceQueueResult {
   aiInsights: AIInsight[];
 }
 
+// Define the shape of raw data from Supabase
+interface RawServiceRequest {
+  id: string;
+  patient_id: string;
+  patient_name: string | null;
+  status: string;
+  priority: string;
+  request_type: string;
+  requested_by: string;
+  requested_date: string;
+  service_date: string;
+  service_type: string;
+  trip_type: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  origin: string | null;
+  destination: string | null;
+  warnings: string[] | null;
+}
+
 export const useServiceQueue = (): UseServiceQueueResult => {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +48,7 @@ export const useServiceQueue = (): UseServiceQueueResult => {
 
         if (error) throw error;
 
-        const formattedRequests = data.map(item => ({
+        const formattedRequests = (data as RawServiceRequest[]).map(item => ({
           id: item.id,
           patient_id: item.patient_id,
           patientName: item.patient_name || 'Unknown',
@@ -40,12 +61,12 @@ export const useServiceQueue = (): UseServiceQueueResult => {
           serviceDate: new Date(item.service_date).toLocaleDateString(),
           service_type: item.service_type,
           tripType: item.trip_type,
-          notes: item.notes,
+          notes: item.notes || undefined,
           created_at: item.created_at,
           updated_at: item.updated_at,
-          origin: item.origin || '',
-          destination: item.destination || '',
-          warnings: item.warnings || []
+          origin: item.origin || undefined,
+          destination: item.destination || undefined,
+          warnings: item.warnings || undefined
         }));
 
         setRequests(formattedRequests);
