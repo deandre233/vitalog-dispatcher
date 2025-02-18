@@ -4,10 +4,15 @@ import type { AIInsight } from './ai';
 export interface ServiceRequest {
   id: string;
   patientName: string;
-  status: 'pending' | 'in-progress' | 'completed';
-  priority: 'high' | 'medium' | 'low';
+  serviceDate?: string;
   requestTime: string;
   estimatedCompletion: string;
+  status: 'pending' | 'in-progress' | 'completed';
+  priority: 'high' | 'medium' | 'low';
+  tripType?: string;
+  route?: string;
+  serviceType?: string;
+  notes?: string;
 }
 
 export interface QueueMetrics {
@@ -16,15 +21,9 @@ export interface QueueMetrics {
   avgResponseTime: string;
   completionRate: number;
   efficiency: number;
-}
-
-export interface ServiceQueueItem {
-  id: string;
-  patientName: string;
-  status: 'pending' | 'in-progress' | 'completed';
-  priority: 'high' | 'medium' | 'low';
-  requestTime: string;
-  estimatedCompletion: string;
+  pending: number;
+  inProgress: number;
+  completed: number;
 }
 
 export interface ServiceQueueStats {
@@ -34,4 +33,20 @@ export interface ServiceQueueStats {
   insights: AIInsight[];
 }
 
-export { AIInsight };
+export interface AuthorizationRequest {
+  id: string;
+  patient_id: string;
+  insurance_id: string;
+  authorized_by: string;
+  authorization_number: string;
+  status: 'pending' | 'approved' | 'denied' | 'expired';
+  valid_from: string;
+  valid_until: string;
+  priority: string;
+  service_type: string;
+  requested_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export { type AIInsight };
