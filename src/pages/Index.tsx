@@ -1,6 +1,9 @@
+
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { 
   Ambulance, 
   DollarSign, 
@@ -10,21 +13,23 @@ import {
   Database, 
   ShieldCheck, 
   Headphones,
-  BarChart,
-  TrendingUp,
-  Truck,
-  UserCheck
+  Search,
+  Clock,
+  MapPin,
+  Calendar
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-// Move console logs outside of the component
-const logStartup = () => {
-  console.log("Index component starting to render...");
-};
+const quickActions = [
+  { title: "Create Dispatch", path: "/create", icon: Ambulance },
+  { title: "View Schedule", path: "/schedule-overview", icon: Calendar },
+  { title: "View Map", path: "/operations-map", icon: MapPin },
+  { title: "Timesheets", path: "/shift-records", icon: Clock }
+];
 
-const menuItems = [
+const mainMenuItems = [
   {
-    title: "Dispatch",
+    title: "Dispatch Operations",
     icon: Ambulance,
     description: "Manage active dispatches and transport requests",
     path: "/dispatch",
@@ -32,9 +37,9 @@ const menuItems = [
     gradient: "from-medical-gradient-start to-medical-gradient-middle"
   },
   {
-    title: "Billing",
+    title: "Financial Management",
     icon: DollarSign,
-    description: "Handle invoices and payment processing",
+    description: "Handle billing and payment processing",
     path: "/billing",
     color: "text-emerald-500",
     gradient: "from-emerald-400 to-teal-500"
@@ -48,197 +53,154 @@ const menuItems = [
     gradient: "from-indigo-400 to-purple-500"
   },
   {
-    title: "HR",
+    title: "HR Management",
     icon: Users,
     description: "Manage staff and crew assignments",
     path: "/crew",
     color: "text-amber-500",
     gradient: "from-amber-400 to-orange-500"
-  },
+  }
+];
+
+const secondaryMenuItems = [
   {
     title: "Settings",
     icon: Settings,
-    description: "Configure system preferences and alerts",
     path: "/alerts",
-    color: "text-slate-600",
-    gradient: "from-slate-400 to-slate-500"
+    description: "Configure system preferences"
   },
   {
-    title: "Data Hub",
+    title: "Database",
     icon: Database,
-    description: "Access and analyze transport data",
     path: "/routes",
-    color: "text-cyan-500",
-    gradient: "from-cyan-400 to-blue-500"
+    description: "Access transport records"
   },
   {
-    title: "Authorization",
+    title: "Security",
     icon: ShieldCheck,
-    description: "Manage access and permissions",
-    path: "/settings",
-    color: "text-rose-500",
-    gradient: "from-rose-400 to-pink-500"
+    path: "/authorization-queue",
+    description: "Manage access control"
   },
   {
     title: "Support",
     icon: Headphones,
-    description: "Get help and access resources",
-    path: "/support",
-    color: "text-violet-500",
-    gradient: "from-violet-400 to-purple-500"
-  },
-  {
-    title: "Performance",
-    icon: BarChart,
-    description: "Monitor key business metrics and analytics",
-    path: "/analytics",
-    color: "text-blue-500",
-    gradient: "from-blue-400 to-indigo-500",
-    metrics: [
-      {
-        icon: UserCheck,
-        label: "Crew Performance",
-        value: "94%",
-        change: "+2.3%"
-      },
-      {
-        icon: Truck,
-        label: "Fleet Utilization",
-        value: "87%",
-        change: "+1.5%"
-      },
-      {
-        icon: TrendingUp,
-        label: "Profit Margin",
-        value: "$142K",
-        change: "+12.5%"
-      }
-    ]
+    path: "/resource-library",
+    description: "Get help and resources"
   }
 ];
 
 const Index = () => {
-  // Log startup
-  logStartup();
-  console.log("Menu items loaded:", menuItems.length);
+  console.log("Index component rendering");
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="flex-1 bg-gradient-to-br from-medical-accent to-white overflow-auto">
-        <main className="p-6 md:p-8 max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-medical-primary mb-2">
-            Welcome to Dispatch Control
-          </h1>
-          <p className="text-medical-primary/60 mb-8">
-            Select a module to get started
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {(() => {
-              console.log("Starting to render menu items grid");
-              return menuItems.slice(0, -2).map((item, index) => {
-                console.log(`Rendering menu item ${index + 1}:`, item.title);
-                return (
-                <Link 
-                  key={item.title} 
-                  to={item.path}
-                  className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1"
-                >
-                  <Card className={`
-                    h-full relative overflow-hidden
-                    bg-gradient-to-br ${item.gradient}
-                    border-0 shadow-lg hover:shadow-xl
-                    group transition-all duration-500
-                    before:absolute before:inset-0
-                    before:bg-white before:z-10 before:opacity-95
-                    before:transition-opacity before:duration-500
-                    hover:before:opacity-90
-                    after:absolute after:inset-0 after:-z-10
-                    after:bg-gradient-to-br ${item.gradient}
-                    after:opacity-0 hover:after:opacity-100
-                    after:transition-opacity after:duration-500
-                    backdrop-blur-sm
-                    hover:shadow-glow
-                  `}>
-                    <div className="relative z-20 p-6">
-                      <div className="flex flex-col items-center text-center space-y-4">
-                        <div className={`
-                          p-3 rounded-xl ${item.color}
-                          bg-white/80 shadow-lg
-                          group-hover:scale-110 group-hover:shadow-xl
-                          transform transition-all duration-500
-                          backdrop-blur-sm
-                          group-hover:rotate-3
-                        `}>
-                          <item.icon className="w-8 h-8" />
-                        </div>
-                        <h2 className="text-xl font-semibold text-medical-primary group-hover:text-medical-secondary transition-colors duration-300">
-                          {item.title}
-                        </h2>
-                        <p className="text-sm text-medical-primary/70 group-hover:text-medical-primary/90 transition-colors duration-300">
-                          {item.description}
-                        </p>
+      <div className="flex-1 bg-gradient-to-br from-medical-accent to-white">
+        <main className="container mx-auto p-6 space-y-8">
+          {/* Search and Quick Actions */}
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            <div className="w-full md:w-2/3 space-y-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Input 
+                  type="search" 
+                  placeholder="Search dispatches, patients, or crew members..." 
+                  className="w-full pl-10 h-12 bg-white shadow-sm"
+                />
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {quickActions.map((action) => (
+                  <Link 
+                    key={action.title} 
+                    to={action.path}
+                    className="block"
+                  >
+                    <Card className="p-4 hover:shadow-lg transition-shadow duration-200 flex flex-col items-center text-center space-y-2">
+                      <action.icon className="w-6 h-6 text-medical-secondary" />
+                      <span className="text-sm font-medium">{action.title}</span>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <Card className="w-full md:w-1/3 p-6 bg-medical-primary text-white">
+              <h2 className="text-lg font-semibold mb-4">System Status</h2>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span>Active Dispatches</span>
+                  <span className="font-bold">12</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Available Units</span>
+                  <span className="font-bold">8</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Pending Authorizations</span>
+                  <span className="font-bold">3</span>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Main Menu */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {mainMenuItems.map((item) => (
+              <Link 
+                key={item.title} 
+                to={item.path}
+                className="block transform transition-all duration-300 hover:scale-105"
+              >
+                <Card className={`
+                  h-full relative overflow-hidden
+                  bg-gradient-to-br ${item.gradient}
+                  border-0 shadow-lg hover:shadow-xl
+                  group transition-all duration-500
+                `}>
+                  <div className="absolute inset-0 bg-white opacity-95 group-hover:opacity-90 transition-opacity" />
+                  <div className="relative z-10 p-6">
+                    <div className="flex flex-col items-center text-center space-y-4">
+                      <div className={`
+                        p-3 rounded-xl ${item.color}
+                        bg-white/80 shadow-lg
+                        group-hover:scale-110
+                        transform transition-all duration-500
+                      `}>
+                        <item.icon className="w-8 h-8" />
                       </div>
+                      <h2 className="text-xl font-semibold text-medical-primary group-hover:text-medical-secondary transition-colors">
+                        {item.title}
+                      </h2>
+                      <p className="text-sm text-medical-primary/70">
+                        {item.description}
+                      </p>
                     </div>
-                  </Card>
-                </Link>
-                );
-              });
-            })()}
-            
-            {(() => {
-              return menuItems.slice(-2).map((item, index) => {
-                console.log(`Rendering special panel ${index + 1}:`, item.title);
-                return (
-                <Link 
-                  key={item.title} 
-                  to={item.path}
-                  className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1 xl:col-span-2"
-                >
-                  <Card className={`
-                    h-full relative overflow-hidden
-                    bg-gradient-to-br ${item.gradient}
-                    border-0 shadow-lg hover:shadow-xl
-                    group transition-all duration-500
-                    before:absolute before:inset-0
-                    before:bg-white before:z-10 before:opacity-95
-                    before:transition-opacity before:duration-500
-                    hover:before:opacity-90
-                    after:absolute after:inset-0 after:-z-10
-                    after:bg-gradient-to-br ${item.gradient}
-                    after:opacity-0 hover:after:opacity-100
-                    after:transition-opacity after:duration-500
-                    backdrop-blur-sm
-                    hover:shadow-glow
-                  `}>
-                    <div className="relative z-20 p-6">
-                      <div className="flex items-center space-x-6">
-                        <div className={`
-                          p-3 rounded-xl ${item.color}
-                          bg-white/80 shadow-lg
-                          group-hover:scale-110 group-hover:shadow-xl
-                          transform transition-all duration-500
-                          backdrop-blur-sm
-                          group-hover:rotate-3
-                        `}>
-                          <item.icon className="w-8 h-8" />
-                        </div>
-                        <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-medical-primary group-hover:text-medical-secondary transition-colors duration-300">
-                            {item.title}
-                          </h2>
-                          <p className="text-sm text-medical-primary/70 group-hover:text-medical-primary/90 transition-colors duration-300">
-                            {item.description}
-                          </p>
-                        </div>
-                      </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+
+          {/* Secondary Menu */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {secondaryMenuItems.map((item) => (
+              <Link 
+                key={item.title} 
+                to={item.path}
+                className="block"
+              >
+                <Card className="p-4 hover:bg-gray-50 transition-colors duration-200">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 rounded-lg bg-medical-accent">
+                      <item.icon className="w-5 h-5 text-medical-secondary" />
                     </div>
-                  </Card>
-                </Link>
-                );
-              });
-            })()}
+                    <div>
+                      <h3 className="font-medium text-sm">{item.title}</h3>
+                      <p className="text-xs text-gray-500">{item.description}</p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
           </div>
         </main>
       </div>
@@ -246,7 +208,5 @@ const Index = () => {
     </div>
   );
 };
-
-console.log("Index component definition completed");
 
 export default Index;
