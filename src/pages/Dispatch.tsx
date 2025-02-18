@@ -5,24 +5,31 @@ import { DispatchStatusBar } from "@/components/dispatch/DispatchStatusBar";
 import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
 import { useState } from "react";
 import type { DispatchStatus } from "@/components/dispatch/DispatchStatusBar";
+import type { AIInsight } from "@/types/ai";
 
-const mockInsights = [
+const mockInsights: AIInsight[] = [
   {
+    type: 'optimization',
+    message: 'Unit 7 could improve response time',
     recommendation: "Based on historical data, assigning Unit 7 could reduce response time by 23%",
     confidence: 89,
-    impact: "high" as const,
+    impact: "high",
     timeEstimate: "2-3 min"
   },
   {
+    type: 'prediction',
+    message: 'Alternative route suggestion',
     recommendation: "Traffic patterns suggest taking Maple Ave route instead of Oak St",
     confidence: 75,
-    impact: "medium" as const,
+    impact: "medium",
     timeEstimate: "5 min"
   },
   {
+    type: 'warning',
+    message: 'Supply recommendation',
     recommendation: "Similar cases typically require additional oxygen supplies",
     confidence: 65,
-    impact: "low" as const,
+    impact: "low",
     timeEstimate: "1-2 min"
   },
 ];

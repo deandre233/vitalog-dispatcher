@@ -3,14 +3,10 @@ import { Card } from "@/components/ui/card";
 import { Brain, TrendingUp, AlertTriangle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import type { AIInsight } from "@/types/ai";
 
 interface AIInsightsPanelProps {
-  insights: {
-    recommendation: string;
-    confidence: number;
-    impact: "high" | "medium" | "low";
-    timeEstimate: string;
-  }[];
+  insights: AIInsight[];
 }
 
 export function AIInsightsPanel({ insights }: AIInsightsPanelProps) {
