@@ -1,27 +1,8 @@
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import type { AIInsight } from '@/types/ai';
 import { useQuery } from '@tanstack/react-query';
-
-export interface AuthorizationRecord {
-  id: string;
-  patient_id: string;
-  insurance_id: string;
-  request_date: string;
-  status: 'pending' | 'approved' | 'denied' | 'expired';
-  notes?: string;
-  priority: string;
-  request_type: string;
-  requested_by: string;
-  requested_date: string;
-  route: string;
-  service_date: string;
-  service_type: string;
-  trip_type: string;
-  created_at: string;
-  updated_at: string;
-}
+import { supabase } from '@/integrations/supabase/client';
+import type { AuthorizationRecord } from '@/types/service-queue';
+import type { AIInsight } from '@/types/ai';
 
 export interface AuthorizationStats {
   totalAuthorizations: number;
@@ -40,12 +21,36 @@ export const useAuthorizationRecords = () => {
         .select('*');
 
       if (error) throw error;
-      return data as AuthorizationRecord[];
+
+      const formattedData: AuthorizationRecord[] = data.map(item => ({
+        id: item.id,
+        patient_id: item.patient_id,
+        insurance_id: item.insurance_id,
+        authorized_by: item.authorized_by,
+        authorization_number: item.authorization_number,
+        request_date: item.created_at, // Using created_at as request_date
+        request_type: item.service_type, // Using service_type as request_type
+        requested_by: item.requested_by,
+        requested_date: item.created_at, // Using created_at as requested_date
+        route: 'default', // Default value since it's required
+        service_date: item.valid_from, // Using valid_from as service_date
+        service_type: item.service_type,
+        status: item.status as 'pending' | 'approved' | 'denied' | 'expired',
+        trip_type: 'standard', // Default value since it's required
+        priority: item.priority,
+        notes: '',
+        valid_from: item.valid_from,
+        valid_until: item.valid_until,
+        created_at: item.created_at,
+        updated_at: item.updated_at
+      }));
+
+      return formattedData;
     }
   });
 
-  const generateAIInsights = (data: AuthorizationRecord[]): AIInsight[] => {
-    const insights: AIInsight[] = [
+  const generateAIInsights = (records: AuthorizationRecord[]): AIInsight[] => {
+    return [
       {
         type: 'optimization',
         message: 'Authorization flow can be expedited',
@@ -71,16 +76,15 @@ export const useAuthorizationRecords = () => {
         timeEstimate: '1 week'
       }
     ];
-    return insights;
   };
 
-  const stats: AuthorizationStats | null = data ? {
-    totalAuthorizations: data.length,
-    pendingAuthorizations: data.filter(auth => auth.status === 'pending').length,
-    approvedAuthorizations: data.filter(auth => auth.status === 'approved').length,
-    deniedAuthorizations: data.filter(auth => auth.status === 'denied').length,
-    aiInsights: generateAIInsights(data)
-  } : null;
+  const stats: AuthorizationStats = {
+    totalAuthorizations: data?.length || 0,
+    pendingAuthorizations: data?.filter(auth => auth.status === 'pending').length || 0,
+    approvedAuthorizations: data?.filter(auth => auth.status === 'approved').length || 0,
+    deniedAuthorizations: data?.filter(auth => auth.status === 'denied').length || 0,
+    aiInsights: data ? generateAIInsights(data) : []
+  };
 
   return {
     authorizations: data || [],
