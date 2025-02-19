@@ -1,4 +1,5 @@
-import { Bell, Settings, User, Calendar, Clock } from "lucide-react";
+
+import { Bell, Settings, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { DispatchTabs } from "../dispatch/navigation/DispatchTabs";
 
 export type ViewType = 'active' | 'schedule' | 'calendar';
 
@@ -30,14 +32,14 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
     <div className="flex flex-col bg-white border-b">
       <div className="flex justify-between items-center p-6">
         <h1 className="text-2xl font-semibold text-medical-primary">
-          Dispatch Control
+          Mission Control
         </h1>
         <div className="flex items-center gap-4">
           <Button
             variant={unattendedMode ? "default" : "outline"}
             onClick={() => setUnattendedMode(!unattendedMode)}
           >
-            {unattendedMode ? "Exit Unattended Mode" : "Enter Unattended Mode"}
+            {unattendedMode ? "Exit Automated Mode" : "Enter Automated Mode"}
           </Button>
           <button className="relative p-2 hover:bg-medical-accent rounded-full">
             <Bell className="w-6 h-6 text-medical-primary" />
@@ -48,7 +50,7 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
               <User className="w-6 h-6 text-medical-primary" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>Command Center</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
@@ -64,31 +66,8 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
           </DropdownMenu>
         </div>
       </div>
-      <div className="flex gap-2 px-6 pb-2">
-        <Button
-          variant={view === 'active' ? 'default' : 'outline'}
-          onClick={() => handleViewChange('active')}
-          className="gap-2"
-        >
-          <Clock className="w-4 h-4" />
-          Active
-        </Button>
-        <Button
-          variant={view === 'schedule' ? 'default' : 'outline'}
-          onClick={() => handleViewChange('schedule')}
-          className="gap-2"
-        >
-          <Clock className="w-4 h-4" />
-          Schedule
-        </Button>
-        <Button
-          variant={view === 'calendar' ? 'default' : 'outline'}
-          onClick={() => handleViewChange('calendar')}
-          className="gap-2"
-        >
-          <Calendar className="w-4 h-4" />
-          Calendar
-        </Button>
+      <div className="px-6 pb-2">
+        <DispatchTabs activeTab={view} onTabChange={handleViewChange} />
       </div>
     </div>
   );
