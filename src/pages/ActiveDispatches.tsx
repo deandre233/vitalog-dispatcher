@@ -1,4 +1,3 @@
-
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -58,40 +57,40 @@ const metricCards = [
 
 const reportMenus = [
   {
-    title: "General",
+    title: "Operations",
     items: [
-      { name: "Dispatch Runtimes", path: "/reports/dispatch-runtimes" },
-      { name: "Distance Efficiency", path: "/reports/distance-efficiency" },
-      { name: "Dispatcher Efficiency", path: "/reports/dispatcher-efficiency" },
-      { name: "Late Analysis", path: "/reports/late-analysis" },
-      { name: "Top Complaints", path: "/reports/top-complaints" }
+      { name: "Response Times", path: "/reports/dispatch-runtimes" },
+      { name: "Route Optimization", path: "/reports/distance-efficiency" },
+      { name: "Team Performance", path: "/reports/dispatcher-efficiency" },
+      { name: "Delay Analysis", path: "/reports/late-analysis" },
+      { name: "Service Feedback", path: "/reports/top-complaints" }
     ]
   },
   {
-    title: "Calls",
+    title: "Communication",
     items: [
-      { name: "Call Volume Summary", path: "/reports/call-volume" },
-      { name: "Volume Visualizer", path: "/reports/volume-visualizer" },
-      { name: "Volume Heatmap", path: "/reports/volume-heatmap" },
-      { name: "Day/Night Split", path: "/reports/day-night-split" }
+      { name: "Request Analytics", path: "/reports/call-volume" },
+      { name: "Activity Patterns", path: "/reports/volume-visualizer" },
+      { name: "Service Distribution", path: "/reports/volume-heatmap" },
+      { name: "Time Distribution", path: "/reports/day-night-split" }
     ]
   },
   {
-    title: "Facility",
+    title: "Location",
     items: [
-      { name: "On-Time Performance", path: "/reports/on-time" },
-      { name: "Pickup Delays", path: "/reports/pickup-delays" },
-      { name: "Dropoff Delays", path: "/reports/dropoff-delays" },
-      { name: "Volume Monitor", path: "/reports/volume-monitor" }
+      { name: "Service Timeliness", path: "/reports/on-time" },
+      { name: "Collection Metrics", path: "/reports/pickup-delays" },
+      { name: "Delivery Metrics", path: "/reports/dropoff-delays" },
+      { name: "Location Analytics", path: "/reports/volume-monitor" }
     ]
   },
   {
-    title: "Crew",
+    title: "Personnel",
     items: [
-      { name: "Utilization Calendar", path: "/reports/crew-calendar" },
-      { name: "Utilization Visualizer", path: "/reports/crew-visualizer" },
-      { name: "Shift Utilization", path: "/reports/shift-utilization" },
-      { name: "Runtime Performance", path: "/reports/runtime-performance" }
+      { name: "Staff Schedule", path: "/reports/crew-calendar" },
+      { name: "Team Activity", path: "/reports/crew-visualizer" },
+      { name: "Resource Usage", path: "/reports/shift-utilization" },
+      { name: "Service Duration", path: "/reports/runtime-performance" }
     ]
   }
 ];
