@@ -11,11 +11,14 @@ import {
   UserCog,
   ClipboardList, 
   Timer,
-  Users
+  Users,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const metricCards = [
   {
@@ -97,11 +100,20 @@ const reportMenus = [
 
 export default function ActiveDispatches() {
   useEffect(() => {
-    // Notify about high-priority items
     if (parseInt(metricCards[2].value) > 20) {
       toast.warning(`${metricCards[2].value} prior authorizations need attention`);
     }
   }, []);
+
+  const [openStates, setOpenStates] = useState(reportMenus.map(() => true));
+
+  const toggleCard = (index: number) => {
+    setOpenStates(prev => {
+      const newStates = [...prev];
+      newStates[index] = !newStates[index];
+      return newStates;
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -134,23 +146,34 @@ export default function ActiveDispatches() {
 
               {/* Report Menus */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-                {reportMenus.map((menu) => (
+                {reportMenus.map((menu, index) => (
                   <Card key={menu.title} className="p-4">
-                    <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                      <UserCog className="w-5 h-5" />
-                      {menu.title}
-                    </h3>
-                    <div className="space-y-2">
-                      {menu.items.map((item) => (
-                        <Link
-                          key={item.name}
-                          to={item.path}
-                          className="block text-sm text-gray-600 hover:text-medical-secondary hover:bg-gray-50 rounded p-2 transition-colors"
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
-                    </div>
+                    <Collapsible open={openStates[index]} onOpenChange={() => toggleCard(index)}>
+                      <CollapsibleTrigger className="flex w-full items-center justify-between">
+                        <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                          <UserCog className="w-5 h-5" />
+                          {menu.title}
+                        </h3>
+                        {openStates[index] ? (
+                          <ChevronUp className="h-5 w-5 text-gray-500" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-gray-500" />
+                        )}
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <div className="space-y-2 mt-2">
+                          {menu.items.map((item) => (
+                            <Link
+                              key={item.name}
+                              to={item.path}
+                              className="block text-sm text-gray-600 hover:text-medical-secondary hover:bg-gray-50 rounded p-2 transition-colors"
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </Card>
                 ))}
               </div>
