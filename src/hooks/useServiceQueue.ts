@@ -22,6 +22,7 @@ interface RawServiceRequest {
   request_type: string;
   requested_by: string;
   requested_date: string;
+  route: string;
   service_date: string;
   service_type: string;
   trip_type: string;
@@ -41,14 +42,17 @@ export const useServiceQueue = (): UseServiceQueueResult => {
   useEffect(() => {
     const fetchQueue = async () => {
       try {
-        const { data, error } = await supabase
+        const { data: rawData, error } = await supabase
           .from('service_requests')
           .select('*')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        const formattedRequests = (data as RawServiceRequest[]).map(item => ({
+        // First cast to unknown, then to RawServiceRequest[]
+        const data = rawData as unknown as RawServiceRequest[];
+
+        const formattedRequests = data.map(item => ({
           id: item.id,
           patient_id: item.patient_id,
           patientName: item.patient_name || 'Unknown',
