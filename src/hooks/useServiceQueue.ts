@@ -12,7 +12,7 @@ interface UseServiceQueueResult {
   aiInsights: AIInsight[];
 }
 
-// Define the shape of raw data from Supabase
+// Define the shape of raw data from Supabase that matches the actual data structure
 interface RawServiceRequest {
   id: string;
   patient_id: string;
@@ -29,9 +29,20 @@ interface RawServiceRequest {
   notes: string | null;
   created_at: string;
   updated_at: string;
-  origin: string | null;
-  destination: string | null;
+  origin: {
+    name: string;
+    phone: string | null;
+    address: string;
+  } | null;
+  destination: {
+    name: string;
+    phone: string | null;
+    address: string;
+  } | null;
   warnings: string[] | null;
+  assigned_to: string | null;
+  progress_status: string | null;
+  estimated_pickup_time: string | null;
 }
 
 export const useServiceQueue = (): UseServiceQueueResult => {
@@ -68,9 +79,9 @@ export const useServiceQueue = (): UseServiceQueueResult => {
           notes: item.notes || undefined,
           created_at: item.created_at,
           updated_at: item.updated_at,
-          origin: item.origin || undefined,
-          destination: item.destination || undefined,
-          warnings: item.warnings || undefined
+          origin: item.origin ? `${item.origin.name}${item.origin.address ? `, ${item.origin.address}` : ''}` : undefined,
+          destination: item.destination ? `${item.destination.name}${item.destination.address ? `, ${item.destination.address}` : ''}` : undefined,
+          warnings: item.warnings || undefined,
         }));
 
         setRequests(formattedRequests);
