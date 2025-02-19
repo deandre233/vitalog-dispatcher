@@ -1,3 +1,4 @@
+
 import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import { Button } from "./components/ui/button";
 import Index from "./pages/Index";
@@ -29,7 +30,7 @@ import { ResourceLibrary } from "./pages/ResourceLibrary";
 import { Categories } from "./pages/Categories";
 import { HistoricalEntry } from "./pages/HistoricalEntry";
 import { ExternalLink } from "./pages/ExternalLink";
-import { AnnouncementsControl } from "./pages/AnnouncementsControl";
+import AnnouncementsControl from "./pages/AnnouncementsControl";
 
 const router = createBrowserRouter([
   {
