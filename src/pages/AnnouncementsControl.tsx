@@ -81,113 +81,125 @@ export default function BulletinControl() {
     });
   };
 
-  const generateSummary = () => {
-    toast.success("AI Summary Generated", {
-      description: "Summary of current bulletins has been created and exported",
-    });
-  };
-
-  const suggestTargetGroups = () => {
-    toast.info("AI Targeting Suggestion", {
-      description: "Based on content analysis, consider including Dispatch team in bulletin #2",
-    });
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-accent to-white">
       <Header />
       <div className="flex-1 flex">
         <SidebarProvider>
           <AppSidebar />
-          <div className="flex-1 overflow-auto p-6">
-            <div className="max-w-7xl mx-auto">
-              {/* Header Section */}
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  <Megaphone className="h-6 w-6 text-blue-500" />
-                  Bulletin Control Center
-                </h1>
-                <div className="flex gap-2">
-                  <Button onClick={getAIInsights} variant="secondary" className="gap-2">
-                    <Brain className="h-4 w-4" />
-                    AI Insights
-                  </Button>
-                  <Button variant="default" className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    New Bulletin
-                  </Button>
+          <div className="flex-1 overflow-auto p-8">
+            <div className="max-w-7xl mx-auto space-y-8">
+              {/* Hero Section */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/50 to-indigo-600/50 backdrop-blur-sm"></div>
+                <div className="relative z-10 flex justify-between items-center">
+                  <div>
+                    <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+                      <Megaphone className="h-8 w-8" />
+                      Command Center
+                    </h1>
+                    <p className="text-blue-100">Centralized Broadcast Management System</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button onClick={getAIInsights} className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border-white/30 border">
+                      <Brain className="h-5 w-5 mr-2" />
+                      AI Insights
+                    </Button>
+                    <Button className="bg-white text-blue-600 hover:bg-white/90">
+                      <Plus className="h-5 w-5 mr-2" />
+                      New Broadcast
+                    </Button>
+                  </div>
                 </div>
               </div>
 
-              {/* Analytics Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <Card className="bg-white/50 backdrop-blur-sm border border-blue-100">
+              {/* Analytics Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-md border-blue-100/20">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-500">Active Bulletins</CardTitle>
+                    <CardTitle className="text-sm font-medium text-gray-600">Active Broadcasts</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-blue-600">12</div>
+                    <div className="text-3xl font-bold text-blue-600">12</div>
+                    <div className="text-sm text-gray-500 mt-1">+2 from last week</div>
                   </CardContent>
                 </Card>
-                <Card className="bg-white/50 backdrop-blur-sm border border-green-100">
+                
+                <Card className="bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-md border-green-100/20">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-500">Read Rate</CardTitle>
+                    <CardTitle className="text-sm font-medium text-gray-600">Read Rate</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-green-600">85%</div>
+                    <div className="text-3xl font-bold text-green-600">85%</div>
+                    <div className="text-sm text-gray-500 mt-1">Target: 90%</div>
                   </CardContent>
                 </Card>
-                <Card className="bg-white/50 backdrop-blur-sm border border-purple-100">
+
+                <Card className="bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-md border-purple-100/20">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-500">Pending Signatures</CardTitle>
+                    <CardTitle className="text-sm font-medium text-gray-600">Pending Signatures</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-purple-600">3</div>
+                    <div className="text-3xl font-bold text-purple-600">3</div>
+                    <div className="text-sm text-gray-500 mt-1">Due within 24h</div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-md border-orange-100/20">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-600">Engagement Score</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-orange-600">92</div>
+                    <div className="text-sm text-gray-500 mt-1">Above average</div>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Controls */}
-              <div className="flex gap-4 mb-6">
+              {/* Search and Controls */}
+              <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 rounded-lg backdrop-blur-sm -z-10"></div>
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input
-                    placeholder="Search bulletins..."
-                    className="pl-8"
+                    placeholder="Search broadcasts..."
+                    className="pl-10 bg-white/50 border-0 focus:ring-2 ring-blue-500/20"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <Button variant="outline" className="gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Filter Date
-                </Button>
-                <Button variant="outline" className="gap-2">
-                  <Filter className="h-4 w-4" />
-                  Status
-                </Button>
-                <Button variant="outline" className="gap-2">
-                  <Download className="h-4 w-4" />
-                  Export
-                </Button>
+                <div className="flex gap-3">
+                  <Button variant="outline" className="bg-white/50 backdrop-blur-sm">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Date Range
+                  </Button>
+                  <Button variant="outline" className="bg-white/50 backdrop-blur-sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filter
+                  </Button>
+                  <Button variant="outline" className="bg-white/50 backdrop-blur-sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Export
+                  </Button>
+                </div>
               </div>
 
               {/* Main Table */}
-              <Card className="bg-white/50 backdrop-blur-sm">
+              <Card className="bg-white/60 backdrop-blur-lg shadow-xl">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Title</TableHead>
-                      <TableHead>Target Groups</TableHead>
-                      <TableHead>Expiry</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
+                    <TableRow className="border-b border-blue-100">
+                      <TableHead className="font-semibold text-blue-900">ID</TableHead>
+                      <TableHead className="font-semibold text-blue-900">Title</TableHead>
+                      <TableHead className="font-semibold text-blue-900">Target Groups</TableHead>
+                      <TableHead className="font-semibold text-blue-900">Expiry</TableHead>
+                      <TableHead className="font-semibold text-blue-900">Status</TableHead>
+                      <TableHead className="font-semibold text-blue-900">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {announcements.map((announcement) => (
-                      <TableRow key={announcement.id}>
+                      <TableRow key={announcement.id} className="border-b border-blue-50 hover:bg-blue-50/50 transition-colors">
                         <TableCell className="font-medium">{announcement.id}</TableCell>
                         <TableCell className="max-w-md">
                           <div className="flex items-center gap-2">
@@ -200,7 +212,11 @@ export default function BulletinControl() {
                         <TableCell>
                           <div className="flex gap-1 flex-wrap">
                             {announcement.targetGroups.map((group) => (
-                              <Badge key={group} variant="secondary" className="text-xs">
+                              <Badge 
+                                key={group} 
+                                variant="secondary" 
+                                className="bg-blue-100/50 text-blue-700 hover:bg-blue-200/50"
+                              >
                                 {group}
                               </Badge>
                             ))}
@@ -210,16 +226,19 @@ export default function BulletinControl() {
                         <TableCell>
                           <Badge
                             variant={announcement.status === 'active' ? 'default' : 'destructive'}
+                            className={announcement.status === 'active' 
+                              ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                              : 'bg-red-100 text-red-700 hover:bg-red-200'}
                           >
                             {announcement.status}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
                               Edit
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
                               Delete
                             </Button>
                           </div>
