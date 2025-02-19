@@ -1,7 +1,7 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { User, Brain, AlertTriangle, Timer } from "lucide-react";
+import { User, Brain, AlertTriangle, Timer, Users } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CrewMember {
@@ -23,6 +23,8 @@ interface AIRecommendation {
     estimatedDelay: number;
   };
   routeEfficiency: number;
+  similarNameWarning?: string;
+  recentAssignmentWarning?: string;
 }
 
 interface CrewListProps {
@@ -87,6 +89,18 @@ export function CrewList({ crews, selectedCrew, onCrewSelect, isLoading, aiRecom
                       </Tooltip>
                     </TooltipProvider>
                   )}
+                  {aiRec?.similarNameWarning && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Users className="h-4 w-4 text-yellow-500" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{aiRec.similarNameWarning}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </div>
                 <Badge variant="outline">
                   {crew.vehicle_type}
@@ -126,6 +140,13 @@ export function CrewList({ crews, selectedCrew, onCrewSelect, isLoading, aiRecom
                       ETA: {Math.round(aiRec.routeEfficiency)} min
                     </Badge>
                   </div>
+
+                  {aiRec.recentAssignmentWarning && (
+                    <div className="text-xs text-yellow-600 italic flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      {aiRec.recentAssignmentWarning}
+                    </div>
+                  )}
 
                   {aiRec.reasons.length > 0 && (
                     <div className="text-xs text-gray-500 italic">
