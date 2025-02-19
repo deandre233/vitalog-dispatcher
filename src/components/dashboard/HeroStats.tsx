@@ -6,7 +6,7 @@ import { toast } from "sonner";
 interface StatItem {
   label: string;
   value: string;
-  icon: React.ComponentType;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
 }
 
