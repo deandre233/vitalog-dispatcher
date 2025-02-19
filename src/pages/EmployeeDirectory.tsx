@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, UserPlus, Filter, Brain } from "lucide-react";
@@ -79,6 +78,10 @@ export function EmployeeDirectory() {
     navigate(`/employee/${employeeId}`);
   };
 
+  const handleAddEmployee = () => {
+    navigate("/create");
+  };
+
   const getAIInsights = () => {
     const insights = [
       `${filteredEmployees.length} active employees`,
@@ -118,7 +121,7 @@ export function EmployeeDirectory() {
               <Filter className="mr-2 h-4 w-4" />
               Filters
             </Button>
-            <Button>
+            <Button onClick={handleAddEmployee}>
               <UserPlus className="mr-2 h-4 w-4" />
               Add Employee
             </Button>
