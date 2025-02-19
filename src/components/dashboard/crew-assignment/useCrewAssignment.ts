@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { analyzeDispatchEfficiency } from "@/utils/aiDispatchAnalytics";
+import { predictTraffic, optimizeRoute } from "@/utils/aiDispatchOptimization";
 
 interface CrewMember {
   id: string;
@@ -14,16 +16,29 @@ interface CrewMember {
   status: string;
 }
 
+interface AIRecommendation {
+  crewId: string;
+  score: number;
+  reasons: string[];
+  trafficPrediction: {
+    congestionLevel: "low" | "medium" | "high";
+    estimatedDelay: number;
+  };
+  routeEfficiency: number;
+}
+
 export function useCrewAssignment(transportId: string, patientId: string, isOpen: boolean) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [availableCrews, setAvailableCrews] = useState<CrewMember[]>([]);
   const [selectedCrew, setSelectedCrew] = useState<CrewMember | null>(null);
+  const [aiRecommendations, setAiRecommendations] = useState<Record<string, AIRecommendation>>({});
 
   useEffect(() => {
     const fetchAvailableCrews = async () => {
       try {
+        // Mock crew data since we don't have a crews table yet
         const mockCrews: CrewMember[] = [
           {
             id: '1',
@@ -44,7 +59,49 @@ export function useCrewAssignment(transportId: string, patientId: string, isOpen
             status: 'available'
           }
         ];
+
+        // Generate AI recommendations for each crew
+        const recommendations: Record<string, AIRecommendation> = {};
+        
+        for (const crew of mockCrews) {
+          // Analyze dispatch efficiency
+          const origin = { lat: 0, lng: 0 }; // Replace with actual coordinates
+          const destination = { lat: 0, lng: 0 }; // Replace with actual coordinates
+          
+          const efficiency = analyzeDispatchEfficiency(origin, destination, crew);
+          const traffic = predictTraffic(origin, destination, new Date());
+          const route = optimizeRoute(origin, destination, new Date());
+
+          recommendations[crew.id] = {
+            crewId: crew.id,
+            score: efficiency.efficiency,
+            reasons: efficiency.suggestedActions,
+            trafficPrediction: {
+              congestionLevel: traffic.congestionLevel,
+              estimatedDelay: traffic.predictedDelayMinutes
+            },
+            routeEfficiency: route.route.duration
+          };
+        }
+
         setAvailableCrews(mockCrews);
+        setAiRecommendations(recommendations);
+
+        // Auto-select the crew with the highest AI score if no crew is selected
+        if (!selectedCrew) {
+          const bestCrew = Object.values(recommendations)
+            .sort((a, b) => b.score - a.score)[0];
+          if (bestCrew) {
+            const crew = mockCrews.find(c => c.id === bestCrew.crewId);
+            if (crew) {
+              setSelectedCrew(crew);
+              toast({
+                title: "AI Recommendation",
+                description: `${crew.name} is recommended for this dispatch based on experience and current conditions.`,
+              });
+            }
+          }
+        }
       } catch (error) {
         console.error('Error fetching crews:', error);
         toast({
@@ -60,7 +117,7 @@ export function useCrewAssignment(transportId: string, patientId: string, isOpen
     if (isOpen) {
       fetchAvailableCrews();
     }
-  }, [isOpen, toast]);
+  }, [isOpen, selectedCrew, toast]);
 
   const handlePatientClick = async () => {
     try {
@@ -108,7 +165,12 @@ export function useCrewAssignment(transportId: string, patientId: string, isOpen
         .from('transport_records')
         .update({
           crew_assigned: selectedCrew.name,
-          status: 'assigned'
+          status: 'assigned',
+          ai_metadata: {
+            recommendation_score: aiRecommendations[selectedCrew.id]?.score,
+            traffic_prediction: aiRecommendations[selectedCrew.id]?.trafficPrediction,
+            route_efficiency: aiRecommendations[selectedCrew.id]?.routeEfficiency
+          }
         })
         .eq('id', transportId);
 
@@ -137,6 +199,7 @@ export function useCrewAssignment(transportId: string, patientId: string, isOpen
     selectedCrew,
     setSelectedCrew,
     handlePatientClick,
-    handleAssignCrew
+    handleAssignCrew,
+    aiRecommendations
   };
 }
