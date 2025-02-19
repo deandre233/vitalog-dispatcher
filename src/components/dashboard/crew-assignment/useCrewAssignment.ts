@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeDispatchEfficiency } from "@/utils/aiDispatchAnalytics";
 import { predictTraffic, optimizeRoute } from "@/utils/aiDispatchOptimization";
+import { CrewMember as AnalysisCrew } from "@/utils/crewRecommendation";
 
 interface CrewMember {
   id: string;
@@ -26,6 +27,19 @@ interface AIRecommendation {
   };
   routeEfficiency: number;
 }
+
+// Helper function to convert our CrewMember to the analysis format
+const mapCrewToAnalysisFormat = (crew: CrewMember): AnalysisCrew => ({
+  id: parseInt(crew.id),
+  name: crew.name,
+  certification: crew.experience_level,
+  location: {
+    // Convert location string to coordinates (mocked for now)
+    lat: crew.current_location.includes('1') ? 33.7765 : 33.7795,
+    lng: crew.current_location.includes('1') ? -84.3963 : -84.3921,
+  },
+  available: crew.status === 'available'
+});
 
 export function useCrewAssignment(transportId: string, patientId: string, isOpen: boolean) {
   const navigate = useNavigate();
@@ -64,11 +78,14 @@ export function useCrewAssignment(transportId: string, patientId: string, isOpen
         const recommendations: Record<string, AIRecommendation> = {};
         
         for (const crew of mockCrews) {
+          // Convert crew to analysis format
+          const analysisCrew = mapCrewToAnalysisFormat(crew);
+          
           // Analyze dispatch efficiency
           const origin = { lat: 0, lng: 0 }; // Replace with actual coordinates
           const destination = { lat: 0, lng: 0 }; // Replace with actual coordinates
           
-          const efficiency = analyzeDispatchEfficiency(origin, destination, crew);
+          const efficiency = analyzeDispatchEfficiency(origin, destination, analysisCrew);
           const traffic = predictTraffic(origin, destination, new Date());
           const route = optimizeRoute(origin, destination, new Date());
 
