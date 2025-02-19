@@ -24,13 +24,13 @@ export function HeroStats({ stats }: HeroStatsProps) {
   return (
     <div className="relative">
       <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-3xl" />
-      <div className="relative bg-black/20 backdrop-blur-xl rounded-3xl border border-white/10 p-8">
-        <div className="flex flex-col lg:flex-row gap-8 items-start justify-between">
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-indigo-200 bg-clip-text text-transparent">
+      <div className="relative bg-black/20 backdrop-blur-xl rounded-3xl border border-white/10 p-6 md:p-8 lg:p-10">
+        <div className="flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-12 items-start justify-between">
+          <div className="space-y-4 md:space-y-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-white via-blue-100 to-indigo-200 bg-clip-text text-transparent">
               Command Center
             </h1>
-            <p className="text-lg text-gray-400 max-w-2xl">
+            <p className="text-lg md:text-xl text-gray-400 max-w-2xl">
               Advanced dispatch management system with real-time monitoring and AI-powered insights
             </p>
             <Button onClick={handleNewDispatch} 
@@ -42,9 +42,9 @@ export function HeroStats({ stats }: HeroStatsProps) {
               </div>
             </Button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full lg:w-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full lg:w-auto">
             {stats.map((stat, index) => (
-              <div key={index} className="bg-black/40 backdrop-blur-sm rounded-xl border border-white/10 p-4">
+              <div key={index} className="bg-black/40 backdrop-blur-sm rounded-xl border border-white/10 p-4 hover:bg-black/50 transition-colors duration-300">
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-lg bg-${stat.color}-500/20 flex items-center justify-center`}>
                     <stat.icon className={`w-4 h-4 text-${stat.color}-400`} />
