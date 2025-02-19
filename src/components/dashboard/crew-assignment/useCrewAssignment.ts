@@ -86,9 +86,9 @@ export function useCrewAssignment(transportId: string, patientId: string, isOpen
     } catch (error) {
       console.error('Error fetching patient:', error);
       toast({
-        title: "Error",
-        description: "Failed to access patient profile",
-        variant: "destructive",
+          title: "Error",
+          description: "Failed to access patient profile",
+          variant: "destructive",
       });
     }
   };
@@ -100,7 +100,7 @@ export function useCrewAssignment(transportId: string, patientId: string, isOpen
         description: "Please select a crew first",
         variant: "destructive",
       });
-      return;
+      return false;
     }
 
     try {
