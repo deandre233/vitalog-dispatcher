@@ -1,73 +1,74 @@
+
 import { HRNavigationItem } from "@/types/hr-navigation";
 
 export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
   {
-    label: "HR Home",
+    label: "Operations Hub",
     href: "/hr",
     icon: "home"
   },
   {
-    label: "Announcements Control",
+    label: "Broadcast Center",
     href: "/hr/announcements",
     icon: "megaphone"
   },
   {
-    label: "Employee Directory",
+    label: "Personnel Hub",
     href: "/hr/employees",
     icon: "users"
   },
   {
-    label: "Manual Clock-in",
+    label: "Time Tracking Portal",
     href: "/hr/clock-in",
     icon: "clock"
   },
   {
-    label: "Payroll Calculator",
+    label: "Compensation Hub",
     href: "/hr/payroll",
     icon: "calculator"
   },
   {
-    label: "Employee Logon History",
+    label: "Access Analytics",
     href: "/hr/logon-history",
     icon: "history"
   },
   {
-    label: "Incident System",
+    label: "Safety Reports",
     href: "/hr/incidents",
     icon: "alert-triangle"
   },
   {
-    label: "Schedule Requests",
+    label: "Shift Management",
     href: "/hr/schedule",
     icon: "calendar"
   },
   {
-    label: "Employees Missing HR Data",
+    label: "Data Completion Status",
     href: "/hr/missing-data",
     icon: "user-x"
   },
   {
-    label: "Crew Certificates Overview",
+    label: "Qualification Dashboard",
     href: "/hr/certificates",
     icon: "award"
   },
   {
-    label: "Certificate Types List",
+    label: "Certification Registry",
     href: "/hr/certificate-types",
     icon: "list"
   },
   {
-    label: "Custom Link 1",
+    label: "Quick Access Portal",
     href: "/hr/custom-link",
     icon: "link"
   },
   {
-    label: "AngelTrack Settings",
+    label: "System Configuration",
     href: "/hr/settings",
     icon: "settings"
   },
   {
-    label: "15 Days Remaining",
+    label: "License Status",
     href: "/hr/subscription",
     icon: "calendar",
     badge: {
@@ -75,7 +76,7 @@ export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
     }
   },
   {
-    label: "Support",
+    label: "Help Center",
     href: "/hr/support",
     icon: "help-circle"
   }
