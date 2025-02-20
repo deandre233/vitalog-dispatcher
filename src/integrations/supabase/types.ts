@@ -134,6 +134,50 @@ export type Database = {
           },
         ]
       }
+      agency_domains: {
+        Row: {
+          agency_id: string | null
+          created_at: string | null
+          custom_domain: string | null
+          dns_validation_record: string | null
+          id: string
+          is_active: boolean | null
+          ssl_status: string | null
+          subdomain: string
+          updated_at: string | null
+        }
+        Insert: {
+          agency_id?: string | null
+          created_at?: string | null
+          custom_domain?: string | null
+          dns_validation_record?: string | null
+          id?: string
+          is_active?: boolean | null
+          ssl_status?: string | null
+          subdomain: string
+          updated_at?: string | null
+        }
+        Update: {
+          agency_id?: string | null
+          created_at?: string | null
+          custom_domain?: string | null
+          dns_validation_record?: string | null
+          id?: string
+          is_active?: boolean | null
+          ssl_status?: string | null
+          subdomain?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agency_domains_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agency_profiles: {
         Row: {
           address: string | null
