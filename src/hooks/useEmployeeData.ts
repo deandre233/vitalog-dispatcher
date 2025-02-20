@@ -46,7 +46,7 @@ export const useEmployeeData = (employeeId: string | undefined) => {
     staleTime: 30000, // Consider data fresh for 30 seconds
   });
 
-  const { mutateAsync: updateEmployee } = useMutation({
+  const updateEmployee = useMutation({
     mutationFn: async (updates: Partial<Employee>) => {
       if (!employeeId) throw new Error('Employee ID is required');
 
