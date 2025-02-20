@@ -2390,6 +2390,56 @@ export type Database = {
           },
         ]
       }
+      qa_analysis_results: {
+        Row: {
+          analysis_data: Json
+          analyzed_by: string | null
+          compliance_score: number | null
+          created_at: string
+          id: string
+          issues_found: Json | null
+          recommendations: Json | null
+          review_notes: string | null
+          status: Database["public"]["Enums"]["qa_status"]
+          transport_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          analysis_data?: Json
+          analyzed_by?: string | null
+          compliance_score?: number | null
+          created_at?: string
+          id?: string
+          issues_found?: Json | null
+          recommendations?: Json | null
+          review_notes?: string | null
+          status?: Database["public"]["Enums"]["qa_status"]
+          transport_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          analysis_data?: Json
+          analyzed_by?: string | null
+          compliance_score?: number | null
+          created_at?: string
+          id?: string
+          issues_found?: Json | null
+          recommendations?: Json | null
+          review_notes?: string | null
+          status?: Database["public"]["Enums"]["qa_status"]
+          transport_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qa_analysis_results_transport_id_fkey"
+            columns: ["transport_id"]
+            isOneToOne: false
+            referencedRelation: "transport_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resources: {
         Row: {
           category: string | null
@@ -3251,6 +3301,7 @@ export type Database = {
         | "other"
       payment_status: "pending" | "completed" | "failed" | "refunded"
       priority_level: "Critical" | "Emergency" | "Lower acuity" | "Scheduled"
+      qa_status: "pending" | "in_progress" | "completed" | "failed"
       recurrence_type: "Disabled" | "Daily" | "Weekly" | "Monthly"
       service_type: "WC" | "BLS" | "ALS" | "MICU"
       supervisor_role:
