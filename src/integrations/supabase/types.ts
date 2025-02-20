@@ -134,6 +134,69 @@ export type Database = {
           },
         ]
       }
+      agency_profiles: {
+        Row: {
+          address: string | null
+          billing_email: string | null
+          branding_config: Json | null
+          city: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          npi_number: string | null
+          phone: string | null
+          settings: Json | null
+          state: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subdomain: string
+          subscription_tier: string | null
+          updated_at: string | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          billing_email?: string | null
+          branding_config?: Json | null
+          city?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          npi_number?: string | null
+          phone?: string | null
+          settings?: Json | null
+          state?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subdomain: string
+          subscription_tier?: string | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          billing_email?: string | null
+          branding_config?: Json | null
+          city?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          npi_number?: string | null
+          phone?: string | null
+          settings?: Json | null
+          state?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subdomain?: string
+          subscription_tier?: string | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
       ai_analysis_results: {
         Row: {
           analysis_type: string
@@ -184,6 +247,44 @@ export type Database = {
             columns: ["transport_id"]
             isOneToOne: false
             referencedRelation: "transport_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_configurations: {
+        Row: {
+          agency_id: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          module_type: string
+          settings: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          agency_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          module_type: string
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          agency_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          module_type?: string
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_configurations_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -530,6 +631,47 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clearinghouse_configs: {
+        Row: {
+          agency_id: string | null
+          created_at: string | null
+          credentials: Json | null
+          id: string
+          is_active: boolean | null
+          provider: string
+          settings: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          agency_id?: string | null
+          created_at?: string | null
+          credentials?: Json | null
+          id?: string
+          is_active?: boolean | null
+          provider: string
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          agency_id?: string | null
+          created_at?: string | null
+          credentials?: Json | null
+          id?: string
+          is_active?: boolean | null
+          provider?: string
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clearinghouse_configs_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1131,6 +1273,7 @@ export type Database = {
       employees: {
         Row: {
           access_codes: string | null
+          agency_id: string | null
           certification_level: string | null
           created_at: string | null
           employee_type: string | null
@@ -1150,6 +1293,7 @@ export type Database = {
         }
         Insert: {
           access_codes?: string | null
+          agency_id?: string | null
           certification_level?: string | null
           created_at?: string | null
           employee_type?: string | null
@@ -1169,6 +1313,7 @@ export type Database = {
         }
         Update: {
           access_codes?: string | null
+          agency_id?: string | null
           certification_level?: string | null
           created_at?: string | null
           employee_type?: string | null
@@ -1186,7 +1331,15 @@ export type Database = {
           updated_at?: string | null
           uses_timeclock?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "employees_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       files: {
         Row: {
@@ -1991,6 +2144,7 @@ export type Database = {
       patients: {
         Row: {
           address: string | null
+          agency_id: string | null
           allergies: string[] | null
           blood_type: string | null
           city: string | null
@@ -2023,6 +2177,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          agency_id?: string | null
           allergies?: string[] | null
           blood_type?: string | null
           city?: string | null
@@ -2055,6 +2210,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          agency_id?: string | null
           allergies?: string[] | null
           blood_type?: string | null
           city?: string | null
@@ -2085,7 +2241,15 @@ export type Database = {
           weight?: string | null
           zip?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "patients_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payer_database: {
         Row: {
@@ -2190,6 +2354,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          agency_id: string | null
           avatar_url: string | null
           created_at: string
           first_name: string | null
@@ -2198,6 +2363,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agency_id?: string | null
           avatar_url?: string | null
           created_at?: string
           first_name?: string | null
@@ -2206,6 +2372,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agency_id?: string | null
           avatar_url?: string | null
           created_at?: string
           first_name?: string | null
@@ -2213,7 +2380,15 @@ export type Database = {
           last_name?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       resources: {
         Row: {
@@ -2494,6 +2669,39 @@ export type Database = {
           },
         ]
       }
+      subscription_tiers: {
+        Row: {
+          annual_price: number
+          created_at: string | null
+          features: Json
+          id: string
+          monthly_price: number
+          name: string
+          stripe_price_id_annual: string | null
+          stripe_price_id_monthly: string | null
+        }
+        Insert: {
+          annual_price: number
+          created_at?: string | null
+          features: Json
+          id?: string
+          monthly_price: number
+          name: string
+          stripe_price_id_annual?: string | null
+          stripe_price_id_monthly?: string | null
+        }
+        Update: {
+          annual_price?: number
+          created_at?: string | null
+          features?: Json
+          id?: string
+          monthly_price?: number
+          name?: string
+          stripe_price_id_annual?: string | null
+          stripe_price_id_monthly?: string | null
+        }
+        Relationships: []
+      }
       traffic_analysis: {
         Row: {
           average_duration: number
@@ -2539,6 +2747,7 @@ export type Database = {
       transport_records: {
         Row: {
           actual_arrival: string | null
+          agency_id: string | null
           ai_recommendations: Json | null
           behavioral_illness: boolean | null
           billing_notes: string | null
@@ -2609,6 +2818,7 @@ export type Database = {
         }
         Insert: {
           actual_arrival?: string | null
+          agency_id?: string | null
           ai_recommendations?: Json | null
           behavioral_illness?: boolean | null
           billing_notes?: string | null
@@ -2681,6 +2891,7 @@ export type Database = {
         }
         Update: {
           actual_arrival?: string | null
+          agency_id?: string | null
           ai_recommendations?: Json | null
           behavioral_illness?: boolean | null
           billing_notes?: string | null
@@ -2752,6 +2963,13 @@ export type Database = {
           weather_conditions?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "transport_records_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transport_records_patient_id_fkey"
             columns: ["patient_id"]
@@ -2942,6 +3160,12 @@ export type Database = {
       analyze_payer_id: {
         Args: {
           payer_id: string
+        }
+        Returns: Json
+      }
+      analyze_transport_data: {
+        Args: {
+          transport_id: string
         }
         Returns: Json
       }
