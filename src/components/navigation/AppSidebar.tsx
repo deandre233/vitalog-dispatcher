@@ -1,191 +1,55 @@
-import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
-import { useMobile } from "@/hooks/use-mobile";
-import {
-  ChevronLeft,
-  CircuitBoard,
-  Users,
-  Map,
-  CheckSquare,
-  Zap,
-  Calendar,
-  FileText,
-  Phone,
-  FileCheck,
-  Building2,
-  Bookmark,
-  User,
-  Upload,
-  BookOpen,
-  Tag,
-  Clock,
-  Link2,
-  Menu
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  Ambulance, Activity, BarChart3, Database, 
+  CreditCard, Users, FileText, Clock, Shield,
+  Brain, FilePlus2, UserCog, Home
 } from "lucide-react";
 
-const routes = [
-  {
-    label: "Employee Directory",
-    icon: Users,
-    href: "/employees",
-  },
-  {
-    label: "Operations Map",
-    icon: Map,
-    href: "/operations-map", // Updated from /live-map
-  },
-  {
-    label: "Shift Records & Checklists",
-    icon: CheckSquare,
-    href: "/shift-records", // Updated from /shifts
-  },
-  {
-    label: "Smart Route Optimization",
-    icon: Zap,
-    href: "/smart-route-optimization", // Updated from /route-planner
-  },
-  {
-    label: "Verification Queue (11)",
-    icon: Calendar,
-    href: "/verification-queue", // Updated from /confirmation-queue
-  },
-  {
-    label: "Schedule Overview",
-    icon: Calendar,
-    href: "/schedule-overview", // Updated from /calendar
-  },
-  {
-    label: "Dispatch Page",
-    icon: FileText,
-    href: "/dispatch",
-  },
-  {
-    label: "Service Queue",
-    icon: Phone,
-    href: "/service-queue", // Updated from /request-queue
-  },
-  {
-    label: "Authorization Queue (10)",
-    icon: FileCheck,
-    href: "/authorization-queue", // Updated from /prior-auth-queue
-  },
-  {
-    label: "Authorizations on Record",
-    icon: FileText,
-    href: "/authorizations-on-record", // Updated from /prior-auths
-  },
-  {
-    label: "Center List",
-    icon: Building2,
-    href: "/center-list", // Updated from /facilities
-  },
-  {
-    label: "Partner List",
-    icon: Bookmark,
-    href: "/partner-list", // Updated from /affiliates
-  },
-  {
-    label: "Patient Directory",
-    icon: User,
-    href: "/patient-directory", // Updated from /patients
-  },
-  {
-    label: "Document Upload",
-    icon: Upload,
-    href: "/document-upload",
-  },
-  {
-    label: "Resource Library",
-    icon: BookOpen,
-    href: "/resource-library", // Updated from /librarian
-  },
-  {
-    label: "Categories",
-    icon: Tag,
-    href: "/categories", // Updated from /tags
-  },
-  {
-    label: "Historical Entry",
-    icon: Clock,
-    href: "/historical-entry", // Updated from /backdated-dispatch
-  },
-  {
-    label: "External Link",
-    icon: Link2,
-    href: "/external-link", // Updated from /custom-link-1
-  },
+const sidebarItems = [
+  { icon: Home, label: "Dashboard", href: "/" },
+  { icon: Ambulance, label: "Dispatch", href: "/dispatch" },
+  { icon: Activity, label: "Monitoring", href: "/monitoring" },
+  { icon: BarChart3, label: "Analytics", href: "/analytics" },
+  { icon: Database, label: "Data", href: "/data" },
+  { icon: Shield, label: "Insurance", href: "/insurance" },
+  { icon: Users, label: "Patients", href: "/patients" },
+  { icon: FileText, label: "Invoices", href: "/invoices" },
+  { icon: CreditCard, label: "Billing", href: "/billing" },
+  { icon: UserCog, label: "Employees", href: "/employees" },
+  { icon: FilePlus2, label: "PCR", href: "/pcr" },
+  { icon: Clock, label: "Shifts", href: "/shifts" },
+  { icon: Brain, label: "QA System", href: "/qa" }
 ];
 
-export function AppSidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const { pathname } = useLocation();
-  const isMobile = useMobile();
+interface AppSidebarProps {
+  className?: string;
+}
 
-  useEffect(() => {
-    if (isMobile) {
-      setIsCollapsed(true);
-    }
-  }, [isMobile]);
-
+export function AppSidebar({ className }: AppSidebarProps) {
   return (
-    <div className={cn(
-      "relative border-r bg-white/80 backdrop-blur-sm",
-      "transition-all duration-300 ease-in-out h-[calc(100vh-4rem)]",
-      isCollapsed ? "w-16" : "w-64",
-      isMobile && !isCollapsed && "absolute left-0 top-0 z-50 h-screen shadow-lg"
-    )}>
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4">
-          {!isCollapsed && (
-            <h2 className="text-lg font-semibold text-medical-primary flex items-center gap-2">
-              <CircuitBoard className="h-5 w-5" />
-              Dispatch Control
-            </h2>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-medical-primary hover:bg-medical-accent/10"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-          >
-            {isCollapsed ? 
-              <Menu className="h-4 w-4" /> : 
-              <ChevronLeft className="h-4 w-4" />
-            }
-          </Button>
-        </div>
-        
-        <nav className="flex-1 overflow-y-auto">
-          <div className="space-y-1 p-2">
-            {routes.map((route) => (
-              <div key={route.href}>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start relative overflow-hidden group",
-                    "hover:bg-medical-accent/10",
-                    "transition-all duration-200 ease-in-out",
-                    pathname === route.href && "bg-medical-accent/20",
-                    isCollapsed ? "px-2" : "px-4"
-                  )}
-                  asChild
-                >
-                  <Link to={route.href} className="flex items-center">
-                    <route.icon className={cn(
-                      "h-4 w-4 text-medical-primary",
-                      !isCollapsed && "mr-2"
-                    )} />
-                    {!isCollapsed && (
-                      <span className="font-medium text-medical-primary">{route.label}</span>
-                    )}
-                  </Link>
-                </Button>
-              </div>
-            ))}
+    <div className={cn("pb-12 w-full", className)}>
+      <div className="space-y-4 py-4">
+        <div className="px-3 py-2">
+          <div className="space-y-1">
+            <ScrollArea className="h-[calc(100vh-120px)] px-1">
+              {sidebarItems.map((item) => (
+                <Link key={item.href} to={item.href}>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start mb-1 hover:bg-white/5"
+                  >
+                    <item.icon className="mr-2 h-4 w-4" />
+                    {item.label}
+                  </Button>
+                </Link>
+              ))}
+            </ScrollArea>
           </div>
-        </nav>
+        </div>
       </div>
     </div>
   );
