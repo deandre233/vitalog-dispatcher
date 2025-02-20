@@ -1,176 +1,143 @@
 
-import { useState } from "react";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/navigation/AppSidebar";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { 
-  Ambulance, Activity, BarChart3, Database, 
-  CreditCard, Users, FileText, Clock, Shield, 
-  Brain, FilePlus2, UserCog, StethoscopeIcon 
+  Truck, 
+  DollarSign, 
+  ClipboardList, 
+  Users, 
+  Settings, 
+  Database, 
+  Shield, 
+  Headphones, 
+  BarChart,
+  Activity,
+  Zap,
+  Bell
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { HeroStats } from "@/components/dashboard/HeroStats";
 import { ModuleGrid } from "@/components/dashboard/ModuleGrid";
 
-const modules = [
-  {
-    title: "Live Dispatch Board",
-    description: "AI-powered dispatch management and real-time tracking",
-    icon: Ambulance,
-    gradient: "from-blue-500/20 to-cyan-500/20",
-    border: "border-blue-500/20",
-    iconClass: "text-blue-400",
-    link: "/dispatch"
-  },
-  {
-    title: "Live EKG Monitoring",
-    description: "Real-time patient vitals and EKG monitoring",
-    icon: Activity,
-    gradient: "from-red-500/20 to-pink-500/20",
-    border: "border-red-500/20",
-    iconClass: "text-red-400",
-    link: "/monitoring"
-  },
-  {
-    title: "Performance Analytics",
-    description: "AI-driven insights and performance metrics",
-    icon: BarChart3,
-    gradient: "from-purple-500/20 to-indigo-500/20",
-    border: "border-purple-500/20",
-    iconClass: "text-purple-400",
-    link: "/analytics"
-  },
-  {
-    title: "Data Management",
-    description: "AI-powered data organization and retrieval",
-    icon: Database,
-    gradient: "from-emerald-500/20 to-teal-500/20",
-    border: "border-emerald-500/20",
-    iconClass: "text-emerald-400",
-    link: "/data"
-  },
-  {
-    title: "Insurance Verification",
-    description: "Real-time insurance eligibility verification",
-    icon: Shield,
-    gradient: "from-amber-500/20 to-yellow-500/20",
-    border: "border-amber-500/20",
-    iconClass: "text-amber-400",
-    link: "/insurance"
-  },
-  {
-    title: "Patient Database",
-    description: "Comprehensive patient history and management",
-    icon: Users,
-    gradient: "from-sky-500/20 to-blue-500/20",
-    border: "border-sky-500/20",
-    iconClass: "text-sky-400",
-    link: "/patients"
-  },
-  {
-    title: "Invoice Processing",
-    description: "AI-assisted invoice generation and tracking",
-    icon: FileText,
-    gradient: "from-lime-500/20 to-green-500/20",
-    border: "border-lime-500/20",
-    iconClass: "text-lime-400",
-    link: "/invoices"
-  },
-  {
-    title: "Auto Billing System",
-    description: "Automated billing and payment tracking",
-    icon: CreditCard,
-    gradient: "from-orange-500/20 to-red-500/20",
-    border: "border-orange-500/20",
-    iconClass: "text-orange-400",
-    link: "/billing"
-  },
-  {
-    title: "Employee Management",
-    description: "AI-driven staff scheduling and management",
-    icon: UserCog,
-    gradient: "from-violet-500/20 to-purple-500/20",
-    border: "border-violet-500/20",
-    iconClass: "text-violet-400",
-    link: "/employees"
-  },
-  {
-    title: "PCR System",
-    description: "Smart patient care reporting system",
-    icon: FilePlus2,
-    gradient: "from-rose-500/20 to-pink-500/20",
-    border: "border-rose-500/20",
-    iconClass: "text-rose-400",
-    link: "/pcr"
-  },
-  {
-    title: "Shift Management",
-    description: "AI-optimized shift scheduling",
-    icon: Clock,
-    gradient: "from-cyan-500/20 to-teal-500/20",
-    border: "border-cyan-500/20",
-    iconClass: "text-cyan-400",
-    link: "/shifts"
-  },
-  {
-    title: "QA System",
-    description: "AI-powered quality assurance analysis",
-    icon: Brain,
-    gradient: "from-fuchsia-500/20 to-pink-500/20",
-    border: "border-fuchsia-500/20",
-    iconClass: "text-fuchsia-400",
-    link: "/qa"
-  }
-];
+export default function Index() {
+  const primaryStats = [
+    { label: "Active Units", value: "24", icon: Truck, color: "blue" },
+    { label: "Response Time", value: "3.2m", icon: Zap, color: "yellow" },
+    { label: "Alerts", value: "7", icon: Bell, color: "red" },
+    { label: "System Load", value: "82%", icon: Activity, color: "green" }
+  ];
 
-export function Index() {
-  const [activeModule, setActiveModule] = useState<string | null>(null);
+  const modules = [
+    {
+      title: "Dispatch",
+      description: "Manage active dispatches and transport requests",
+      icon: Truck,
+      gradient: "from-blue-500/20 to-blue-400/10",
+      border: "border-blue-400/20",
+      iconClass: "text-blue-400",
+      link: "/dispatch"
+    },
+    {
+      title: "Billing",
+      description: "Handle invoices and payment processing",
+      icon: DollarSign,
+      gradient: "from-green-500/20 to-green-400/10",
+      border: "border-green-400/20",
+      iconClass: "text-green-400",
+      link: "/billing"
+    },
+    {
+      title: "Supervision",
+      description: "Monitor operations and staff performance",
+      icon: ClipboardList,
+      gradient: "from-purple-500/20 to-purple-400/10",
+      border: "border-purple-400/20",
+      iconClass: "text-purple-400",
+      link: "/supervision"
+    },
+    {
+      title: "HR",
+      description: "Manage staff and crew assignments",
+      icon: Users,
+      gradient: "from-orange-500/20 to-orange-400/10",
+      border: "border-orange-400/20",
+      iconClass: "text-orange-400",
+      link: "/hr"
+    }
+  ];
 
-  const handleAction = (action: string) => {
-    setActiveModule(action);
-    toast.success(`Initializing ${action}`, {
-      description: "Please wait while we set up your workspace..."
-    });
-  };
+  const secondaryModules = [
+    {
+      title: "Settings",
+      description: "Configure system preferences and alerts",
+      icon: Settings,
+      gradient: "from-gray-500/20 to-gray-400/10",
+      border: "border-gray-400/20",
+      iconClass: "text-gray-400",
+      link: "/settings"
+    },
+    {
+      title: "Data Hub",
+      description: "Access and analyze transport data",
+      icon: Database,
+      gradient: "from-cyan-500/20 to-cyan-400/10",
+      border: "border-cyan-400/20",
+      iconClass: "text-cyan-400",
+      link: "/data-hub"
+    },
+    {
+      title: "Authorization",
+      description: "Manage access and permissions",
+      icon: Shield,
+      gradient: "from-red-500/20 to-red-400/10",
+      border: "border-red-400/20",
+      iconClass: "text-red-400",
+      link: "/authorization"
+    }
+  ];
+
+  const wideModules = [
+    {
+      title: "Support",
+      description: "Get help and access resources",
+      icon: Headphones,
+      gradient: "from-indigo-500/20 to-indigo-400/10",
+      border: "border-indigo-400/20",
+      iconClass: "text-indigo-400",
+      link: "/support"
+    },
+    {
+      title: "Performance",
+      description: "Monitor key business metrics and analytics",
+      icon: BarChart,
+      gradient: "from-pink-500/20 to-pink-400/10",
+      border: "border-pink-400/20",
+      iconClass: "text-pink-400",
+      link: "/performance"
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 p-6 md:p-8 lg:p-10">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-3xl" />
-          <Card className="relative bg-black/40 backdrop-blur-xl border-white/10 p-6 md:p-8 lg:p-10 rounded-3xl overflow-hidden">
-            <div className="flex items-center gap-4 mb-6">
-              <StethoscopeIcon className="w-8 h-8 text-blue-400" />
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-indigo-200 bg-clip-text text-transparent">
-                AI-Enhanced EMS Management System
-              </h1>
-            </div>
-            <p className="text-gray-400 max-w-3xl mb-6">
-              Advanced dispatch, PCR, and shift management powered by artificial intelligence. 
-              Streamline your operations with smart automation and real-time insights.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Button 
-                onClick={() => handleAction('Smart Dispatch')}
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
-              >
-                <Ambulance className="mr-2 h-4 w-4" />
-                Smart Dispatch
-              </Button>
-              <Button 
-                variant="outline" 
-                className="bg-white/5 border-white/10 text-white hover:bg-white/10"
-                onClick={() => handleAction('Live Monitoring')}
-              >
-                <Activity className="mr-2 h-4 w-4" />
-                Live Monitoring
-              </Button>
-            </div>
-          </Card>
-        </div>
-
-        <ModuleGrid modules={modules} columns={4} />
+    <div className="min-h-screen flex flex-col bg-[#0D1117] bg-grid-white/[0.02] text-white">
+      <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-[#0D1117]">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent animate-pulse" />
       </div>
+      <Header />
+      <div className="flex-1 flex">
+        <SidebarProvider>
+          <AppSidebar />
+          <div className="flex-1 overflow-auto">
+            <main className="max-w-[1800px] mx-auto p-4 md:p-8 space-y-8 relative">
+              <HeroStats stats={primaryStats} />
+              <ModuleGrid modules={modules} columns={4} />
+              <ModuleGrid modules={secondaryModules} columns={3} />
+              <ModuleGrid modules={wideModules} columns={2} isWide />
+            </main>
+          </div>
+        </SidebarProvider>
+      </div>
+      <Footer />
     </div>
   );
 }
-
-export default Index;
