@@ -14,14 +14,6 @@ interface AgencyDomain {
   dns_validation_record?: string;
 }
 
-interface AgencyDomainUpdate {
-  subdomain: string;  // Make subdomain required
-  custom_domain?: string;
-  is_active?: boolean;
-  ssl_status?: string;
-  dns_validation_record?: string;
-}
-
 export function useAgencyDomain(agencyId?: string) {
   const queryClient = useQueryClient();
 
@@ -43,9 +35,9 @@ export function useAgencyDomain(agencyId?: string) {
   });
 
   const updateDomain = useMutation({
-    mutationFn: async (updates: AgencyDomainUpdate) => {
+    mutationFn: async (updates: Partial<AgencyDomain>) => {
       if (!agencyId) throw new Error('Agency ID is required');
-      if (!isValidSubdomain(updates.subdomain)) {
+      if (updates.subdomain && !isValidSubdomain(updates.subdomain)) {
         throw new Error('Invalid subdomain format');
       }
 
@@ -53,11 +45,7 @@ export function useAgencyDomain(agencyId?: string) {
         .from('agency_domains')
         .upsert({
           agency_id: agencyId,
-          subdomain: updates.subdomain,
-          custom_domain: updates.custom_domain,
-          is_active: updates.is_active,
-          ssl_status: updates.ssl_status,
-          dns_validation_record: updates.dns_validation_record
+          ...updates
         });
 
       if (error) throw error;
