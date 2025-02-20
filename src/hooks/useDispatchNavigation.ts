@@ -1,33 +1,19 @@
-import { useState } from 'react';
-import type { DispatchViewState } from '@/types/dispatch';
 
-export function useDispatchNavigation() {
+import { useCallback, useState } from 'react';
+import { DispatchViewState } from '@/types/dispatch';
+
+export const useDispatchNavigation = () => {
   const [viewState, setViewState] = useState<DispatchViewState>({
     activeTab: 'active',
-    activeView: 'dispatches',
+    activeView: 'list',
   });
 
-  const setActiveTab = (tab: DispatchViewState['activeTab']) => {
-    setViewState(prev => ({ ...prev, activeTab: tab }));
-  };
-
-  const setActiveView = (view: DispatchViewState['activeView']) => {
-    setViewState(prev => ({ ...prev, activeView: view }));
-  };
-
-  const setSelectedDate = (date?: Date) => {
-    setViewState(prev => ({ ...prev, selectedDate: date }));
-  };
-
-  const setFilterStatus = (status?: string[]) => {
-    setViewState(prev => ({ ...prev, filterStatus: status }));
-  };
+  const updateViewState = useCallback((updates: Partial<DispatchViewState>) => {
+    setViewState(prev => ({ ...prev, ...updates }));
+  }, []);
 
   return {
     viewState,
-    setActiveTab,
-    setActiveView,
-    setSelectedDate,
-    setFilterStatus,
+    updateViewState,
   };
-}
+};

@@ -1,124 +1,96 @@
-import { Json } from '@/integrations/supabase/types';
 
-export interface DispatchFormData {
-  pickup_location: string;
-  dropoff_location: string;
-  scheduled_time?: string;
-  patient_id?: string;
-  transport_type?: string;
-  priority_level?: "Critical" | "Emergency" | "Lower acuity" | "Scheduled";
-  notes?: string;
-  service_type: "WC" | "BLS" | "ALS" | "MICU";
-  caller_name?: string;
-  caller_phone?: string;
-  trip_type: "One way" | "Wait-and-return" | "Round trip";
-  origin_floor_room?: string;
-  origin_type?: string;
-  origin_address?: string;
-  origin_city?: string;
-  origin_state?: string;
-  origin_zip?: string;
-  origin_county?: string;
-  origin_phone?: string;
-  destination_floor_room?: string;
-  destination_type?: string;
-  destination_address?: string;
-  destination_city?: string;
-  destination_state?: string;
-  destination_zip?: string;
-  destination_county?: string;
-  destination_phone?: string;
-  activation_type: "now" | "later";
-  activation_datetime?: string;
-  pickup_type: "asap" | "scheduled";
-  pickup_time?: string;
-  dropoff_type: "asap" | "scheduled";
-  dropoff_time?: string;
-  requires_ekg: boolean;
-  requires_o2: boolean;
-  requires_ventilator: boolean;
-  requires_isolation: boolean;
-  requires_bariatric: boolean;
-  breathing_problem: boolean;
-  confined_to_bed: boolean;
-  behavioral_illness: boolean;
-  unstable_impaired: boolean;
-  physically_impaired: boolean;
-  hearing_impaired: boolean;
-  sight_impaired: boolean;
-  speech_impaired: boolean;
-  dnr_order: boolean;
-  language_barrier: boolean;
-  fresh_prepared: boolean;
-  precise_pickup: boolean;
-  is_billable: boolean;
-  requires_pcs: boolean;
-  bill_to_insurance: boolean;
-  bill_to_facility: boolean;
-  billing_facility?: string;
-  bill_to_affiliate: boolean;
-  billing_affiliate?: string;
-  bill_to_patient: boolean;
-  cash_upfront: boolean;
-  price_quote?: string;
-  service_complaint?: string;
-  dispatcher_notes?: string;
-  billing_notes?: string;
-  recurrence_type?: string;
-  patient_first_name?: string;
-  patient_last_name?: string;
-  patient_dob?: string;
+export interface DispatchViewState {
+  activeTab: 'active' | 'schedule' | 'calendar';
+  activeView: 'list' | 'map' | 'calendar';
+  selectedDate?: Date | null;
+  filterStatus?: string[];
 }
 
-export interface TransportRecord {
+export interface TransportRequest {
   id: string;
+  priority_level: 'emergency' | 'non_emergency' | 'scheduled';
   patient_id?: string;
-  dispatch_id: string;
   pickup_location: string;
   dropoff_location: string;
-  transport_date?: string;
-  status: string;
-  crew_assigned?: string;
-  notes?: string;
-  route_data?: Json;
-  traffic_conditions?: Json;
-  [key: string]: any;
+  requested_time: string;
+  scheduled_time?: string;
+  ai_recommendations: {
+    efficiency_score?: number;
+    compliance_score?: number;
+    risk_factors?: string[];
+    recommendations?: string[];
+  };
+  status: 'pending' | 'en_route' | 'on_scene' | 'transporting' | 'completed' | 'cancelled';
+  crew_assignments: Array<{
+    crew_id: string;
+    assigned_at: string;
+    role: string;
+  }>;
 }
 
-export interface DispatchAssignment {
+export interface PCRRecord {
   id: string;
   transport_id: string;
-  crew_member_id: string;
-  assignment_time: string;
-  unassignment_time?: string;
-  assignment_reason?: string;
-}
-
-export interface SearchableItem {
-  id: string;
-  [key: string]: any;
-}
-
-export interface InsuranceRecord extends SearchableItem {
-  id: string;
   patient_id?: string;
-  type: string;
-  carrier_type: string;
-  carrier_name: string;
-  policy_number: string;
-  phone?: string;
-  claims_zip?: string;
-  activation_date?: string;
-  created_at?: string;
-  updated_at?: string;
+  crew_id?: string;
+  chief_complaint?: string;
+  vital_signs: Array<{
+    type: string;
+    value: string;
+    timestamp: string;
+  }>;
+  medications_given: Array<{
+    medication: string;
+    dosage: string;
+    timestamp: string;
+  }>;
+  procedures_performed: Array<{
+    procedure: string;
+    timestamp: string;
+    notes?: string;
+  }>;
+  narrative?: string;
+  qa_status: 'draft' | 'pending_qa' | 'qa_flagged' | 'approved' | 'submitted';
+  qa_notes: Array<{
+    note: string;
+    timestamp: string;
+    author: string;
+  }>;
+}
+
+export interface BillingRecord {
+  id: string;
+  pcr_id: string;
+  patient_id?: string;
+  transport_id: string;
+  billing_codes: Array<{
+    code: string;
+    description: string;
+    amount: number;
+  }>;
+  insurance_verification: {
+    status: string;
+    verified_at?: string;
+    coverage_details?: any;
+  };
+  claim_status: 'pending' | 'submitted' | 'approved' | 'denied' | 'resubmitted' | 'paid';
+  amount_billed: number;
+  amount_paid: number;
 }
 
 export interface AIAnalysisResult {
-  efficiency_score: number;
-  communication_score: number;
-  teamwork_score: number;
-  technical_skills: number;
-  training_needs: string[];
-  growth_opportunities: string[];
-  performance_insights: string;
+  id: string;
+  transport_id: string;
+  pcr_id?: string;
+  analysis_type: string;
+  analysis_data: Record<string, any>;
+  recommendations: Record<string, any>;
+  confidence_score: number;
+  created_at: string;
+}
+
+// Common interfaces
+export interface SearchableItem {
+  id: string;
+  [key: string]: any;
 }

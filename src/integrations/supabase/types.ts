@@ -490,6 +490,79 @@ export type Database = {
           },
         ]
       }
+      billing_records: {
+        Row: {
+          ai_analysis: Json | null
+          amount_billed: number | null
+          amount_paid: number | null
+          billing_codes: Json | null
+          claim_status: Database["public"]["Enums"]["billing_status"] | null
+          clearinghouse_response: Json | null
+          created_at: string | null
+          id: string
+          insurance_verification: Json | null
+          patient_id: string | null
+          pcr_id: string | null
+          submitted_at: string | null
+          transport_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          amount_billed?: number | null
+          amount_paid?: number | null
+          billing_codes?: Json | null
+          claim_status?: Database["public"]["Enums"]["billing_status"] | null
+          clearinghouse_response?: Json | null
+          created_at?: string | null
+          id?: string
+          insurance_verification?: Json | null
+          patient_id?: string | null
+          pcr_id?: string | null
+          submitted_at?: string | null
+          transport_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ai_analysis?: Json | null
+          amount_billed?: number | null
+          amount_paid?: number | null
+          billing_codes?: Json | null
+          claim_status?: Database["public"]["Enums"]["billing_status"] | null
+          clearinghouse_response?: Json | null
+          created_at?: string | null
+          id?: string
+          insurance_verification?: Json | null
+          patient_id?: string | null
+          pcr_id?: string | null
+          submitted_at?: string | null
+          transport_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_records_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_records_pcr_id_fkey"
+            columns: ["pcr_id"]
+            isOneToOne: false
+            referencedRelation: "patient_care_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_records_transport_id_fkey"
+            columns: ["transport_id"]
+            isOneToOne: false
+            referencedRelation: "transport_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       billing_settings: {
         Row: {
           created_at: string | null
@@ -2126,6 +2199,85 @@ export type Database = {
         }
         Relationships: []
       }
+      patient_care_reports: {
+        Row: {
+          ai_suggestions: Json | null
+          chief_complaint: string | null
+          completed_at: string | null
+          created_at: string | null
+          crew_id: string | null
+          id: string
+          locked_at: string | null
+          medications_given: Json | null
+          narrative: string | null
+          patient_id: string | null
+          procedures_performed: Json | null
+          qa_notes: Json | null
+          qa_status: Database["public"]["Enums"]["pcr_status"] | null
+          transport_id: string | null
+          updated_at: string | null
+          vital_signs: Json | null
+        }
+        Insert: {
+          ai_suggestions?: Json | null
+          chief_complaint?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          crew_id?: string | null
+          id?: string
+          locked_at?: string | null
+          medications_given?: Json | null
+          narrative?: string | null
+          patient_id?: string | null
+          procedures_performed?: Json | null
+          qa_notes?: Json | null
+          qa_status?: Database["public"]["Enums"]["pcr_status"] | null
+          transport_id?: string | null
+          updated_at?: string | null
+          vital_signs?: Json | null
+        }
+        Update: {
+          ai_suggestions?: Json | null
+          chief_complaint?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          crew_id?: string | null
+          id?: string
+          locked_at?: string | null
+          medications_given?: Json | null
+          narrative?: string | null
+          patient_id?: string | null
+          procedures_performed?: Json | null
+          qa_notes?: Json | null
+          qa_status?: Database["public"]["Enums"]["pcr_status"] | null
+          transport_id?: string | null
+          updated_at?: string | null
+          vital_signs?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_care_reports_crew_id_fkey"
+            columns: ["crew_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_care_reports_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_care_reports_transport_id_fkey"
+            columns: ["transport_id"]
+            isOneToOne: false
+            referencedRelation: "transport_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patient_documents: {
         Row: {
           comments: string | null
@@ -3080,6 +3232,59 @@ export type Database = {
           },
         ]
       }
+      transport_requests: {
+        Row: {
+          ai_analysis: Json | null
+          ai_recommendations: Json | null
+          created_at: string | null
+          crew_assignments: Json | null
+          dropoff_location: string
+          id: string
+          patient_id: string | null
+          pickup_location: string
+          priority_level: Database["public"]["Enums"]["transport_priority_level"]
+          requested_time: string | null
+          scheduled_time: string | null
+          status: Database["public"]["Enums"]["transport_status"] | null
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          ai_recommendations?: Json | null
+          created_at?: string | null
+          crew_assignments?: Json | null
+          dropoff_location: string
+          id?: string
+          patient_id?: string | null
+          pickup_location: string
+          priority_level: Database["public"]["Enums"]["transport_priority_level"]
+          requested_time?: string | null
+          scheduled_time?: string | null
+          status?: Database["public"]["Enums"]["transport_status"] | null
+        }
+        Update: {
+          ai_analysis?: Json | null
+          ai_recommendations?: Json | null
+          created_at?: string | null
+          crew_assignments?: Json | null
+          dropoff_location?: string
+          id?: string
+          patient_id?: string | null
+          pickup_location?: string
+          priority_level?: Database["public"]["Enums"]["transport_priority_level"]
+          requested_time?: string | null
+          scheduled_time?: string | null
+          status?: Database["public"]["Enums"]["transport_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transport_requests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_preferences: {
         Row: {
           created_at: string | null
@@ -3301,6 +3506,13 @@ export type Database = {
         | "complete"
         | "cancel"
       appointment_status: "scheduled" | "completed" | "cancelled" | "no_show"
+      billing_status:
+        | "pending"
+        | "submitted"
+        | "approved"
+        | "denied"
+        | "resubmitted"
+        | "paid"
       claim_status_type:
         | "pending"
         | "approved"
@@ -3344,6 +3556,12 @@ export type Database = {
         | "check"
         | "other"
       payment_status: "pending" | "completed" | "failed" | "refunded"
+      pcr_status:
+        | "draft"
+        | "pending_qa"
+        | "qa_flagged"
+        | "approved"
+        | "submitted"
       priority_level: "Critical" | "Emergency" | "Lower acuity" | "Scheduled"
       qa_status: "pending" | "in_progress" | "completed" | "failed"
       recurrence_type: "Disabled" | "Daily" | "Weekly" | "Monthly"
@@ -3355,6 +3573,14 @@ export type Database = {
         | "Call-taker / Self-dispatch"
       traffic_level_enum: "low" | "medium" | "high"
       traffic_severity: "low" | "medium" | "high" | "severe"
+      transport_priority_level: "emergency" | "non_emergency" | "scheduled"
+      transport_status:
+        | "pending"
+        | "en_route"
+        | "on_scene"
+        | "transporting"
+        | "completed"
+        | "cancelled"
       trip_type: "One way" | "Wait-and-return" | "Round trip"
       user_access_level: "admin" | "user" | "guest"
       user_role: "admin" | "doctor" | "nurse" | "billing" | "receptionist"
