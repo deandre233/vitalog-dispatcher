@@ -134,6 +134,113 @@ export type Database = {
           },
         ]
       }
+      agency_domains: {
+        Row: {
+          agency_id: string | null
+          created_at: string | null
+          custom_domain: string | null
+          dns_validation_record: string | null
+          id: string
+          is_active: boolean | null
+          ssl_status: string | null
+          subdomain: string
+          updated_at: string | null
+        }
+        Insert: {
+          agency_id?: string | null
+          created_at?: string | null
+          custom_domain?: string | null
+          dns_validation_record?: string | null
+          id?: string
+          is_active?: boolean | null
+          ssl_status?: string | null
+          subdomain: string
+          updated_at?: string | null
+        }
+        Update: {
+          agency_id?: string | null
+          created_at?: string | null
+          custom_domain?: string | null
+          dns_validation_record?: string | null
+          id?: string
+          is_active?: boolean | null
+          ssl_status?: string | null
+          subdomain?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agency_domains_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agency_profiles: {
+        Row: {
+          address: string | null
+          billing_email: string | null
+          branding_config: Json | null
+          city: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          npi_number: string | null
+          phone: string | null
+          settings: Json | null
+          state: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subdomain: string
+          subscription_tier: string | null
+          updated_at: string | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          billing_email?: string | null
+          branding_config?: Json | null
+          city?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          npi_number?: string | null
+          phone?: string | null
+          settings?: Json | null
+          state?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subdomain: string
+          subscription_tier?: string | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          billing_email?: string | null
+          branding_config?: Json | null
+          city?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          npi_number?: string | null
+          phone?: string | null
+          settings?: Json | null
+          state?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subdomain?: string
+          subscription_tier?: string | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
       ai_analysis_results: {
         Row: {
           analysis_type: string
@@ -184,6 +291,44 @@ export type Database = {
             columns: ["transport_id"]
             isOneToOne: false
             referencedRelation: "transport_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_configurations: {
+        Row: {
+          agency_id: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          module_type: string
+          settings: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          agency_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          module_type: string
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          agency_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          module_type?: string
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_configurations_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -276,6 +421,7 @@ export type Database = {
           id: string
           insurance_id: string | null
           patient_id: string | null
+          priority: string | null
           requested_by: string | null
           service_type: string
           status: string | null
@@ -290,6 +436,7 @@ export type Database = {
           id?: string
           insurance_id?: string | null
           patient_id?: string | null
+          priority?: string | null
           requested_by?: string | null
           service_type: string
           status?: string | null
@@ -304,6 +451,7 @@ export type Database = {
           id?: string
           insurance_id?: string | null
           patient_id?: string | null
+          priority?: string | null
           requested_by?: string | null
           service_type?: string
           status?: string | null
@@ -430,10 +578,14 @@ export type Database = {
       centers: {
         Row: {
           address: string | null
+          ai_recommendations: Json | null
           city: string | null
           created_at: string | null
+          dispatch_count: number | null
+          efficiency_score: number | null
           email: string | null
           id: string
+          last_ai_analysis: string | null
           name: string
           phone: string | null
           state: string | null
@@ -444,10 +596,14 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          ai_recommendations?: Json | null
           city?: string | null
           created_at?: string | null
+          dispatch_count?: number | null
+          efficiency_score?: number | null
           email?: string | null
           id?: string
+          last_ai_analysis?: string | null
           name: string
           phone?: string | null
           state?: string | null
@@ -458,10 +614,14 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          ai_recommendations?: Json | null
           city?: string | null
           created_at?: string | null
+          dispatch_count?: number | null
+          efficiency_score?: number | null
           email?: string | null
           id?: string
+          last_ai_analysis?: string | null
           name?: string
           phone?: string | null
           state?: string | null
@@ -515,6 +675,47 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clearinghouse_configs: {
+        Row: {
+          agency_id: string | null
+          created_at: string | null
+          credentials: Json | null
+          id: string
+          is_active: boolean | null
+          provider: string
+          settings: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          agency_id?: string | null
+          created_at?: string | null
+          credentials?: Json | null
+          id?: string
+          is_active?: boolean | null
+          provider: string
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          agency_id?: string | null
+          created_at?: string | null
+          credentials?: Json | null
+          id?: string
+          is_active?: boolean | null
+          provider?: string
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clearinghouse_configs_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1116,6 +1317,7 @@ export type Database = {
       employees: {
         Row: {
           access_codes: string | null
+          agency_id: string | null
           certification_level: string | null
           created_at: string | null
           employee_type: string | null
@@ -1135,6 +1337,7 @@ export type Database = {
         }
         Insert: {
           access_codes?: string | null
+          agency_id?: string | null
           certification_level?: string | null
           created_at?: string | null
           employee_type?: string | null
@@ -1154,6 +1357,7 @@ export type Database = {
         }
         Update: {
           access_codes?: string | null
+          agency_id?: string | null
           certification_level?: string | null
           created_at?: string | null
           employee_type?: string | null
@@ -1171,7 +1375,15 @@ export type Database = {
           updated_at?: string | null
           uses_timeclock?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "employees_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       files: {
         Row: {
@@ -1856,6 +2068,7 @@ export type Database = {
       }
       partners: {
         Row: {
+          ai_recommendations: Json | null
           contact_email: string | null
           contact_name: string | null
           contact_phone: string | null
@@ -1863,12 +2076,18 @@ export type Database = {
           contract_start_date: string | null
           created_at: string | null
           id: string
+          last_interaction: string | null
           name: string
+          next_review_date: string | null
+          partnership_score: number | null
           partnership_type: string
+          performance_metrics: Json | null
+          risk_assessment: string | null
           status: string | null
           updated_at: string | null
         }
         Insert: {
+          ai_recommendations?: Json | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -1876,12 +2095,18 @@ export type Database = {
           contract_start_date?: string | null
           created_at?: string | null
           id?: string
+          last_interaction?: string | null
           name: string
+          next_review_date?: string | null
+          partnership_score?: number | null
           partnership_type: string
+          performance_metrics?: Json | null
+          risk_assessment?: string | null
           status?: string | null
           updated_at?: string | null
         }
         Update: {
+          ai_recommendations?: Json | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -1889,16 +2114,81 @@ export type Database = {
           contract_start_date?: string | null
           created_at?: string | null
           id?: string
+          last_interaction?: string | null
           name?: string
+          next_review_date?: string | null
+          partnership_score?: number | null
           partnership_type?: string
+          performance_metrics?: Json | null
+          risk_assessment?: string | null
           status?: string | null
           updated_at?: string | null
         }
         Relationships: []
       }
+      patient_documents: {
+        Row: {
+          comments: string | null
+          created_at: string
+          directive_type: string[] | null
+          document_date: string
+          document_type: string
+          extracted_data: Json | null
+          extraction_status: string | null
+          file_name: string
+          file_path: string
+          id: string
+          is_active: boolean | null
+          patient_id: string | null
+          provider: string | null
+          updated_at: string
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string
+          directive_type?: string[] | null
+          document_date: string
+          document_type: string
+          extracted_data?: Json | null
+          extraction_status?: string | null
+          file_name: string
+          file_path: string
+          id?: string
+          is_active?: boolean | null
+          patient_id?: string | null
+          provider?: string | null
+          updated_at?: string
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string
+          directive_type?: string[] | null
+          document_date?: string
+          document_type?: string
+          extracted_data?: Json | null
+          extraction_status?: string | null
+          file_name?: string
+          file_path?: string
+          id?: string
+          is_active?: boolean | null
+          patient_id?: string | null
+          provider?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_documents_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           address: string | null
+          agency_id: string | null
           allergies: string[] | null
           blood_type: string | null
           city: string | null
@@ -1931,6 +2221,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          agency_id?: string | null
           allergies?: string[] | null
           blood_type?: string | null
           city?: string | null
@@ -1963,6 +2254,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          agency_id?: string | null
           allergies?: string[] | null
           blood_type?: string | null
           city?: string | null
@@ -1993,7 +2285,15 @@ export type Database = {
           weight?: string | null
           zip?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "patients_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payer_database: {
         Row: {
@@ -2096,6 +2396,94 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          agency_id: string | null
+          avatar_url: string | null
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          agency_id?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agency_id?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qa_analysis_results: {
+        Row: {
+          analysis_data: Json
+          analyzed_by: string | null
+          compliance_score: number | null
+          created_at: string
+          id: string
+          issues_found: Json | null
+          recommendations: Json | null
+          review_notes: string | null
+          status: Database["public"]["Enums"]["qa_status"]
+          transport_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          analysis_data?: Json
+          analyzed_by?: string | null
+          compliance_score?: number | null
+          created_at?: string
+          id?: string
+          issues_found?: Json | null
+          recommendations?: Json | null
+          review_notes?: string | null
+          status?: Database["public"]["Enums"]["qa_status"]
+          transport_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          analysis_data?: Json
+          analyzed_by?: string | null
+          compliance_score?: number | null
+          created_at?: string
+          id?: string
+          issues_found?: Json | null
+          recommendations?: Json | null
+          review_notes?: string | null
+          status?: Database["public"]["Enums"]["qa_status"]
+          transport_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qa_analysis_results_transport_id_fkey"
+            columns: ["transport_id"]
+            isOneToOne: false
+            referencedRelation: "transport_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resources: {
         Row: {
           category: string | null
@@ -2176,6 +2564,53 @@ export type Database = {
         }
         Relationships: []
       }
+      schedule_recommendations: {
+        Row: {
+          confidence_score: number
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          original_time: string
+          reason: string
+          recommended_time: string
+          status: string | null
+          transport_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          confidence_score: number
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          original_time: string
+          reason: string
+          recommended_time: string
+          status?: string | null
+          transport_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          confidence_score?: number
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          original_time?: string
+          reason?: string
+          recommended_time?: string
+          status?: string | null
+          transport_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_recommendations_transport_id_fkey"
+            columns: ["transport_id"]
+            isOneToOne: false
+            referencedRelation: "transport_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_requests: {
         Row: {
           created_at: string | null
@@ -2186,8 +2621,11 @@ export type Database = {
           request_type: string
           requested_by: string | null
           requested_date: string | null
+          route: string | null
           service_date: string | null
+          service_type: string | null
           status: string | null
+          trip_type: string | null
           updated_at: string | null
         }
         Insert: {
@@ -2199,8 +2637,11 @@ export type Database = {
           request_type: string
           requested_by?: string | null
           requested_date?: string | null
+          route?: string | null
           service_date?: string | null
+          service_type?: string | null
           status?: string | null
+          trip_type?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -2212,8 +2653,11 @@ export type Database = {
           request_type?: string
           requested_by?: string | null
           requested_date?: string | null
+          route?: string | null
           service_date?: string | null
+          service_type?: string | null
           status?: string | null
+          trip_type?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -2235,40 +2679,79 @@ export type Database = {
       }
       shift_records: {
         Row: {
+          ai_analysis: Json | null
           checklist_completed: boolean | null
+          compliance_status: string | null
           created_at: string | null
+          distance: number | null
           employee_id: string | null
           end_time: string | null
+          ending_odometer: number | null
+          fatigue_indicators: string[] | null
           id: string
           notes: string | null
+          performance_metrics: Json | null
+          primary_checklist_completed: boolean | null
+          safety_score: number | null
+          secondary_checklist_completed: boolean | null
           shift_date: string
+          shift_pattern_analysis: string | null
           shift_type: string
           start_time: string | null
+          starting_odometer: number | null
           updated_at: string | null
+          uuid: string
+          vehicle_id: string | null
         }
         Insert: {
+          ai_analysis?: Json | null
           checklist_completed?: boolean | null
+          compliance_status?: string | null
           created_at?: string | null
+          distance?: number | null
           employee_id?: string | null
           end_time?: string | null
+          ending_odometer?: number | null
+          fatigue_indicators?: string[] | null
           id?: string
           notes?: string | null
+          performance_metrics?: Json | null
+          primary_checklist_completed?: boolean | null
+          safety_score?: number | null
+          secondary_checklist_completed?: boolean | null
           shift_date: string
+          shift_pattern_analysis?: string | null
           shift_type: string
           start_time?: string | null
+          starting_odometer?: number | null
           updated_at?: string | null
+          uuid?: string
+          vehicle_id?: string | null
         }
         Update: {
+          ai_analysis?: Json | null
           checklist_completed?: boolean | null
+          compliance_status?: string | null
           created_at?: string | null
+          distance?: number | null
           employee_id?: string | null
           end_time?: string | null
+          ending_odometer?: number | null
+          fatigue_indicators?: string[] | null
           id?: string
           notes?: string | null
+          performance_metrics?: Json | null
+          primary_checklist_completed?: boolean | null
+          safety_score?: number | null
+          secondary_checklist_completed?: boolean | null
           shift_date?: string
+          shift_pattern_analysis?: string | null
           shift_type?: string
           start_time?: string | null
+          starting_odometer?: number | null
           updated_at?: string | null
+          uuid?: string
+          vehicle_id?: string | null
         }
         Relationships: [
           {
@@ -2280,9 +2763,85 @@ export type Database = {
           },
         ]
       }
+      subscription_tiers: {
+        Row: {
+          annual_price: number
+          created_at: string | null
+          features: Json
+          id: string
+          monthly_price: number
+          name: string
+          stripe_price_id_annual: string | null
+          stripe_price_id_monthly: string | null
+        }
+        Insert: {
+          annual_price: number
+          created_at?: string | null
+          features: Json
+          id?: string
+          monthly_price: number
+          name: string
+          stripe_price_id_annual?: string | null
+          stripe_price_id_monthly?: string | null
+        }
+        Update: {
+          annual_price?: number
+          created_at?: string | null
+          features?: Json
+          id?: string
+          monthly_price?: number
+          name?: string
+          stripe_price_id_annual?: string | null
+          stripe_price_id_monthly?: string | null
+        }
+        Relationships: []
+      }
+      traffic_analysis: {
+        Row: {
+          average_duration: number
+          confidence_score: number
+          created_at: string | null
+          day_of_week: string
+          historical_data: Json | null
+          hour_of_day: number
+          id: string
+          last_updated: string | null
+          route_end_location: string
+          route_start_location: string
+          traffic_level: Database["public"]["Enums"]["traffic_severity"]
+        }
+        Insert: {
+          average_duration: number
+          confidence_score: number
+          created_at?: string | null
+          day_of_week: string
+          historical_data?: Json | null
+          hour_of_day: number
+          id?: string
+          last_updated?: string | null
+          route_end_location: string
+          route_start_location: string
+          traffic_level: Database["public"]["Enums"]["traffic_severity"]
+        }
+        Update: {
+          average_duration?: number
+          confidence_score?: number
+          created_at?: string | null
+          day_of_week?: string
+          historical_data?: Json | null
+          hour_of_day?: number
+          id?: string
+          last_updated?: string | null
+          route_end_location?: string
+          route_start_location?: string
+          traffic_level?: Database["public"]["Enums"]["traffic_severity"]
+        }
+        Relationships: []
+      }
       transport_records: {
         Row: {
           actual_arrival: string | null
+          agency_id: string | null
           ai_recommendations: Json | null
           behavioral_illness: boolean | null
           billing_notes: string | null
@@ -2303,6 +2862,7 @@ export type Database = {
           dnr_order: boolean | null
           dropoff_location: string
           dropoff_type: string | null
+          efficiency: number | null
           estimated_arrival: string | null
           fresh_prepared: boolean | null
           hearing_impaired: boolean | null
@@ -2352,6 +2912,7 @@ export type Database = {
         }
         Insert: {
           actual_arrival?: string | null
+          agency_id?: string | null
           ai_recommendations?: Json | null
           behavioral_illness?: boolean | null
           billing_notes?: string | null
@@ -2374,6 +2935,7 @@ export type Database = {
           dnr_order?: boolean | null
           dropoff_location: string
           dropoff_type?: string | null
+          efficiency?: number | null
           estimated_arrival?: string | null
           fresh_prepared?: boolean | null
           hearing_impaired?: boolean | null
@@ -2423,6 +2985,7 @@ export type Database = {
         }
         Update: {
           actual_arrival?: string | null
+          agency_id?: string | null
           ai_recommendations?: Json | null
           behavioral_illness?: boolean | null
           billing_notes?: string | null
@@ -2445,6 +3008,7 @@ export type Database = {
           dnr_order?: boolean | null
           dropoff_location?: string
           dropoff_type?: string | null
+          efficiency?: number | null
           estimated_arrival?: string | null
           fresh_prepared?: boolean | null
           hearing_impaired?: boolean | null
@@ -2493,6 +3057,13 @@ export type Database = {
           weather_conditions?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "transport_records_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agency_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transport_records_patient_id_fkey"
             columns: ["patient_id"]
@@ -2686,6 +3257,12 @@ export type Database = {
         }
         Returns: Json
       }
+      analyze_transport_data: {
+        Args: {
+          transport_id: string
+        }
+        Returns: Json
+      }
       generate_dispatch_id: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -2768,6 +3345,7 @@ export type Database = {
         | "other"
       payment_status: "pending" | "completed" | "failed" | "refunded"
       priority_level: "Critical" | "Emergency" | "Lower acuity" | "Scheduled"
+      qa_status: "pending" | "in_progress" | "completed" | "failed"
       recurrence_type: "Disabled" | "Daily" | "Weekly" | "Monthly"
       service_type: "WC" | "BLS" | "ALS" | "MICU"
       supervisor_role:
@@ -2775,6 +3353,8 @@ export type Database = {
         | "Lieutenant"
         | "Full privileges"
         | "Call-taker / Self-dispatch"
+      traffic_level_enum: "low" | "medium" | "high"
+      traffic_severity: "low" | "medium" | "high" | "severe"
       trip_type: "One way" | "Wait-and-return" | "Round trip"
       user_access_level: "admin" | "user" | "guest"
       user_role: "admin" | "doctor" | "nurse" | "billing" | "receptionist"
