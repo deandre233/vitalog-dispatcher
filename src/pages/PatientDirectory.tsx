@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -9,11 +9,15 @@ import { Footer } from "@/components/layout/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PatientFilters } from "@/components/patient/PatientFilters";
+import { PatientInsights } from "@/components/patient/PatientInsights";
 import { 
   Table, TableBody, TableCell, TableHead, 
   TableHeader, TableRow 
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Phone, Mail, AlertTriangle } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
+import { formatPhoneNumber } from "@/utils/stringUtils";
 
 type Patient = Tables<"patients">;
 
@@ -30,7 +34,12 @@ export function PatientDirectory() {
       console.log('Fetching patients...');
       const { data, error } = await supabase
         .from('patients')
-        .select('*')
+        .select(`
+          *,
+          medical_records (*),
+          insurance_policies (*),
+          appointments (*)
+        `)
         .order('last_name', { ascending: true });
 
       if (error) {
@@ -69,9 +78,35 @@ export function PatientDirectory() {
     setFilteredPatients(filtered);
   }, [patients]);
 
-  const formatDate = (date: string | null) => {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString();
+  const getStatusBadge = (patient: Patient) => {
+    const lastYear = new Date();
+    lastYear.setFullYear(lastYear.getFullYear() - 1);
+    const lastPhysical = patient.last_physical ? new Date(patient.last_physical) : null;
+    
+    if (!lastPhysical) {
+      return (
+        <Badge variant="destructive" className="flex items-center gap-1">
+          <AlertTriangle className="h-3 w-3" />
+          No Records
+        </Badge>
+      );
+    }
+    
+    if (lastPhysical < lastYear) {
+      return (
+        <Badge variant="warning" className="flex items-center gap-1">
+          <Calendar className="h-3 w-3" />
+          Due Visit
+        </Badge>
+      );
+    }
+    
+    return (
+      <Badge variant="success" className="flex items-center gap-1">
+        <Calendar className="h-3 w-3" />
+        Active
+      </Badge>
+    );
   };
 
   const displayedPatients = filteredPatients.length > 0 ? filteredPatients : (patients || []);
@@ -85,9 +120,12 @@ export function PatientDirectory() {
           <div className="flex-1 bg-medical-accent/5 backdrop-blur-sm overflow-auto">
             <DashboardHeader />
             <main className="p-6 space-y-6">
-              <h1 className="text-2xl font-bold text-medical-primary mb-6">
-                Patient Directory
-              </h1>
+              <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold text-medical-primary mb-6">
+                  Patient Directory
+                </h1>
+                <PatientInsights />
+              </div>
               
               <PatientFilters
                 onNameFilterChange={handleNameFilter}
@@ -114,13 +152,11 @@ export function PatientDirectory() {
                   <TableHeader>
                     <TableRow className="hover:bg-medical-secondary/5">
                       <TableHead className="text-medical-secondary">ID</TableHead>
-                      <TableHead className="text-medical-secondary">Last Name</TableHead>
-                      <TableHead className="text-medical-secondary">First Name</TableHead>
-                      <TableHead className="text-medical-secondary">Gender</TableHead>
-                      <TableHead className="text-medical-secondary">DOB</TableHead>
+                      <TableHead className="text-medical-secondary">Name</TableHead>
+                      <TableHead className="text-medical-secondary">Contact</TableHead>
                       <TableHead className="text-medical-secondary">Insurance</TableHead>
-                      <TableHead className="text-medical-secondary">Home Facility</TableHead>
-                      <TableHead className="text-medical-secondary">Last Activity</TableHead>
+                      <TableHead className="text-medical-secondary">Last Visit</TableHead>
+                      <TableHead className="text-medical-secondary">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -133,10 +169,26 @@ export function PatientDirectory() {
                         <TableCell className="font-medium">
                           {patient.legacy_display_id || patient.id.slice(0, 8)}
                         </TableCell>
-                        <TableCell>{patient.last_name}</TableCell>
-                        <TableCell>{patient.first_name}</TableCell>
-                        <TableCell>{patient.gender || 'N/A'}</TableCell>
-                        <TableCell>{formatDate(patient.dob)}</TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="font-medium">{patient.last_name}, {patient.first_name}</div>
+                            <div className="text-sm text-gray-500">
+                              DOB: {patient.dob ? new Date(patient.dob).toLocaleDateString() : 'N/A'}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="flex items-center space-x-2">
+                              <Phone className="h-4 w-4 text-gray-400" />
+                              <span>{formatPhoneNumber(patient.phone || '')}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Mail className="h-4 w-4 text-gray-400" />
+                              <span>{patient.email || 'N/A'}</span>
+                            </div>
+                          </div>
+                        </TableCell>
                         <TableCell>
                           <div className="space-y-1">
                             {patient.primary_insurance && (
@@ -150,11 +202,16 @@ export function PatientDirectory() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {patient.usual_transport_mode || 'N/A'}
+                          {patient.last_physical ? (
+                            <div className="flex items-center space-x-2">
+                              <Calendar className="h-4 w-4 text-gray-400" />
+                              <span>{new Date(patient.last_physical).toLocaleDateString()}</span>
+                            </div>
+                          ) : (
+                            'No records'
+                          )}
                         </TableCell>
-                        <TableCell>
-                          {patient.last_physical ? formatDate(patient.last_physical) : 'N/A'}
-                        </TableCell>
+                        <TableCell>{getStatusBadge(patient)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
