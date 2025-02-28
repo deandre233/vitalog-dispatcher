@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
@@ -31,9 +32,11 @@ export const PartnerList = () => {
   const loadPartners = async () => {
     try {
       setIsLoading(true);
-      const data = await api.get<Partner>("partners");
-      setPartners(data);
-      setFilteredPartners(data);
+      // Using the updated api.list method
+      const response = await api.list<Partner>("partners");
+      const partnerData = response.items;
+      setPartners(partnerData);
+      setFilteredPartners(partnerData);
     } catch (error) {
       toast({
         title: "Error loading partners",

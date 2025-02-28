@@ -42,14 +42,14 @@ export type FetchOptions = {
 export async function fetchFromSupabase<T>(
   table: TableNames,
   options: {
-    id?: string | number;
+    id?: string;
     query?: any;
     queryParams?: QueryParams;
   } = {}
 ): Promise<ApiResponse<T>> {
   try {
     const { id, query, queryParams } = options;
-    let supabaseQuery = supabase.from(table);
+    let supabaseQuery: any = supabase.from(table);
 
     if (id) {
       supabaseQuery = supabaseQuery.select('*').eq('id', id).single();
@@ -116,6 +116,48 @@ export async function fetchFromSupabase<T>(
     return { data: null, error: errorMessage, status: 500 };
   }
 }
+
+// Export a named 'api' object with convenience methods
+export const api = {
+  async get<T>(table: TableNames, id?: string): Promise<T> {
+    const response = await fetchFromSupabase<T>(table, { id });
+    if (response.error) {
+      throw new Error(response.error);
+    }
+    return response.data as T;
+  },
+  
+  async list<T>(table: TableNames, queryParams?: QueryParams): Promise<ListResponse<T>> {
+    const response = await fetchFromSupabase<ListResponse<T>>(table, { queryParams });
+    if (response.error) {
+      throw new Error(response.error);
+    }
+    return response.data as ListResponse<T>;
+  },
+  
+  async create<T>(table: TableNames, data: any): Promise<T> {
+    const { data: result, error } = await supabase.from(table).insert(data).select().single();
+    if (error) {
+      throw new Error(error.message);
+    }
+    return result as T;
+  },
+  
+  async update<T>(table: TableNames, id: string, data: any): Promise<T> {
+    const { data: result, error } = await supabase.from(table).update(data).eq('id', id).select().single();
+    if (error) {
+      throw new Error(error.message);
+    }
+    return result as T;
+  },
+  
+  async delete(table: TableNames, id: string): Promise<void> {
+    const { error } = await supabase.from(table).delete().eq('id', id);
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+};
 
 export const fetchData = async <T>(endpoint: string): Promise<ApiResponse<T>> => {
   try {
