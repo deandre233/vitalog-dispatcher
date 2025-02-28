@@ -1,135 +1,107 @@
-import { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Building2, Phone, Mail, Calendar, AlertTriangle, TrendingUp, Star } from "lucide-react";
-import { Tables } from "@/integrations/supabase/types";
-import { formatPhoneNumber } from "@/utils/stringUtils";
 
-type Partner = Tables<"partners">;
+import React from 'react';
+import { Partner } from '@/types/partner';
+import { DataTable } from '@/components/ui/data-table';
+import { Button } from '@/components/ui/button';
+import { ColumnDef } from '@tanstack/react-table';
+import { Pencil, Trash, RefreshCw } from 'lucide-react';
 
 interface PartnerTableProps {
   partners: Partner[];
-  showInactive?: boolean;
+  isLoading: boolean;
+  onRefresh: () => void;
 }
 
-export const PartnerTable = ({ partners, showInactive = false }: PartnerTableProps) => {
-  const getStatusBadge = (status: string | null) => {
-    const statusConfig = {
-      active: { color: "bg-green-500", icon: Star },
-      inactive: { color: "bg-gray-500", icon: AlertTriangle },
-      pending: { color: "bg-yellow-500", icon: Calendar },
-      high_risk: { color: "bg-red-500", icon: AlertTriangle },
-    };
-
-    const config = statusConfig[status?.toLowerCase() ?? "inactive"];
-
-    return (
-      <Badge className={`${config.color} text-white flex items-center gap-1`}>
-        <config.icon className="h-3 w-3" />
-        <span>{status || "Unknown"}</span>
-      </Badge>
-    );
-  };
-
-  const getRiskBadge = (risk: string | null) => {
-    if (!risk) return null;
-    
-    const riskConfig = {
-      low: "bg-green-500",
-      medium: "bg-yellow-500",
-      high: "bg-red-500",
-    };
-
-    return (
-      <Badge className={`${riskConfig[risk.toLowerCase()] || "bg-gray-500"} text-white`}>
-        {risk}
-      </Badge>
-    );
-  };
-
-  const getPerformanceScore = (score: number | null) => {
-    if (score === null) return null;
-    
-    let color = "text-gray-500";
-    if (score >= 80) color = "text-green-500";
-    else if (score >= 60) color = "text-yellow-500";
-    else if (score > 0) color = "text-red-500";
-
-    return (
-      <div className="flex items-center gap-1">
-        <TrendingUp className={`h-4 w-4 ${color}`} />
-        <span className={color}>{score.toFixed(1)}%</span>
-      </div>
-    );
-  };
+export const PartnerTable: React.FC<PartnerTableProps> = ({ 
+  partners, 
+  isLoading, 
+  onRefresh 
+}) => {
+  const columns: ColumnDef<Partner>[] = [
+    {
+      accessorKey: 'name',
+      header: 'Partner Name',
+    },
+    {
+      accessorKey: 'partnership_type',
+      header: 'Type',
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => (
+        <div className="flex items-center">
+          <span className={`h-2 w-2 rounded-full mr-2 ${
+            row.original.status === 'active' ? 'bg-green-500' :
+            row.original.status === 'inactive' ? 'bg-red-500' :
+            row.original.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-500'
+          }`}></span>
+          {row.original.status}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'contact_name',
+      header: 'Contact',
+    },
+    {
+      accessorKey: 'last_interaction',
+      header: 'Last Interaction',
+      cell: ({ row }) => (
+        <span>{new Date(row.original.last_interaction).toLocaleDateString()}</span>
+      ),
+    },
+    {
+      accessorKey: 'partnership_score',
+      header: 'Score',
+      cell: ({ row }) => (
+        <div className="flex items-center">
+          <div className="bg-gray-200 w-full h-2 rounded-full">
+            <div 
+              className="h-2 rounded-full"
+              style={{ 
+                width: `${row.original.partnership_score}%`,
+                backgroundColor: 
+                  row.original.partnership_score > 75 ? 'rgb(34, 197, 94)' :
+                  row.original.partnership_score > 50 ? 'rgb(234, 179, 8)' :
+                  'rgb(239, 68, 68)'
+              }}
+            />
+          </div>
+          <span className="ml-2">{row.original.partnership_score}%</span>
+        </div>
+      ),
+    },
+    {
+      id: 'actions',
+      cell: ({ row }) => (
+        <div className="flex space-x-2">
+          <Button variant="outline" size="sm">
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" className="text-red-500">
+            <Trash className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Partner</TableHead>
-            <TableHead>Contact</TableHead>
-            <TableHead>Partnership Type</TableHead>
-            <TableHead>Performance Score</TableHead>
-            <TableHead>Risk Assessment</TableHead>
-            <TableHead>Next Review</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {partners
-            .filter(partner => showInactive || partner.status === "active")
-            .map((partner) => (
-              <TableRow key={partner.id} className="group hover:bg-gray-50">
-                <TableCell>
-                  <div className="flex flex-col">
-                    <div className="flex items-center space-x-2">
-                      <Building2 className="h-4 w-4 text-gray-400" />
-                      <span className="font-medium">{partner.name}</span>
-                    </div>
-                    {partner.ai_recommendations && (
-                      <div className="mt-1 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        AI Insight: {JSON.parse(partner.ai_recommendations as string).latest || "No insights available"}
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2">
-                      <Phone className="h-4 w-4 text-gray-400" />
-                      <span>{formatPhoneNumber(partner.contact_phone || '')}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Mail className="h-4 w-4 text-gray-400" />
-                      <span>{partner.contact_email}</span>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>{partner.partnership_type}</TableCell>
-                <TableCell>{getPerformanceScore(partner.partnership_score)}</TableCell>
-                <TableCell>{getRiskBadge(partner.risk_assessment)}</TableCell>
-                <TableCell>
-                  {partner.next_review_date && (
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-gray-400" />
-                      <span>{new Date(partner.next_review_date).toLocaleDateString()}</span>
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell>{getStatusBadge(partner.status)}</TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Partners</h2>
+        <Button variant="outline" size="sm" onClick={onRefresh} className="gap-2">
+          <RefreshCw className="h-4 w-4" />
+          Refresh
+        </Button>
+      </div>
+      
+      <DataTable
+        columns={columns}
+        data={partners}
+        searchKey="name"
+      />
     </div>
   );
 };

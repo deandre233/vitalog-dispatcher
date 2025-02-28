@@ -2,14 +2,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
-// We're defining a more specific set of allowed table names to match what the Supabase instance supports
+// Define the allowed table names based on what exists in your Supabase instance
 export type TableNames = 
   | 'patients' 
   | 'employees' 
   | 'partners'
-  | 'authorizations' 
+  | 'transport_records' 
   | 'certificates'
-  | 'transport_records'
   | 'incidents';
 
 export interface QueryParams {
@@ -57,20 +56,31 @@ export async function fetchFromSupabase<T>(
 ): Promise<ApiResponse<T>> {
   try {
     const { id, query, queryParams } = options;
-    let supabaseQuery: any = supabase.from(table);
+    let supabaseQuery = supabase.from(table);
 
     if (id) {
-      supabaseQuery = supabaseQuery.select('*').eq('id', id).single();
+      const { data, error } = await supabaseQuery.select('*').eq('id', id).single();
+      return {
+        data: data as T,
+        error: error ? error.message : null,
+        status: error ? 400 : 200
+      };
     } else if (query) {
-      supabaseQuery = query(supabaseQuery);
+      const result = await query(supabaseQuery);
+      return {
+        data: result.data as T,
+        error: result.error ? result.error.message : null,
+        status: result.error ? 400 : 200,
+        count: result.count
+      };
     } else {
-      supabaseQuery = supabaseQuery.select('*', { count: 'exact' });
+      let query = supabaseQuery.select('*', { count: 'exact' });
 
       if (queryParams) {
         // Apply ordering
         if (queryParams.order) {
           const { column, direction } = queryParams.order;
-          supabaseQuery = supabaseQuery.order(column, { ascending: direction === 'asc' });
+          query = query.order(column, { ascending: direction === 'asc' });
         }
 
         // Apply filters
@@ -78,37 +88,37 @@ export async function fetchFromSupabase<T>(
           queryParams.filters.forEach(filter => {
             const { column, operator, value } = filter;
             if (operator === 'like' || operator === 'ilike') {
-              supabaseQuery = supabaseQuery[operator](column, `%${value}%`);
+              query = query[operator](column, `%${value}%`);
             } else {
-              supabaseQuery = supabaseQuery[operator](column, value);
+              query = query[operator](column, value);
             }
           });
         }
 
         // Apply search
         if (queryParams.search) {
-          const { column, query } = queryParams.search;
-          supabaseQuery = supabaseQuery.ilike(column, `%${query}%`);
+          const { column, query: searchQuery } = queryParams.search;
+          query = query.ilike(column, `%${searchQuery}%`);
         }
 
         // Apply pagination
         if (queryParams.limit !== undefined && queryParams.offset !== undefined) {
-          supabaseQuery = supabaseQuery.range(
+          query = query.range(
             queryParams.offset, 
             queryParams.offset + queryParams.limit - 1
           );
         }
       }
+
+      const { data, error, count } = await query;
+
+      return {
+        data: data as T,
+        error: error ? error.message : null,
+        status: error ? 400 : 200,
+        count
+      };
     }
-
-    const { data, error, count } = await supabaseQuery;
-
-    return {
-      data: data as T,
-      error: error ? error.message : null,
-      status: error ? 400 : 200,
-      count
-    };
   } catch (error: any) {
     return {
       data: null,
