@@ -4,104 +4,118 @@ import { handleError } from "@/utils/errorHandling";
 import { logger } from "@/utils/logger";
 import { Database } from "@/integrations/supabase/types";
 
-// Define a depth-limited DeepPartial utility type to prevent infinite recursion
-type Prev = [never, 0, 1, 2, 3, 4, 5];
-type DeepPartial<T, Depth extends number = 5> = Depth extends 0
-  ? Partial<T>
-  : { [P in keyof T]?: DeepPartial<T[P], Prev[Depth]> };
+// Use a simplified approach to avoid excessive type instantiation
+type SimplePartial<T> = {
+  [P in keyof T]?: T[P] extends object ? unknown : T[P];
+};
 
 type TableNames = keyof Database['public']['Tables'];
-
-export const api = {
-  async get<T>(table: TableNames, query: any = {}): Promise<T[]> {
-    try {
-      logger.info(`Fetching data from ${table}`, query);
-      const { data, error } = await supabase
-        .from(table)
-        .select(query.select || '*')
-        .order(query.orderBy || 'created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as T[];
-    } catch (error) {
-      handleError(error);
-      throw error;
-    }
-  },
-
-  async getById<T>(table: TableNames, id: string, query: any = {}): Promise<T | null> {
-    try {
-      logger.info(`Fetching ${table} by id: ${id}`, query);
-      const { data, error } = await supabase
-        .from(table)
-        .select(query.select || '*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      return data as T;
-    } catch (error) {
-      handleError(error);
-      throw error;
-    }
-  },
-
-  async create<T>(table: TableNames, data: Partial<T>): Promise<T> {
-    try {
-      logger.info(`Creating new ${table}`, data);
-      const { data: created, error } = await supabase
-        .from(table)
-        .insert(data)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return created as T;
-    } catch (error) {
-      handleError(error);
-      throw error;
-    }
-  },
-
-  async update<T>(table: TableNames, id: string, data: Partial<T>): Promise<T> {
-    try {
-      logger.info(`Updating ${table} ${id}`, data);
-      const { data: updated, error } = await supabase
-        .from(table)
-        .update(data)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return updated as T;
-    } catch (error) {
-      handleError(error);
-      throw error;
-    }
-  },
-
-  async delete(table: TableNames, id: string): Promise<void> {
-    try {
-      logger.info(`Deleting ${table} ${id}`);
-      const { error } = await supabase
-        .from(table)
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    } catch (error) {
-      handleError(error);
-      throw error;
-    }
-  }
-};
 
 export type ApiResponse<T> = {
   data: T | null;
   error: string | null;
   status: number;
 };
+
+export type QueryParams = {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+  filters?: Record<string, any>;
+};
+
+export type ListResponse<T> = {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+};
+
+export type FetchOptions = {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  headers?: Record<string, string>;
+  body?: any;
+};
+
+export async function fetchFromSupabase<T>(
+  table: TableNames,
+  options: {
+    id?: string | number;
+    query?: any;
+    queryParams?: QueryParams;
+  } = {}
+): Promise<ApiResponse<T>> {
+  try {
+    const { id, query, queryParams } = options;
+    let supabaseQuery = supabase.from(table);
+
+    if (id) {
+      supabaseQuery = supabaseQuery.select('*').eq('id', id).single();
+    } else if (query) {
+      supabaseQuery = query;
+    } else {
+      supabaseQuery = supabaseQuery.select('*', { count: 'exact' });
+    }
+
+    // Handle pagination and sorting
+    if (queryParams) {
+      const { page = 1, limit = 10, sortBy, sortDirection, filters } = queryParams;
+
+      // Apply sorting
+      if (sortBy) {
+        supabaseQuery = supabaseQuery.order(sortBy, { ascending: sortDirection !== 'desc' });
+      }
+
+      // Apply filters
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            if (typeof value === 'string' && value.includes('%')) {
+              supabaseQuery = supabaseQuery.ilike(key, value);
+            } else {
+              supabaseQuery = supabaseQuery.eq(key, value);
+            }
+          }
+        });
+      }
+
+      // Apply pagination
+      const from = (page - 1) * limit;
+      const to = page * limit - 1;
+      supabaseQuery = supabaseQuery.range(from, to);
+    }
+
+    // Execute the query
+    logger.debug(`Fetching from ${table}`, { options });
+    const { data, error, count } = await supabaseQuery;
+
+    if (error) {
+      logger.error(`Error fetching from ${table}`, error);
+      return { data: null, error: error.message, status: 400 };
+    }
+
+    // Format the response for list queries with pagination
+    if (queryParams && count !== null) {
+      const { page = 1, limit = 10 } = queryParams;
+      const listResponse: ListResponse<any> = {
+        items: data || [],
+        total: count,
+        page,
+        limit,
+        pages: Math.ceil(count / limit),
+      };
+      return { data: listResponse as unknown as T, error: null, status: 200 };
+    }
+
+    return { data: data as T, error: null, status: 200 };
+  } catch (error: any) {
+    const errorMessage = handleError(error);
+    logger.error(`Error in fetchFromSupabase for ${table}`, error);
+    return { data: null, error: errorMessage, status: 500 };
+  }
+}
 
 export const fetchData = async <T>(endpoint: string): Promise<ApiResponse<T>> => {
   try {
