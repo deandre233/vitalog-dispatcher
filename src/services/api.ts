@@ -2,10 +2,10 @@
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
+// We're defining a more specific set of allowed table names to match what the Supabase instance supports
 export type TableNames = 
-  | 'users' 
-  | 'dispatches' 
   | 'patients' 
+  | 'dispatches' 
   | 'employees' 
   | 'partners'
   | 'authorizations' 
@@ -57,7 +57,7 @@ export async function fetchFromSupabase<T>(
 ): Promise<ApiResponse<T>> {
   try {
     const { id, query, queryParams } = options;
-    let supabaseQuery: any = supabase.from(table);
+    let supabaseQuery = supabase.from(table);
 
     if (id) {
       supabaseQuery = supabaseQuery.select('*').eq('id', id).single();
@@ -118,9 +118,9 @@ export async function fetchFromSupabase<T>(
   }
 }
 
-// Fixing the delete function to return void instead of string
+// Simple API wrapper for CRUD operations
 export const api = {
-  async get<T>(table: TableNames, id?: string): Promise<T> {
+  async get<T>(table: TableNames, id: string): Promise<T> {
     const response = await fetchFromSupabase<T>(table, { id });
     if (response.error) {
       throw new Error(response.error);
