@@ -12,18 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, BarChart, Search } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { api } from "@/services/api";
-
-interface Partner {
-  id: string;
-  name: string;
-  type: string;
-  status: string;
-  location: string;
-  contact: string;
-  relationship_manager: string;
-  last_contact: string;
-  satisfaction_score: number;
-}
+import { Partner } from "@/types/partner";
 
 export const PartnerList = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -103,7 +92,7 @@ export const PartnerList = () => {
 
                 <TabsContent value="search" className="space-y-6">
                   <PartnerAdvancedSearch
-                    allPartners={partners}
+                    partners={partners}
                     onSearch={handleSearch}
                   />
                   <PartnerTable

@@ -5,11 +5,11 @@ import { supabase } from '@/integrations/supabase/client';
 // We're defining a more specific set of allowed table names to match what the Supabase instance supports
 export type TableNames = 
   | 'patients' 
-  | 'dispatches' 
   | 'employees' 
   | 'partners'
   | 'authorizations' 
   | 'certificates'
+  | 'transport_records'
   | 'incidents';
 
 export interface QueryParams {
@@ -57,7 +57,7 @@ export async function fetchFromSupabase<T>(
 ): Promise<ApiResponse<T>> {
   try {
     const { id, query, queryParams } = options;
-    let supabaseQuery = supabase.from(table);
+    let supabaseQuery: any = supabase.from(table);
 
     if (id) {
       supabaseQuery = supabaseQuery.select('*').eq('id', id).single();
