@@ -62,6 +62,7 @@ export const AuthorizationsOnRecord = () => {
                     <span className="text-sm font-medium">Show authorizations as of:</span>
                     <DatePicker
                       date={selectedDate}
+                      setDate={setSelectedDate}
                       onDateChange={setSelectedDate}
                     />
                   </div>

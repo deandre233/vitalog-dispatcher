@@ -90,6 +90,25 @@ export const api = {
   }
 };
 
+export type ApiResponse<T> = {
+  data: T | null;
+  error: string | null;
+  status: number;
+};
+
+export const fetchData = async <T>(endpoint: string): Promise<ApiResponse<T>> => {
+  try {
+    return { data: null, error: null, status: 200 } as ApiResponse<T>;
+  } catch (error) {
+    return { data: null, error: error.message, status: 500 } as ApiResponse<T>;
+  }
+};
+
+export const isValidResponse = <T>(response: unknown): response is ApiResponse<T> => {
+  const resp = response as ApiResponse<T>;
+  return resp && typeof resp === 'object' && 'data' in resp && 'error' in resp && 'status' in resp;
+};
+
 export const fixCircularTypeReference = () => {
   console.log("This is a placeholder to fix circular type reference");
 };
