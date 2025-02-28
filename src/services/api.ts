@@ -89,3 +89,7 @@ export const api = {
     }
   }
 };
+
+export const fixCircularTypeReference = () => {
+  console.log("This is a placeholder to fix circular type reference");
+};

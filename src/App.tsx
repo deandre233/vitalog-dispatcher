@@ -1,6 +1,6 @@
 
 import { Routes, Route } from "react-router-dom";
-import { Index } from "./pages/Index";
+import Index from "./pages/Index";
 import { ScheduleOverview } from "./pages/ScheduleOverview";
 import { Toaster } from "@/components/ui/toaster";
 import { AnnouncementsPage } from "./pages/hr/AnnouncementsPage";
