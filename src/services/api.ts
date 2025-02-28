@@ -1,42 +1,50 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { handleError } from "@/utils/errorHandling";
-import { logger } from "@/utils/logger";
-import { Database } from "@/integrations/supabase/types";
+import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
-// Use a simplified approach to avoid excessive type instantiation
-type SimplePartial<T> = {
-  [P in keyof T]?: T[P] extends object ? unknown : T[P];
-};
+export type TableNames = 
+  | 'users' 
+  | 'dispatches' 
+  | 'patients' 
+  | 'employees' 
+  | 'partners'
+  | 'authorizations' 
+  | 'certificates'
+  | 'incidents';
 
-type TableNames = keyof Database['public']['Tables'];
+export interface QueryParams {
+  limit?: number;
+  offset?: number;
+  order?: {
+    column: string;
+    direction: 'asc' | 'desc';
+  };
+  filters?: {
+    column: string;
+    operator: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'like' | 'ilike' | 'is';
+    value: any;
+  }[];
+  search?: {
+    column: string;
+    query: string;
+  };
+}
 
-export type ApiResponse<T> = {
+export interface ApiResponse<T> {
   data: T | null;
   error: string | null;
   status: number;
-};
+  count?: number;
+}
 
-export type QueryParams = {
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortDirection?: 'asc' | 'desc';
-  filters?: Record<string, any>;
-};
-
-export type ListResponse<T> = {
+export interface ListResponse<T> {
   items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  pages: number;
-};
+  count: number;
+}
 
-export type FetchOptions = {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  headers?: Record<string, string>;
-  body?: any;
+// Use a simpler type to avoid excessive recursion
+type SimplePartial<T> = {
+  [P in keyof T]?: unknown;
 };
 
 export async function fetchFromSupabase<T>(
@@ -54,70 +62,63 @@ export async function fetchFromSupabase<T>(
     if (id) {
       supabaseQuery = supabaseQuery.select('*').eq('id', id).single();
     } else if (query) {
-      supabaseQuery = query;
+      supabaseQuery = query(supabaseQuery);
     } else {
       supabaseQuery = supabaseQuery.select('*', { count: 'exact' });
-    }
 
-    // Handle pagination and sorting
-    if (queryParams) {
-      const { page = 1, limit = 10, sortBy, sortDirection, filters } = queryParams;
+      if (queryParams) {
+        // Apply ordering
+        if (queryParams.order) {
+          const { column, direction } = queryParams.order;
+          supabaseQuery = supabaseQuery.order(column, { ascending: direction === 'asc' });
+        }
 
-      // Apply sorting
-      if (sortBy) {
-        supabaseQuery = supabaseQuery.order(sortBy, { ascending: sortDirection !== 'desc' });
-      }
-
-      // Apply filters
-      if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== '') {
-            if (typeof value === 'string' && value.includes('%')) {
-              supabaseQuery = supabaseQuery.ilike(key, value);
+        // Apply filters
+        if (queryParams.filters && queryParams.filters.length > 0) {
+          queryParams.filters.forEach(filter => {
+            const { column, operator, value } = filter;
+            if (operator === 'like' || operator === 'ilike') {
+              supabaseQuery = supabaseQuery[operator](column, `%${value}%`);
             } else {
-              supabaseQuery = supabaseQuery.eq(key, value);
+              supabaseQuery = supabaseQuery[operator](column, value);
             }
-          }
-        });
-      }
+          });
+        }
 
-      // Apply pagination
-      const from = (page - 1) * limit;
-      const to = page * limit - 1;
-      supabaseQuery = supabaseQuery.range(from, to);
+        // Apply search
+        if (queryParams.search) {
+          const { column, query } = queryParams.search;
+          supabaseQuery = supabaseQuery.ilike(column, `%${query}%`);
+        }
+
+        // Apply pagination
+        if (queryParams.limit !== undefined && queryParams.offset !== undefined) {
+          supabaseQuery = supabaseQuery.range(
+            queryParams.offset, 
+            queryParams.offset + queryParams.limit - 1
+          );
+        }
+      }
     }
 
-    // Execute the query
-    logger.debug(`Fetching from ${table}`, { options });
     const { data, error, count } = await supabaseQuery;
 
-    if (error) {
-      logger.error(`Error fetching from ${table}`, error);
-      return { data: null, error: error.message, status: 400 };
-    }
-
-    // Format the response for list queries with pagination
-    if (queryParams && count !== null) {
-      const { page = 1, limit = 10 } = queryParams;
-      const listResponse: ListResponse<any> = {
-        items: data || [],
-        total: count,
-        page,
-        limit,
-        pages: Math.ceil(count / limit),
-      };
-      return { data: listResponse as unknown as T, error: null, status: 200 };
-    }
-
-    return { data: data as T, error: null, status: 200 };
+    return {
+      data: data as T,
+      error: error ? error.message : null,
+      status: error ? 400 : 200,
+      count
+    };
   } catch (error: any) {
-    const errorMessage = handleError(error);
-    logger.error(`Error in fetchFromSupabase for ${table}`, error);
-    return { data: null, error: errorMessage, status: 500 };
+    return {
+      data: null,
+      error: error.message || 'An unknown error occurred',
+      status: 500
+    };
   }
 }
 
-// Export a named 'api' object with convenience methods
+// Fixing the delete function to return void instead of string
 export const api = {
   async get<T>(table: TableNames, id?: string): Promise<T> {
     const response = await fetchFromSupabase<T>(table, { id });
@@ -128,11 +129,14 @@ export const api = {
   },
   
   async list<T>(table: TableNames, queryParams?: QueryParams): Promise<ListResponse<T>> {
-    const response = await fetchFromSupabase<ListResponse<T>>(table, { queryParams });
+    const response = await fetchFromSupabase<T[]>(table, { queryParams });
     if (response.error) {
       throw new Error(response.error);
     }
-    return response.data as ListResponse<T>;
+    return {
+      items: response.data as T[],
+      count: response.count || 0
+    };
   },
   
   async create<T>(table: TableNames, data: any): Promise<T> {
@@ -156,6 +160,8 @@ export const api = {
     if (error) {
       throw new Error(error.message);
     }
+    // Return void explicitly
+    return;
   }
 };
 
@@ -163,20 +169,10 @@ export const fetchData = async <T>(endpoint: string): Promise<ApiResponse<T>> =>
   try {
     return { data: null, error: null, status: 200 } as ApiResponse<T>;
   } catch (error: any) {
-    return { data: null, error: error.message, status: 500 } as ApiResponse<T>;
+    return {
+      data: null,
+      error: error.message || 'An unknown error occurred',
+      status: 500
+    };
   }
-};
-
-export const isValidResponse = <T>(response: unknown): response is ApiResponse<T> => {
-  const resp = response as Partial<ApiResponse<T>>;
-  return resp !== null && 
-         typeof resp === 'object' && 
-         'data' in resp && 
-         'error' in resp && 
-         'status' in resp;
-};
-
-// This is just a placeholder function to avoid any circular references
-export const fixCircularTypeReference = () => {
-  console.log("This placeholder fixes circular type references");
 };
