@@ -157,6 +157,10 @@ const router = createBrowserRouter([
   {
     path: "/hr/announcements",
     element: <BroadcastCenter />,
+  },
+  {
+    path: "/hr/employees",
+    element: <EmployeeDirectory />,
   }
 ]);
 

@@ -13,7 +13,7 @@ export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
     icon: "megaphone"
   },
   {
-    label: "Personnel Hub",
+    label: "Employee Directory",
     href: "/hr/employees",
     icon: "users"
   },
