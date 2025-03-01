@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { MenuCard } from "@/components/dashboard/MenuCard";
 import { WideMenuCard } from "@/components/dashboard/WideMenuCard";
 import { menuItems } from "@/config/menuItems";
+import { useEffect } from "react";
 
 // Move console logs outside of the component
 const logStartup = () => {
@@ -14,6 +15,12 @@ const Index = () => {
   // Log startup
   logStartup();
   console.log("Menu items loaded:", menuItems.length);
+  
+  // Add an effect to log when the component mounts
+  useEffect(() => {
+    console.log("Index component mounted successfully");
+    console.log("DOM fully rendered, checking visibility");
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -1,5 +1,5 @@
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Index from "./pages/Index";
 import { ScheduleOverview } from "./pages/ScheduleOverview";
 import { Toaster } from "@/components/ui/toaster";
@@ -11,6 +11,8 @@ import { VerificationQueuePage } from "./pages/VerificationQueuePage";
 import { ServiceQueuePage } from "./pages/ServiceQueuePage";
 
 function App() {
+  console.log("App component rendering");
+  
   return (
     <>
       <Routes>
