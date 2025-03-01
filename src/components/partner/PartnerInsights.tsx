@@ -1,147 +1,161 @@
+import { useEffect, useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Brain, TrendingUp, AlertTriangle, Signal, Bot } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Partner } from '@/types/partner';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-
-interface PartnerInsightsProps {
-  partners: Partner[];
-  isLoading: boolean;
+interface PartnerInsight {
+  type: "recommendation" | "alert" | "trend" | "ai";
+  message: string;
+  priority: "low" | "medium" | "high";
+  source?: "ai" | "system";
 }
 
-export const PartnerInsights: React.FC<PartnerInsightsProps> = ({ partners, isLoading }) => {
+export const PartnerInsights = () => {
+  const [insights, setInsights] = useState<PartnerInsight[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    loadInsights();
+  }, []);
+
+  const loadInsights = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Fetch partners data
+      const { data: partners, error } = await supabase
+        .from('partners')
+        .select('*');
+
+      if (error) throw error;
+
+      // Generate insights from partner data
+      const generatedInsights: PartnerInsight[] = [];
+
+      // Add AI-generated insights
+      const aiInsights = await generateAIInsights(partners);
+      generatedInsights.push(...aiInsights);
+
+      // Add system-generated insights
+      const systemInsights = generateSystemInsights(partners);
+      generatedInsights.push(...systemInsights);
+
+      setInsights(generatedInsights);
+    } catch (error) {
+      console.error('Error loading insights:', error);
+      toast({
+        title: "Error loading insights",
+        description: "There was a problem loading the partner insights.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generateAIInsights = async (partners: any[]): Promise<PartnerInsight[]> => {
+    try {
+      const response = await supabase.functions.invoke('analyze-partner', {
+        body: { partnerData: partners }
+      });
+
+      if (response.error) throw response.error;
+
+      const analysis = response.data;
+      return analysis.recommendations.map((rec: string) => ({
+        type: "ai",
+        message: rec.replace('Recommendation: ', ''),
+        priority: analysis.riskAssessment,
+        source: "ai"
+      }));
+    } catch (error) {
+      console.error('Error generating AI insights:', error);
+      return [];
+    }
+  };
+
+  const generateSystemInsights = (partners: any[]): PartnerInsight[] => {
+    const insights: PartnerInsight[] = [];
+    
+    // Check for expiring contracts
+    const expiringPartners = partners.filter(p => {
+      if (!p.contract_end_date) return false;
+      const daysUntilExpiry = (new Date(p.contract_end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24);
+      return daysUntilExpiry < 30;
+    });
+
+    if (expiringPartners.length > 0) {
+      insights.push({
+        type: "alert",
+        message: `${expiringPartners.length} partners have contracts expiring in the next 30 days`,
+        priority: "high"
+      });
+    }
+
+    // Check for high performing partners
+    const highPerformers = partners.filter(p => p.partnership_score >= 90);
+    if (highPerformers.length > 0) {
+      insights.push({
+        type: "trend",
+        message: `${highPerformers.length} partners are showing exceptional performance`,
+        priority: "medium"
+      });
+    }
+
+    return insights;
+  };
+
+  const getIcon = (type: PartnerInsight["type"], source?: string) => {
+    if (source === "ai") return <Bot className="h-5 w-5 text-purple-500" />;
+    
+    switch (type) {
+      case "recommendation":
+        return <Brain className="h-5 w-5 text-blue-500" />;
+      case "alert":
+        return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+      case "trend":
+        return <TrendingUp className="h-5 w-5 text-green-500" />;
+      case "ai":
+        return <Signal className="h-5 w-5 text-purple-500" />;
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Partnership Types</CardTitle>
-          </CardHeader>
-          <CardContent className="h-80">
-            <div className="flex items-center justify-center h-full">Loading...</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Partner Status Distribution</CardTitle>
-          </CardHeader>
-          <CardContent className="h-80">
-            <div className="flex items-center justify-center h-full">Loading...</div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="p-4">
+        <h3 className="text-lg font-semibold">AI Insights</h3>
+        <div className="animate-pulse space-y-3 mt-4">
+          <div className="h-12 bg-gray-200 rounded"></div>
+          <div className="h-12 bg-gray-200 rounded"></div>
+          <div className="h-12 bg-gray-200 rounded"></div>
+        </div>
+      </Card>
     );
   }
 
-  // Generate data for partnership types chart
-  const partnershipTypeData = partners.reduce((acc, partner) => {
-    const existing = acc.find(item => item.name === partner.partnership_type);
-    if (existing) {
-      existing.value += 1;
-    } else {
-      acc.push({ name: partner.partnership_type, value: 1 });
-    }
-    return acc;
-  }, [] as { name: string; value: number }[]);
-
-  // Generate data for partner status distribution
-  const statusDistributionData = partners.reduce((acc, partner) => {
-    const existing = acc.find(item => item.name === partner.status);
-    if (existing) {
-      existing.value += 1;
-    } else {
-      acc.push({ name: partner.status, value: 1 });
-    }
-    return acc;
-  }, [] as { name: string; value: number }[]);
-
-  // Colors for the pie chart
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-
-  // Average partnership score
-  const averageScore = partners.length
-    ? partners.reduce((sum, partner) => sum + partner.partnership_score, 0) / partners.length
-    : 0;
-
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Partners</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold">{partners.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Active Partners</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-green-500">
-              {partners.filter(p => p.status === 'active').length}
+    <Card className="p-4 space-y-4">
+      <h3 className="text-lg font-semibold">AI Insights</h3>
+      <div className="space-y-3">
+        {insights.map((insight, index) => (
+          <div
+            key={index}
+            className={`flex items-start space-x-3 p-3 rounded-lg ${
+              insight.source === "ai" ? "bg-purple-50" : "bg-gray-50"
+            }`}
+          >
+            {getIcon(insight.type, insight.source)}
+            <div>
+              <p className="text-sm text-gray-600">{insight.message}</p>
+              {insight.source === "ai" && (
+                <span className="text-xs text-purple-600 mt-1">AI-generated insight</span>
+              )}
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Average Score</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-blue-500">
-              {averageScore.toFixed(1)}%
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        ))}
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Partnership Types</CardTitle>
-          </CardHeader>
-          <CardContent className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={partnershipTypeData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={150} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" name="Partners" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Partner Status Distribution</CardTitle>
-          </CardHeader>
-          <CardContent className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={statusDistributionData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={true}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                >
-                  {statusDistributionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    </Card>
   );
 };

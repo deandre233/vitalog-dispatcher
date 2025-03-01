@@ -1,37 +1,43 @@
-
 import { useEffect, useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
-import { PartnerTable } from "@/components/partner/PartnerTable";
-import { PartnerAdvancedSearch } from "@/components/partner/PartnerAdvancedSearch";
-import { PartnerInsights } from "@/components/partner/PartnerInsights";
-import { PartnerMetrics } from "@/components/partner/PartnerMetrics";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, BarChart, Search } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { PartnerTable } from "@/components/partner/PartnerTable";
+import { PartnerMetrics } from "@/components/partner/PartnerMetrics";
+import { PartnerInsights } from "@/components/partner/PartnerInsights";
+import { PartnerAdvancedSearch } from "@/components/partner/PartnerAdvancedSearch";
+import { Tables } from "@/integrations/supabase/types";
 import { api } from "@/services/api";
-import { Partner } from "@/types/partner";
+
+type Partner = Tables<"partners">;
 
 export const PartnerList = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [filteredPartners, setFilteredPartners] = useState<Partner[]>([]);
+  const [showInactive, setShowInactive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    loadPartners();
+  }, []);
 
   const loadPartners = async () => {
     try {
       setIsLoading(true);
-      // Using the updated api.list method
-      const response = await api.list<Partner>("partners");
-      const partnerData = response.items;
-      setPartners(partnerData);
-      setFilteredPartners(partnerData);
+      const data = await api.get<Partner>("partners");
+      setPartners(data);
+      setFilteredPartners(data);
     } catch (error) {
       toast({
         title: "Error loading partners",
-        description: error instanceof Error ? error.message : "Failed to load partner data",
+        description: "There was an error loading the partner list. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -39,77 +45,90 @@ export const PartnerList = () => {
     }
   };
 
-  useEffect(() => {
-    loadPartners();
-  }, []);
-
-  const handleSearch = (searchResults: Partner[]) => {
-    setFilteredPartners(searchResults);
+  const handleNameFilter = ({ type, query }: { type: string; query: string }) => {
+    if (!partners) return;
+    
+    const filtered = partners.filter(partner => {
+      if (!query) return true;
+      
+      const name = partner.name.toLowerCase();
+      const searchQuery = query.toLowerCase();
+      
+      switch (type) {
+        case 'contains':
+          return name.includes(searchQuery);
+        case 'starts_with':
+          return name.startsWith(searchQuery);
+        case 'exact_match':
+          return name === searchQuery;
+        default:
+          return true;
+      }
+    });
+    
+    setFilteredPartners(filtered);
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <SidebarProvider>
-        <div className="flex h-screen">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <div className="flex-1 flex">
+        <SidebarProvider>
           <AppSidebar />
-          <div className="flex-1 overflow-auto">
-            <div className="container mx-auto p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Partner Management</h1>
-                <Link to="/partners/new">
-                  <Button className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add Partner
-                  </Button>
-                </Link>
+          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+            <DashboardHeader />
+            <main className="p-6">
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-gray-900">Partner Management</h1>
+                <p className="mt-1 text-sm text-gray-500">
+                  Manage and monitor your business partnerships with AI-powered insights
+                </p>
               </div>
 
-              <PartnerMetrics partners={partners} isLoading={isLoading} />
+              {isLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <LoadingSpinner size={40} />
+                </div>
+              ) : (
+                <>
+                  <PartnerMetrics partners={partners} />
 
-              <Tabs defaultValue="listing" className="mt-6">
-                <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="listing" className="gap-2">
-                    <Search className="h-4 w-4" />
-                    Partner Listing
-                  </TabsTrigger>
-                  <TabsTrigger value="search" className="gap-2">
-                    <Search className="h-4 w-4" />
-                    Advanced Search
-                  </TabsTrigger>
-                  <TabsTrigger value="analytics" className="gap-2">
-                    <BarChart className="h-4 w-4" />
-                    Partner Analytics
-                  </TabsTrigger>
-                </TabsList>
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div className="lg:col-span-3">
+                      <Card className="p-6">
+                        <div className="space-y-6">
+                          <div className="flex justify-between items-center">
+                            <h2 className="text-lg font-semibold">Partner List</h2>
+                            <Button className="bg-medical-primary text-white hover:bg-medical-primary/90">
+                              Add Partner
+                            </Button>
+                          </div>
 
-                <TabsContent value="listing" className="space-y-6">
-                  <PartnerTable
-                    partners={filteredPartners}
-                    isLoading={isLoading}
-                    onRefresh={loadPartners}
-                  />
-                </TabsContent>
+                          <PartnerAdvancedSearch
+                            onNameFilterChange={handleNameFilter}
+                            onHideInactiveChange={setShowInactive}
+                            hideInactive={showInactive}
+                          />
 
-                <TabsContent value="search" className="space-y-6">
-                  <PartnerAdvancedSearch
-                    partners={partners}
-                    onSearch={handleSearch}
-                  />
-                  <PartnerTable
-                    partners={filteredPartners}
-                    isLoading={isLoading}
-                    onRefresh={loadPartners}
-                  />
-                </TabsContent>
+                          <PartnerTable
+                            partners={filteredPartners}
+                            showInactive={showInactive}
+                          />
+                        </div>
+                      </Card>
+                    </div>
 
-                <TabsContent value="analytics" className="space-y-6">
-                  <PartnerInsights partners={partners} isLoading={isLoading} />
-                </TabsContent>
-              </Tabs>
-            </div>
+                    <div className="lg:col-span-1">
+                      <PartnerInsights />
+                    </div>
+                  </div>
+                </>
+              )}
+            </main>
           </div>
-        </div>
-      </SidebarProvider>
+        </SidebarProvider>
+      </div>
+      <Footer />
     </div>
   );
 };

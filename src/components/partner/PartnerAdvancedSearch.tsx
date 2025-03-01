@@ -1,99 +1,75 @@
-
-import React, { useState } from 'react';
+import React from 'react';
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Partner } from '@/types/partner';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface PartnerAdvancedSearchProps {
-  partners: Partner[];
-  onSearch: (results: Partner[]) => void;
+  onNameFilterChange: (value: { type: string; query: string }) => void;
+  onHideInactiveChange: (checked: boolean) => void;
+  hideInactive: boolean;
 }
 
-export const PartnerAdvancedSearch: React.FC<PartnerAdvancedSearchProps> = ({
-  partners,
-  onSearch
-}) => {
-  const [name, setName] = useState('');
-  const [type, setType] = useState('');
-  const [status, setStatus] = useState('');
+export function PartnerAdvancedSearch({
+  onNameFilterChange,
+  onHideInactiveChange,
+  hideInactive
+}: PartnerAdvancedSearchProps) {
+  const [filterType, setFilterType] = React.useState("contains");
+  const [nameQuery, setNameQuery] = React.useState("");
 
-  const handleSearch = () => {
-    const filtered = partners.filter(partner => {
-      const nameMatch = !name || partner.name.toLowerCase().includes(name.toLowerCase());
-      const typeMatch = !type || partner.partnership_type === type;
-      const statusMatch = !status || partner.status === status;
-      return nameMatch && typeMatch && statusMatch;
-    });
-    
-    onSearch(filtered);
+  const handleTypeChange = (value: string) => {
+    setFilterType(value);
+    onNameFilterChange({ type: value, query: nameQuery });
   };
 
-  const handleReset = () => {
-    setName('');
-    setType('');
-    setStatus('');
-    onSearch(partners);
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNameQuery(e.target.value);
+    onNameFilterChange({ type: filterType, query: e.target.value });
   };
-
-  // Get unique partnership types for the select dropdown
-  const partnershipTypes = [...new Set(partners.map(p => p.partnership_type))];
-  // Get unique statuses for the select dropdown
-  const statuses = [...new Set(partners.map(p => p.status))];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Advanced Search</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Partner Name</label>
-            <Input 
-              placeholder="Search by name" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Partnership Type</label>
-            <Select value={type} onValueChange={setType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
-                {partnershipTypes.map(type => (
-                  <SelectItem key={type} value={type}>{type}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Status</label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
-                {statuses.map(status => (
-                  <SelectItem key={status} value={status}>{status}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-end gap-2">
-            <Button onClick={handleSearch} className="flex-1">Search</Button>
-            <Button variant="outline" onClick={handleReset}>Reset</Button>
-          </div>
+    <Card className="p-4 space-y-4 mb-4">
+      <div className="space-y-2">
+        <Label>Partner name:</Label>
+        <div className="flex gap-4">
+          <RadioGroup
+            defaultValue="contains"
+            onValueChange={handleTypeChange}
+            className="flex flex-col space-y-1"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="contains" id="contains" />
+              <Label htmlFor="contains">contains</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="starts_with" id="starts_with" />
+              <Label htmlFor="starts_with">starts with</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="exact_match" id="exact_match" />
+              <Label htmlFor="exact_match">exact match</Label>
+            </div>
+          </RadioGroup>
+          <Input
+            type="text"
+            placeholder="Enter partner name"
+            value={nameQuery}
+            onChange={handleQueryChange}
+            className="w-64"
+          />
         </div>
-      </CardContent>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="hideInactive"
+          checked={hideInactive}
+          onCheckedChange={onHideInactiveChange}
+        />
+        <Label htmlFor="hideInactive">Hide inactive partners</Label>
+      </div>
     </Card>
   );
-};
+}

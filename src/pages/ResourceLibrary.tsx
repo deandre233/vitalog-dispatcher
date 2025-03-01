@@ -133,7 +133,6 @@ export const ResourceLibrary = () => {
                     <div className="flex items-center space-x-2">
                       <DatePicker
                         date={patientDOB}
-                        setDate={setPatientDOB}
                         onDateChange={setPatientDOB}
                       />
                       <Button
@@ -155,7 +154,6 @@ export const ResourceLibrary = () => {
                   </Label>
                   <DatePicker
                     date={beforeDate}
-                    setDate={setBeforeDate}
                     onDateChange={setBeforeDate}
                   />
                 </div>
