@@ -8,7 +8,69 @@ export type TableNames =
   | 'employees' 
   | 'partners'
   | 'transport_records' 
-  | 'incidents';
+  | 'agency_profiles'
+  | 'authorization_requests'
+  | 'medical_records'
+  | 'insurance_records'
+  | 'appointments'
+  | 'dispatch_assignments'
+  | 'claims'
+  | 'payments'
+  | 'invoices'
+  | 'categories'
+  | 'actions'
+  | 'pages'
+  | 'panels'
+  | 'resources'
+  | 'shift_records'
+  | 'verification_queue'
+  | 'centers'
+  | 'workflows'
+  | 'action_definitions'
+  | 'action_instances'
+  | 'agency_domains'
+  | 'ai_analysis_results'
+  | 'ai_configurations'
+  | 'audit_logs'
+  | 'billing_records'
+  | 'billing_settings'
+  | 'clearinghouse_configs'
+  | 'content_templates'
+  | 'content_versions'
+  | 'corrective_actions'
+  | 'corrective_action_documents'
+  | 'dispatch_locations'
+  | 'dispatch_patterns'
+  | 'employee_navigation_settings'
+  | 'employee_payroll_history'
+  | 'employee_privileges'
+  | 'employee_profiles'
+  | 'employee_roles'
+  | 'files'
+  | 'historical_entries'
+  | 'insurance_carriers'
+  | 'insurance_groups'
+  | 'insurance_policies'
+  | 'medical_history'
+  | 'medications'
+  | 'navigation'
+  | 'navigation_items'
+  | 'notifications'
+  | 'patient_care_reports'
+  | 'patient_documents'
+  | 'payer_database'
+  | 'policy_types'
+  | 'profiles'
+  | 'qa_analysis_results'
+  | 'route_optimizations'
+  | 'schedule_recommendations'
+  | 'service_requests'
+  | 'subscription_tiers'
+  | 'traffic_analysis'
+  | 'transport_requests'
+  | 'user_preferences'
+  | 'user_roles'
+  | 'workflow_logs';
 
 export interface QueryParams {
   limit?: number;
@@ -44,13 +106,15 @@ export async function fetchFromSupabase<T>(
   table: TableNames,
   options: {
     id?: string;
-    query?: any;
+    query?: (query: any) => Promise<any>;
     queryParams?: QueryParams;
   } = {}
 ): Promise<ApiResponse<T>> {
   try {
     const { id, query, queryParams } = options;
-    let supabaseQuery = supabase.from(table);
+    
+    // Explicit type casting to handle Supabase's typing issues
+    let supabaseQuery = supabase.from(table as any);
 
     if (id) {
       const { data, error } = await supabaseQuery.select('*').eq('id', id).single();
@@ -68,7 +132,8 @@ export async function fetchFromSupabase<T>(
         count: result.count
       };
     } else {
-      let query = supabaseQuery.select('*', { count: 'exact' });
+      // Cast query to any to avoid TypeScript errors
+      let query = supabaseQuery.select('*', { count: 'exact' }) as any;
 
       if (queryParams) {
         // Apply ordering
@@ -166,7 +231,8 @@ export const api = {
   },
   
   async create<T>(table: TableNames, data: any): Promise<T> {
-    const { data: result, error } = await supabase.from(table).insert(data).select().single();
+    // Cast to any to avoid TypeScript errors with the table names
+    const { data: result, error } = await (supabase.from(table as any).insert(data).select().single() as any);
     if (error) {
       throw new Error(error.message);
     }
@@ -174,7 +240,8 @@ export const api = {
   },
   
   async update<T>(table: TableNames, id: string, data: any): Promise<T> {
-    const { data: result, error } = await supabase.from(table).update(data).eq('id', id).select().single();
+    // Cast to any to avoid TypeScript errors with the table names
+    const { data: result, error } = await (supabase.from(table as any).update(data).eq('id', id).select().single() as any);
     if (error) {
       throw new Error(error.message);
     }
@@ -182,7 +249,8 @@ export const api = {
   },
   
   async delete(table: TableNames, id: string): Promise<void> {
-    const { error } = await supabase.from(table).delete().eq('id', id);
+    // Cast to any to avoid TypeScript errors with the table names
+    const { error } = await supabase.from(table as any).delete().eq('id', id);
     if (error) {
       throw new Error(error.message);
     }
