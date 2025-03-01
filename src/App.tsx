@@ -30,6 +30,7 @@ import { ResourceLibrary } from "./pages/ResourceLibrary";
 import { Categories } from "./pages/Categories";
 import { HistoricalEntry } from "./pages/HistoricalEntry";
 import { ExternalLink } from "./pages/ExternalLink";
+import BroadcastCenter from "./pages/BroadcastCenter";
 
 const router = createBrowserRouter([
   {
@@ -152,6 +153,10 @@ const router = createBrowserRouter([
   {
     path: "/external-link",
     element: <ExternalLink />,
+  },
+  {
+    path: "/hr/announcements",
+    element: <BroadcastCenter />,
   }
 ]);
 
