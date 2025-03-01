@@ -23,3 +23,23 @@ export interface Partner {
   created_at: string;
   updated_at: string;
 }
+
+export interface PartnerMetricsProps {
+  partners: Partner[];
+}
+
+export interface PartnerAdvancedSearchProps {
+  partners: Partner[];
+  onSearch: (searchResults: Partner[]) => void;
+}
+
+export interface PartnerTableProps {
+  partners: Partner[];
+  isLoading: boolean;
+  onRefresh: () => void;
+}
+
+export interface PartnerInsightsProps {
+  partners: Partner[];
+  isLoading: boolean;
+}

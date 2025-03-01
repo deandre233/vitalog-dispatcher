@@ -8,7 +8,6 @@ export type TableNames =
   | 'employees' 
   | 'partners'
   | 'transport_records' 
-  | 'certificates'
   | 'incidents';
 
 export interface QueryParams {
@@ -41,11 +40,6 @@ export interface ListResponse<T> {
   count: number;
 }
 
-// Use a simpler type to avoid excessive recursion
-type SimplePartial<T> = {
-  [P in keyof T]?: unknown;
-};
-
 export async function fetchFromSupabase<T>(
   table: TableNames,
   options: {
@@ -61,14 +55,14 @@ export async function fetchFromSupabase<T>(
     if (id) {
       const { data, error } = await supabaseQuery.select('*').eq('id', id).single();
       return {
-        data: data as T,
+        data: data as unknown as T,
         error: error ? error.message : null,
         status: error ? 400 : 200
       };
     } else if (query) {
       const result = await query(supabaseQuery);
       return {
-        data: result.data as T,
+        data: result.data as unknown as T,
         error: result.error ? result.error.message : null,
         status: result.error ? 400 : 200,
         count: result.count
@@ -87,10 +81,32 @@ export async function fetchFromSupabase<T>(
         if (queryParams.filters && queryParams.filters.length > 0) {
           queryParams.filters.forEach(filter => {
             const { column, operator, value } = filter;
-            if (operator === 'like' || operator === 'ilike') {
-              query = query[operator](column, `%${value}%`);
-            } else {
-              query = query[operator](column, value);
+            switch (operator) {
+              case 'eq':
+                query = query.eq(column, value);
+                break;
+              case 'neq':
+                query = query.neq(column, value);
+                break;
+              case 'gt':
+                query = query.gt(column, value);
+                break;
+              case 'gte':
+                query = query.gte(column, value);
+                break;
+              case 'lt':
+                query = query.lt(column, value);
+                break;
+              case 'lte':
+                query = query.lte(column, value);
+                break;
+              case 'like':
+              case 'ilike':
+                query = query.ilike(column, `%${value}%`);
+                break;
+              case 'is':
+                query = query.is(column, value);
+                break;
             }
           });
         }
@@ -113,7 +129,7 @@ export async function fetchFromSupabase<T>(
       const { data, error, count } = await query;
 
       return {
-        data: data as T,
+        data: data as unknown as T,
         error: error ? error.message : null,
         status: error ? 400 : 200,
         count
@@ -154,7 +170,7 @@ export const api = {
     if (error) {
       throw new Error(error.message);
     }
-    return result as T;
+    return result as unknown as T;
   },
   
   async update<T>(table: TableNames, id: string, data: any): Promise<T> {
@@ -162,7 +178,7 @@ export const api = {
     if (error) {
       throw new Error(error.message);
     }
-    return result as T;
+    return result as unknown as T;
   },
   
   async delete(table: TableNames, id: string): Promise<void> {
@@ -170,8 +186,6 @@ export const api = {
     if (error) {
       throw new Error(error.message);
     }
-    // Return void explicitly
-    return;
   }
 };
 
