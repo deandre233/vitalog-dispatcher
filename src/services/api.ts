@@ -5,7 +5,7 @@ import { logger } from "@/utils/logger";
 import { Database } from "@/integrations/supabase/types";
 
 type TableNames = keyof Database['public']['Tables'];
-// Simplify QueryParams to avoid deep recursion
+// Simplify QueryParams to avoid deep recursion - using Record instead of recursive type
 type QueryParams = {
   select?: string;
   orderBy?: string;
@@ -13,7 +13,7 @@ type QueryParams = {
 };
 
 export const api = {
-  async get<T>(table: TableNames, query: QueryParams = {}): Promise<T[]> {
+  async get<T>(table: string, query: QueryParams = {}): Promise<T[]> {
     try {
       logger.info(`Fetching data from ${table}`, query);
       let dbQuery = supabase.from(table).select(query.select || '*');
@@ -39,7 +39,7 @@ export const api = {
     }
   },
 
-  async getById<T>(table: TableNames, id: string, query: QueryParams = {}): Promise<T | null> {
+  async getById<T>(table: string, id: string, query: QueryParams = {}): Promise<T | null> {
     try {
       logger.info(`Fetching ${table} by id: ${id}`, query);
       const { data, error } = await supabase
@@ -56,7 +56,7 @@ export const api = {
     }
   },
 
-  async create<T>(table: TableNames, data: Partial<T>): Promise<T> {
+  async create<T>(table: string, data: Partial<T>): Promise<T> {
     try {
       logger.info(`Creating new ${table}`, data);
       const { data: created, error } = await supabase
@@ -73,7 +73,7 @@ export const api = {
     }
   },
 
-  async update<T>(table: TableNames, id: string, data: Partial<T>): Promise<T> {
+  async update<T>(table: string, id: string, data: Partial<T>): Promise<T> {
     try {
       logger.info(`Updating ${table} ${id}`, data);
       const { data: updated, error } = await supabase
@@ -91,7 +91,7 @@ export const api = {
     }
   },
 
-  async delete(table: TableNames, id: string): Promise<void> {
+  async delete(table: string, id: string): Promise<void> {
     try {
       logger.info(`Deleting ${table} ${id}`);
       const { error } = await supabase

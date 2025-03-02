@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { Brain, Calendar, Clock, LayoutDashboard, BarChart4, UserPlus, Alert, TrendingUp } from "lucide-react";
+import { Brain, Calendar, Clock, LayoutDashboard, BarChart4, UserPlus, AlertTriangle, TrendingUp } from "lucide-react";
 import { MODULES } from "@/config/modules";
 import { AIDashboardData, AIPrediction } from "@/types/ai-analytics";
 import { toast } from "sonner";
@@ -172,7 +171,7 @@ export default function ModuleDashboard() {
                             <CardHeader className="pb-2">
                               <CardTitle className="text-md flex items-center">
                                 {/* Dynamically render icon based on feature.icon */}
-                                {feature.icon === 'activity' && <Alert className="mr-2 h-4 w-4" />}
+                                {feature.icon === 'activity' && <AlertTriangle className="mr-2 h-4 w-4" />}
                                 {feature.icon === 'users' && <UserPlus className="mr-2 h-4 w-4" />}
                                 {feature.icon === 'layout-dashboard' && <LayoutDashboard className="mr-2 h-4 w-4" />}
                                 {feature.icon === 'calendar' && <Calendar className="mr-2 h-4 w-4" />}
