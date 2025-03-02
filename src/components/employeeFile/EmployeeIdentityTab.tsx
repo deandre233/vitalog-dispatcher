@@ -133,9 +133,7 @@ export const EmployeeIdentityTab = ({
                 value={formData.phone}
                 onChange={handlePhoneChange}
                 className="pl-10"
-                // The PhoneInput doesn't support the disabled prop directly
-                // We'll handle it with the readOnly prop instead
-                readOnly={!isEditing}
+                disabled={!isEditing}
               />
             </div>
           </div>
