@@ -21,6 +21,7 @@ export const api = {
         dbQuery = dbQuery.order(query.orderBy, { ascending: false });
       }
 
+      // Filter out special keys and apply equals filter for the rest
       Object.entries(query).forEach(([key, value]) => {
         if (!['select', 'orderBy'].includes(key) && value !== undefined) {
           dbQuery = dbQuery.eq(key, value);
