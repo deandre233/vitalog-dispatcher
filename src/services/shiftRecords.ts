@@ -45,6 +45,6 @@ export const shiftRecordsService = {
   },
   
   createShiftRecord: async (record: Partial<ShiftRecord>) => {
-    return await api.create<ShiftRecord>("shift_records", record);
+    return await api.create<ShiftRecord>("shift_records", record as Record<string, unknown>);
   }
 };
