@@ -13,9 +13,11 @@ export async function get<T>(table: TableName, query: QueryParams = {}, useCache
     const cacheKey = useCache ? `${table}-${JSON.stringify(query)}` : null;
     
     // Check cache if enabled
-    const cachedData = getCachedData<T>(cacheKey);
-    if (cachedData) {
-      return cachedData;
+    if (cacheKey) {
+      const cachedData = getCachedData<T>(cacheKey);
+      if (cachedData) {
+        return cachedData;
+      }
     }
     
     logger.info(`Fetching data from ${table}`, query);
@@ -29,9 +31,12 @@ export async function get<T>(table: TableName, query: QueryParams = {}, useCache
     if (error) throw error;
     
     // Store in cache if caching is enabled
-    setCacheData(cacheKey, data || []);
+    const safeData = data || [];
+    if (cacheKey) {
+      setCacheData(cacheKey, safeData);
+    }
     
-    return (data || []) as T[];
+    return safeData as T[];
   } catch (error) {
     return handleApiError(error, `get(${table})`);
   }
