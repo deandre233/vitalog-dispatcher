@@ -4,16 +4,17 @@ import { handleError } from "@/utils/errorHandling";
 import { logger } from "@/utils/logger";
 import { Database } from "@/integrations/supabase/types";
 
-type TableNames = keyof Database['public']['Tables'];
-// Simplify QueryParams to avoid deep recursion - using Record instead of recursive type
+// Use a union type of all table names from the Database type
+type TableName = keyof Database['public']['Tables'];
+
 type QueryParams = {
   select?: string;
   orderBy?: string;
-  [key: string]: any; // Using any to avoid excessive type recursion
+  [key: string]: any;
 };
 
 export const api = {
-  async get<T>(table: string, query: QueryParams = {}): Promise<T[]> {
+  async get<T>(table: TableName, query: QueryParams = {}): Promise<T[]> {
     try {
       logger.info(`Fetching data from ${table}`, query);
       let dbQuery = supabase.from(table).select(query.select || '*');
@@ -39,7 +40,7 @@ export const api = {
     }
   },
 
-  async getById<T>(table: string, id: string, query: QueryParams = {}): Promise<T | null> {
+  async getById<T>(table: TableName, id: string, query: QueryParams = {}): Promise<T | null> {
     try {
       logger.info(`Fetching ${table} by id: ${id}`, query);
       const { data, error } = await supabase
@@ -56,7 +57,7 @@ export const api = {
     }
   },
 
-  async create<T>(table: string, data: Partial<T>): Promise<T> {
+  async create<T>(table: TableName, data: Partial<T>): Promise<T> {
     try {
       logger.info(`Creating new ${table}`, data);
       const { data: created, error } = await supabase
@@ -73,7 +74,7 @@ export const api = {
     }
   },
 
-  async update<T>(table: string, id: string, data: Partial<T>): Promise<T> {
+  async update<T>(table: TableName, id: string, data: Partial<T>): Promise<T> {
     try {
       logger.info(`Updating ${table} ${id}`, data);
       const { data: updated, error } = await supabase
@@ -91,7 +92,7 @@ export const api = {
     }
   },
 
-  async delete(table: string, id: string): Promise<void> {
+  async delete(table: TableName, id: string): Promise<void> {
     try {
       logger.info(`Deleting ${table} ${id}`);
       const { error } = await supabase
