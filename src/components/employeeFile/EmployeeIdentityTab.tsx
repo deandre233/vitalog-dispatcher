@@ -1,126 +1,174 @@
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PhoneInput } from "@/components/common/PhoneInput";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import type { Employee } from "@/types/employee";
+import { useEmployeeData } from "@/hooks/useEmployeeData";
+import PhoneInput from "@/components/common/PhoneInput";
+import { formatPhoneNumber } from "@/utils/stringUtils";
 
-interface EmployeeIdentityTabProps {
-  employee: Employee;
-  isEditing: boolean;
-  updateEmployee: (updates: Partial<Employee>) => Promise<void>;
+interface EmployeeIdentityProps {
+  employeeId: string;
+  isEditable?: boolean;
 }
 
-export const EmployeeIdentityTab: React.FC<EmployeeIdentityTabProps> = ({
-  employee,
-  isEditing,
-  updateEmployee
-}) => {
+export function EmployeeIdentityTab({ employeeId, isEditable = true }: EmployeeIdentityProps) {
+  const { employee, isLoading, updateEmployee } = useEmployeeData(employeeId);
+  const [isEditing, setIsEditing] = React.useState(false);
+
+  if (isLoading) {
+    return <Card className="p-6 animate-pulse">Loading...</Card>;
+  }
+
+  if (!employee) {
+    return <Card className="p-6">Employee not found</Card>;
+  }
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      await updateEmployee({
+        first_name: employee.first_name,
+        last_name: employee.last_name,
+        email: employee.email,
+        phone: employee.phone,
+        address: employee.address,
+        employee_id: employee.employee_id,
+        position: employee.position,
+      });
+      setIsEditing(false);
+      toast.success("Employee information updated successfully");
+    } catch (error) {
+      toast.error("Failed to update employee information");
+      console.error(error);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
+
+  const handleChange = async (field: string, value: string) => {
+    if (employee) {
+      await updateEmployee({
+        ...employee,
+        [field]: value,
+      });
+    }
+  };
+
   return (
-    <Card>
-      <CardContent className="p-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label>Full Name</Label>
-            <div className="flex gap-4">
-              <Input 
-                value={employee.first_name} 
-                onChange={(e) => updateEmployee({ first_name: e.target.value })}
-                placeholder="First name" 
-                disabled={!isEditing}
-              />
-              <Input 
-                value={employee.last_name} 
-                onChange={(e) => updateEmployee({ last_name: e.target.value })}
-                placeholder="Last name" 
-                disabled={!isEditing}
-              />
-            </div>
+    <Card className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Personal Information</h2>
+        {isEditable && (
+          <div className="space-x-2">
+            {isEditing ? (
+              <>
+                <Button variant="outline" onClick={handleCancel}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSave}>Save</Button>
+              </>
+            ) : (
+              <Button onClick={handleEdit}>Edit</Button>
+            )}
           </div>
+        )}
+      </div>
 
-          <div className="space-y-2">
-            <Label>Mobile phone</Label>
-            <PhoneInput 
-              value={employee.mobile || ''} 
-              onChange={(value) => updateEmployee({ mobile: value })}
-              disabled={!isEditing}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <Label htmlFor="firstName">First Name</Label>
+          <Input
+            id="firstName"
+            value={employee.first_name || ""}
+            onChange={(e) => handleChange("first_name", e.target.value)}
+            disabled={!isEditing}
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input
+            id="lastName"
+            value={employee.last_name || ""}
+            onChange={(e) => handleChange("last_name", e.target.value)}
+            disabled={!isEditing}
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={employee.email || ""}
+            onChange={(e) => handleChange("email", e.target.value)}
+            disabled={!isEditing}
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="phone">Phone</Label>
+          {/* Removing the disabled prop as it's not supported in PhoneInput */}
+          {isEditing ? (
+            <PhoneInput
+              value={employee.phone || ""}
+              onChange={(value) => handleChange("phone", value)}
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Station</Label>
-            <Select 
-              value={employee.station} 
-              onValueChange={(value) => updateEmployee({ station: value })}
-              disabled={!isEditing}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select station" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Main">Main</SelectItem>
-                <SelectItem value="North">North</SelectItem>
-                <SelectItem value="South">South</SelectItem>
-                <SelectItem value="East">East</SelectItem>
-                <SelectItem value="West">West</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Employee ID</Label>
-            <Input value={employee.readable_id || ''} disabled />
-          </div>
+          ) : (
+            <Input 
+              id="phone"
+              value={formatPhoneNumber(employee.phone || "")}
+              readOnly
+              className="mt-1"
+            />
+          )}
         </div>
+      </div>
 
-        <Separator />
+      <Separator className="my-6" />
 
-        <div className="space-y-4">
-          <h3 className="font-semibold">Login Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label>Username</Label>
-              <Input value={employee.readable_id?.toLowerCase() || ''} disabled />
-            </div>
-            <div className="space-y-2">
-              <Label>Password</Label>
-              <div className="flex gap-2">
-                <Input type="password" value="********" disabled />
-                {isEditing && <Button variant="outline">Reset Password</Button>}
-              </div>
-            </div>
-          </div>
+      <h3 className="text-lg font-medium mb-4">Employment Details</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <Label htmlFor="employeeId">Employee ID</Label>
+          <Input
+            id="employeeId"
+            value={employee.employee_id || ""}
+            onChange={(e) => handleChange("employee_id", e.target.value)}
+            disabled={!isEditing}
+            className="mt-1"
+          />
         </div>
-
-        <Separator />
-
-        <div className="space-y-4">
-          <h3 className="font-semibold">Notification Settings</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="dispatch-notifications">Dispatch notifications</Label>
-              <Switch id="dispatch-notifications" checked={true} disabled={!isEditing} />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="schedule-notifications">Schedule notifications</Label>
-              <Switch id="schedule-notifications" checked={true} disabled={!isEditing} />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="cert-notifications">Certification expiry alerts</Label>
-              <Switch id="cert-notifications" checked={true} disabled={!isEditing} />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="ai-notifications">AI performance insights</Label>
-              <Switch id="ai-notifications" checked={true} disabled={!isEditing} />
-            </div>
-          </div>
+        <div>
+          <Label htmlFor="position">Position</Label>
+          <Input
+            id="position"
+            value={employee.position || ""}
+            onChange={(e) => handleChange("position", e.target.value)}
+            disabled={!isEditing}
+            className="mt-1"
+          />
         </div>
-      </CardContent>
+        <div className="md:col-span-2">
+          <Label htmlFor="address">Address</Label>
+          <Input
+            id="address"
+            value={employee.address || ""}
+            onChange={(e) => handleChange("address", e.target.value)}
+            disabled={!isEditing}
+            className="mt-1"
+          />
+        </div>
+      </div>
     </Card>
   );
 }
