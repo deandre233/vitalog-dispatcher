@@ -29,9 +29,9 @@ export async function get<T>(table: TableName, query: QueryParams = {}, useCache
     if (error) throw error;
     
     // Store in cache if caching is enabled
-    setCacheData(cacheKey, data);
+    setCacheData(cacheKey, data || []);
     
-    return data as T[];
+    return (data || []) as T[];
   } catch (error) {
     return handleApiError(error, `get(${table})`);
   }
