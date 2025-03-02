@@ -5,20 +5,28 @@ import { logger } from "@/utils/logger";
 import { Database } from "@/integrations/supabase/types";
 
 type TableNames = keyof Database['public']['Tables'];
-type QueryParams = { 
-  select?: string; 
+type QueryParams = Record<string, string | number | boolean | undefined> & {
+  select?: string;
   orderBy?: string;
-  [key: string]: any;
 };
 
 export const api = {
   async get<T>(table: TableNames, query: QueryParams = {}): Promise<T[]> {
     try {
       logger.info(`Fetching data from ${table}`, query);
-      const { data, error } = await supabase
-        .from(table)
-        .select(query.select || '*')
-        .order(query.orderBy || 'created_at', { ascending: false });
+      let dbQuery = supabase.from(table).select(query.select || '*');
+
+      if (query.orderBy) {
+        dbQuery = dbQuery.order(query.orderBy, { ascending: false });
+      }
+
+      Object.entries(query).forEach(([key, value]) => {
+        if (!['select', 'orderBy'].includes(key) && value !== undefined) {
+          dbQuery = dbQuery.eq(key, value);
+        }
+      });
+
+      const { data, error } = await dbQuery;
 
       if (error) throw error;
       return data as T[];
