@@ -1,6 +1,5 @@
-
 import { supabase, logger, cache, CACHE_TTL } from './apiClient';
-import { TableName, QueryParams } from './types';
+import { TableName, QueryParams, FilterOperator } from './types';
 import { handleError } from "@/utils/errorHandling";
 
 /**
@@ -41,38 +40,7 @@ export async function get<T>(table: TableName, query: QueryParams = {}, useCache
     // Apply advanced filters
     if (query.filters && Array.isArray(query.filters)) {
       for (const filter of query.filters) {
-        switch (filter.operator) {
-          case 'eq':
-            dbQuery = dbQuery.eq(filter.column, filter.value);
-            break;
-          case 'neq':
-            dbQuery = dbQuery.neq(filter.column, filter.value);
-            break;
-          case 'gt':
-            dbQuery = dbQuery.gt(filter.column, filter.value);
-            break;
-          case 'gte':
-            dbQuery = dbQuery.gte(filter.column, filter.value);
-            break;
-          case 'lt':
-            dbQuery = dbQuery.lt(filter.column, filter.value);
-            break;
-          case 'lte':
-            dbQuery = dbQuery.lte(filter.column, filter.value);
-            break;
-          case 'like':
-            dbQuery = dbQuery.like(filter.column, filter.value as string);
-            break;
-          case 'ilike':
-            dbQuery = dbQuery.ilike(filter.column, filter.value as string);
-            break;
-          case 'in':
-            dbQuery = dbQuery.in(filter.column, filter.value as any[]);
-            break;
-          case 'is':
-            dbQuery = dbQuery.is(filter.column, filter.value as boolean | null);
-            break;
-        }
+        dbQuery = applyFilter(dbQuery, filter.column, filter.operator, filter.value);
       }
     }
 
@@ -96,6 +64,34 @@ export async function get<T>(table: TableName, query: QueryParams = {}, useCache
   } catch (error) {
     handleError(error);
     throw error;
+  }
+}
+
+// Helper function to apply filter based on operator
+function applyFilter(query: any, column: string, operator: FilterOperator, value: unknown) {
+  switch (operator) {
+    case 'eq':
+      return query.eq(column, value);
+    case 'neq':
+      return query.neq(column, value);
+    case 'gt':
+      return query.gt(column, value);
+    case 'gte':
+      return query.gte(column, value);
+    case 'lt':
+      return query.lt(column, value);
+    case 'lte':
+      return query.lte(column, value);
+    case 'like':
+      return query.like(column, value as string);
+    case 'ilike':
+      return query.ilike(column, value as string);
+    case 'in':
+      return query.in(column, value as any[]);
+    case 'is':
+      return query.is(column, value as boolean | null);
+    default:
+      return query;
   }
 }
 
