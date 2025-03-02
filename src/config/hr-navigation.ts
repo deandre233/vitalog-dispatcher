@@ -1,4 +1,3 @@
-
 import { HRNavigationItem } from "@/types/hr-navigation";
 
 export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
@@ -6,6 +5,11 @@ export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
     label: "Operations Hub",
     href: "/hr",
     icon: "home"
+  },
+  {
+    label: "Transport Dashboard",
+    href: "/hr/transport-dashboard",
+    icon: "ambulance"
   },
   {
     label: "Broadcast Center",

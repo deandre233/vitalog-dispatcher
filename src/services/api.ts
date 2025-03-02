@@ -5,10 +5,11 @@ import { logger } from "@/utils/logger";
 import { Database } from "@/integrations/supabase/types";
 
 type TableNames = keyof Database['public']['Tables'];
+// Simplify QueryParams to avoid deep recursion
 type QueryParams = {
   select?: string;
   orderBy?: string;
-  [key: string]: any; // Using 'any' here prevents excessive type depth
+  [key: string]: string | number | boolean | undefined;
 };
 
 export const api = {

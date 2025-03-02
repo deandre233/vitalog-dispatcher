@@ -1,4 +1,3 @@
-
 import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import { Button } from "./components/ui/button";
 import Index from "./pages/Index";
@@ -31,6 +30,7 @@ import { Categories } from "./pages/Categories";
 import { HistoricalEntry } from "./pages/HistoricalEntry";
 import { ExternalLink } from "./pages/ExternalLink";
 import BroadcastCenter from "./pages/BroadcastCenter";
+import { TransportDashboard } from "./pages/TransportDashboard";
 
 const router = createBrowserRouter([
   {
@@ -161,6 +161,14 @@ const router = createBrowserRouter([
   {
     path: "/hr/employees",
     element: <EmployeeDirectory />,
+  },
+  {
+    path: "/transport-dashboard",
+    element: <TransportDashboard />,
+  },
+  {
+    path: "/hr/transport-dashboard",
+    element: <TransportDashboard />,
   }
 ]);
 
