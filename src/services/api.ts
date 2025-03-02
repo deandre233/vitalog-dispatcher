@@ -7,7 +7,7 @@ import { Database } from "@/integrations/supabase/types";
 // Valid table names from database schema
 export type TableName = keyof Database['public']['Tables'];
 
-// Interface for query parameters to avoid recursion issues
+// Interface for query parameters with improved type safety
 export interface QueryParams {
   select?: string;
   orderBy?: {
