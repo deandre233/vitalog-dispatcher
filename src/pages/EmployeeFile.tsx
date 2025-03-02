@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { HRLayout } from "@/components/layout/HRLayout";
@@ -220,7 +219,11 @@ export default function EmployeeFile() {
               </TabsList>
 
               <TabsContent value="identity">
-                <EmployeeIdentityTab employee={employee} isEditing={isEditing} updateEmployee={updateEmployee} />
+                <EmployeeIdentityTab 
+                  employeeData={employee} 
+                  isEditing={isEditing}
+                  updateEmployeeData={updateEmployee}
+                />
               </TabsContent>
 
               <TabsContent value="roles">
