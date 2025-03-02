@@ -5,9 +5,14 @@ import { logger } from "@/utils/logger";
 import { Database } from "@/integrations/supabase/types";
 
 type TableNames = keyof Database['public']['Tables'];
+type QueryParams = { 
+  select?: string; 
+  orderBy?: string;
+  [key: string]: any;
+};
 
 export const api = {
-  async get<T>(table: TableNames, query: Record<string, any> = {}): Promise<T[]> {
+  async get<T>(table: TableNames, query: QueryParams = {}): Promise<T[]> {
     try {
       logger.info(`Fetching data from ${table}`, query);
       const { data, error } = await supabase
@@ -23,7 +28,7 @@ export const api = {
     }
   },
 
-  async getById<T>(table: TableNames, id: string, query: Record<string, any> = {}): Promise<T | null> {
+  async getById<T>(table: TableNames, id: string, query: QueryParams = {}): Promise<T | null> {
     try {
       logger.info(`Fetching ${table} by id: ${id}`, query);
       const { data, error } = await supabase
