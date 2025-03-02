@@ -15,7 +15,7 @@ export default function ModuleDashboard() {
   const [activeTab, setActiveTab] = useState("dispatch");
   const [aiData, setAiData] = useState<AIDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  // Function to fetch AI data for the dashboard
   useEffect(() => {
     const fetchAIData = async () => {
       try {
