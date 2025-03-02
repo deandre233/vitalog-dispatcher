@@ -1,3 +1,4 @@
+
 import { HRNavigationItem } from "@/types/hr-navigation";
 
 export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
@@ -60,6 +61,27 @@ export const HR_NAVIGATION_ITEMS: HRNavigationItem[] = [
     label: "Certification Registry",
     href: "/hr/certificate-types",
     icon: "list"
+  },
+  {
+    label: "Performance Metrics",
+    href: "/hr/performance",
+    icon: "bar-chart"
+  },
+  {
+    label: "AI Recommendations",
+    href: "/hr/ai-insights",
+    icon: "brain",
+    badge: {
+      text: "New"
+    }
+  },
+  {
+    label: "Predictive Analytics",
+    href: "/hr/predictive-analytics",
+    icon: "trending-up",
+    badge: {
+      text: "AI"
+    }
   },
   {
     label: "Quick Access Portal",
