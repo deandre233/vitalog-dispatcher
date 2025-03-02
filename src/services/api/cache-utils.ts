@@ -1,6 +1,17 @@
 
-import { cache, CACHE_TTL, logger } from './apiClient';
 import { TableName } from './types';
+
+// Define a simple in-memory cache with a Map
+export const cache = new Map<string, { data: any[]; timestamp: number }>();
+
+// Set cache TTL to 5 minutes by default
+export const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+// Simple logger for debugging cache operations
+export const logger = {
+  info: (message: string, data?: any) => console.log(`[API] ${message}`, data || ''),
+  error: (message: string, error?: any) => console.error(`[API Error] ${message}`, error || '')
+};
 
 /**
  * Check if data exists in cache and is valid

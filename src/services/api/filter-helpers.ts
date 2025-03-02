@@ -1,5 +1,5 @@
 
-import { FilterOperator } from './types';
+import { FilterOperator, QueryParams } from './types';
 
 /**
  * Applies a filter to a query based on the operator and value
@@ -34,7 +34,7 @@ export function applyFilter(query: any, column: string, operator: FilterOperator
 /**
  * Apply all filters from query params to a Supabase query
  */
-export function applyFilters(dbQuery: any, query: any) {
+export function applyFilters(dbQuery: any, query: QueryParams) {
   // Apply ordering
   if (query.orderBy) {
     dbQuery = dbQuery.order(query.orderBy.column, { ascending: query.orderBy.ascending ?? false });

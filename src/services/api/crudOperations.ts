@@ -1,9 +1,9 @@
 
-import { supabase, logger } from './apiClient';
+import { supabase } from './apiClient';
 import { TableName, QueryParams } from './types';
-import { handleError } from "@/utils/errorHandling";
 import { applyFilters } from './filter-helpers';
-import { getCachedData, setCacheData, invalidateCache } from './cache-utils';
+import { getCachedData, setCacheData, invalidateCache, logger } from './cache-utils';
+import { handleApiError } from './error-handler';
 
 /**
  * Fetch records from a table with optional filtering
@@ -33,8 +33,7 @@ export async function get<T>(table: TableName, query: QueryParams = {}, useCache
     
     return data as T[];
   } catch (error) {
-    handleError(error);
-    throw error;
+    return handleApiError(error, `get(${table})`);
   }
 }
 
@@ -53,8 +52,7 @@ export async function getById<T>(table: TableName, id: string, query: QueryParam
     if (error) throw error;
     return data as T;
   } catch (error) {
-    handleError(error);
-    throw error;
+    return handleApiError(error, `getById(${table}, ${id})`);
   }
 }
 
@@ -77,8 +75,7 @@ export async function create<T>(table: TableName, data: Record<string, unknown>)
     
     return created as T;
   } catch (error) {
-    handleError(error);
-    throw error;
+    return handleApiError(error, `create(${table})`);
   }
 }
 
@@ -102,8 +99,7 @@ export async function update<T>(table: TableName, id: string, data: Record<strin
     
     return updated as T;
   } catch (error) {
-    handleError(error);
-    throw error;
+    return handleApiError(error, `update(${table}, ${id})`);
   }
 }
 
@@ -123,8 +119,7 @@ export async function deleteRecord(table: TableName, id: string): Promise<void> 
     // Invalidate any cached queries for this table
     invalidateCache(table);
   } catch (error) {
-    handleError(error);
-    throw error;
+    handleApiError(error, `deleteRecord(${table}, ${id})`);
   }
 }
 

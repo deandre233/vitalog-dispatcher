@@ -2,6 +2,7 @@
 import { TableName, QueryParams } from './api/types';
 import * as crudOps from './api/crudOperations';
 import * as advancedOps from './api/advancedQueries';
+import { invalidateCache } from './api/cache-utils';
 
 export type { TableName, QueryParams };
 
@@ -44,5 +45,5 @@ export const api = {
   /**
    * Clear cache for a specific table or all tables
    */
-  invalidateCache: crudOps.invalidateCache
+  invalidateCache
 };

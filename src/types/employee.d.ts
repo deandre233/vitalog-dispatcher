@@ -25,6 +25,11 @@ export interface Employee {
     end: string;
     role: string;
   }[];
+  contact_email?: string;
+  contact_phone?: string;
+  contact_address?: string;
+  employee_number?: string;
+  job_title?: string;
 }
 
 export interface EmployeeRole {

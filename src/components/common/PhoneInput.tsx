@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { formatPhoneNumber } from '@/utils/stringUtils';
@@ -8,6 +9,7 @@ interface PhoneInputProps {
   className?: string;
   placeholder?: string;
   required?: boolean;
+  disabled?: boolean; // Added disabled prop instead of readOnly
 }
 
 export function PhoneInput({
@@ -15,7 +17,8 @@ export function PhoneInput({
   onChange,
   className = "",
   placeholder = "(XXX) XXX-XXXX",
-  required = false
+  required = false,
+  disabled = false // Initialize with default value
 }: PhoneInputProps) {
   const [displayValue, setDisplayValue] = useState(formatPhoneNumber(value));
 
@@ -24,6 +27,8 @@ export function PhoneInput({
   }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return; // Don't process changes if disabled
+    
     const newValue = e.target.value;
     const formatted = formatPhoneNumber(newValue);
     setDisplayValue(formatted);
@@ -40,6 +45,7 @@ export function PhoneInput({
       placeholder={placeholder}
       className={className}
       required={required}
+      disabled={disabled} // Use disabled prop instead of readOnly
       maxLength={14} // (XXX) XXX-XXXX
     />
   );
