@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { handleError } from "@/utils/errorHandling";
 import { logger } from "@/utils/logger";
@@ -7,7 +8,7 @@ type TableNames = keyof Database['public']['Tables'];
 type QueryParams = {
   select?: string;
   orderBy?: string;
-  [key: string]: string | number | boolean | undefined;
+  [key: string]: any; // Using 'any' here prevents excessive type depth
 };
 
 export const api = {
