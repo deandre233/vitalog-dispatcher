@@ -1,13 +1,13 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { handleError } from "@/utils/errorHandling";
 import { logger } from "@/utils/logger";
 import { Database } from "@/integrations/supabase/types";
 
 type TableNames = keyof Database['public']['Tables'];
-type QueryParams = Record<string, string | number | boolean | undefined> & {
+type QueryParams = {
   select?: string;
   orderBy?: string;
+  [key: string]: string | number | boolean | undefined;
 };
 
 export const api = {
@@ -43,7 +43,7 @@ export const api = {
         .from(table)
         .select(query.select || '*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data as T;
