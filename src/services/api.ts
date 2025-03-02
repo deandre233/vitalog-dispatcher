@@ -5,10 +5,10 @@ import { logger } from "@/utils/logger";
 import { Database } from "@/integrations/supabase/types";
 
 // Valid table names from database schema
-type TableName = keyof Database['public']['Tables'];
+export type TableName = keyof Database['public']['Tables'];
 
 // Interface for query parameters to avoid recursion issues
-interface QueryParams {
+export interface QueryParams {
   select?: string;
   orderBy?: {
     column: string;
@@ -25,7 +25,7 @@ interface QueryParams {
 }
 
 // Simple cache implementation
-const cache = new Map<string, { data: any; timestamp: number }>();
+const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_TTL = 60000; // 1 minute cache TTL
 
 export const api = {
@@ -242,13 +242,10 @@ export const api = {
   async executeRawQuery<T>(query: string, params: any[] = []): Promise<T[]> {
     try {
       logger.info(`Executing raw query`, { query, params });
-      const { data, error } = await supabase.rpc('execute_sql', { 
-        sql_query: query,
-        params: params 
-      });
-      
-      if (error) throw error;
-      return data as T[];
+      // Using a direct database query would be better but we don't have direct DB access
+      // For now, we'll warn about this limitation
+      logger.warn("Raw SQL execution is not available without a custom edge function");
+      throw new Error("Raw SQL execution requires a custom edge function");
     } catch (error) {
       handleError(error);
       throw error;
