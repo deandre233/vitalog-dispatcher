@@ -7,11 +7,12 @@ import { Database } from "@/integrations/supabase/types";
 // Use a union type of all table names from the Database type
 type TableName = keyof Database['public']['Tables'];
 
-type QueryParams = {
+// Simplify the QueryParams type to avoid deep recursion
+interface QueryParams {
   select?: string;
   orderBy?: string;
-  [key: string]: any;
-};
+  [key: string]: unknown; // Using unknown instead of any for better type safety
+}
 
 export const api = {
   async get<T>(table: TableName, query: QueryParams = {}): Promise<T[]> {
@@ -57,7 +58,7 @@ export const api = {
     }
   },
 
-  async create<T>(table: TableName, data: Partial<T>): Promise<T> {
+  async create<T>(table: TableName, data: Record<string, unknown>): Promise<T> {
     try {
       logger.info(`Creating new ${table}`, data);
       const { data: created, error } = await supabase
@@ -74,7 +75,7 @@ export const api = {
     }
   },
 
-  async update<T>(table: TableName, id: string, data: Partial<T>): Promise<T> {
+  async update<T>(table: TableName, id: string, data: Record<string, unknown>): Promise<T> {
     try {
       logger.info(`Updating ${table} ${id}`, data);
       const { data: updated, error } = await supabase
