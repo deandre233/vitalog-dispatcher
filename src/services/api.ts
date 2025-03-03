@@ -45,5 +45,15 @@ export const api = {
   /**
    * Clear cache for a specific table or all tables
    */
-  invalidateCache
+  invalidateCache,
+
+  /**
+   * Update employee location
+   */
+  updateEmployeeLocation: crudOps.updateEmployeeLocation,
+
+  /**
+   * Get employee location history
+   */
+  getEmployeeLocationHistory: crudOps.getEmployeeLocationHistory
 };

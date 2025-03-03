@@ -1,5 +1,4 @@
-
-import { supabase } from './apiClient';
+import { supabase } from '@/integrations/supabase/client';
 import { TableName, QueryParams } from './types';
 import { applyFilters } from './filter-helpers';
 import { getCachedData, setCacheData, invalidateCache, logger } from './cache-utils';
@@ -14,7 +13,7 @@ export async function get<T>(table: TableName, query: QueryParams = {}, useCache
     
     // Check cache if enabled
     if (cacheKey) {
-      const cachedData = getCachedData<T>(cacheKey);
+      const cachedData = getCachedData<T[]>(cacheKey);
       if (cachedData) {
         return cachedData;
       }
@@ -33,7 +32,7 @@ export async function get<T>(table: TableName, query: QueryParams = {}, useCache
     // Store in cache if caching is enabled
     const safeData = data || [];
     if (cacheKey) {
-      setCacheData(cacheKey, safeData);
+      setCacheData(cacheKey, safeData as T[]);
     }
     
     return safeData as T[];
@@ -125,6 +124,48 @@ export async function deleteRecord(table: TableName, id: string): Promise<void> 
     invalidateCache(table);
   } catch (error) {
     handleApiError(error, `deleteRecord(${table}, ${id})`);
+  }
+}
+
+/**
+ * Update employee location
+ */
+export async function updateEmployeeLocation(employeeId: string, location: { lat: number; lng: number; timestamp: string }) {
+  try {
+    logger.info(`Updating location for employee ${employeeId}`, location);
+    const { error } = await supabase
+      .from('employee_locations')
+      .upsert({
+        employee_id: employeeId,
+        latitude: location.lat,
+        longitude: location.lng,
+        updated_at: location.timestamp || new Date().toISOString()
+      });
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    handleApiError(error, `updateEmployeeLocation(${employeeId})`);
+    return false;
+  }
+}
+
+/**
+ * Get employee location history
+ */
+export async function getEmployeeLocationHistory(employeeId: string, limit = 100): Promise<any[]> {
+  try {
+    const { data, error } = await supabase
+      .from('employee_locations')
+      .select('*')
+      .eq('employee_id', employeeId)
+      .order('updated_at', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    return handleApiError(error, `getEmployeeLocationHistory(${employeeId})`);
   }
 }
 
