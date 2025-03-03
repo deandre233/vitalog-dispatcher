@@ -1093,6 +1093,53 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_locations: {
+        Row: {
+          accuracy: number | null
+          altitude: number | null
+          device_info: Json | null
+          employee_id: string
+          heading: number | null
+          id: number
+          latitude: number
+          longitude: number
+          speed: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          accuracy?: number | null
+          altitude?: number | null
+          device_info?: Json | null
+          employee_id: string
+          heading?: number | null
+          id?: number
+          latitude: number
+          longitude: number
+          speed?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          accuracy?: number | null
+          altitude?: number | null
+          device_info?: Json | null
+          employee_id?: string
+          heading?: number | null
+          id?: number
+          latitude?: number
+          longitude?: number
+          speed?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_locations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_navigation_settings: {
         Row: {
           created_at: string | null

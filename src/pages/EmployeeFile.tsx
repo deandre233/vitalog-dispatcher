@@ -1,99 +1,105 @@
 
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent } from "@/components/ui/card";
-import { EmployeeIdentityTab } from "@/components/employeeFile/EmployeeIdentityTab";
-import { EmployeeRolesTab } from "@/components/employeeFile/EmployeeRolesTab";
-import { EmployeePrivilegesTab } from "@/components/employeeFile/EmployeePrivilegesTab";
-import { EmployeeCertificatesTab } from "@/components/employeeFile/EmployeeCertificatesTab";
-import { EmployeePayrollTab } from "@/components/employeeFile/EmployeePayrollTab"; 
-import { EmployeePerformanceTab } from "@/components/employeeFile/EmployeePerformanceTab";
-import { EmployeeTrackingTab } from "@/components/employeeFile/EmployeeTrackingTab";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { EmployeeAIInsightsPanel } from "@/components/employeeFile/EmployeeAIInsightsPanel";
-import { useEmployeeData } from "@/hooks/useEmployeeData";
-import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
-import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { EmployeeIdentityTab } from '@/components/employeeFile/EmployeeIdentityTab';
+import { EmployeeRolesTab } from '@/components/employeeFile/EmployeeRolesTab';
+import { EmployeePrivilegesTab } from '@/components/employeeFile/EmployeePrivilegesTab';
+import { EmployeeCertificatesTab } from '@/components/employeeFile/EmployeeCertificatesTab';
+import { EmployeePayrollTab } from '@/components/employeeFile/EmployeePayrollTab';
+import { EmployeePerformanceTab } from '@/components/employeeFile/EmployeePerformanceTab';
+import { EmployeeAIInsightsPanel } from '@/components/employeeFile/EmployeeAIInsightsPanel';
+import { EmployeeTrackingTab } from '@/components/employeeFile/EmployeeTrackingTab';
+import { useEmployeeData } from '@/hooks/useEmployeeData';
+import { useEmployeeRoles } from '@/hooks/useEmployeeRoles';
+import { useEmployeePrivileges } from '@/hooks/useEmployeePrivileges';
 
 export default function EmployeeFile() {
   const { id } = useParams<{ id: string }>();
-  const { employee, loading: employeeLoading, error: employeeError } = useEmployeeData(id || "");
-  const { roles, loading: rolesLoading } = useEmployeeRoles(id || "");
-  const { privileges, loading: privilegesLoading } = useEmployeePrivileges(id || "");
-  const [activeTab, setActiveTab] = useState("identity");
+  const [activeTab, setActiveTab] = useState('identity');
+  const { employee, isLoading: employeeLoading, error: employeeError } = useEmployeeData(id as string);
+  const { roles, isLoading: rolesLoading, error: rolesError } = useEmployeeRoles(id as string);
+  const { privileges, isLoading: privilegesLoading, error: privilegesError } = useEmployeePrivileges(id as string);
 
-  const loading = employeeLoading || rolesLoading || privilegesLoading;
+  const isLoading = employeeLoading || rolesLoading || privilegesLoading;
+  const error = employeeError || rolesError || privilegesError;
 
-  if (loading) {
-    return <LoadingSpinner message="Loading employee file..." />;
+  if (isLoading) {
+    return <LoadingSpinner />;
   }
 
-  if (employeeError || !employee) {
+  if (error) {
     return (
-      <div className="container mx-auto py-8">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center py-8">
-              <h2 className="text-2xl font-bold text-red-600 mb-2">Employee Not Found</h2>
-              <p className="text-gray-600">The requested employee file could not be found.</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="p-4">
+        <p className="text-red-500">Error loading employee data: {error.message}</p>
+      </div>
+    );
+  }
+
+  if (!employee) {
+    return (
+      <div className="p-4">
+        <p>Employee not found.</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-4">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <ScrollArea className="h-[calc(100vh-100px)]">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="w-full justify-start mb-4 overflow-x-auto flex-wrap">
+    <div className="container mx-auto p-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="md:col-span-3">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <ScrollArea className="w-full">
+              <TabsList className="w-full justify-start mb-6 overflow-x-auto p-1 rounded-md">
                 <TabsTrigger value="identity">Identity</TabsTrigger>
                 <TabsTrigger value="roles">Roles</TabsTrigger>
                 <TabsTrigger value="privileges">Privileges</TabsTrigger>
-                <TabsTrigger value="certificates">Certifications</TabsTrigger>
+                <TabsTrigger value="tracking">Tracking</TabsTrigger>
+                <TabsTrigger value="certificates">Certificates</TabsTrigger>
                 <TabsTrigger value="payroll">Payroll</TabsTrigger>
                 <TabsTrigger value="performance">Performance</TabsTrigger>
-                <TabsTrigger value="tracking">Location Tracking</TabsTrigger>
               </TabsList>
+            </ScrollArea>
 
-              <TabsContent value="identity">
-                <EmployeeIdentityTab employee={employee} />
-              </TabsContent>
-
-              <TabsContent value="roles">
-                <EmployeeRolesTab roles={roles} employee={employee} />
-              </TabsContent>
-
-              <TabsContent value="privileges">
-                <EmployeePrivilegesTab privileges={privileges} employee={employee} />
-              </TabsContent>
-
-              <TabsContent value="certificates">
-                <EmployeeCertificatesTab employee={employee} />
-              </TabsContent>
-
-              <TabsContent value="payroll">
-                <EmployeePayrollTab employee={employee} />
-              </TabsContent>
-
-              <TabsContent value="performance">
-                <EmployeePerformanceTab employee={employee} />
-              </TabsContent>
-
-              <TabsContent value="tracking">
-                <EmployeeTrackingTab employee={employee} />
-              </TabsContent>
-            </Tabs>
-          </ScrollArea>
+            <TabsContent value="identity">
+              <EmployeeIdentityTab employee={employee} />
+            </TabsContent>
+            
+            <TabsContent value="roles">
+              <EmployeeRolesTab roles={roles} />
+            </TabsContent>
+            
+            <TabsContent value="privileges">
+              <EmployeePrivilegesTab privileges={privileges} />
+            </TabsContent>
+            
+            <TabsContent value="tracking">
+              <EmployeeTrackingTab employee={employee} />
+            </TabsContent>
+            
+            <TabsContent value="certificates">
+              <EmployeeCertificatesTab isEditing={false} />
+            </TabsContent>
+            
+            <TabsContent value="payroll">
+              <EmployeePayrollTab isEditing={false} />
+            </TabsContent>
+            
+            <TabsContent value="performance">
+              <EmployeePerformanceTab employeeId={employee.id} />
+            </TabsContent>
+          </Tabs>
         </div>
-
-        <div>
-          <EmployeeAIInsightsPanel employee={employee} />
+        
+        <div className="md:col-span-1">
+          <Card>
+            <CardContent className="p-4">
+              <EmployeeAIInsightsPanel employeeId={employee.id} />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

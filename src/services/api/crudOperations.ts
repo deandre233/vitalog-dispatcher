@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { TableName, QueryParams } from './types';
 import { applyFilters } from './filter-helpers';
@@ -32,7 +33,7 @@ export async function get<T>(table: TableName, query: QueryParams = {}, useCache
     // Store in cache if caching is enabled
     const safeData = data || [];
     if (cacheKey) {
-      setCacheData(cacheKey, safeData as T[]);
+      setCacheData<T[]>(cacheKey, safeData as T[]);
     }
     
     return safeData as T[];
@@ -133,16 +134,28 @@ export async function deleteRecord(table: TableName, id: string): Promise<void> 
 export async function updateEmployeeLocation(employeeId: string, location: { lat: number; lng: number; timestamp: string }) {
   try {
     logger.info(`Updating location for employee ${employeeId}`, location);
-    const { error } = await supabase
-      .from('employee_locations')
-      .upsert({
-        employee_id: employeeId,
-        latitude: location.lat,
-        longitude: location.lng,
-        updated_at: location.timestamp || new Date().toISOString()
-      });
+    
+    const { error } = await supabase.rpc('update_employee_location', {
+      p_employee_id: employeeId,
+      p_latitude: location.lat,
+      p_longitude: location.lng,
+      p_updated_at: location.timestamp || new Date().toISOString()
+    });
 
-    if (error) throw error;
+    if (error) {
+      // Fallback to direct table operation if RPC fails
+      const { error: insertError } = await supabase
+        .from('employee_locations')
+        .insert({
+          employee_id: employeeId,
+          latitude: location.lat,
+          longitude: location.lng,
+          updated_at: location.timestamp || new Date().toISOString()
+        });
+        
+      if (insertError) throw insertError;
+    }
+    
     return true;
   } catch (error) {
     handleApiError(error, `updateEmployeeLocation(${employeeId})`);

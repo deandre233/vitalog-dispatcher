@@ -1,5 +1,5 @@
 
-import { supabase, logger } from './apiClient';
+import { supabase } from './apiClient';
 import { TableName } from './types';
 import { handleError } from "@/utils/errorHandling";
 
@@ -34,12 +34,15 @@ export async function count(table: TableName, filters: Record<string, unknown> =
       }
     });
     
-    const { count, error } = await query;
+    const { count: resultCount, error } = await query;
     
     if (error) throw error;
-    return count || 0;
+    return resultCount || 0;
   } catch (error) {
     handleError(error);
     throw error;
   }
 }
+
+// Import logger
+import { logger } from './cache-utils';

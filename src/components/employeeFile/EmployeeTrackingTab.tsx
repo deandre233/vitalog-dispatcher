@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, Clock, Activity, Navigation, AlertTriangle } from "lucide-react";
-import { getEmployeeLocationHistory } from "@/services/api/crudOperations";
+import { api } from "@/services/api";
 import { format, formatDistanceToNow } from "date-fns";
 import { Employee } from "@/types/employee";
 import { EmployeeLocationMap } from "./EmployeeLocationMap";
@@ -26,7 +26,7 @@ export function EmployeeTrackingTab({ employee }: EmployeeTrackingTabProps) {
     const fetchLocationHistory = async () => {
       try {
         setIsLoading(true);
-        const history = await getEmployeeLocationHistory(employee.id);
+        const history = await api.getEmployeeLocationHistory(employee.id);
         setLocationHistory(history);
       } catch (error) {
         console.error("Failed to fetch location history:", error);
