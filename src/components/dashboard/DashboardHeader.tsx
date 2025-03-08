@@ -1,5 +1,5 @@
 
-import { Bell, Settings, User } from "lucide-react";
+import { Bell, Settings, User, Brain } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,8 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { DispatchTabs } from "../dispatch/navigation/DispatchTabs";
+import { Badge } from "@/components/ui/badge";
 
-export type ViewType = 'active' | 'schedule' | 'calendar';
+export type ViewType = 'active' | 'schedule' | 'calendar' | 'ai';
 
 interface DashboardHeaderProps {
   onViewChange?: (view: ViewType) => void;
@@ -31,13 +32,23 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
   return (
     <div className="flex flex-col bg-white border-b">
       <div className="flex justify-between items-center p-6">
-        <h1 className="text-2xl font-semibold text-medical-primary">
-          Mission Control
-        </h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-semibold text-medical-primary">
+            Mission Control
+          </h1>
+          <Badge variant="outline" className="gap-1 px-2 py-1 bg-blue-50 text-blue-700 border-blue-200">
+            <Brain className="h-3.5 w-3.5" />
+            <span>AI Assisted</span>
+          </Badge>
+        </div>
         <div className="flex items-center gap-4">
           <Button
             variant={unattendedMode ? "default" : "outline"}
             onClick={() => setUnattendedMode(!unattendedMode)}
+            className={unattendedMode ? 
+              "bg-green-600 hover:bg-green-700 text-white" : 
+              "border-green-200 text-green-600 hover:bg-green-50"
+            }
           >
             {unattendedMode ? "Exit Automated Mode" : "Enter Automated Mode"}
           </Button>
