@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -663,6 +664,7 @@ export function BookingForm() {
           <div className="space-y-2">
             <Label>Location Name</Label>
             <Input 
+              id="pickup_location"
               {...register("pickup_location")} 
               className="border-medical-secondary/30 focus:border-medical-secondary"
             />
@@ -755,6 +757,7 @@ export function BookingForm() {
           <div className="space-y-2">
             <Label>Location Name</Label>
             <Input 
+              id="dropoff_location"
               {...register("dropoff_location")}
               className="border-medical-secondary/30 focus:border-medical-secondary"
             />
@@ -825,3 +828,34 @@ export function BookingForm() {
               className="border-medical-secondary/30 focus:border-medical-secondary"
               placeholder="(XXX) XXX-XXXX"
             />
+          </div>
+          <Button 
+            type="button"
+            variant="outline"
+            onClick={() => handleSaveFacility('destination')}
+            className="w-full mt-4 bg-medical-highlight text-medical-primary hover:bg-medical-highlight/90"
+          >
+            Save as New Facility
+          </Button>
+        </div>
+      </Card>
+      
+      <div className="flex justify-end space-x-4 pt-4">
+        <Button 
+          variant="outline" 
+          type="button"
+          className="bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-all duration-300"
+        >
+          Cancel
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={isSubmitting}
+          className="bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] hover:from-[#7E69AB] hover:to-[#9b87f5] text-white transition-all duration-300"
+        >
+          {isSubmitting ? "Creating..." : "Create Dispatch"}
+        </Button>
+      </div>
+    </form>
+  );
+}
