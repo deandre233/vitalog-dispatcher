@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { handleError } from "@/utils/errorHandling";
 import { logger } from "@/utils/logger";
@@ -40,7 +39,7 @@ export const api = {
     }
   },
 
-  async create<T extends Record<string, any>>(table: TableNames, data: Omit<T, 'id'>): Promise<T> {
+  async create<T>(table: TableNames, data: Partial<T>): Promise<T> {
     try {
       logger.info(`Creating new ${table}`, data);
       const { data: created, error } = await supabase
@@ -57,7 +56,7 @@ export const api = {
     }
   },
 
-  async update<T extends Record<string, any>>(table: TableNames, id: string, data: Partial<T>): Promise<T> {
+  async update<T>(table: TableNames, id: string, data: Partial<T>): Promise<T> {
     try {
       logger.info(`Updating ${table} ${id}`, data);
       const { data: updated, error } = await supabase
