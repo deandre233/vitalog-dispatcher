@@ -1,11 +1,12 @@
+
 import React, { useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
-import { getRouteDetails, geocodeAddress, analyzeTrafficConditions } from '@/services/googleMaps';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Car, AlertTriangle, Info, DollarSign, Activity, Truck } from 'lucide-react';
 import type { RouteData } from '@/types/operations-map';
+import { initGoogleMaps, Location } from '@/services/googleMaps';
 
 interface DirectionsTabProps {
   transportId: string;
@@ -38,55 +39,61 @@ export const DirectionsTab: React.FC<DirectionsTabProps> = ({
   useEffect(() => {
     if (!mapElement) return;
 
-    const newMap = new google.maps.Map(mapElement, {
-      zoom: 12,
-      center: { lat: 33.7490, lng: -84.3880 }, // Atlanta coordinates
-      mapTypeId: 'terrain',
-      styles: [
-        {
-          featureType: 'all',
-          elementType: 'geometry',
-          stylers: [{ color: '#1a1b1e' }]
-        },
-        {
-          featureType: 'road',
-          elementType: 'geometry',
-          stylers: [{ color: '#2a2b30' }]
-        },
-        {
-          featureType: 'road',
-          elementType: 'labels.text.fill',
-          stylers: [{ color: '#9ca3af' }]
-        },
-        {
-          featureType: 'water',
-          elementType: 'geometry',
-          stylers: [{ color: '#0f172a' }]
-        },
-        {
-          featureType: 'poi',
-          elementType: 'labels',
-          stylers: [{ visibility: 'off' }]
+    const initMap = async () => {
+      await initGoogleMaps();
+      
+      const newMap = new google.maps.Map(mapElement, {
+        zoom: 12,
+        center: { lat: 33.7490, lng: -84.3880 }, // Atlanta coordinates
+        mapTypeId: 'terrain',
+        styles: [
+          {
+            featureType: 'all',
+            elementType: 'geometry',
+            stylers: [{ color: '#1a1b1e' }]
+          },
+          {
+            featureType: 'road',
+            elementType: 'geometry',
+            stylers: [{ color: '#2a2b30' }]
+          },
+          {
+            featureType: 'road',
+            elementType: 'labels.text.fill',
+            stylers: [{ color: '#9ca3af' }]
+          },
+          {
+            featureType: 'water',
+            elementType: 'geometry',
+            stylers: [{ color: '#0f172a' }]
+          },
+          {
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
+          }
+        ]
+      });
+
+      const renderer = new google.maps.DirectionsRenderer({
+        map: newMap,
+        suppressMarkers: false,
+        polylineOptions: {
+          strokeColor: '#3b82f6',
+          strokeWeight: 6,
+          strokeOpacity: 0.8
         }
-      ]
-    });
+      });
 
-    const renderer = new google.maps.DirectionsRenderer({
-      map: newMap,
-      suppressMarkers: false,
-      polylineOptions: {
-        strokeColor: '#3b82f6',
-        strokeWeight: 6,
-        strokeOpacity: 0.8
-      }
-    });
+      // Add traffic layer with custom styling
+      const trafficLayer = new google.maps.TrafficLayer();
+      trafficLayer.setMap(newMap);
 
-    // Add traffic layer with custom styling
-    const trafficLayer = new google.maps.TrafficLayer();
-    trafficLayer.setMap(newMap);
+      setMap(newMap);
+      setDirectionsRenderer(renderer);
+    };
 
-    setMap(newMap);
-    setDirectionsRenderer(renderer);
+    initMap();
 
     return () => {
       if (directionsRenderer) {
@@ -97,19 +104,49 @@ export const DirectionsTab: React.FC<DirectionsTabProps> = ({
 
   useEffect(() => {
     const calculateRoute = async () => {
-      if (!pickupLocation || !dropoffLocation) return;
+      if (!pickupLocation || !dropoffLocation || !directionsRenderer) return;
 
       try {
-        const routeDetails = await getRouteDetails(pickupLocation, dropoffLocation);
-        const trafficConditions = await analyzeTrafficConditions(pickupLocation, dropoffLocation);
+        await initGoogleMaps();
         
-        if (directionsRenderer && routeDetails.route) {
-          directionsRenderer.setDirections(routeDetails.route);
-          
-          const leg = routeDetails.route.routes[0]?.legs[0];
-          if (leg) {
+        const directionsService = new google.maps.DirectionsService();
+        
+        const request: google.maps.DirectionsRequest = {
+          origin: pickupLocation,
+          destination: dropoffLocation,
+          travelMode: google.maps.TravelMode.DRIVING,
+          drivingOptions: {
+            departureTime: new Date(),
+            trafficModel: google.maps.TrafficModel.BEST_GUESS
+          },
+          optimizeWaypoints: true,
+          provideRouteAlternatives: true,
+          avoidHighways: false,
+          avoidTolls: false
+        };
+        
+        directionsService.route(request, async (result, status) => {
+          if (status === 'OK' && result?.routes[0]?.legs[0]) {
+            directionsRenderer.setDirections(result);
+            
+            const leg = result.routes[0].legs[0];
+            
             // Calculate distance in miles
             const distanceInMiles = parseFloat(leg.distance?.text?.replace(/[^0-9.]/g, '') || '0');
+            
+            // Analyze traffic conditions
+            const normalDuration = leg.duration?.value || 0;
+            const trafficDuration = leg.duration_in_traffic?.value || normalDuration;
+            const delay = trafficDuration - normalDuration;
+            
+            const delayPercentage = (delay / normalDuration) * 100;
+            let severity: 'low' | 'medium' | 'high' = 'low';
+            
+            if (delayPercentage > 50) {
+              severity = 'high';
+            } else if (delayPercentage > 25) {
+              severity = 'medium';
+            }
             
             // Calculate rates based on distance
             const retailRate = Math.round(distanceInMiles * 25); // $25 per mile
@@ -133,25 +170,31 @@ export const DirectionsTab: React.FC<DirectionsTabProps> = ({
               distance: leg.distance?.text || '',
               duration: leg.duration?.text || '',
               trafficDuration: leg.duration_in_traffic?.text || leg.duration?.text || '',
-              trafficSeverity: trafficConditions.severity,
+              trafficSeverity: severity,
               mileage: distanceInMiles,
               retailRate,
               medicareRate,
               contractRate,
-              alternativeRoutes: routeDetails.route.routes.length,
+              alternativeRoutes: result.routes.length,
               fuelConsumption: `${(distanceInMiles * 0.12).toFixed(1)} gal est.`,
-              tollRoads: routeDetails.route.routes[0].warnings.some(w => w.includes('toll'))
+              tollRoads: result.routes[0].warnings.some(w => w.includes('toll'))
             });
 
             await supabase
               .from('transport_records')
               .update({
                 route_data: routeData as any,
-                traffic_conditions: trafficConditions
+                traffic_conditions: {
+                  severity,
+                  delay: Math.round(delay / 60), // Convert to minutes
+                  alternateRoutes: result.routes.length > 1
+                }
               })
               .eq('id', transportId);
+          } else {
+            toast.error('Failed to calculate route');
           }
-        }
+        });
       } catch (error) {
         console.error('Error calculating route:', error);
         toast.error('Failed to calculate route');
