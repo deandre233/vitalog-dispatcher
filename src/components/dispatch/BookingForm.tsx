@@ -64,7 +64,6 @@ const affiliates = [
   "AccentCare"
 ];
 
-// Add mock calls data
 const mockCalls = [
   {
     caller_name: "John Smith",
@@ -301,7 +300,6 @@ export function BookingForm() {
         patientId = newPatient.id;
       }
 
-      // Create the initial transport record
       const transportRecord = {
         patient_id: patientId,
         status: 'pending',
@@ -342,20 +340,17 @@ export function BookingForm() {
         billing_notes: data.billing_notes
       };
 
-      // Insert the initial transport record
       const { error: initialError } = await supabase
         .from('transport_records')
         .insert(transportRecord);
 
       if (initialError) throw initialError;
 
-      // If this is a round trip, create the return trip with reversed locations
       if (data.trip_type === 'Round trip') {
         const returnTripId = await generateDispatchId();
         const returnTransportRecord = {
           ...transportRecord,
           dispatch_id: returnTripId,
-          // Swap origin and destination details
           pickup_location: data.dropoff_location,
           dropoff_location: data.pickup_location,
           origin_floor_room: data.destination_floor_room,
@@ -364,7 +359,6 @@ export function BookingForm() {
           destination_floor_room: data.origin_floor_room,
           destination_type: data.origin_type,
           destination_address: data.origin_address,
-          // Link the trips together
           return_trip_id: transportRecord.dispatch_id,
           dispatcher_notes: `Return trip for dispatch ${transportRecord.dispatch_id}\n${data.dispatcher_notes || ''}`
         };
@@ -375,7 +369,6 @@ export function BookingForm() {
 
         if (returnError) throw returnError;
 
-        // Update the original transport record with the return trip ID
         const { error: updateError } = await supabase
           .from('transport_records')
           .update({ return_trip_id: returnTripId })
