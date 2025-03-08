@@ -1,28 +1,24 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { type DispatchFormData } from "@/types/dispatch";
 import { supabase } from "@/integrations/supabase/client";
-import { Bot, MapPin, Search, UserCircle2, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
 import { initGoogleMaps } from "@/services/googleMaps";
-import { DirectionsTab } from "@/components/dashboard/dispatch/DirectionsTab";
 
+// Import our new components
+import { CallerSection } from "./form/CallerSection";
+import { PatientSection } from "./form/PatientSection";
+import { LocationSection } from "./form/LocationSection";
+import { RoutePreviewSection } from "./form/RoutePreviewSection";
+import { ServiceDetailsSection } from "./form/ServiceDetailsSection";
+import { ScheduleDetailsSection } from "./form/ScheduleDetailsSection";
+import { RequirementsSection } from "./form/RequirementsSection";
+import { NotesSection } from "./form/NotesSection";
+import { AIRecommendationsSection } from "./form/AIRecommendationsSection";
+
+// Constants
 const serviceComplaints = [
   "Transfer / Palliative care",
   "Medical alarm",
@@ -67,7 +63,7 @@ const affiliates = [
   "AccentCare"
 ];
 
-// Add mock calls data
+// Mock calls data
 const mockCalls = [
   {
     caller_name: "John Smith",
@@ -136,7 +132,6 @@ const mockCalls = [
 export function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedMockCall, setSelectedMockCall] = useState(0);
-  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
   const [isSearchingPatient, setIsSearchingPatient] = useState(false);
   const [foundPatient, setFoundPatient] = useState<{ id: string; first_name: string; last_name: string } | null>(null);
   
@@ -195,9 +190,6 @@ export function BookingForm() {
       billing_notes: ''
     }
   });
-
-  const billToFacility = watch('bill_to_facility');
-  const billToAffiliate = watch('bill_to_affiliate');
 
   const loadMockCall = () => {
     const mockCall = mockCalls[selectedMockCall];
@@ -439,99 +431,20 @@ export function BookingForm() {
     }
   };
 
-  const renderTimeSlot = () => {
-    const currentHour = new Date().getHours();
-    const slots = Array.from({ length: 24 }).map((_, i) => ({
-      hour: i,
-      isCurrentHour: i === currentHour,
-      isPeak: i >= 8 && i <= 18, // Peak hours between 8 AM and 6 PM
-    }));
-
-    return (
-      <div className="mt-6 space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-500">Time Availability</span>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-medical-secondary/20 rounded-full"></div>
-              <span className="text-xs text-gray-500">Off-Peak</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-medical-secondary rounded-full"></div>
-              <span className="text-xs text-gray-500">Peak Hours</span>
-            </div>
-          </div>
-        </div>
-        <div className="h-12 bg-gray-50 rounded-lg flex overflow-hidden">
-          {slots.map(({ hour, isCurrentHour, isPeak }) => (
-            <div
-              key={hour}
-              className={`flex-1 flex flex-col justify-between relative ${
-                isPeak ? 'bg-medical-secondary/20' : 'bg-medical-secondary/10'
-              } ${isCurrentHour ? 'border-b-2 border-medical-secondary' : ''}`}
-              title={`${hour}:00`}
-            >
-              {hour % 3 === 0 && (
-                <>
-                  <div className="text-[10px] text-gray-500 text-center absolute top-1 w-full">
-                    {hour.toString().padStart(2, '0')}:00
-                  </div>
-                  <div className="w-px h-2 bg-gray-300 absolute bottom-0 left-1/2"></div>
-                </>
-              )}
-              {isCurrentHour && (
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                  <div className="w-1 h-1 bg-medical-secondary rounded-full"></div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const initializeAutocomplete = () => {
-    initGoogleMaps().then(({ google }) => {
-      const originAutocomplete = new google.maps.places.Autocomplete(
-        document.getElementById('pickup_location') as HTMLInputElement,
-        {
-          types: ['establishment'],
-          componentRestrictions: { country: ['us'] },
-          fields: ['place_id', 'name', 'geometry', 'formatted_address'],
-        }
-      );
-
-      originAutocomplete.addListener('place_changed', () => {
-        const place = originAutocomplete.getPlace();
-        if (!place.geometry) {
-          console.log("No details available for input: '" + place.name + "'");
-          return;
-        }
-        setValue('pickup_location', place.name || '');
-        setValue('origin_address', place.formatted_address || '');
-      });
-
-      const destinationAutocomplete = new google.maps.places.Autocomplete(
-        document.getElementById('dropoff_location') as HTMLInputElement,
-        {
-          types: ['establishment'],
-          componentRestrictions: { country: ['us'] },
-          fields: ['place_id', 'name', 'geometry', 'formatted_address'],
-        }
-      );
-
-      destinationAutocomplete.addListener('place_changed', () => {
-        const place = destinationAutocomplete.getPlace();
-        if (!place.geometry) {
-          console.log("No details available for input: '" + place.name + "'");
-          return;
-        }
-        setValue('dropoff_location', place.name || '');
-        setValue('destination_address', place.formatted_address || '');
-      });
-    });
-  };
+  const setupLocationInput = useCallback((input: HTMLInputElement | null, type: 'origin' | 'destination') => {
+    if (!input) return;
+    
+    const loadGoogleMaps = async () => {
+      try {
+        await initGoogleMaps();
+        // Removed the geocodeAddress since it doesn't exist in the googleMaps service
+      } catch (error) {
+        console.error('Error initializing Google Maps:', error);
+      }
+    };
+    
+    loadGoogleMaps();
+  }, []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-[1200px] mx-auto">
@@ -549,296 +462,69 @@ export function BookingForm() {
         </Button>
       </div>
 
-      {/* Caller Information */}
-      <Card className="p-6 border-l-4 border-l-[#9b87f5] bg-gradient-to-br from-white to-[#F1F0FB] shadow-lg hover:shadow-xl transition-all duration-300">
-        <h3 className="text-lg font-semibold mb-4 text-[#7E69AB] flex items-center gap-2">
-          <UserCircle2 className="w-5 h-5" />
-          Caller Information
-        </h3>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="caller_name">Caller Name</Label>
-              <Input
-                id="caller_name"
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-                {...register("caller_name", { required: true })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="caller_phone">Phone</Label>
-              <Input
-                id="caller_phone"
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-                placeholder="###-###-####"
-                {...register("caller_phone", { required: true })}
-              />
-            </div>
-          </div>
-        </div>
-      </Card>
+      {/* Caller Section */}
+      <CallerSection register={register} />
 
-      {/* Patient/Customer Section */}
-      <Card className="p-6 border-l-4 border-l-[#D946EF] bg-gradient-to-br from-white to-[#FFDEE2] shadow-lg hover:shadow-xl transition-all duration-300">
-        <h3 className="text-lg font-semibold mb-4 text-[#D946EF] flex items-center gap-2">
-          <UserCircle2 className="w-5 h-5" />
-          Patient / Customer Information
-        </h3>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="patient_last_name">Last Name</Label>
-              <div className="relative">
-                <Input
-                  id="patient_last_name"
-                  {...register("patient_last_name")}
-                  className="border-medical-secondary/30 focus:border-medical-secondary"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="patient_first_name">First Name</Label>
-              <Input
-                id="patient_first_name"
-                {...register("patient_first_name")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-          </div>
-          <div className="flex justify-between items-center">
-            <div className="flex-1">
-              {foundPatient && (
-                <Link 
-                  to={`/patient/${encodeURIComponent(`${foundPatient.last_name}, ${foundPatient.first_name} (PAT-${foundPatient.id.slice(0, 5)})`)}` }
-                  className="text-medical-secondary hover:text-medical-secondary/80 font-medium flex items-center gap-2"
-                >
-                  <UserCircle2 className="w-4 h-4" />
-                  View {foundPatient.first_name} {foundPatient.last_name}'s Profile
-                </Link>
-              )}
-            </div>
-            <Button
-              type="button"
-              onClick={handlePatientSearch}
-              disabled={isSearchingPatient}
-              className="flex items-center gap-2 bg-medical-secondary text-white hover:bg-medical-secondary/90"
-            >
-              <Search className="w-4 h-4" />
-              {isSearchingPatient ? "Searching..." : "Search Patient"}
-            </Button>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="patient_dob">Date of Birth</Label>
-            <Input
-              id="patient_dob"
-              type="date"
-              {...register("patient_dob")}
-              className="border-medical-secondary/30 focus:border-medical-secondary"
-            />
-          </div>
-          {!foundPatient && (
-            <>
-              <p className="text-sm text-gray-500 italic">
-                A new patient record will be created when you save this dispatch.
-              </p>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleCreatePatient}
-                className="w-full bg-medical-highlight text-medical-primary hover:bg-medical-highlight/90"
-              >
-                Create Patient Record Now
-              </Button>
-            </>
-          )}
-        </div>
-      </Card>
+      {/* Patient Section */}
+      <PatientSection 
+        register={register} 
+        watch={watch} 
+        setValue={setValue} 
+        foundPatient={foundPatient} 
+        isSearchingPatient={isSearchingPatient} 
+        handlePatientSearch={handlePatientSearch} 
+        handleCreatePatient={handleCreatePatient} 
+      />
 
       {/* Origin Location */}
-      <Card className="p-6 border-l-4 border-l-[#0EA5E9] bg-gradient-to-br from-white to-[#D3E4FD] shadow-lg hover:shadow-xl transition-all duration-300">
-        <h3 className="text-lg font-semibold mb-4 text-[#0EA5E9] flex items-center gap-2">
-          <MapPin className="w-5 h-5" />
-          Origin Location
-        </h3>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Location Name</Label>
-            <Input 
-              id="pickup_location"
-              {...register("pickup_location")} 
-              className="border-medical-secondary/30 focus:border-medical-secondary"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Floor/Room</Label>
-              <Input 
-                {...register("origin_floor_room")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Type</Label>
-              <Select onValueChange={(value) => register("origin_type").onChange({ target: { value } })}>
-                <SelectTrigger className="border-medical-secondary/30">
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="hospital">Hospital</SelectItem>
-                  <SelectItem value="nursing_home">Nursing Home</SelectItem>
-                  <SelectItem value="residence">Residence</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Address</Label>
-            <Input 
-              {...register("origin_address")}
-              className="border-medical-secondary/30 focus:border-medical-secondary"
-            />
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label>City</Label>
-              <Input 
-                {...register("origin_city")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>State</Label>
-              <Input 
-                {...register("origin_state")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>ZIP</Label>
-              <Input 
-                {...register("origin_zip")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>County</Label>
-              <Input 
-                {...register("origin_county")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Phone Number</Label>
-            <Input 
-              {...register("origin_phone")}
-              className="border-medical-secondary/30 focus:border-medical-secondary"
-              placeholder="(XXX) XXX-XXXX"
-            />
-          </div>
-          <Button 
-            type="button"
-            variant="outline"
-            onClick={() => handleSaveFacility('origin')}
-            className="w-full mt-4 bg-medical-highlight text-medical-primary hover:bg-medical-highlight/90"
-          >
-            Save as New Facility
-          </Button>
-        </div>
-      </Card>
+      <LocationSection 
+        type="origin" 
+        register={register}
+        watch={watch}
+        handleSaveFacility={handleSaveFacility}
+        inputRef={(input) => setupLocationInput(input, 'origin')}
+      />
+
+      {/* Map Visualization */}
+      <RoutePreviewSection
+        pickupLocation={watch('pickup_location')}
+        dropoffLocation={watch('dropoff_location')}
+      />
 
       {/* Destination Location */}
-      <Card className="p-6 border-l-4 border-l-[#F97316] bg-gradient-to-br from-white to-[#FEC6A1] shadow-lg hover:shadow-xl transition-all duration-300">
-        <h3 className="text-lg font-semibold mb-4 text-[#F97316] flex items-center gap-2">
-          <MapPin className="w-5 h-5" />
-          Destination Location
-        </h3>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Location Name</Label>
-            <Input 
-              id="dropoff_location"
-              {...register("dropoff_location")}
-              className="border-medical-secondary/30 focus:border-medical-secondary"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Floor/Room</Label>
-              <Input 
-                {...register("destination_floor_room")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Type</Label>
-              <Select onValueChange={(value) => register("destination_type").onChange({ target: { value } })}>
-                <SelectTrigger className="border-medical-secondary/30">
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="hospital">Hospital</SelectItem>
-                  <SelectItem value="nursing_home">Nursing Home</SelectItem>
-                  <SelectItem value="residence">Residence</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Address</Label>
-            <Input 
-              {...register("destination_address")}
-              className="border-medical-secondary/30 focus:border-medical-secondary"
-            />
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label>City</Label>
-              <Input 
-                {...register("destination_city")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>State</Label>
-              <Input 
-                {...register("destination_state")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>ZIP</Label>
-              <Input 
-                {...register("destination_zip")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>County</Label>
-              <Input 
-                {...register("destination_county")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Phone Number</Label>
-            <Input 
-              {...register("destination_phone")}
-              className="border-medical-secondary/30 focus:border-medical-secondary"
-              placeholder="(XXX) XXX-XXXX"
-            />
-          </div>
-          <Button 
-            type="button"
-            variant="outline"
-            onClick={() => handleSaveFacility('destination')}
-            className="w-full mt-4 bg-medical-highlight text-medical-primary hover:bg-medical-highlight/90"
-          >
-            Save as New Facility
-          </Button>
-        </div>
-      </Card>
+      <LocationSection 
+        type="destination" 
+        register={register}
+        watch={watch}
+        handleSaveFacility={handleSaveFacility}
+        inputRef={(input) => setupLocationInput(input, 'destination')}
+      />
+
+      {/* Service Details */}
+      <ServiceDetailsSection 
+        register={register}
+        watch={watch}
+        setValue={setValue}
+        serviceComplaints={serviceComplaints}
+        facilities={facilities}
+        affiliates={affiliates}
+      />
+
+      {/* Schedule Details */}
+      <ScheduleDetailsSection 
+        register={register}
+        watch={watch}
+        setValue={setValue}
+      />
+
+      {/* Requirements Section */}
+      <RequirementsSection register={register} />
+
+      {/* Notes Section */}
+      <NotesSection register={register} />
+
+      {/* AI Recommendations */}
+      <AIRecommendationsSection />
       
       <div className="flex justify-end space-x-4 pt-4">
         <Button 
