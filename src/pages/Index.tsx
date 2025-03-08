@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-// Move console logs outside of the component
 const logStartup = () => {
   console.log("Index component starting to render...");
 };
@@ -118,7 +117,6 @@ const menuItems = [
 ];
 
 const Index = () => {
-  // Log startup
   logStartup();
   console.log("Menu items loaded:", menuItems.length);
 
