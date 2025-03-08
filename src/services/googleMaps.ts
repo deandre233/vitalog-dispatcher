@@ -106,7 +106,6 @@ export const getRouteDetails = async (
 
 export const geocodeAddress = async (address: string): Promise<Location> => {
   await initGoogleMaps();
-  
   const geocoder = new google.maps.Geocoder();
   
   return new Promise((resolve, reject) => {
@@ -140,6 +139,7 @@ export const analyzeTrafficConditions = async (
     const trafficDuration = leg.duration_in_traffic?.value || normalDuration;
     const delay = trafficDuration - normalDuration;
     
+    // Calculate traffic severity based on delay percentage
     const delayPercentage = (delay / normalDuration) * 100;
     let severity: 'low' | 'medium' | 'high' = 'low';
     

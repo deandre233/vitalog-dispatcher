@@ -19,9 +19,6 @@ import { type DispatchFormData } from "@/types/dispatch";
 import { supabase } from "@/integrations/supabase/client";
 import { Bot, MapPin, Search, UserCircle2, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import { initGoogleMaps } from "@/services/googleMaps";
-import { Card } from "@/components/ui/card";
-import { DirectionsTab } from "@/components/dashboard/dispatch/DirectionsTab";
 
 const serviceComplaints = [
   "Transfer / Palliative care",
@@ -139,8 +136,6 @@ export function BookingForm() {
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
   const [isSearchingPatient, setIsSearchingPatient] = useState(false);
   const [foundPatient, setFoundPatient] = useState<{ id: string; first_name: string; last_name: string } | null>(null);
-  const [originAutocomplete, setOriginAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
-  const [destinationAutocomplete, setDestinationAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   
   const { register, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm<DispatchFormData>({
     defaultValues: {
@@ -493,93 +488,6 @@ export function BookingForm() {
     );
   };
 
-  // Initialize Google Maps and set up autocomplete
-  const initializeAutocomplete = async (inputElement: HTMLInputElement, type: 'origin' | 'destination') => {
-    await initGoogleMaps();
-    
-    const autocomplete = new google.maps.places.Autocomplete(inputElement, {
-      types: ['address'],
-      componentRestrictions: { country: 'US' },
-      fields: ['address_components', 'formatted_address', 'geometry']
-    });
-
-    if (type === 'origin') {
-      setOriginAutocomplete(autocomplete);
-    } else {
-      setDestinationAutocomplete(autocomplete);
-    }
-
-    // Add the place_changed event listener
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-      if (!place.address_components) return;
-
-      let streetNumber = '';
-      let route = '';
-      let city = '';
-      let state = '';
-      let zip = '';
-      let county = '';
-
-      for (const component of place.address_components) {
-        const type = component.types[0];
-        switch (type) {
-          case 'street_number':
-            streetNumber = component.long_name;
-            break;
-          case 'route':
-            route = component.long_name;
-            break;
-          case 'locality':
-            city = component.long_name;
-            break;
-          case 'administrative_area_level_1':
-            state = component.short_name;
-            break;
-          case 'postal_code':
-            zip = component.long_name;
-            break;
-          case 'administrative_area_level_2':
-            county = component.long_name.replace(' County', '');
-            break;
-        }
-      }
-
-      const address = `${streetNumber} ${route}`.trim();
-
-      if (type === 'origin') {
-        setValue('origin_address', address);
-        setValue('origin_city', city);
-        setValue('origin_state', state);
-        setValue('origin_zip', zip);
-        setValue('origin_county', county);
-        setValue('pickup_location', address);
-      } else {
-        setValue('destination_address', address);
-        setValue('destination_city', city);
-        setValue('destination_state', state);
-        setValue('destination_zip', zip);
-        setValue('destination_county', county);
-        setValue('dropoff_location', address);
-      }
-
-      toast.success(`${type === 'origin' ? 'Pickup' : 'Dropoff'} address details filled automatically`);
-    });
-
-    // Add input event listener to handle minimum character requirement
-    inputElement.addEventListener('input', (e) => {
-      const input = e.target as HTMLInputElement;
-      if (input.value.length < 3) {
-        autocomplete.set('types', []); // Disable suggestions
-      } else {
-        autocomplete.set('types', ['address']); // Enable suggestions
-      }
-    });
-
-    // Initially disable suggestions until 3 characters are typed
-    autocomplete.set('types', []);
-  };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-[1200px] mx-auto">
       <div className="flex justify-between items-center mb-8">
@@ -710,16 +618,10 @@ export function BookingForm() {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Location Name</Label>
-            <div className="relative">
-              <Input 
-                {...register("pickup_location")} 
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-                ref={(input) => {
-                  if (input) initializeAutocomplete(input, 'origin');
-                }}
-                placeholder="Type at least 3 characters to see suggestions..."
-              />
-            </div>
+            <Input 
+              {...register("pickup_location")} 
+              className="border-medical-secondary/30 focus:border-medical-secondary"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -799,23 +701,6 @@ export function BookingForm() {
         </div>
       </Card>
 
-      {/* Map Visualization */}
-      {watch('pickup_location') && watch('dropoff_location') && (
-        <Card className="p-6 border-l-4 border-l-[#4B5563] bg-gradient-to-br from-white to-[#F3F4F6] shadow-lg hover:shadow-xl transition-all duration-300">
-          <h3 className="text-lg font-semibold mb-4 text-[#4B5563] flex items-center gap-2">
-            <MapPin className="w-5 h-5" />
-            Route Preview
-          </h3>
-          <div className="w-full h-[400px] rounded-lg overflow-hidden">
-            <DirectionsTab
-              transportId=""
-              pickupLocation={watch('pickup_location')}
-              dropoffLocation={watch('dropoff_location')}
-            />
-          </div>
-        </Card>
-      )}
-
       {/* Destination Location */}
       <Card className="p-6 border-l-4 border-l-[#F97316] bg-gradient-to-br from-white to-[#FEC6A1] shadow-lg hover:shadow-xl transition-all duration-300">
         <h3 className="text-lg font-semibold mb-4 text-[#F97316] flex items-center gap-2">
@@ -825,16 +710,10 @@ export function BookingForm() {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Location Name</Label>
-            <div className="relative">
-              <Input 
-                {...register("dropoff_location")}
-                className="border-medical-secondary/30 focus:border-medical-secondary"
-                ref={(input) => {
-                  if (input) initializeAutocomplete(input, 'destination');
-                }}
-                placeholder="Type at least 3 characters to see suggestions..."
-              />
-            </div>
+            <Input 
+              {...register("dropoff_location")}
+              className="border-medical-secondary/30 focus:border-medical-secondary"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
