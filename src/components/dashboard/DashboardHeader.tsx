@@ -1,5 +1,4 @@
-
-import { Bell, Settings, User, Brain } from "lucide-react";
+import { Bell, Settings, User, Calendar, Clock } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +9,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { DispatchTabs } from "../dispatch/navigation/DispatchTabs";
-import { Badge } from "@/components/ui/badge";
 
-export type ViewType = 'active' | 'schedule' | 'calendar' | 'ai';
+export type ViewType = 'active' | 'schedule' | 'calendar';
 
 interface DashboardHeaderProps {
   onViewChange?: (view: ViewType) => void;
@@ -32,25 +29,15 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
   return (
     <div className="flex flex-col bg-white border-b">
       <div className="flex justify-between items-center p-6">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-semibold text-medical-primary">
-            Mission Control
-          </h1>
-          <Badge variant="outline" className="gap-1 px-2 py-1 bg-blue-50 text-blue-700 border-blue-200">
-            <Brain className="h-3.5 w-3.5" />
-            <span>AI Assisted</span>
-          </Badge>
-        </div>
+        <h1 className="text-2xl font-semibold text-medical-primary">
+          Dispatch Control
+        </h1>
         <div className="flex items-center gap-4">
           <Button
             variant={unattendedMode ? "default" : "outline"}
             onClick={() => setUnattendedMode(!unattendedMode)}
-            className={unattendedMode ? 
-              "bg-green-600 hover:bg-green-700 text-white" : 
-              "border-green-200 text-green-600 hover:bg-green-50"
-            }
           >
-            {unattendedMode ? "Exit Automated Mode" : "Enter Automated Mode"}
+            {unattendedMode ? "Exit Unattended Mode" : "Enter Unattended Mode"}
           </Button>
           <button className="relative p-2 hover:bg-medical-accent rounded-full">
             <Bell className="w-6 h-6 text-medical-primary" />
@@ -61,7 +48,7 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
               <User className="w-6 h-6 text-medical-primary" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Command Center</DropdownMenuLabel>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
@@ -77,8 +64,31 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
           </DropdownMenu>
         </div>
       </div>
-      <div className="px-6 pb-2">
-        <DispatchTabs activeTab={view} onTabChange={handleViewChange} />
+      <div className="flex gap-2 px-6 pb-2">
+        <Button
+          variant={view === 'active' ? 'default' : 'outline'}
+          onClick={() => handleViewChange('active')}
+          className="gap-2"
+        >
+          <Clock className="w-4 h-4" />
+          Active
+        </Button>
+        <Button
+          variant={view === 'schedule' ? 'default' : 'outline'}
+          onClick={() => handleViewChange('schedule')}
+          className="gap-2"
+        >
+          <Clock className="w-4 h-4" />
+          Schedule
+        </Button>
+        <Button
+          variant={view === 'calendar' ? 'default' : 'outline'}
+          onClick={() => handleViewChange('calendar')}
+          className="gap-2"
+        >
+          <Calendar className="w-4 h-4" />
+          Calendar
+        </Button>
       </div>
     </div>
   );

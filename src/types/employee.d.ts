@@ -16,20 +16,6 @@ export interface Employee {
   uses_timeclock?: boolean;
   access_codes?: string;
   photo_url?: string;
-  middle_name?: string;
-  capabilities?: string[];
-  crew_status?: 'available' | 'on-duty' | 'off-duty' | 'on-break';
-  last_status_change?: string;
-  scheduled_shifts?: {
-    start: string;
-    end: string;
-    role: string;
-  }[];
-  contact_email?: string;
-  contact_phone?: string;
-  contact_address?: string;
-  employee_number?: string;
-  job_title?: string;
 }
 
 export interface EmployeeRole {
@@ -76,30 +62,4 @@ export interface EmployeePrivileges {
   can_use_ai_assistance: boolean;
   created_at: string;
   updated_at: string;
-}
-
-export interface AICrewRecommendation {
-  employeeId: string;
-  matchScore: number;
-  reasons: string[];
-  availabilityScore: number;
-  skillMatchScore: number;
-  certificationMatchScore: number;
-  warnings?: string[];
-}
-
-export interface EmployeeCapability {
-  name: string;
-  level: 'basic' | 'intermediate' | 'advanced';
-  certified: boolean;
-  expiryDate?: string;
-  icon?: string;
-}
-
-export interface CapabilityAlert {
-  employeeId: string;
-  type: 'expiring' | 'missing' | 'conflict';
-  message: string;
-  severity: 'low' | 'medium' | 'high';
-  relatedTo: string;
 }

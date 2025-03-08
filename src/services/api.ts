@@ -1,59 +1,91 @@
+import { supabase } from "@/integrations/supabase/client";
+import { handleError } from "@/utils/errorHandling";
+import { logger } from "@/utils/logger";
+import { Database } from "@/integrations/supabase/types";
 
-import { TableName, QueryParams } from './api/types';
-import * as crudOps from './api/crudOperations';
-import * as advancedOps from './api/advancedQueries';
-import { invalidateCache } from './api/cache-utils';
-
-export type { TableName, QueryParams };
+type TableNames = keyof Database['public']['Tables'];
 
 export const api = {
-  /**
-   * Fetch records from a table with optional filtering
-   */
-  get: crudOps.get,
+  async get<T>(table: TableNames, query: any = {}): Promise<T[]> {
+    try {
+      logger.info(`Fetching data from ${table}`, query);
+      const { data, error } = await supabase
+        .from(table)
+        .select(query.select || '*')
+        .order(query.orderBy || 'created_at', { ascending: false });
 
-  /**
-   * Fetch a single record by ID
-   */
-  getById: crudOps.getById,
+      if (error) throw error;
+      return data as T[];
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  },
 
-  /**
-   * Create a new record
-   */
-  create: crudOps.create,
+  async getById<T>(table: TableNames, id: string, query: any = {}): Promise<T | null> {
+    try {
+      logger.info(`Fetching ${table} by id: ${id}`, query);
+      const { data, error } = await supabase
+        .from(table)
+        .select(query.select || '*')
+        .eq('id', id)
+        .single();
 
-  /**
-   * Update an existing record
-   */
-  update: crudOps.update,
+      if (error) throw error;
+      return data as T;
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  },
 
-  /**
-   * Delete a record
-   */
-  delete: crudOps.deleteRecord,
-  
-  /**
-   * Execute a raw SQL query (use with caution)
-   */
-  executeRawQuery: advancedOps.executeRawQuery,
-  
-  /**
-   * Count records in a table with optional filtering
-   */
-  count: advancedOps.count,
-  
-  /**
-   * Clear cache for a specific table or all tables
-   */
-  invalidateCache,
+  async create<T>(table: TableNames, data: Partial<T>): Promise<T> {
+    try {
+      logger.info(`Creating new ${table}`, data);
+      const { data: created, error } = await supabase
+        .from(table)
+        .insert(data)
+        .select()
+        .single();
 
-  /**
-   * Update employee location
-   */
-  updateEmployeeLocation: crudOps.updateEmployeeLocation,
+      if (error) throw error;
+      return created as T;
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  },
 
-  /**
-   * Get employee location history
-   */
-  getEmployeeLocationHistory: crudOps.getEmployeeLocationHistory
+  async update<T>(table: TableNames, id: string, data: Partial<T>): Promise<T> {
+    try {
+      logger.info(`Updating ${table} ${id}`, data);
+      const { data: updated, error } = await supabase
+        .from(table)
+        .update(data)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return updated as T;
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  },
+
+  async delete(table: TableNames, id: string): Promise<void> {
+    try {
+      logger.info(`Deleting ${table} ${id}`);
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  }
 };

@@ -1,4 +1,3 @@
-
 import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import { Button } from "./components/ui/button";
 import Index from "./pages/Index";
@@ -12,7 +11,6 @@ import AlertsConfig from "./pages/AlertsConfig";
 import Billing from "./pages/Billing";
 import { EmployeeDirectory } from "./pages/EmployeeDirectory";
 import EmployeeProfile from "./pages/EmployeeProfile";
-import CreateEmployee from "./pages/CreateEmployee";
 import { PatientRecord } from "./pages/PatientRecord";
 import { OperationsMap } from "./pages/OperationsMap";
 import { ShiftRecords } from "./pages/ShiftRecords";
@@ -30,10 +28,6 @@ import { ResourceLibrary } from "./pages/ResourceLibrary";
 import { Categories } from "./pages/Categories";
 import { HistoricalEntry } from "./pages/HistoricalEntry";
 import { ExternalLink } from "./pages/ExternalLink";
-import BroadcastCenter from "./pages/BroadcastCenter";
-import { TransportDashboard } from "./pages/TransportDashboard";
-import PredictiveAnalytics from "./pages/PredictiveAnalytics";
-import ModuleDashboard from "./pages/ModuleDashboard";
 
 const router = createBrowserRouter([
   {
@@ -59,7 +53,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/create",
-    element: <CreateEmployee />,
+    element: <CreateDispatch />,
   },
   {
     path: "/crew",
@@ -156,30 +150,6 @@ const router = createBrowserRouter([
   {
     path: "/external-link",
     element: <ExternalLink />,
-  },
-  {
-    path: "/hr/announcements",
-    element: <BroadcastCenter />,
-  },
-  {
-    path: "/hr/employees",
-    element: <EmployeeDirectory />,
-  },
-  {
-    path: "/transport-dashboard",
-    element: <TransportDashboard />,
-  },
-  {
-    path: "/hr/transport-dashboard",
-    element: <TransportDashboard />,
-  },
-  {
-    path: "/hr/predictive-analytics",
-    element: <PredictiveAnalytics />,
-  },
-  {
-    path: "/modules",
-    element: <ModuleDashboard />,
   }
 ]);
 

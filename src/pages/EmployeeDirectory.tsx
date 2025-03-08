@@ -1,34 +1,64 @@
-
-import React from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { HRLayout } from "@/components/layout/HRLayout";
-import { EmployeeDirectoryHeader } from "@/components/employee/EmployeeDirectoryHeader";
-import { EmployeeCardGrid } from "@/components/employee/EmployeeCardGrid";
-import { EmployeeTable } from "@/components/employee/EmployeeTable";
-import { useEmployeeDirectory } from "@/hooks/useEmployeeDirectory";
-import { getCapabilityDisplay } from "@/utils/capabilityUtils";
+import type { Employee } from "@/types/employee";
+import { handleError } from "@/utils/errorHandling";
+import { logger } from "@/utils/logger";
 
+/**
+ * EmployeeDirectory Component
+ * 
+ * Displays a grid of employee cards with basic information and navigation
+ * to individual employee profiles.
+ */
 export function EmployeeDirectory() {
-  const {
-    employees,
-    filteredEmployees,
-    searchQuery,
-    isLoading,
-    alerts,
-    showCardView,
-    sortField,
-    sortDirection,
-    aiRecommendations,
-    assignmentRequirements,
-    handleSearch,
-    handleEmployeeClick,
-    handleAddEmployee,
-    handleSort,
-    handleGetRecommendations,
-    setShowCardView,
-    setAiRecommendations,
-    setAssignmentRequirements,
-  } = useEmployeeDirectory();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        setIsLoading(true);
+        logger.info('Fetching employees from database');
+        
+        const { data, error } = await supabase
+          .from('employees')
+          .select('*')
+          .order('last_name', { ascending: true });
+
+        if (error) {
+          handleError(error);
+          throw error;
+        }
+
+        setEmployees(data || []);
+        logger.info(`Successfully fetched ${data?.length || 0} employees`);
+      } catch (error) {
+        console.error('Error fetching employees:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load employee directory. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEmployees();
+  }, [toast]);
+
+  const handleEmployeeClick = (employeeId: string) => {
+    logger.info(`Navigating to employee profile: ${employeeId}`);
+    navigate(`/employee/${employeeId}`);
+  };
 
   if (isLoading) {
     return (
@@ -43,51 +73,52 @@ export function EmployeeDirectory() {
   return (
     <HRLayout>
       <div className="space-y-6">
-        <EmployeeDirectoryHeader 
-          searchQuery={searchQuery}
-          onSearch={handleSearch}
-          onAddEmployee={handleAddEmployee}
-          showCardView={showCardView}
-          setShowCardView={setShowCardView}
-          alertCount={alerts.length}
-          assignmentRequirements={assignmentRequirements}
-          setAssignmentRequirements={setAssignmentRequirements}
-          handleGetRecommendations={handleGetRecommendations}
-          aiRecommendations={aiRecommendations}
-          setAiRecommendations={setAiRecommendations}
-          employees={employees}
-          handleEmployeeClick={handleEmployeeClick}
-        />
-
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Employee Directory</h1>
           <Badge variant="outline" className="text-sm">
-            {filteredEmployees.length} Employees
+            {employees.length} Employees
           </Badge>
         </div>
         
-        {showCardView ? (
-          <EmployeeCardGrid 
-            employees={filteredEmployees}
-            alerts={alerts}
-            onEmployeeClick={handleEmployeeClick}
-            getCapabilityDisplay={getCapabilityDisplay}
-          />
-        ) : (
-          <EmployeeTable 
-            employees={filteredEmployees}
-            alerts={alerts}
-            onEmployeeClick={handleEmployeeClick}
-            getCapabilityDisplay={getCapabilityDisplay}
-            sortField={sortField}
-            sortDirection={sortDirection}
-            handleSort={handleSort}
-          />
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {employees.map((employee) => (
+            <Card 
+              key={employee.id}
+              className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => handleEmployeeClick(employee.id)}
+              role="button"
+              tabIndex={0}
+              aria-label={`View ${employee.first_name} ${employee.last_name}'s profile`}
+            >
+              <div className="flex flex-col items-center space-y-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage 
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${employee.id}`} 
+                    alt={`${employee.first_name} ${employee.last_name}`}
+                  />
+                  <AvatarFallback>
+                    {employee.first_name?.[0]}{employee.last_name?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="text-center">
+                  <h3 className="font-semibold">
+                    {employee.first_name} {employee.last_name}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {employee.station || 'Unassigned'}
+                  </p>
+                  <Badge variant="outline" className="mt-2">
+                    {employee.certification_level || 'Uncertified'}
+                  </Badge>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
 
-        {filteredEmployees.length === 0 && (
+        {employees.length === 0 && (
           <div className="text-center py-10">
-            <p className="text-gray-500">No employees found matching your search</p>
+            <p className="text-gray-500">No employees found in directory</p>
           </div>
         )}
       </div>
