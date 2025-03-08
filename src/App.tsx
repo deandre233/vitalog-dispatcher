@@ -1,3 +1,4 @@
+
 import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import { Button } from "./components/ui/button";
 import Index from "./pages/Index";
@@ -11,6 +12,7 @@ import AlertsConfig from "./pages/AlertsConfig";
 import Billing from "./pages/Billing";
 import { EmployeeDirectory } from "./pages/EmployeeDirectory";
 import EmployeeProfile from "./pages/EmployeeProfile";
+import CreateEmployee from "./pages/CreateEmployee";
 import { PatientRecord } from "./pages/PatientRecord";
 import { OperationsMap } from "./pages/OperationsMap";
 import { ShiftRecords } from "./pages/ShiftRecords";
@@ -28,6 +30,7 @@ import { ResourceLibrary } from "./pages/ResourceLibrary";
 import { Categories } from "./pages/Categories";
 import { HistoricalEntry } from "./pages/HistoricalEntry";
 import { ExternalLink } from "./pages/ExternalLink";
+import AnnouncementsControl from "./pages/AnnouncementsControl";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +47,10 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/hr/announcements",
+    element: <AnnouncementsControl />,
+  },
+  {
     path: "/dispatch",
     element: <ActiveDispatches />,
   },
@@ -53,7 +60,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/create",
-    element: <CreateDispatch />,
+    element: <CreateEmployee />,
   },
   {
     path: "/crew",

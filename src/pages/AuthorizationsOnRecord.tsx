@@ -31,14 +31,7 @@ export const AuthorizationsOnRecord = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedFacility, setSelectedFacility] = useState<string>("");
 
-  const { data, isLoading, refetch } = useAuthorizationRecords({
-    showExpired,
-    showUpcoming,
-    showOneShot,
-    showDeleted,
-    date: selectedDate,
-    facility: selectedFacility
-  });
+  const { authorizations, isLoading, error, stats, refetch } = useAuthorizationRecords();
 
   const handleRefresh = async () => {
     await refetch();
@@ -134,12 +127,12 @@ export const AuthorizationsOnRecord = () => {
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-3">
                   <AuthorizationTable 
-                    authorizations={data?.records || []} 
+                    authorizations={authorizations || []} 
                     isLoading={isLoading} 
                   />
                 </div>
                 <div className="lg:col-span-1">
-                  <AIInsightsPanel insights={data?.aiInsights || []} />
+                  <AIInsightsPanel insights={stats?.aiInsights || []} />
                 </div>
               </div>
             </main>

@@ -197,3 +197,5 @@ export const AuthorizationQueue = () => {
     </div>
   );
 };
+
+export default AuthorizationQueue;

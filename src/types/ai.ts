@@ -1,8 +1,11 @@
+
 export interface AIInsight {
   type: 'optimization' | 'warning' | 'prediction';
   message: string;
   confidence: number;
   impact: 'high' | 'medium' | 'low';
+  recommendation: string;
+  timeEstimate: string;
 }
 
 export interface AIRecommendation {
