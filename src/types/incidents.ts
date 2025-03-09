@@ -58,3 +58,30 @@ export interface IncidentAnalysisResult {
   similarIncidents: string;
   preventionTips: string[];
 }
+
+export type PerformanceWriteUpSubject = 
+  | "missed_punch" 
+  | "tardiness" 
+  | "pcr_quality" 
+  | "pcr_completion" 
+  | "inservice_attendance" 
+  | "protocol_adherence" 
+  | "patient_feedback"
+  | "teamwork"
+  | "overall_performance";
+
+export interface PerformanceWriteUpData {
+  employeeId: string;
+  employeeName: string;
+  subject: PerformanceWriteUpSubject;
+  score: number;
+  trend: string;
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  departmentAvg: number;
+}
+
+export interface PerformanceWriteUpResult {
+  content: string;
+  severity: "recognition" | "advisory" | "warning" | "critical";
+  title: string;
+}
