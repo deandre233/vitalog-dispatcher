@@ -1,122 +1,92 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { handleError } from "@/utils/errorHandling";
+import { logger } from "@/utils/logger";
+import { Database } from "@/integrations/supabase/types";
 
-export async function fetchPatients(params?: {
-  search?: string;
-  filters?: Record<string, any>;
-  limit?: number;
-  offset?: number;
-}) {
-  try {
-    let query = supabase.from("patients").select("*");
+type TableNames = keyof Database['public']['Tables'];
 
-    if (params?.search) {
-      query = query.or(
-        `first_name.ilike.%${params.search}%,last_name.ilike.%${params.search}%,email.ilike.%${params.search}%`
-      );
+export const api = {
+  async get<T>(table: TableNames, query: any = {}): Promise<T[]> {
+    try {
+      logger.info(`Fetching data from ${table}`, query);
+      const { data, error } = await supabase
+        .from(table)
+        .select(query.select || '*')
+        .order(query.orderBy || 'created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as T[];
+    } catch (error) {
+      handleError(error);
+      throw error;
     }
+  },
 
-    if (params?.filters) {
-      Object.entries(params.filters).forEach(([key, value]) => {
-        if (value) {
-          query = query.eq(key, value);
-        }
-      });
+  async getById<T>(table: TableNames, id: string, query: any = {}): Promise<T | null> {
+    try {
+      logger.info(`Fetching ${table} by id: ${id}`, query);
+      const { data, error } = await supabase
+        .from(table)
+        .select(query.select || '*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      return data as T;
+    } catch (error) {
+      handleError(error);
+      throw error;
     }
+  },
 
-    if (params?.limit) {
-      query = query.limit(params.limit);
+  async create<T extends Record<string, any>>(table: TableNames, data: Partial<T>): Promise<T> {
+    try {
+      logger.info(`Creating new ${table}`, data);
+      const { data: created, error } = await supabase
+        .from(table)
+        .insert(data)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return created as T;
+    } catch (error) {
+      handleError(error);
+      throw error;
     }
+  },
 
-    if (params?.offset) {
-      query = query.range(params.offset, params.offset + (params.limit || 10) - 1);
+  async update<T extends Record<string, any>>(table: TableNames, id: string, data: Partial<T>): Promise<T> {
+    try {
+      logger.info(`Updating ${table} ${id}`, data);
+      const { data: updated, error } = await supabase
+        .from(table)
+        .update(data)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return updated as T;
+    } catch (error) {
+      handleError(error);
+      throw error;
     }
+  },
 
-    const { data, error } = await query;
+  async delete(table: TableNames, id: string): Promise<void> {
+    try {
+      logger.info(`Deleting ${table} ${id}`);
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq('id', id);
 
-    if (error) {
-      throw new Error(error.message);
+      if (error) throw error;
+    } catch (error) {
+      handleError(error);
+      throw error;
     }
-
-    return { data, error: null };
-  } catch (error) {
-    console.error("Error fetching patients:", error);
-    return {
-      data: null,
-      error: error instanceof Error ? error.message : "An unknown error occurred",
-    };
   }
-}
-
-// Simplified pagination params
-export interface PaginationParams {
-  page: number;
-  pageSize: number;
-}
-
-export interface FetchResourceParams {
-  search?: string;
-  filters?: Record<string, any>;
-  pagination?: PaginationParams;
-  sort?: {
-    field: string;
-    direction: 'asc' | 'desc';
-  };
-}
-
-// Fixed generic function to avoid deep instantiation issues
-export async function fetchResource<T>(
-  resourceName: string,
-  params?: FetchResourceParams
-): Promise<{ data: T[] | null; count: number | null; error: string | null }> {
-  try {
-    // Fix type safety by explicitly typing the table name
-    const { data, error, count } = await supabase
-      .from(resourceName)
-      .select('*', { count: 'exact' })
-      .modify(query => {
-        if (params?.search) {
-          query.or(`name.ilike.%${params.search}%,description.ilike.%${params.search}%`);
-        }
-
-        if (params?.filters) {
-          Object.entries(params.filters).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-              query.eq(key, value);
-            }
-          });
-        }
-
-        if (params?.sort) {
-          query.order(params.sort.field, {
-            ascending: params.sort.direction === 'asc',
-          });
-        }
-
-        if (params?.pagination) {
-          const { page, pageSize } = params.pagination;
-          const start = (page - 1) * pageSize;
-          const end = start + pageSize - 1;
-          query.range(start, end);
-        }
-      });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    // Type assertion to fix the conversion issue
-    return { 
-      data: data as T[], 
-      count, 
-      error: null 
-    };
-  } catch (error) {
-    console.error(`Error fetching ${resourceName}:`, error);
-    return {
-      data: null,
-      count: null,
-      error: error instanceof Error ? error.message : "An unknown error occurred",
-    };
-  }
-}
+};
