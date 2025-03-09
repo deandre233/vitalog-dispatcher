@@ -1,46 +1,47 @@
 
-import { CongestionLevel } from "../../../types/service-queue";
+import { DispatchStatus } from "../DispatchStatusBar";
 
-export const simulateRealTimeUpdates = async (dispatch: any): Promise<any> => {
-  const now = new Date();
-  const activationTime = new Date(dispatch.activationTime);
-  const elapsedMinutes = Math.floor((now.getTime() - activationTime.getTime()) / (1000 * 60));
-  
-  let progress = Number(dispatch.progress || 0);
-  if (dispatch.assignedTo !== "Unassigned") {
-    progress = Math.min(100, progress + Math.random() * 5);
+export const getProgressForStatus = (status: DispatchStatus): number => {
+  switch (status) {
+    case "dispatch":
+      return 0;
+    case "enroute":
+      return 20;
+    case "onscene":
+      return 40;
+    case "transporting":
+      return 60;
+    case "destination":
+      return 80;
+    case "available":
+      return 100;
+    case "canceled":
+      return 0;
+    default:
+      return 0;
   }
-
-  let status = dispatch.status;
-  if (progress === 100) {
-    status = "available";
-  } else if (progress > 0) {
-    status = "transporting";
-  }
-
-  const congestionLevels: CongestionLevel[] = ["low", "medium", "high"];
-  const randomCongestionLevel = congestionLevels[Math.floor(Math.random() * congestionLevels.length)];
-
-  return {
-    ...dispatch,
-    status,
-    progress,
-    elapsedTime: `${elapsedMinutes} min`,
-    lastUpdated: now.toISOString(),
-    efficiency: Math.random() * 100,
-    aiRecommendations: {
-      ...dispatch.aiRecommendations,
-      trafficStatus: {
-        ...dispatch.aiRecommendations.trafficStatus,
-        congestionLevel: randomCongestionLevel
-      }
-    }
-  };
 };
 
-export const filterDispatches = (dispatches: any[], status: "assigned" | "unassigned"): any[] => {
-  return dispatches.filter(dispatch => {
-    const isAssigned = dispatch.assignedTo && dispatch.assignedTo !== "Unassigned";
-    return status === "assigned" ? isAssigned : !isAssigned;
-  });
+export const getStatusColor = (status: DispatchStatus): string => {
+  switch (status) {
+    case "dispatch":
+      return "bg-gray-100 text-gray-700";
+    case "enroute":
+      return "bg-blue-100 text-blue-700";
+    case "onscene":
+      return "bg-green-100 text-green-700";
+    case "transporting":
+      return "bg-orange-100 text-orange-700";
+    case "destination":
+      return "bg-yellow-100 text-yellow-700";
+    case "available":
+      return "bg-emerald-100 text-emerald-700";
+    case "canceled":
+      return "bg-red-100 text-red-700";
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
 };
+
+// Define CongestionLevel type if not available in service-queue
+export type CongestionLevel = "low" | "medium" | "high" | "critical" | "unknown";

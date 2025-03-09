@@ -1,134 +1,95 @@
-import { useEffect, useState } from "react";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/navigation/AppSidebar";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { ApiResponse } from "@/types/api";
 import { PartnerTable } from "@/components/partner/PartnerTable";
+import { PartnerAdvancedSearch } from "@/components/partner/PartnerAdvancedSearch";
 import { PartnerMetrics } from "@/components/partner/PartnerMetrics";
 import { PartnerInsights } from "@/components/partner/PartnerInsights";
-import { PartnerAdvancedSearch } from "@/components/partner/PartnerAdvancedSearch";
-import { Tables } from "@/integrations/supabase/types";
-import { api } from "@/services/api";
+import { MainLayout } from "@/components/layout/MainLayout";
 
-type Partner = Tables<"partners">;
+type Partner = {
+  id: string;
+  name: string;
+  partner_type: string;
+  status: string;
+  location: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone: string;
+  contract_start_date: string;
+  contract_end_date: string;
+  notes: string;
+  ai_recommendations: any;
+  created_at: string;
+  updated_at: string;
+};
 
-export const PartnerList = () => {
+export function PartnerList() {
+  const { toast } = useToast();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [filteredPartners, setFilteredPartners] = useState<Partner[]>([]);
-  const [showInactive, setShowInactive] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadPartners();
-  }, []);
+    const fetchPartners = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('partners')
+          .select('*');
 
-  const loadPartners = async () => {
-    try {
-      setIsLoading(true);
-      const data = await api.get<Partner>("partners");
-      setPartners(data);
-      setFilteredPartners(data);
-    } catch (error) {
-      toast({
-        title: "Error loading partners",
-        description: "There was an error loading the partner list. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleNameFilter = ({ type, query }: { type: string; query: string }) => {
-    if (!partners) return;
-    
-    const filtered = partners.filter(partner => {
-      if (!query) return true;
-      
-      const name = partner.name.toLowerCase();
-      const searchQuery = query.toLowerCase();
-      
-      switch (type) {
-        case 'contains':
-          return name.includes(searchQuery);
-        case 'starts_with':
-          return name.startsWith(searchQuery);
-        case 'exact_match':
-          return name === searchQuery;
-        default:
-          return true;
+        if (error) throw error;
+        
+        // Ensure data is an array before setting state
+        if (Array.isArray(data)) {
+          setPartners(data);
+          setFilteredPartners(data);
+        } else {
+          // Handle case where data is not an array
+          setPartners([]);
+          setFilteredPartners([]);
+          console.warn("Expected array of partners but received:", data);
+        }
+      } catch (error) {
+        console.error('Error fetching partners:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load partner list",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
       }
-    });
-    
-    setFilteredPartners(filtered);
-  };
+    };
+
+    fetchPartners();
+  }, [toast]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
-      <div className="flex-1 flex">
-        <SidebarProvider>
-          <AppSidebar />
-          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
-            <DashboardHeader />
-            <main className="p-6">
-              <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Partner Management</h1>
-                <p className="mt-1 text-sm text-gray-500">
-                  Manage and monitor your business partnerships with AI-powered insights
-                </p>
-              </div>
-
-              {isLoading ? (
-                <div className="flex justify-center items-center h-64">
-                  <LoadingSpinner size={40} />
-                </div>
-              ) : (
-                <>
-                  <PartnerMetrics partners={partners} />
-
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    <div className="lg:col-span-3">
-                      <Card className="p-6">
-                        <div className="space-y-6">
-                          <div className="flex justify-between items-center">
-                            <h2 className="text-lg font-semibold">Partner List</h2>
-                            <Button className="bg-medical-primary text-white hover:bg-medical-primary/90">
-                              Add Partner
-                            </Button>
-                          </div>
-
-                          <PartnerAdvancedSearch
-                            onNameFilterChange={handleNameFilter}
-                            onHideInactiveChange={setShowInactive}
-                            hideInactive={showInactive}
-                          />
-
-                          <PartnerTable
-                            partners={filteredPartners}
-                            showInactive={showInactive}
-                          />
-                        </div>
-                      </Card>
-                    </div>
-
-                    <div className="lg:col-span-1">
-                      <PartnerInsights />
-                    </div>
-                  </div>
-                </>
-              )}
-            </main>
+    <MainLayout>
+      <div className="space-y-6 p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="lg:w-3/4 space-y-6">
+            <h1 className="text-3xl font-bold">Partner Management</h1>
+            <PartnerAdvancedSearch 
+              partners={partners} 
+              setFilteredPartners={setFilteredPartners} 
+            />
+            <PartnerTable 
+              partners={filteredPartners} 
+              loading={loading} 
+            />
           </div>
-        </SidebarProvider>
+          <div className="lg:w-1/4 space-y-6">
+            <PartnerMetrics partners={partners} />
+            <PartnerInsights partners={partners} />
+          </div>
+        </div>
       </div>
-      <Footer />
-    </div>
+    </MainLayout>
   );
-};
+}
+
+export default PartnerList;
