@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -91,17 +92,17 @@ const getStatusColor = (status: DispatchStatus): string => {
     case "dispatch":
       return "bg-gray-900/50 text-gray-200";
     case "enroute":
-      return "bg-blue-900/50 text-blue-200";
+      return "blue-glass";
     case "onscene":
-      return "bg-green-900/50 text-green-200";
+      return "green-glass";
     case "transporting":
-      return "bg-orange-900/50 text-orange-200";
+      return "purple-glass";
     case "destination":
-      return "bg-yellow-900/50 text-yellow-200";
+      return "yellow-glass";
     case "available":
       return "bg-emerald-900/50 text-emerald-200";
     case "canceled":
-      return "bg-red-900/50 text-red-200";
+      return "red-glass";
     default:
       return "bg-gray-900/50 text-gray-200";
   }
@@ -188,23 +189,23 @@ export function DispatchItem({
   const getPriorityBadge = () => {
     switch (priority) {
       case "high":
-        return "bg-red-900/40 text-red-200 border-red-500/30";
+        return "red-glass attention-pulse";
       case "medium":
-        return "bg-yellow-900/40 text-yellow-200 border-yellow-500/30";
+        return "yellow-glass";
       default:
-        return "bg-blue-900/40 text-blue-200 border-blue-500/30";
+        return "blue-glass";
     }
   };
 
   return (
-    <div className={`futuristic-card p-4 transition-all duration-300 hover:shadow-purple-500/20 ${
-      priority === "high" ? "border-red-500/30 shadow-red-500/10" : "border-[#334155]/50"
+    <div className={`futuristic-card p-4 transition-all duration-300 hover-glow ${
+      priority === "high" ? "border-red-500/30 shadow-red-500/10" : ""
     }`}>
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Link 
             to={`/dispatch/${id}`}
-            className="text-lg font-semibold text-white hover:text-purple-300 transition-colors"
+            className="text-lg font-semibold text-white hover:text-purple-300 transition-colors text-shadow-sm"
           >
             {id}
           </Link>
@@ -293,9 +294,9 @@ export function DispatchItem({
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-red-400 mt-1" />
                 <div>
-                  <div className="text-sm text-gray-300">From: <span className="text-white">{origin}</span></div>
+                  <div className="text-sm text-gray-300">From: <span className="text-white text-shadow-sm">{origin}</span></div>
                   <div className="text-xs text-gray-500">{aiRecommendations.trafficStatus?.congestionLevel === "high" && (
-                    <Badge className="bg-red-900/30 text-red-200 mt-1">High Traffic</Badge>
+                    <Badge className="red-glass mt-1 attention-pulse">High Traffic</Badge>
                   )}</div>
                 </div>
               </div>
@@ -303,7 +304,7 @@ export function DispatchItem({
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-green-400 mt-1" />
                 <div>
-                  <div className="text-sm text-gray-300">To: <span className="text-white">{destination}</span></div>
+                  <div className="text-sm text-gray-300">To: <span className="text-white text-shadow-sm">{destination}</span></div>
                   <div className="text-xs mt-1">
                     <HospitalStatus 
                       hospitalName={destination} 
@@ -313,8 +314,8 @@ export function DispatchItem({
                 </div>
               </div>
               
-              <div className="glass-panel p-3 border border-purple-500/20">
-                <h4 className="text-sm font-medium text-purple-300 mb-1">AI Recommendations:</h4>
+              <div className="purple-glass p-3">
+                <h4 className="text-sm font-medium text-purple-300 mb-1 text-shadow-sm">AI Recommendations:</h4>
                 <div className="text-xs text-gray-300 space-y-1">
                   <div>{aiRecommendations.route}</div>
                   <div>{aiRecommendations.crew}</div>
@@ -329,7 +330,7 @@ export function DispatchItem({
                     variant="outline"
                     size="sm"
                     onClick={openAssignModal}
-                    className="flex-1 glass-panel bg-purple-900/20 text-purple-200 hover:bg-purple-800/40 border-purple-500/30"
+                    className="flex-1 purple-glass hover-glow"
                   >
                     Assign Crew
                   </Button>
@@ -337,7 +338,7 @@ export function DispatchItem({
                     variant="destructive"
                     size="sm"
                     onClick={handleCancel}
-                    className="flex-1 bg-red-900/30 hover:bg-red-800/50 text-red-200"
+                    className="flex-1 red-glass hover-glow"
                   >
                     Cancel Dispatch
                   </Button>
@@ -351,13 +352,13 @@ export function DispatchItem({
                           variant="destructive"
                           size="sm"
                           onClick={handleUnassign}
-                          className="bg-red-900/30 hover:bg-red-800/50 text-red-200 flex items-center gap-1"
+                          className="red-glass hover-glow flex items-center gap-1"
                         >
                           <XCircle className="h-4 w-4" />
                           Unassign
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent className="bg-black/80 text-white border-gray-700">
+                      <TooltipContent className="glass-panel text-white">
                         Remove crew assignment
                       </TooltipContent>
                     </Tooltip>
@@ -366,9 +367,9 @@ export function DispatchItem({
               )}
 
               {assignedTo === "Unassigned" ? (
-                <div className="glass-panel p-3 flex items-center gap-2 bg-yellow-950/20 border-yellow-500/30">
+                <div className="status-warning p-3 flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 text-yellow-400" />
-                  <span className="text-sm text-yellow-300">
+                  <span className="text-sm text-yellow-300 text-shadow-sm">
                     Assign a crew to enable status updates
                   </span>
                 </div>
@@ -382,15 +383,15 @@ export function DispatchItem({
           </div>
 
           {warnings && (
-            <div className="flex items-center gap-2 text-yellow-300 glass-panel border-yellow-500/20 p-2 bg-yellow-950/20">
-              <AlertTriangle className="h-4 w-4" />
-              <span className="text-sm">{warnings}</span>
+            <div className="flex items-center gap-2 status-warning p-2">
+              <AlertTriangle className="h-4 w-4 attention-pulse" />
+              <span className="text-sm text-shadow-sm">{warnings}</span>
             </div>
           )}
 
           {aiRecommendations.insights && aiRecommendations.insights.length > 0 && (
-            <div className="glass-panel p-3 border-blue-500/20 bg-blue-950/10">
-              <h4 className="font-medium text-blue-300 mb-1 flex items-center gap-2">
+            <div className="blue-glass p-3">
+              <h4 className="font-medium text-blue-300 mb-1 flex items-center gap-2 text-shadow-sm">
                 <Settings className="h-3 w-3" />
                 AI Insights:
               </h4>
@@ -411,7 +412,7 @@ export function DispatchItem({
                   <span className="text-xs text-gray-400">Efficiency:</span>
                   <div className="w-24 h-1.5 bg-gray-800 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full ${getProgressColor()}`} 
+                      className={`h-full ${getProgressColor()} shimmer`} 
                       style={{ width: `${efficiency}%` }}
                     ></div>
                   </div>
@@ -423,7 +424,7 @@ export function DispatchItem({
               variant="outline"
               size="sm"
               onClick={handleTrackTransport}
-              className="glass-panel bg-blue-900/20 text-blue-200 hover:bg-blue-800/40 border-blue-500/30 flex items-center gap-1"
+              className="blue-glass hover-glow flex items-center gap-1"
             >
               <Truck className="h-4 w-4" />
               Track Transport

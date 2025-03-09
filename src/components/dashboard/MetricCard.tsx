@@ -21,13 +21,12 @@ export function MetricCard({ title, value, icon: Icon, change, aiInsight }: Metr
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Card className="relative overflow-hidden p-6 cursor-help group hover:shadow-purple-500/20 hover:shadow-lg transition-shadow duration-300 border-[#334155] bg-[#1e293b]">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-800/10 to-indigo-800/10 opacity-50" />
+          <Card className="futuristic-card p-6 cursor-help group hover-glow transition-all duration-300">
             <div className="relative z-10">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-400">{title}</p>
-                  <h3 className="text-2xl font-bold text-white mt-2 group-hover:text-purple-400 transition-colors">
+                  <h3 className="text-2xl font-bold text-gradient-purple mt-2">
                     {value}
                   </h3>
                   <p className="text-sm mt-2">
@@ -39,15 +38,15 @@ export function MetricCard({ title, value, icon: Icon, change, aiInsight }: Metr
                     <span className="text-gray-500">from last hour</span>
                   </p>
                 </div>
-                <div className="p-2 rounded-full bg-purple-900/30 group-hover:bg-purple-800/40 transition-colors">
-                  <Icon className="w-8 h-8 text-purple-400" />
+                <div className="p-2 rounded-full purple-glass">
+                  <Icon className="w-8 h-8 text-purple-400 pulse-glow" />
                 </div>
               </div>
             </div>
           </Card>
         </TooltipTrigger>
-        <TooltipContent className="bg-[#1e293b] border-[#334155] text-white">
-          <p>{aiInsight}</p>
+        <TooltipContent className="blue-glass">
+          <p className="text-shadow-sm">{aiInsight}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

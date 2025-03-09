@@ -74,12 +74,12 @@ export function DispatchBoard({ priority = "low" }: DispatchBoardProps) {
   };
 
   return (
-    <Card className="futuristic-panel p-6 m-6 shadow-xl transition-all hover:shadow-purple-500/20 overflow-hidden">
+    <Card className="futuristic-panel p-6 m-6 shadow-xl transition-all hover-glow overflow-hidden">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Ambulance className="w-6 h-6 text-purple-400" />
-            <span className="bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
+            <Ambulance className="w-6 h-6 text-purple-400 pulse-glow" />
+            <span className="text-gradient-purple">
               Dispatch Control Center
             </span>
           </h2>
