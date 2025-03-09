@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UseMutationResult } from "@tanstack/react-query";
 import { AddressAutocomplete } from "../demographics/AddressAutocomplete";
 import { DemographicsSummary } from "../demographics/DemographicsSummary";
-import { MapPin, Calendar, User, Phone, Mail, Flag, IdCard } from "lucide-react";
+import { MapPin, Calendar, User, Phone, Mail, Flag } from "lucide-react";
 
 interface DemographicsTabProps {
   employee: Employee | undefined;
@@ -30,7 +30,6 @@ export function DemographicsTab({ employee, isLoading, onSave }: DemographicsTab
     race_ethnicity: employee?.race_ethnicity || "",
     secondary_race: employee?.secondary_race || "",
     citizenship: employee?.citizenship || "",
-    certification_number: employee?.certification_number || "",
     certification_expiry: employee?.certification_expiry || "",
     years_experience: employee?.years_experience || 0,
     email: employee?.email || "",
@@ -333,24 +332,6 @@ export function DemographicsTab({ employee, isLoading, onSave }: DemographicsTab
                     <h3 className="text-sm font-medium">Certification Information</h3>
                     
                     <div className="grid gap-3">
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <Label htmlFor="certification_number" className="text-right text-xs">
-                            Provider-issued ID number:
-                          </Label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            id="certification_number"
-                            placeholder="If different than patch number"
-                            value={formValues.certification_number}
-                            onChange={(e) => handleInputChange("certification_number", e.target.value)}
-                            className="flex-grow"
-                          />
-                          <IdCard className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                      </div>
-                      
                       <div>
                         <div className="flex justify-between mb-1">
                           <Label htmlFor="certification_expiry" className="text-right text-xs">Certification Expiry:</Label>

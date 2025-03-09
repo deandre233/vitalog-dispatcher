@@ -29,7 +29,7 @@ export interface Employee {
   race_ethnicity?: string;
   secondary_race?: string;
   citizenship?: string;
-  certification_number?: string;
+  certification_number?: string; // Keep for backward compatibility
   certification_expiry?: string;
   years_experience?: number;
   email?: string;

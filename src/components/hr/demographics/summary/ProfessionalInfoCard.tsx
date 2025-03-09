@@ -18,10 +18,6 @@ export function ProfessionalInfoCard({ data, formatDate }: ProfessionalInfoCardP
           value={data.certification_level || "Not specified"} 
         />
         <InfoRow 
-          label="Certification ID" 
-          value={data.certification_number || "Not provided"} 
-        />
-        <InfoRow 
           label="Certification Expiry" 
           value={formatDate(data.certification_expiry)} 
         />
