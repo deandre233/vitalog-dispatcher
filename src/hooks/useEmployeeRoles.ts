@@ -25,7 +25,6 @@ const defaultRole: EmployeeRole = {
   is_administrator: false,
   is_principal: false,
   is_provisional: false,
-  years_experience: 0,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString()
 };
@@ -54,23 +53,10 @@ export const useEmployeeRoles = (employeeId?: string) => {
         throw error;
       }
 
-      // Get employee to check experience
-      const { data: employee } = await supabase
-        .from("employees")
-        .select("years_experience")
-        .eq("id", employeeId)
-        .single();
-
-      if (!data) {
-        return {
-          ...defaultRole,
-          years_experience: employee?.years_experience || 0
-        };
-      }
+      if (!data) return defaultRole;
 
       return {
         ...data,
-        years_experience: employee?.years_experience || 0,
         created_at: data.created_at || new Date().toISOString(),
         updated_at: data.updated_at || new Date().toISOString()
       } as EmployeeRole;

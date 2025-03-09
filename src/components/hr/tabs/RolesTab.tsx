@@ -5,27 +5,12 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TabsContent } from "@/components/ui/tabs";
 import { UseMutationResult } from "@tanstack/react-query";
-import { Separator } from "@/components/ui/separator";
-import { 
-  AlertCircle, 
-  Shield, 
-  Users, 
-  Headset, 
-  FileEdit, 
-  Tool, 
-  BadgePercent, 
-  FirstAid, 
-  Eye, 
-  ShieldAlert, 
-  Star, 
-  Info,
-  Medal
-} from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Shield, AlertTriangle, Brain, Info } from "lucide-react";
+import { Tooltip } from "@/components/ui/tooltip";
+import { TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface RolesTabProps {
   roles: EmployeeRole | undefined;
@@ -34,475 +19,540 @@ interface RolesTabProps {
 
 export function RolesTab({ roles, updateRole }: RolesTabProps) {
   const [showAIRecommendations, setShowAIRecommendations] = useState(false);
-  
-  const handleRoleToggle = (field: keyof EmployeeRole, currentValue: boolean) => {
-    updateRole.mutate({ [field]: !currentValue });
-  };
+  const [selectedCategory, setSelectedCategory] = useState<string>("operational");
 
-  // AI role recommendations - simulated based on existing roles
-  const generateRoleRecommendations = () => {
+  // AI role recommendations based on current selections
+  const getAIRecommendations = () => {
     if (!roles) return [];
     
     const recommendations = [];
     
-    if (roles.is_crew_member && !roles.is_dispatcher && roles.years_experience > 3) {
-      recommendations.push({
-        role: "Dispatcher",
-        reason: "Has 3+ years of experience as crew member, which is valuable for dispatch operations.",
-        impact: "High",
-      });
+    if (roles.is_crew_member && !roles.is_supervisor) {
+      recommendations.push("Based on experience patterns, crew members often benefit from QA Reviewer privileges to improve service quality.");
     }
     
-    if (roles.is_supervisor && !roles.is_qa_reviewer) {
-      recommendations.push({
-        role: "QA Reviewer", 
-        reason: "Supervisors often have the experience needed to perform quality reviews.",
-        impact: "Medium",
-      });
+    if (roles.is_dispatcher && !roles.can_see_non_emergent) {
+      recommendations.push("Dispatchers typically need access to non-emergent calls for comprehensive scheduling.");
     }
     
-    if (roles.is_biller && !roles.can_see_non_emergent) {
-      recommendations.push({
-        role: "Can See Non-Emergent", 
-        reason: "Billers typically need access to all transport types for complete financial processing.",
-        impact: "Medium",
-      });
+    if (roles.is_supervisor && roles.supervisor_role === "Captain") {
+      recommendations.push("Captains often need administrator access for team management. Consider granting limited administrative privileges.");
     }
     
-    return recommendations;
+    if (roles.is_onlooker && !roles.onlooker_facility && !roles.onlooker_city) {
+      recommendations.push("Onlooker role is incomplete. Please specify facility and location information.");
+    }
+    
+    return recommendations.length > 0 ? recommendations : ["No specific role recommendations at this time."];
   };
 
-  const roleRecommendations = generateRoleRecommendations();
-  
+  const roleCategories = [
+    { id: "operational", label: "Operational Roles", icon: <Shield className="h-4 w-4 mr-2" /> },
+    { id: "administrative", label: "Administrative Roles", icon: <Info className="h-4 w-4 mr-2" /> },
+    { id: "special", label: "Special Access", icon: <AlertTriangle className="h-4 w-4 mr-2" /> }
+  ];
+
   return (
     <TabsContent value="roles" className="mt-0 animate-in fade-in-50">
       <div className="p-6">
-        {roleRecommendations.length > 0 && (
-          <Card className="mb-6 border-l-4 border-l-amber-500">
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Medal className="h-5 w-5 text-amber-500" />
-                  AI Role Recommendations
-                </CardTitle>
+        <div className="flex gap-6 flex-col lg:flex-row">
+          {/* Left column - Role categories */}
+          <div className="bg-white rounded-lg shadow p-6 lg:w-1/4">
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <Shield className="h-5 w-5 mr-2 text-primary" />
+              Role Categories
+            </h2>
+            <div className="space-y-2">
+              {roleCategories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`w-full text-left px-3 py-2 rounded-md flex items-center ${
+                    selectedCategory === category.id
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  {category.icon}
+                  {category.label}
+                </button>
+              ))}
+            </div>
+
+            {/* AI Recommendations Toggle */}
+            <div className="mt-6 border-t pt-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Brain className="h-5 w-5 mr-2 text-purple-500" />
+                  <span className="font-medium">AI Role Insights</span>
+                </div>
                 <Switch
                   checked={showAIRecommendations}
                   onCheckedChange={setShowAIRecommendations}
                 />
               </div>
-              <CardDescription>
-                Based on current roles and experience, the system suggests the following role changes
-              </CardDescription>
-            </CardHeader>
+              <p className="text-sm text-gray-500 mt-2">
+                Enable AI to analyze and suggest optimal role configurations
+              </p>
+            </div>
+          </div>
+
+          {/* Right column - Role settings */}
+          <div className="bg-white rounded-lg shadow p-6 lg:flex-1">
+            <div className="flex justify-between items-start mb-4">
+              <h2 className="text-xl font-semibold">
+                {selectedCategory === "operational" && "Operational Roles"}
+                {selectedCategory === "administrative" && "Administrative Roles"}
+                {selectedCategory === "special" && "Special Access"}
+              </h2>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <a 
+                      href="#" 
+                      className="text-sm text-primary underline flex items-center"
+                      onClick={(e) => e.preventDefault()}
+                    >
+                      <Info className="h-4 w-4 mr-1" /> 
+                      Roles Guide
+                    </a>
+                  </TooltipTrigger>
+                  <TooltipContent className="w-80 p-4">
+                    <h3 className="font-bold mb-2">About Employee Roles</h3>
+                    <p className="text-sm">
+                      Roles determine what actions an employee can perform in the system.
+                      Multiple roles can be assigned to create custom permission sets.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            {/* AI Recommendations Panel */}
             {showAIRecommendations && (
-              <CardContent>
-                <div className="space-y-3">
-                  {roleRecommendations.map((rec, index) => (
-                    <div key={index} className="flex items-start gap-2 p-2 bg-muted/50 rounded-md">
-                      <div className="mt-1">
-                        <Badge variant={rec.impact === "High" ? "destructive" : "secondary"}>
-                          {rec.impact}
-                        </Badge>
+              <div className="mb-6 bg-purple-50 border border-purple-200 rounded-md p-4">
+                <div className="flex items-center mb-2">
+                  <Brain className="h-5 w-5 mr-2 text-purple-600" />
+                  <h3 className="font-medium text-purple-800">AI Role Recommendations</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-purple-700">
+                  {getAIRecommendations().map((rec, i) => (
+                    <li key={i} className="flex items-start">
+                      <span className="mr-2">•</span>
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {/* Operational Roles */}
+            {selectedCategory === "operational" && (
+              <div className="space-y-6">
+                <div className="grid gap-4">
+                  <div className="flex items-center justify-between group">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        Crew Member
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Employee joins shifts and runs calls</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                    </div>
+                    <Switch
+                      checked={roles?.is_crew_member}
+                      onCheckedChange={() => updateRole.mutate({is_crew_member: !roles?.is_crew_member})}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between group">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        Supervisor
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Can supervise other employees and approve schedule changes</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                    </div>
+                    <Switch
+                      checked={roles?.is_supervisor}
+                      onCheckedChange={() => updateRole.mutate({is_supervisor: !roles?.is_supervisor})}
+                    />
+                  </div>
+
+                  {roles?.is_supervisor && (
+                    <div className="ml-6 p-4 bg-gray-50 rounded-md border border-gray-200">
+                      <label className="font-medium block mb-3">Supervisor Role</label>
+                      <RadioGroup 
+                        value={roles.supervisor_role} 
+                        onValueChange={(value: "Captain" | "Lieutenant" | "Full privileges" | "Call-taker / Self-dispatch") => 
+                          updateRole.mutate({supervisor_role: value})
+                        }
+                        className="space-y-3"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Captain" id="captain" />
+                          <label htmlFor="captain" className="text-sm font-medium">Captain</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Lieutenant" id="lieutenant" />
+                          <label htmlFor="lieutenant" className="text-sm font-medium">Lieutenant</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Full privileges" id="full" />
+                          <label htmlFor="full" className="text-sm font-medium">Full privileges</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Call-taker / Self-dispatch" id="calltaker" />
+                          <label htmlFor="calltaker" className="text-sm font-medium">Call-taker / Self-dispatch</label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between group">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        Dispatcher
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Can assign crews to calls and manage dispatch board</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                    </div>
+                    <Switch
+                      checked={roles?.is_dispatcher}
+                      onCheckedChange={() => updateRole.mutate({is_dispatcher: !roles?.is_dispatcher})}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between group">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        QA Reviewer
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Can review and approve report quality</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                    </div>
+                    <Switch
+                      checked={roles?.is_qa_reviewer}
+                      onCheckedChange={() => updateRole.mutate({is_qa_reviewer: !roles?.is_qa_reviewer})}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between group">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        Mechanic
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Can manage vehicle maintenance and repairs</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                    </div>
+                    <Switch
+                      checked={roles?.is_mechanic}
+                      onCheckedChange={() => updateRole.mutate({is_mechanic: !roles?.is_mechanic})}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Administrative Roles */}
+            {selectedCategory === "administrative" && (
+              <div className="space-y-6">
+                <div className="grid gap-4">
+                  <div className="flex items-center justify-between group">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        HR
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Can manage employee information and permissions</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                    </div>
+                    <Switch
+                      checked={roles?.is_hr}
+                      onCheckedChange={() => updateRole.mutate({is_hr: !roles?.is_hr})}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between group">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        Biller
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Can process payments and manage billing records</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                    </div>
+                    <Switch
+                      checked={roles?.is_biller}
+                      onCheckedChange={() => updateRole.mutate({is_biller: !roles?.is_biller})}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between group">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        Salesperson
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Can manage sales accounts and contracts</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                    </div>
+                    <Switch
+                      checked={roles?.is_salesperson}
+                      onCheckedChange={() => updateRole.mutate({is_salesperson: !roles?.is_salesperson})}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between group">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        Medical Director
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Reviews completed run reports for medical protocol compliance</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                    </div>
+                    <Switch
+                      checked={roles?.is_medical_director}
+                      onCheckedChange={() => updateRole.mutate({is_medical_director: !roles?.is_medical_director})}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Special Access */}
+            {selectedCategory === "special" && (
+              <div className="space-y-6">
+                <div className="grid gap-4">
+                  <div className="flex items-center justify-between group border-b pb-4">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        Onlooker
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Can view (but not modify) the active dispatch board with restrictions</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                    </div>
+                    <Switch
+                      checked={roles?.is_onlooker}
+                      onCheckedChange={() => updateRole.mutate({is_onlooker: !roles?.is_onlooker})}
+                    />
+                  </div>
+
+                  {roles?.is_onlooker && (
+                    <div className="ml-6 space-y-4 bg-gray-50 p-4 rounded-md border border-gray-200">
+                      <div>
+                        <label className="font-medium block mb-2 text-sm">Facility</label>
+                        <Input
+                          type="text"
+                          value={roles.onlooker_facility}
+                          onChange={(e) => updateRole.mutate({ onlooker_facility: e.target.value })}
+                          placeholder="Enter facility name"
+                          className="max-w-md"
+                        />
                       </div>
                       <div>
-                        <p className="font-medium">Add {rec.role} role</p>
-                        <p className="text-sm text-muted-foreground">{rec.reason}</p>
+                        <label className="font-medium block mb-2 text-sm">City</label>
+                        <Input
+                          type="text"
+                          value={roles.onlooker_city}
+                          onChange={(e) => updateRole.mutate({ onlooker_city: e.target.value })}
+                          placeholder="Enter city"
+                          className="max-w-md"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-medium block mb-2 text-sm">County</label>
+                        <Select
+                          value={roles.onlooker_county}
+                          onValueChange={(value) => updateRole.mutate({ onlooker_county: value })}
+                        >
+                          <SelectTrigger className="w-full max-w-md">
+                            <SelectValue placeholder="Select county" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">No limit</SelectItem>
+                            <SelectItem value="Fulton">Fulton</SelectItem>
+                            <SelectItem value="DeKalb">DeKalb</SelectItem>
+                            <SelectItem value="Cobb">Cobb</SelectItem>
+                            <SelectItem value="Gwinnett">Gwinnett</SelectItem>
+                            <SelectItem value="Clayton">Clayton</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex items-center space-x-2 pt-2">
+                        <Checkbox 
+                          id="non-emergent"
+                          checked={roles.can_see_non_emergent}
+                          onCheckedChange={() => updateRole.mutate({can_see_non_emergent: !roles?.can_see_non_emergent})}
+                        />
+                        <label 
+                          htmlFor="non-emergent" 
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Allow to also see non-emergent calls
+                        </label>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            )}
-          </Card>
-        )}
-        
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Employee Roles
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Manage role assignments and access permissions for this employee
-            </p>
-          </div>
-          
-          {/* Operational Roles Section */}
-          <div className="p-6 border-b">
-            <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
-              <Shield className="h-4 w-4 text-blue-600" />
-              Operational Roles
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">Crew Member</label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Joins shifts, runs calls, and provides direct patient care
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_crew_member}
-                  onCheckedChange={() => handleRoleToggle('is_crew_member', roles?.is_crew_member || false)}
-                />
-              </div>
+                  )}
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">Supervisor</label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Oversees crew members and has elevated permissions
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_supervisor}
-                  onCheckedChange={() => handleRoleToggle('is_supervisor', roles?.is_supervisor || false)}
-                />
-              </div>
-
-              {roles?.is_supervisor && (
-                <div className="ml-6 pt-2 pb-1 px-4 bg-slate-50 rounded-md border">
-                  <label className="font-medium block mb-2 text-sm">Supervisor Role</label>
-                  <Select
-                    value={roles.supervisor_role}
-                    onValueChange={(value: "Captain" | "Lieutenant" | "Full privileges" | "Call-taker / Self-dispatch") => 
-                      updateRole.mutate({supervisor_role: value})
-                    }
-                  >
-                    <SelectTrigger className="bg-white">
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Captain">Captain</SelectItem>
-                      <SelectItem value="Lieutenant">Lieutenant</SelectItem>
-                      <SelectItem value="Full privileges">Full privileges</SelectItem>
-                      <SelectItem value="Call-taker / Self-dispatch">Call-taker / Self-dispatch</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">Dispatcher</label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Manages inbound calls and crew assignments
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_dispatcher}
-                  onCheckedChange={() => handleRoleToggle('is_dispatcher', roles?.is_dispatcher || false)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">QA Reviewer</label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Reviews call reports for quality assurance purposes
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_qa_reviewer}
-                  onCheckedChange={() => handleRoleToggle('is_qa_reviewer', roles?.is_qa_reviewer || false)}
-                />
-              </div>
-            </div>
-          </div>
-          
-          {/* Administrative Roles Section */}
-          <div className="p-6 border-b">
-            <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
-              <FileEdit className="h-4 w-4 text-indigo-600" />
-              Administrative Roles
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">HR</label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Can manage employee records and HR functions
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_hr}
-                  onCheckedChange={() => handleRoleToggle('is_hr', roles?.is_hr || false)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">Biller</label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Manages billing operations and financial records
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_biller}
-                  onCheckedChange={() => handleRoleToggle('is_biller', roles?.is_biller || false)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">Salesperson</label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Manages contracts and partner relationships
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_salesperson}
-                  onCheckedChange={() => handleRoleToggle('is_salesperson', roles?.is_salesperson || false)}
-                />
-              </div>
-            </div>
-          </div>
-          
-          {/* Specialized Roles Section */}
-          <div className="p-6 border-b">
-            <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
-              <FirstAid className="h-4 w-4 text-red-600" />
-              Specialized Roles
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">Mechanic</label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Maintains and repairs fleet vehicles
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_mechanic}
-                  onCheckedChange={() => handleRoleToggle('is_mechanic', roles?.is_mechanic || false)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">Medical Director</label>
-                  <Badge variant="outline" className="ml-2 text-xs">Clinical</Badge>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Reviews completed run reports for medical protocol compliance
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_medical_director}
-                  onCheckedChange={() => handleRoleToggle('is_medical_director', roles?.is_medical_director || false)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">Onlooker</label>
-                  <Badge variant="outline" className="ml-2 text-xs">Limited Access</Badge>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Can view (but not modify) the active dispatch board within specified regions
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_onlooker}
-                  onCheckedChange={() => handleRoleToggle('is_onlooker', roles?.is_onlooker || false)}
-                />
-              </div>
-
-              {roles?.is_onlooker && (
-                <div className="ml-6 pt-3 pb-2 px-4 bg-slate-50 rounded-md border space-y-3">
-                  <div>
-                    <label className="font-medium block mb-1 text-sm">Facility</label>
-                    <Input
-                      type="text"
-                      value={roles.onlooker_facility ?? ""}
-                      onChange={(e) => updateRole.mutate({ onlooker_facility: e.target.value })}
-                      className="bg-white"
-                      placeholder="Enter facility name"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-medium block mb-1 text-sm">City</label>
-                    <Input
-                      type="text"
-                      value={roles.onlooker_city ?? ""}
-                      onChange={(e) => updateRole.mutate({ onlooker_city: e.target.value })}
-                      className="bg-white"
-                      placeholder="Enter city"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-medium block mb-1 text-sm">County</label>
-                    <Input
-                      type="text"
-                      value={roles.onlooker_county ?? ""}
-                      onChange={(e) => updateRole.mutate({ onlooker_county: e.target.value })}
-                      className="bg-white"
-                      placeholder="Enter county"
-                    />
-                  </div>
-                  <div className="flex items-center pt-1">
+                  <div className="flex items-center justify-between group border-b pb-4 pt-4">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        <span className="flex items-center">
+                          Administrator
+                          <AlertTriangle className="h-4 w-4 ml-1 text-amber-500" />
+                        </span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">
+                                <span className="font-bold text-amber-500">Caution:</span> Unlimited access with no safeguards
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                      <p className="text-xs text-gray-500 mt-1">Unlimited access, no safeguards</p>
+                    </div>
                     <Switch
-                      id="non-emergent-switch"
-                      checked={roles?.can_see_non_emergent}
-                      onCheckedChange={() => handleRoleToggle('can_see_non_emergent', roles?.can_see_non_emergent || false)}
-                      className="mr-2"
+                      checked={roles?.is_administrator}
+                      onCheckedChange={() => updateRole.mutate({is_administrator: !roles?.is_administrator})}
                     />
-                    <label htmlFor="non-emergent-switch" className="text-sm">
-                      Allow access to non-emergent calls
-                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between group border-b pb-4">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        <span className="flex items-center">
+                          Principal
+                          <AlertTriangle className="h-4 w-4 ml-1 text-amber-500" />
+                        </span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">
+                                <span className="font-bold text-amber-500">Caution:</span> Can modify core system settings
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                      <p className="text-xs text-gray-500 mt-1">Can sign agreements and modify system settings</p>
+                    </div>
+                    <Switch
+                      checked={roles?.is_principal}
+                      onCheckedChange={() => updateRole.mutate({is_principal: !roles?.is_principal})}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between group pt-4">
+                    <div>
+                      <label className="font-medium flex items-center">
+                        Provisional
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="w-60">Limited access only when at a company facility</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
+                      <p className="text-xs text-gray-500 mt-1">Access only when at a company facility</p>
+                    </div>
+                    <Switch
+                      checked={roles?.is_provisional}
+                      onCheckedChange={() => updateRole.mutate({is_provisional: !roles?.is_provisional})}
+                    />
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-          
-          {/* System Access Roles Section */}
-          <div className="p-6">
-            <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
-              <ShieldAlert className="h-4 w-4 text-amber-600" />
-              System Access Roles
-              <Badge variant="destructive" className="ml-2">Restricted</Badge>
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between bg-amber-50 p-3 rounded-md border border-amber-200">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium flex items-center">
-                    <AlertCircle className="h-4 w-4 text-amber-600 mr-2" />
-                    Administrator
-                  </label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-sm">
-                        <p className="font-bold text-amber-600">CAUTION:</p> 
-                        <p>Unlimited access with no safeguards. This is a high-risk role that should only be assigned to trusted personnel.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_administrator}
-                  onCheckedChange={() => handleRoleToggle('is_administrator', roles?.is_administrator || false)}
-                  className={cn(roles?.is_administrator ? "bg-amber-500" : "")}
-                />
               </div>
-
-              <div className="flex items-center justify-between bg-amber-50 p-3 rounded-md border border-amber-200">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium flex items-center">
-                    <Star className="h-4 w-4 text-amber-600 mr-2" />
-                    Principal
-                  </label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-sm">
-                        <p className="font-bold text-amber-600">CAUTION:</p>
-                        <p>Can sign terms of service and modify system pricing. This role should be reserved for company executives.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_principal}
-                  onCheckedChange={() => handleRoleToggle('is_principal', roles?.is_principal || false)}
-                  className={cn(roles?.is_principal ? "bg-amber-500" : "")}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <label className="font-medium">Provisional</label>
-                  <Badge variant="outline" className="ml-2 text-xs">Training</Badge>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Has access only when at a company facility, typically for trainees
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Switch
-                  checked={roles?.is_provisional}
-                  onCheckedChange={() => handleRoleToggle('is_provisional', roles?.is_provisional || false)}
-                />
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

@@ -61,7 +61,6 @@ export interface EmployeeRole {
   is_administrator: boolean;
   is_principal: boolean;
   is_provisional: boolean;
-  years_experience?: number;
   created_at: string;
   updated_at: string;
 }
