@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Bell, X, CheckCircle, AlertTriangle, InfoIcon } from "lucide-react";
+import { Bell, X, CheckCircle, AlertTriangle, InfoIcon, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -12,10 +12,12 @@ interface EmployeeNotification {
   id: string;
   title: string;
   message: string;
-  type: "info" | "warning" | "success" | "achievement";
+  type: "info" | "warning" | "success" | "achievement" | "message";
   is_read: boolean;
   created_at: string;
   ai_metadata?: AIRecommendation;
+  team_message_id?: string;
+  sender_name?: string;
 }
 
 interface AINotificationCenterProps {
@@ -58,10 +60,16 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
 
   const fetchNotifications = async () => {
     try {
-      // Type the response explicitly to avoid TypeScript errors
+      // Fetch notifications
       const { data, error } = await supabase
         .from('employee_notifications')
-        .select('*')
+        .select(`
+          *,
+          team_messages (
+            id,
+            sender_id
+          )
+        `)
         .eq('employee_id', employeeId)
         .order('created_at', { ascending: false })
         .limit(showAll ? 50 : 10);
@@ -69,10 +77,34 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
       if (error) throw error;
       
       if (data) {
-        // Cast the data to the expected type
-        const typedData = data as EmployeeNotification[];
-        setNotifications(typedData);
-        setUnreadCount(typedData.filter(n => !n.is_read).length || 0);
+        // Process data to enhance team message notifications with sender info
+        const enhancedData = await Promise.all(data.map(async (notif) => {
+          let enhancedNotif = { ...notif } as EmployeeNotification;
+          
+          // If it's a team message notification, get sender info
+          if (notif.team_message_id && notif.team_messages) {
+            const senderId = notif.team_messages.sender_id;
+            
+            try {
+              const { data: senderData } = await supabase
+                .from('employees')
+                .select('first_name, last_name')
+                .eq('id', senderId)
+                .single();
+                
+              if (senderData) {
+                enhancedNotif.sender_name = `${senderData.first_name} ${senderData.last_name}`;
+              }
+            } catch (err) {
+              console.error("Error fetching sender info:", err);
+            }
+          }
+          
+          return enhancedNotif;
+        }));
+        
+        setNotifications(enhancedData);
+        setUnreadCount(enhancedData.filter(n => !n.is_read).length || 0);
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -130,6 +162,8 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'achievement':
         return <Bell className="h-4 w-4 text-purple-500" />;
+      case 'message':
+        return <MessageSquare className="h-4 w-4 text-indigo-500" />;
       default:
         return <Bell className="h-4 w-4" />;
     }
@@ -190,7 +224,12 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
               
               <div className="flex-1">
                 <div className="flex justify-between">
-                  <h4 className="text-sm font-medium">{notification.title}</h4>
+                  <h4 className="text-sm font-medium">
+                    {notification.title}
+                    {notification.sender_name && (
+                      <span className="ml-1 text-muted-foreground">from {notification.sender_name}</span>
+                    )}
+                  </h4>
                   <span className="text-xs text-muted-foreground">
                     {getRelativeTime(notification.created_at)}
                   </span>
@@ -201,6 +240,23 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
                   <div className="mt-2 p-2 bg-blue-50 text-blue-800 text-xs rounded">
                     <div className="font-medium">AI Insight:</div>
                     <p>{notification.ai_metadata.recommendation}</p>
+                  </div>
+                )}
+                
+                {notification.type === 'message' && notification.team_message_id && (
+                  <div className="mt-2">
+                    <Button 
+                      variant="link" 
+                      size="sm" 
+                      className="p-0 h-auto text-xs text-indigo-600"
+                      onClick={() => {
+                        // Find parent component and switch to team chat tab
+                        const tabsTrigger = document.querySelector('[value="team-chat"]') as HTMLElement;
+                        if (tabsTrigger) tabsTrigger.click();
+                      }}
+                    >
+                      View in team chat
+                    </Button>
                   </div>
                 )}
               </div>

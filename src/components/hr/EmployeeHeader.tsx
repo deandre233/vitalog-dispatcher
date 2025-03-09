@@ -1,10 +1,10 @@
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Trophy, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "@/types/employee";
 import { useEmployeeAchievements } from "@/hooks/useEmployeeAchievements";
+import { NotificationBadge } from "./tabs/notifications/NotificationBadge";
 
 interface EmployeeHeaderProps {
   employee: Employee | undefined;
@@ -14,6 +14,11 @@ export function EmployeeHeader({ employee }: EmployeeHeaderProps) {
   const navigate = useNavigate();
   const { employeeLevel, isLevelLoading } = useEmployeeAchievements(employee?.id);
   
+  const navigateToNotifications = () => {
+    const tabsTrigger = document.querySelector('[value="notifications"]') as HTMLElement;
+    if (tabsTrigger) tabsTrigger.click();
+  };
+
   return (
     <div className="bg-white border-b">
       <div className="container mx-auto py-4 px-6 flex items-center justify-between">
@@ -48,10 +53,13 @@ export function EmployeeHeader({ employee }: EmployeeHeaderProps) {
             </p>
           </div>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex items-center space-x-2">
           <Button variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" /> Previous Employee
           </Button>
+          <div className="mr-2">
+            <NotificationBadge employeeId={employee?.id || ''} onClick={navigateToNotifications} />
+          </div>
           <Button variant="outline">
             Next Employee <ArrowLeft className="ml-2 h-4 w-4 rotate-180" />
           </Button>

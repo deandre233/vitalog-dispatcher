@@ -3,8 +3,11 @@ import { useState, useEffect } from "react";
 import { TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmployeeBeacon } from "./notifications/EmployeeBeacon";
 import { AINotificationCenter } from "./notifications/AINotificationCenter";
+import { TeamMessaging } from "./notifications/TeamMessaging";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 
 interface NotificationsTabProps {
@@ -13,6 +16,8 @@ interface NotificationsTabProps {
 
 export function NotificationsTab({ employeeId }: NotificationsTabProps) {
   const [isOnClock, setIsOnClock] = useState(false);
+  const [activeTab, setActiveTab] = useState("notifications");
+  const [teamMembers, setTeamMembers] = useState<{ id: string; name: string; avatar?: string }[]>([]);
   
   useEffect(() => {
     // Check if employee is currently on clock
@@ -33,7 +38,29 @@ export function NotificationsTab({ employeeId }: NotificationsTabProps) {
       }
     };
     
+    // Fetch team members
+    const fetchTeamMembers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('employees')
+          .select('id, first_name, last_name, photo_url');
+          
+        if (error) throw error;
+        
+        if (data) {
+          setTeamMembers(data.map(emp => ({
+            id: emp.id,
+            name: `${emp.first_name} ${emp.last_name}`,
+            avatar: emp.photo_url
+          })));
+        }
+      } catch (error) {
+        console.error("Error fetching team members:", error);
+      }
+    };
+    
     checkShiftStatus();
+    fetchTeamMembers();
     
     // Set up real-time listener for shift status changes
     const channel = supabase
@@ -93,8 +120,13 @@ export function NotificationsTab({ employeeId }: NotificationsTabProps) {
                 defaultEnabled={true}
               />
               <NotificationSetting 
-                title="Team Updates" 
-                description="Updates about your team and colleagues"
+                title="Team Messages" 
+                description="Updates from your team and colleagues"
+                defaultEnabled={true}
+              />
+              <NotificationSetting 
+                title="Important Announcements" 
+                description="Emergency and high-priority messages"
                 defaultEnabled={true}
               />
             </div>
@@ -105,14 +137,20 @@ export function NotificationsTab({ employeeId }: NotificationsTabProps) {
       <Separator />
       
       <Card>
-        <CardHeader>
-          <CardTitle>Notifications</CardTitle>
-          <CardDescription>
-            Your recent notifications and alerts
-          </CardDescription>
+        <CardHeader className="pb-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="team-chat">Team Chat</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </CardHeader>
         <CardContent>
-          <AINotificationCenter employeeId={employeeId} />
+          {activeTab === "notifications" ? (
+            <AINotificationCenter employeeId={employeeId} />
+          ) : (
+            <TeamMessaging employeeId={employeeId} teamMembers={teamMembers} />
+          )}
         </CardContent>
       </Card>
     </TabsContent>
@@ -135,15 +173,11 @@ function NotificationSetting({ title, description, defaultEnabled }: Notificatio
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       <div>
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input 
-            type="checkbox" 
-            checked={enabled}
-            onChange={() => setEnabled(!enabled)}
-            className="sr-only peer" 
-          />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-        </label>
+        <Switch 
+          checked={enabled}
+          onCheckedChange={setEnabled}
+          aria-label={`Toggle ${title.toLowerCase()} notifications`}
+        />
       </div>
     </div>
   );
