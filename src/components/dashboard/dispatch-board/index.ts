@@ -1,7 +1,7 @@
 
-export { default as DispatchNavigation } from './DispatchNavigation';
-export { default as DispatchStatusAlert } from './DispatchStatusAlert';
-export { default as DispatchTabs } from './DispatchTabs';
+export { DispatchNavigation } from './DispatchNavigation';
+export { DispatchStatusAlert } from './DispatchStatusAlert';
+export { DispatchTabs } from './DispatchTabs';
 export { 
   filterDispatches, 
   simulateRealTimeUpdates,

@@ -1,6 +1,5 @@
 
 import { DispatchStatus } from "../DispatchStatusBar";
-import { CongestionLevel } from "../../../types/service-queue";
 
 export const getProgressForStatus = (status: DispatchStatus): number => {
   switch (status) {
