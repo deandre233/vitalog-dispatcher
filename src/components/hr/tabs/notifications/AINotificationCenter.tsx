@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { AIRecommendation } from "@/types/ai";
 
-interface Notification {
+interface EmployeeNotification {
   id: string;
   title: string;
   message: string;
@@ -23,7 +23,7 @@ interface AINotificationCenterProps {
 }
 
 export function AINotificationCenter({ employeeId }: AINotificationCenterProps) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<EmployeeNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showAll, setShowAll] = useState(false);
 
@@ -32,14 +32,14 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
     
     // Set up real-time listener for new notifications
     const channel = supabase
-      .channel('public:employee_notifications')
+      .channel('employee-notifications')
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'employee_notifications',
         filter: `employee_id=eq.${employeeId}`
       }, (payload) => {
-        const newNotification = payload.new as Notification;
+        const newNotification = payload.new as EmployeeNotification;
         setNotifications(prev => [newNotification, ...prev]);
         setUnreadCount(prev => prev + 1);
         
@@ -58,6 +58,7 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
 
   const fetchNotifications = async () => {
     try {
+      // Type the response explicitly to avoid TypeScript errors
       const { data, error } = await supabase
         .from('employee_notifications')
         .select('*')
@@ -67,8 +68,12 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
         
       if (error) throw error;
       
-      setNotifications(data || []);
-      setUnreadCount(data?.filter(n => !n.is_read).length || 0);
+      if (data) {
+        // Cast the data to the expected type
+        const typedData = data as EmployeeNotification[];
+        setNotifications(typedData);
+        setUnreadCount(typedData.filter(n => !n.is_read).length || 0);
+      }
     } catch (error) {
       console.error("Error fetching notifications:", error);
     }
