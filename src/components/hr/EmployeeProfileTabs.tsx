@@ -20,7 +20,7 @@ import {
 interface EmployeeProfileTabsProps {
   activeTab: string;
   onTabChange: (value: string) => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export function EmployeeProfileTabs({ activeTab, onTabChange, children }: EmployeeProfileTabsProps) {
@@ -58,7 +58,12 @@ export function EmployeeProfileTabs({ activeTab, onTabChange, children }: Employ
           ))}
         </TabsList>
       </div>
-      {children}
+      
+      {Object.keys(tabIcons).map((tabKey) => (
+        <TabsContent key={tabKey} value={tabKey} className="mt-6">
+          {children}
+        </TabsContent>
+      ))}
     </Tabs>
   );
 }

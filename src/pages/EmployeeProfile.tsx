@@ -15,6 +15,7 @@ import { PlaceholderTab } from "@/components/hr/tabs/PlaceholderTab";
 import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
 import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
 import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
+import { useEmployeePayroll } from "@/hooks/useEmployeePayroll";
 
 const EmployeeProfile = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
@@ -30,6 +31,73 @@ const EmployeeProfile = () => {
     updateEmployee.mutate(data);
   };
 
+  // Render the active tab content
+  const renderActiveTabContent = () => {
+    switch (activeTab) {
+      case "identity":
+        return (
+          <IdentityTab 
+            employee={employee} 
+            isLoading={isLoading} 
+            onSave={handleEmployeeUpdate} 
+          />
+        );
+      case "roles":
+        return (
+          <RolesTab 
+            roles={roles} 
+            updateRole={updateRole} 
+          />
+        );
+      case "privileges":
+        return (
+          <PrivilegesTab 
+            privileges={privileges} 
+            updatePrivileges={updatePrivileges}
+            getAIRecommendations={getAIRecommendations}
+          />
+        );
+      case "demographics":
+        return (
+          <DemographicsTab
+            employee={employee}
+            isLoading={isLoading}
+            onSave={handleEmployeeUpdate}
+          />
+        );
+      case "payroll":
+        return (
+          <PayrollTab
+            employee={employee}
+            isLoading={isLoading}
+            onSave={handleEmployeeUpdate}
+          />
+        );
+      case "shifts":
+        return (
+          <ShiftsTab
+            employeeId={employeeId}
+          />
+        );
+      case "performance":
+        return <PerformanceTab />;
+      case "certifications":
+        return <PlaceholderTab value="certifications" title="Certifications" />;
+      case "documents":
+        return <PlaceholderTab value="documents" title="Documents" />;
+      case "incidents":
+        return <PlaceholderTab value="incidents" title="Incidents" />;
+      case "stats":
+        return <PlaceholderTab value="stats" title="Performance Statistics" />;
+      case "achievements":
+        return <PlaceholderTab value="achievements" title="Achievements" />;
+      case "notifications":
+        return <PlaceholderTab value="notifications" title="Notification Preferences" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <HRLayout>
       <EmployeeHeader employee={employee} />
@@ -39,70 +107,7 @@ const EmployeeProfile = () => {
           activeTab={activeTab}
           onTabChange={setActiveTab}
         >
-          <IdentityTab 
-            employee={employee} 
-            isLoading={isLoading} 
-            onSave={handleEmployeeUpdate} 
-          />
-          
-          <RolesTab 
-            roles={roles} 
-            updateRole={updateRole} 
-          />
-
-          <PrivilegesTab 
-            privileges={privileges} 
-            updatePrivileges={updatePrivileges}
-            getAIRecommendations={getAIRecommendations}
-          />
-
-          <DemographicsTab
-            employee={employee}
-            isLoading={isLoading}
-            onSave={handleEmployeeUpdate}
-          />
-
-          <PayrollTab
-            employee={employee}
-            isLoading={isLoading}
-            onSave={handleEmployeeUpdate}
-          />
-
-          <ShiftsTab
-            employeeId={employeeId}
-          />
-          
-          <PerformanceTab />
-
-          <PlaceholderTab 
-            value="certifications" 
-            title="Certifications" 
-          />
-
-          <PlaceholderTab 
-            value="documents" 
-            title="Documents" 
-          />
-
-          <PlaceholderTab 
-            value="incidents" 
-            title="Incidents" 
-          />
-
-          <PlaceholderTab 
-            value="stats" 
-            title="Performance Statistics" 
-          />
-
-          <PlaceholderTab 
-            value="achievements" 
-            title="Achievements" 
-          />
-
-          <PlaceholderTab 
-            value="notifications" 
-            title="Notification Preferences" 
-          />
+          {renderActiveTabContent()}
         </EmployeeProfileTabs>
       </div>
     </HRLayout>
