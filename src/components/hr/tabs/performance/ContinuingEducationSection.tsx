@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
@@ -153,16 +154,16 @@ export function ContinuingEducationSection() {
               <div className="flex items-center space-x-2">
                 <Label className="text-sm">From:</Label>
                 <DatePicker 
-                  selected={dateRange.from} 
-                  onChange={(date) => setDateRange(prev => ({ ...prev, from: date as Date }))}
+                  date={dateRange.from} 
+                  onDateChange={(date) => setDateRange(prev => ({ ...prev, from: date }))}
                 />
               </div>
               
               <div className="flex items-center space-x-2">
                 <Label className="text-sm">To:</Label>
                 <DatePicker 
-                  selected={dateRange.to}
-                  onChange={(date) => setDateRange(prev => ({ ...prev, to: date as Date }))}
+                  date={dateRange.to}
+                  onDateChange={(date) => setDateRange(prev => ({ ...prev, to: date }))}
                 />
               </div>
               

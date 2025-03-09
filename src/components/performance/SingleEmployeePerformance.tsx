@@ -146,7 +146,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
 
   const getTrendBadge = (trend: string) => {
     if (trend.includes("Improved")) {
-      return <Badge variant="success" className="ml-2">{trend}</Badge>;
+      return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 ml-2">{trend}</Badge>;
     } else if (trend.includes("Declined")) {
       return <Badge variant="destructive" className="ml-2">{trend}</Badge>;
     } else {
@@ -212,7 +212,6 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
       toast({
         title: "Success",
         description: "Performance write-up has been saved to employee record",
-        variant: "success",
       });
       
       setWriteUpDialogOpen(false);
@@ -343,7 +342,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
                       <>
                         <div className="flex justify-between items-center">
                           <span>Strongest Area</span>
-                          <Badge variant="success">PCR Completion (93%)</Badge>
+                          <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">PCR Completion (93%)</Badge>
                         </div>
                         <div className="flex justify-between items-center">
                           <span>Improvement Area</span>
@@ -351,18 +350,18 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
                         </div>
                         <div className="flex justify-between items-center">
                           <span>Department Rank</span>
-                          <Badge>Top 15%</Badge>
+                          <Badge variant="outline">Top 15%</Badge>
                         </div>
                       </>
                     ) : activeCategory === "pcrCompletion" ? (
                       <>
                         <div className="flex justify-between items-center">
                           <span>24hr Completion Rate</span>
-                          <Badge variant="success">96%</Badge>
+                          <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">96%</Badge>
                         </div>
                         <div className="flex justify-between items-center">
                           <span>Avg Completion Time</span>
-                          <Badge>3.5 hours</Badge>
+                          <Badge variant="outline">3.5 hours</Badge>
                         </div>
                         <div className="flex justify-between items-center">
                           <span>Late Submissions</span>
@@ -373,11 +372,11 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
                       <>
                         <div className="flex justify-between items-center">
                           <span>On-Time Arrival</span>
-                          <Badge variant="success">94%</Badge>
+                          <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">94%</Badge>
                         </div>
                         <div className="flex justify-between items-center">
                           <span>Avg Early Arrival</span>
-                          <Badge>12 minutes</Badge>
+                          <Badge variant="outline">12 minutes</Badge>
                         </div>
                         <div className="flex justify-between items-center">
                           <span>Late Incidents</span>
@@ -388,7 +387,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
                       <>
                         <div className="flex justify-between items-center">
                           <span>Strong Points</span>
-                          <Badge variant="success">Above Average</Badge>
+                          <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Above Average</Badge>
                         </div>
                         <div className="flex justify-between items-center">
                           <span>Improvement Areas</span>
@@ -396,7 +395,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
                         </div>
                         <div className="flex justify-between items-center">
                           <span>Trend</span>
-                          <Badge>Positive</Badge>
+                          <Badge variant="outline">Positive</Badge>
                         </div>
                       </>
                     )}

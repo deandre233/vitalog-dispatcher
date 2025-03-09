@@ -61,7 +61,8 @@ export function PrivilegesTab({ privileges, updatePrivileges, getAIRecommendatio
       
       const updates: Partial<EmployeePrivileges> = {};
       Object.entries(recommendations).forEach(([key, value]) => {
-        updates[key as keyof EmployeePrivileges] = value;
+        // Using type assertion to avoid TypeScript error
+        (updates as any)[key] = value;
       });
       
       updatePrivileges.mutate(updates);
