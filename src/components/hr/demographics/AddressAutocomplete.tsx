@@ -135,53 +135,47 @@ export function AddressAutocomplete({ onAddressSelect, currentAddress }: Address
   }, []);
 
   return (
-    <div className="space-y-2">
-      <div className="text-sm font-medium">Search for Address</div>
-      <div className="relative">
-        <div className="flex">
-          <div className="relative flex-grow">
-            <MapPin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              ref={inputRef}
-              value={searchValue}
-              onChange={handleInputChange}
-              className="pl-8 pr-10"
-              placeholder="Enter address to search..."
-            />
-          </div>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="ml-2"
-            onClick={() => searchAddresses(searchValue)}
-          >
-            <Search className="h-4 w-4" />
-          </Button>
+    <div className="relative">
+      <div className="flex">
+        <div className="relative flex-grow">
+          <MapPin className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            ref={inputRef}
+            value={searchValue}
+            onChange={handleInputChange}
+            className="pl-8"
+            placeholder="Enter address"
+          />
         </div>
-        
-        {showSuggestions && suggestions.length > 0 && (
-          <Card 
-            ref={suggestionRef}
-            className="absolute mt-1 w-full z-50 max-h-56 overflow-auto shadow-lg"
-          >
-            <div className="p-1">
-              {suggestions.map((suggestion) => (
-                <div
-                  key={suggestion.place_id}
-                  className="p-2 hover:bg-slate-100 cursor-pointer rounded"
-                  onClick={() => handleSelectAddress(suggestion)}
-                >
-                  <div className="font-medium">{suggestion.structured_formatting.main_text}</div>
-                  <div className="text-sm text-muted-foreground">{suggestion.structured_formatting.secondary_text}</div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="ml-2"
+          onClick={() => searchAddresses(searchValue)}
+        >
+          <Search className="h-4 w-4" />
+        </Button>
       </div>
-      <div className="text-xs text-muted-foreground">
-        Type to search for your address or fill in the fields manually below
-      </div>
+      
+      {showSuggestions && suggestions.length > 0 && (
+        <Card 
+          ref={suggestionRef}
+          className="absolute mt-1 w-full z-50 max-h-56 overflow-auto shadow-lg"
+        >
+          <div className="p-1">
+            {suggestions.map((suggestion) => (
+              <div
+                key={suggestion.place_id}
+                className="p-2 hover:bg-slate-100 cursor-pointer rounded"
+                onClick={() => handleSelectAddress(suggestion)}
+              >
+                <div className="font-medium">{suggestion.structured_formatting.main_text}</div>
+                <div className="text-sm text-muted-foreground">{suggestion.structured_formatting.secondary_text}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
