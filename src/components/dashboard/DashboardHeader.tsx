@@ -67,44 +67,6 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
           </DropdownMenu>
         </div>
       </div>
-      <div className="flex gap-2 px-6 pb-4">
-        <Button
-          variant={view === 'active' ? 'default' : 'outline'}
-          onClick={() => handleViewChange('active')}
-          className={`
-            gap-2 
-            ${view === 'active' 
-              ? 'bg-purple-600 hover:bg-purple-700 text-white' 
-              : 'bg-transparent border-[#334155] text-gray-300 hover:text-white hover:bg-[#334155]'}
-          `}
-        >
-          Active
-        </Button>
-        <Button
-          variant={view === 'schedule' ? 'default' : 'outline'}
-          onClick={() => handleViewChange('schedule')}
-          className={`
-            gap-2 
-            ${view === 'schedule' 
-              ? 'bg-purple-600 hover:bg-purple-700 text-white' 
-              : 'bg-transparent border-[#334155] text-gray-300 hover:text-white hover:bg-[#334155]'}
-          `}
-        >
-          Schedule
-        </Button>
-        <Button
-          variant={view === 'calendar' ? 'default' : 'outline'}
-          onClick={() => handleViewChange('calendar')}
-          className={`
-            gap-2 
-            ${view === 'calendar' 
-              ? 'bg-purple-600 hover:bg-purple-700 text-white' 
-              : 'bg-transparent border-[#334155] text-gray-300 hover:text-white hover:bg-[#334155]'}
-          `}
-        >
-          Calendar
-        </Button>
-      </div>
     </div>
   );
 }
