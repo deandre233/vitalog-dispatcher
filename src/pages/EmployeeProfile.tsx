@@ -13,6 +13,7 @@ import { DemographicsTab } from "@/components/hr/tabs/DemographicsTab";
 import { PerformanceTab } from "@/components/hr/tabs/PerformanceTab";
 import { CertificationsTab } from "@/components/hr/tabs/CertificationsTab";
 import { DocumentsTab } from "@/components/hr/tabs/DocumentsTab";
+import { IncidentsTab } from "@/components/hr/tabs/IncidentsTab";
 import { PlaceholderTab } from "@/components/hr/tabs/PlaceholderTab";
 import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
 import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
@@ -86,9 +87,9 @@ const EmployeeProfile = () => {
       case "certifications":
         return <CertificationsTab />;
       case "documents":
-        return <DocumentsTab />;
+        return <DocumentsTab employeeId={employeeId} />;
       case "incidents":
-        return <PlaceholderTab value="incidents" title="Incidents" />;
+        return <IncidentsTab employeeId={employeeId} />;
       case "stats":
         return <PlaceholderTab value="stats" title="Performance Statistics" />;
       case "achievements":

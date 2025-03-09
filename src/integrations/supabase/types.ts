@@ -1093,6 +1093,86 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_incidents: {
+        Row: {
+          ai_analysis: Json | null
+          attachments: string[] | null
+          created_at: string
+          description: string
+          employee_id: string
+          followup_date: string | null
+          followup_required: boolean | null
+          id: string
+          incident_date: string
+          incident_type: string
+          location: string | null
+          partner_id: string | null
+          reported_to: string | null
+          resolution: string | null
+          severity: string
+          shift_id: string | null
+          status: string
+          updated_at: string
+          vehicle_id: string | null
+          vehicle_involved: boolean | null
+          witnesses: string[] | null
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          attachments?: string[] | null
+          created_at?: string
+          description: string
+          employee_id: string
+          followup_date?: string | null
+          followup_required?: boolean | null
+          id?: string
+          incident_date: string
+          incident_type: string
+          location?: string | null
+          partner_id?: string | null
+          reported_to?: string | null
+          resolution?: string | null
+          severity: string
+          shift_id?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_id?: string | null
+          vehicle_involved?: boolean | null
+          witnesses?: string[] | null
+        }
+        Update: {
+          ai_analysis?: Json | null
+          attachments?: string[] | null
+          created_at?: string
+          description?: string
+          employee_id?: string
+          followup_date?: string | null
+          followup_required?: boolean | null
+          id?: string
+          incident_date?: string
+          incident_type?: string
+          location?: string | null
+          partner_id?: string | null
+          reported_to?: string | null
+          resolution?: string | null
+          severity?: string
+          shift_id?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_id?: string | null
+          vehicle_involved?: boolean | null
+          witnesses?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_incidents_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "shift_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_locations: {
         Row: {
           accuracy: number | null
