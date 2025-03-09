@@ -6,6 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useParams } from "react-router-dom";
+import { StatisticsSection } from "./performance/StatisticsSection";
+import { PCRCompletenessSection } from "./performance/PCRCompletenessSection";
 
 export function PerformanceTab() {
   const { employeeId } = useParams<{ employeeId: string }>();
@@ -104,6 +106,12 @@ export function PerformanceTab() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Statistics Section */}
+        <StatisticsSection />
+
+        {/* PCR Completeness Section */}
+        <PCRCompletenessSection />
 
         {/* Performance Details */}
         <Card>
