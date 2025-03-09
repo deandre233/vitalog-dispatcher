@@ -153,16 +153,16 @@ export function ContinuingEducationSection() {
               <div className="flex items-center space-x-2">
                 <Label className="text-sm">From:</Label>
                 <DatePicker 
-                  date={dateRange.from}
-                  onSelect={(date) => setDateRange(prev => ({ ...prev, from: date }))}
+                  selected={dateRange.from} 
+                  onChange={(date) => setDateRange(prev => ({ ...prev, from: date as Date }))}
                 />
               </div>
               
               <div className="flex items-center space-x-2">
                 <Label className="text-sm">To:</Label>
                 <DatePicker 
-                  date={dateRange.to}
-                  onSelect={(date) => setDateRange(prev => ({ ...prev, to: date }))}
+                  selected={dateRange.to}
+                  onChange={(date) => setDateRange(prev => ({ ...prev, to: date as Date }))}
                 />
               </div>
               
