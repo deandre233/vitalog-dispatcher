@@ -64,14 +64,15 @@ export interface FetchResourceParams {
   };
 }
 
-// Fixed function with a non-generic implementation to avoid type instantiation issues
+// Generic function with explicit type parameter to prevent deep instantiation issues
 export async function fetchResource<T>(
   resourceName: string,
   params?: FetchResourceParams
 ): Promise<{ data: T[] | null; count: number | null; error: string | null }> {
   try {
-    // Cast as any to bypass TypeScript's type checking for the dynamic table name
-    const selectQuery = supabase.from(resourceName as any).select("*", { count: "exact" });
+    // Use type assertion to avoid TypeScript's excessive type checking
+    const table = resourceName as string;
+    const selectQuery = supabase.from(table).select("*", { count: "exact" });
     
     if (params?.search) {
       selectQuery.or(`name.ilike.%${params.search}%,description.ilike.%${params.search}%`);

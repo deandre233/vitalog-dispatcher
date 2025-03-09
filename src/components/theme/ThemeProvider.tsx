@@ -29,9 +29,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Apply theme class to document
     if (theme === "light") {
       document.documentElement.classList.add("light");
+      document.documentElement.style.colorScheme = "light";
     } else {
       document.documentElement.classList.remove("light");
+      document.documentElement.style.colorScheme = "dark";
     }
+    
+    // Apply transition class for smooth theme changes
+    document.documentElement.classList.add("theme-transition");
+    
+    // Remove transition class after animation completes to prevent transition on page load
+    const transitionTimeout = setTimeout(() => {
+      document.documentElement.classList.remove("theme-transition");
+    }, 300);
+    
+    return () => clearTimeout(transitionTimeout);
   }, [theme]);
   
   const toggleTheme = () => {
