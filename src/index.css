@@ -76,6 +76,18 @@
     @apply bg-background text-foreground antialiased;
     background: #0f172a;
   }
+  
+  /* Improved text rendering for better readability */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-white/95 tracking-tight;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  
+  /* Better paragraph and general text readability */
+  p, span, li, label, div {
+    @apply text-white/90;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  }
 }
 
 @layer components {
@@ -102,6 +114,43 @@
            border border-white/10 
            shadow-lg hover:shadow-xl 
            transition-all duration-300 
+           rounded-lg;
+  }
+
+  /* New color-themed panels */
+  .purple-glass {
+    @apply bg-purple-900/20 backdrop-blur-md 
+           border border-purple-500/20
+           text-purple-100
+           shadow-lg hover:shadow-purple-500/20
+           transition-all duration-300
+           rounded-lg;
+  }
+  
+  .blue-glass {
+    @apply bg-blue-900/20 backdrop-blur-md 
+           border border-blue-500/20
+           text-blue-100
+           shadow-lg hover:shadow-blue-500/20 
+           transition-all duration-300
+           rounded-lg;
+  }
+  
+  .green-glass {
+    @apply bg-green-900/20 backdrop-blur-md 
+           border border-green-500/20
+           text-green-100
+           shadow-lg hover:shadow-green-500/20
+           transition-all duration-300
+           rounded-lg;
+  }
+  
+  .red-glass {
+    @apply bg-red-900/20 backdrop-blur-md 
+           border border-red-500/20
+           text-red-100
+           shadow-lg hover:shadow-red-500/20
+           transition-all duration-300
            rounded-lg;
   }
 
@@ -149,5 +198,22 @@
   
   .hover-glow:hover {
     box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+  }
+  
+  /* Text styling classes */
+  .text-gradient-purple {
+    @apply bg-gradient-to-r from-purple-300 to-purple-100 bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-blue {
+    @apply bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-green {
+    @apply bg-gradient-to-r from-green-300 to-green-100 bg-clip-text text-transparent;
+  }
+  
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
   }
 }
