@@ -3,31 +3,52 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Award, ArrowUp, ArrowDown, Minus, Filter, Crown } from "lucide-react";
+import { 
+  Award, 
+  ArrowUp, 
+  ArrowDown, 
+  Minus, 
+  Filter, 
+  Crown, 
+  Clock, 
+  FileText, 
+  BookOpen,
+  Calendar,
+  Star,
+  TrendingUp,
+  TrendingDown
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface EmployeeRanking {
   id: string;
   name: string;
   avatar: string;
   position: string;
-  score: number;
+  overallScore: number;
   change: 'up' | 'down' | 'none';
   changeAmount: number;
   skillScores: {
-    communication: number;
-    technical: number;
-    reliability: number;
+    pcrCompletion: number;
+    pcrQuality: number;
+    punctuality: number;
+    inserviceAttendance: number;
+    patientFeedback: number;
+    protocolAdherence: number;
     teamwork: number;
+    certification: number;
   };
+  gradeLevel: 'A' | 'B' | 'C' | 'D' | 'F';
+  rank: number;
 }
 
 export function PerformanceRankings() {
-  const [timeRange, setTimeRange] = useState<string>("month");
-  const [rankingType, setRankingType] = useState<string>("overall");
+  const [timeRange, setTimeRange] = useState<string>("quarter");
+  const [activeCategory, setActiveCategory] = useState<string>("overall");
 
   // Mock data - in a real app this would come from an API
   const rankingData: EmployeeRanking[] = [
@@ -36,14 +57,20 @@ export function PerformanceRankings() {
       name: "Sarah Johnson",
       avatar: "",
       position: "Paramedic",
-      score: 94,
+      overallScore: 94,
       change: 'up',
       changeAmount: 3,
+      gradeLevel: 'A',
+      rank: 1,
       skillScores: {
-        communication: 92,
-        technical: 96,
-        reliability: 95,
-        teamwork: 93
+        pcrCompletion: 98,
+        pcrQuality: 95,
+        punctuality: 92,
+        inserviceAttendance: 100,
+        patientFeedback: 91,
+        protocolAdherence: 97,
+        teamwork: 93,
+        certification: 95
       }
     },
     {
@@ -51,14 +78,20 @@ export function PerformanceRankings() {
       name: "Michael Chen",
       avatar: "",
       position: "EMT",
-      score: 92,
+      overallScore: 92,
       change: 'up',
       changeAmount: 1,
+      gradeLevel: 'A',
+      rank: 2,
       skillScores: {
-        communication: 90,
-        technical: 94,
-        reliability: 92,
-        teamwork: 91
+        pcrCompletion: 94,
+        pcrQuality: 93,
+        punctuality: 96,
+        inserviceAttendance: 90,
+        patientFeedback: 95,
+        protocolAdherence: 89,
+        teamwork: 97,
+        certification: 92
       }
     },
     {
@@ -66,14 +99,20 @@ export function PerformanceRankings() {
       name: "David Rodriguez",
       avatar: "",
       position: "Paramedic",
-      score: 89,
+      overallScore: 89,
       change: 'down',
       changeAmount: 2,
+      gradeLevel: 'B',
+      rank: 3,
       skillScores: {
-        communication: 88,
-        technical: 90,
-        reliability: 87,
-        teamwork: 92
+        pcrCompletion: 87,
+        pcrQuality: 90,
+        punctuality: 85,
+        inserviceAttendance: 95,
+        patientFeedback: 92,
+        protocolAdherence: 88,
+        teamwork: 91,
+        certification: 84
       }
     },
     {
@@ -81,14 +120,20 @@ export function PerformanceRankings() {
       name: "Emily Taylor",
       avatar: "",
       position: "EMT-Advanced",
-      score: 87,
+      overallScore: 87,
       change: 'none',
       changeAmount: 0,
+      gradeLevel: 'B',
+      rank: 4,
       skillScores: {
-        communication: 89,
-        technical: 85,
-        reliability: 88,
-        teamwork: 90
+        pcrCompletion: 90,
+        pcrQuality: 86,
+        punctuality: 88,
+        inserviceAttendance: 85,
+        patientFeedback: 93,
+        protocolAdherence: 84,
+        teamwork: 89,
+        certification: 80
       }
     },
     {
@@ -96,14 +141,20 @@ export function PerformanceRankings() {
       name: "James Wilson",
       avatar: "",
       position: "EMT",
-      score: 85,
+      overallScore: 78,
       change: 'up',
       changeAmount: 4,
+      gradeLevel: 'C',
+      rank: 5,
       skillScores: {
-        communication: 83,
-        technical: 86,
-        reliability: 89,
-        teamwork: 84
+        pcrCompletion: 75,
+        pcrQuality: 76,
+        punctuality: 89,
+        inserviceAttendance: 70,
+        patientFeedback: 84,
+        protocolAdherence: 79,
+        teamwork: 83,
+        certification: 70
       }
     }
   ];
@@ -139,6 +190,62 @@ export function PerformanceRankings() {
     return "text-red-600";
   };
 
+  const getGradeColor = (grade: string) => {
+    switch (grade) {
+      case 'A': return "bg-green-100 text-green-800 border-green-300";
+      case 'B': return "bg-blue-100 text-blue-800 border-blue-300";
+      case 'C': return "bg-amber-100 text-amber-800 border-amber-300";
+      case 'D': return "bg-orange-100 text-orange-800 border-orange-300";
+      case 'F': return "bg-red-100 text-red-800 border-red-300";
+      default: return "bg-gray-100 text-gray-800 border-gray-300";
+    }
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'pcrCompletion': return <FileText className="h-4 w-4 mr-1" />;
+      case 'pcrQuality': return <Star className="h-4 w-4 mr-1" />;
+      case 'punctuality': return <Clock className="h-4 w-4 mr-1" />;
+      case 'inserviceAttendance': return <Calendar className="h-4 w-4 mr-1" />;
+      case 'patientFeedback': return <TrendingUp className="h-4 w-4 mr-1" />;
+      case 'protocolAdherence': return <BookOpen className="h-4 w-4 mr-1" />;
+      case 'teamwork': return <Users className="h-4 w-4 mr-1" />;
+      case 'certification': return <Award className="h-4 w-4 mr-1" />;
+      default: return <Award className="h-4 w-4 mr-1" />;
+    }
+  };
+
+  const renderEmployeeScore = (employee: EmployeeRanking, category: string) => {
+    let score: number;
+    
+    if (category === 'overall') {
+      score = employee.overallScore;
+    } else {
+      score = employee.skillScores[category as keyof typeof employee.skillScores];
+    }
+    
+    return (
+      <div className="flex flex-col items-center gap-1">
+        <div className={`text-lg font-semibold ${getScoreColor(score)}`}>
+          {score}
+        </div>
+      </div>
+    );
+  };
+
+  // Sort employees based on active category
+  const getSortedEmployees = () => {
+    return [...rankingData].sort((a, b) => {
+      if (activeCategory === 'overall') {
+        return b.overallScore - a.overallScore;
+      }
+      return b.skillScores[activeCategory as keyof typeof b.skillScores] - 
+             a.skillScores[activeCategory as keyof typeof a.skillScores];
+    });
+  };
+
+  const sortedEmployees = getSortedEmployees();
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -147,177 +254,190 @@ export function PerformanceRankings() {
             <Award className="h-6 w-6 text-amber-500" />
             <div>
               <CardTitle>AI Performance Rankings</CardTitle>
-              <CardDescription>Employee performance based on AI analysis</CardDescription>
+              <CardDescription>Employee grades and rankings across key performance areas</CardDescription>
             </div>
           </div>
           <div className="flex gap-2">
             <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Time Range" />
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Time Period" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="week">This Week</SelectItem>
                 <SelectItem value="month">This Month</SelectItem>
                 <SelectItem value="quarter">This Quarter</SelectItem>
                 <SelectItem value="year">This Year</SelectItem>
+                <SelectItem value="all">All Time</SelectItem>
               </SelectContent>
             </Select>
-            
-            <Select value={rankingType} onValueChange={setRankingType}>
-              <SelectTrigger className="w-[130px]">
-                <SelectValue placeholder="Ranking Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="overall">Overall</SelectItem>
-                <SelectItem value="technical">Technical Skills</SelectItem>
-                <SelectItem value="communication">Communication</SelectItem>
-                <SelectItem value="reliability">Reliability</SelectItem>
-                <SelectItem value="teamwork">Teamwork</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Filter className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="space-y-4">
-                  <h4 className="font-medium">Filter Rankings</h4>
-                  <div className="space-y-2">
-                    <h5 className="text-sm font-medium">Position</h5>
-                    <Select defaultValue="all">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select position" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Positions</SelectItem>
-                        <SelectItem value="paramedic">Paramedic</SelectItem>
-                        <SelectItem value="emt">EMT</SelectItem>
-                        <SelectItem value="emt-advanced">EMT-Advanced</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <h5 className="text-sm font-medium">Performance Trend</h5>
-                    <Select defaultValue="all">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select trend" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Trends</SelectItem>
-                        <SelectItem value="improving">Improving</SelectItem>
-                        <SelectItem value="declining">Declining</SelectItem>
-                        <SelectItem value="stable">Stable</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex justify-end">
-                    <Button size="sm">Apply Filters</Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {rankingData.map((employee, index) => (
-            <div key={employee.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/10 transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-muted-foreground font-semibold">
-                  {index === 0 ? (
-                    <Crown className="h-5 w-5 text-amber-500" />
-                  ) : (
-                    <span>{index + 1}</span>
-                  )}
+      
+      <Tabs defaultValue="overall" value={activeCategory} onValueChange={setActiveCategory}>
+        <div className="px-6">
+          <TabsList className="w-full mb-4 grid grid-cols-4 md:grid-cols-8">
+            <TabsTrigger value="overall" className="text-xs">Overall</TabsTrigger>
+            <TabsTrigger value="pcrCompletion" className="text-xs">PCR Completion</TabsTrigger>
+            <TabsTrigger value="pcrQuality" className="text-xs">PCR Quality</TabsTrigger>
+            <TabsTrigger value="punctuality" className="text-xs">Punctuality</TabsTrigger>
+            <TabsTrigger value="inserviceAttendance" className="text-xs">Inservice</TabsTrigger>
+            <TabsTrigger value="patientFeedback" className="text-xs">Patient Feedback</TabsTrigger>
+            <TabsTrigger value="protocolAdherence" className="text-xs">Protocol</TabsTrigger>
+            <TabsTrigger value="certification" className="text-xs">Certification</TabsTrigger>
+          </TabsList>
+        </div>
+        
+        <CardContent>
+          <div className="space-y-4">
+            <div className="border-b border-gray-200 mb-4 pb-2 flex items-center justify-between text-sm font-medium text-gray-500">
+              <div className="w-1/2">Employee</div>
+              <div className="w-1/6 text-center">Rank</div>
+              <div className="w-1/6 text-center">Grade</div>
+              <div className="w-1/6 text-center">Score</div>
+            </div>
+            
+            {sortedEmployees.map((employee, index) => (
+              <div 
+                key={employee.id} 
+                className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/10 transition-colors"
+              >
+                <div className="flex items-center gap-4 w-1/2">
+                  <Avatar className="h-10 w-10 border">
+                    <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    {employee.avatar && <AvatarImage src={employee.avatar} alt={employee.name} />}
+                  </Avatar>
+                  <div>
+                    <div className="font-medium">{employee.name}</div>
+                    <div className="text-sm text-muted-foreground">{employee.position}</div>
+                  </div>
                 </div>
-                <Avatar className="h-10 w-10 border">
-                  <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  {employee.avatar && <AvatarImage src={employee.avatar} alt={employee.name} />}
-                </Avatar>
-                <div>
-                  <div className="font-medium">{employee.name}</div>
-                  <div className="text-sm text-muted-foreground">{employee.position}</div>
+                
+                <div className="w-1/6 flex justify-center">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-muted-foreground font-bold">
+                    {index === 0 ? (
+                      <Crown className="h-5 w-5 text-amber-500" />
+                    ) : (
+                      <span>{index + 1}</span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="w-1/6 flex justify-center">
+                  <div className={`text-center px-3 py-1 rounded-md border font-bold ${getGradeColor(employee.gradeLevel)}`}>
+                    {employee.gradeLevel}
+                  </div>
+                </div>
+                
+                <div className="w-1/6 flex justify-center items-center gap-2">
+                  {renderEmployeeScore(employee, activeCategory)}
+                  {activeCategory === 'overall' && getChangeIcon(employee.change, employee.changeAmount)}
                 </div>
               </div>
-              <div className="flex items-center gap-6">
-                <div className="hidden md:block w-48">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span>Performance Score</span>
-                    <span className={getScoreColor(employee.score)}>{employee.score}%</span>
-                  </div>
-                  <Progress value={employee.score} className="h-2" />
+            ))}
+          </div>
+          
+          <div className="mt-6 border-t pt-4">
+            <h3 className="font-medium mb-2 flex items-center">
+              {getCategoryIcon(activeCategory)}
+              {activeCategory === 'overall' ? 'Overall Performance Metrics' : 
+                activeCategory === 'pcrCompletion' ? 'PCR Completion Metrics' :
+                activeCategory === 'pcrQuality' ? 'PCR Quality Metrics' :
+                activeCategory === 'punctuality' ? 'Punctuality Metrics' :
+                activeCategory === 'inserviceAttendance' ? 'Inservice Attendance Metrics' :
+                activeCategory === 'patientFeedback' ? 'Patient Feedback Metrics' :
+                activeCategory === 'protocolAdherence' ? 'Protocol Adherence Metrics' :
+                activeCategory === 'certification' ? 'Certification Metrics' : 'Performance Metrics'
+              }
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="bg-gray-50 p-3 rounded-md">
+                <p className="font-medium mb-1">
+                  {activeCategory === 'overall' ? 'Evaluation Criteria' : 
+                   activeCategory === 'pcrCompletion' ? 'PCR Submission Rate' :
+                   activeCategory === 'pcrQuality' ? 'Narrative Quality' :
+                   activeCategory === 'punctuality' ? 'Shift Arrival Time' :
+                   activeCategory === 'inserviceAttendance' ? 'Attendance Rate' :
+                   activeCategory === 'patientFeedback' ? 'Patient Satisfaction' :
+                   activeCategory === 'protocolAdherence' ? 'Protocol Compliance' :
+                   activeCategory === 'certification' ? 'CE Hours Completed' : 'Key Metrics'
+                  }
+                </p>
+                <p className="text-gray-600">
+                  {activeCategory === 'overall' ? 'Based on combined scores across all categories' :
+                   activeCategory === 'pcrCompletion' ? '% of PCRs completed within 24 hours' :
+                   activeCategory === 'pcrQuality' ? 'Quality scoring from QA reviews' :
+                   activeCategory === 'punctuality' ? 'On-time arrival percentage' :
+                   activeCategory === 'inserviceAttendance' ? '% of required inservice hours attended' :
+                   activeCategory === 'patientFeedback' ? 'Average patient satisfaction score' :
+                   activeCategory === 'protocolAdherence' ? '% adherence to clinical protocols' :
+                   activeCategory === 'certification' ? '% of required CE hours completed' : 'Key performance indicators'
+                  }
+                </p>
+              </div>
+              
+              <div className="bg-gray-50 p-3 rounded-md">
+                <p className="font-medium mb-1">Performance Trend</p>
+                <div className="flex items-center">
+                  {activeCategory === 'overall' ? (
+                    <TrendingUp className="h-4 w-4 text-green-600 mr-2" />
+                  ) : activeCategory === 'pcrQuality' ? (
+                    <TrendingDown className="h-4 w-4 text-amber-600 mr-2" />
+                  ) : (
+                    <TrendingUp className="h-4 w-4 text-green-600 mr-2" />
+                  )}
+                  <span className="text-gray-600">
+                    {activeCategory === 'overall' ? 'Overall scores improving by 2.4% this quarter' :
+                     activeCategory === 'pcrCompletion' ? 'PCR completion time improved by 14% this quarter' :
+                     activeCategory === 'pcrQuality' ? 'Minor decline in documentation quality (1.2%)' :
+                     activeCategory === 'punctuality' ? 'On-time arrival improved by 3.8%' :
+                     activeCategory === 'inserviceAttendance' ? 'Attendance increased 4.7% from last quarter' :
+                     activeCategory === 'patientFeedback' ? 'Patient satisfaction up by 2.1%' :
+                     activeCategory === 'protocolAdherence' ? 'Protocol compliance improved by 1.8%' :
+                     activeCategory === 'certification' ? 'CE completion rate up 5.3%' : 'Performance trending upward'
+                    }
+                  </span>
                 </div>
-                <div className="flex flex-col items-center gap-1">
-                  <div className={`text-lg font-semibold ${getScoreColor(employee.score)}`}>
-                    {employee.score}
-                  </div>
-                  {getChangeIcon(employee.change, employee.changeAmount)}
+              </div>
+              
+              <div className="bg-gray-50 p-3 rounded-md">
+                <p className="font-medium mb-1">Department Average</p>
+                <div className="flex items-center space-x-2">
+                  <Progress value={
+                    activeCategory === 'overall' ? 84 :
+                    activeCategory === 'pcrCompletion' ? 82 :
+                    activeCategory === 'pcrQuality' ? 80 :
+                    activeCategory === 'punctuality' ? 87 :
+                    activeCategory === 'inserviceAttendance' ? 79 :
+                    activeCategory === 'patientFeedback' ? 83 :
+                    activeCategory === 'protocolAdherence' ? 85 :
+                    activeCategory === 'certification' ? 81 : 84
+                  } className="h-2 flex-1" />
+                  <span className={getScoreColor(
+                    activeCategory === 'overall' ? 84 :
+                    activeCategory === 'pcrCompletion' ? 82 :
+                    activeCategory === 'pcrQuality' ? 80 :
+                    activeCategory === 'punctuality' ? 87 :
+                    activeCategory === 'inserviceAttendance' ? 79 :
+                    activeCategory === 'patientFeedback' ? 83 :
+                    activeCategory === 'protocolAdherence' ? 85 :
+                    activeCategory === 'certification' ? 81 : 84
+                  )}>
+                    {activeCategory === 'overall' ? "84%" :
+                     activeCategory === 'pcrCompletion' ? "82%" :
+                     activeCategory === 'pcrQuality' ? "80%" :
+                     activeCategory === 'punctuality' ? "87%" :
+                     activeCategory === 'inserviceAttendance' ? "79%" :
+                     activeCategory === 'patientFeedback' ? "83%" :
+                     activeCategory === 'protocolAdherence' ? "85%" :
+                     activeCategory === 'certification' ? "81%" : "84%"
+                    }
+                  </span>
                 </div>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm">Details</Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-96">
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-lg">{employee.name}</h4>
-                      <div className="space-y-3">
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>Communication</span>
-                            <span className={getScoreColor(employee.skillScores.communication)}>
-                              {employee.skillScores.communication}%
-                            </span>
-                          </div>
-                          <Progress value={employee.skillScores.communication} className="h-2" />
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>Technical Skills</span>
-                            <span className={getScoreColor(employee.skillScores.technical)}>
-                              {employee.skillScores.technical}%
-                            </span>
-                          </div>
-                          <Progress value={employee.skillScores.technical} className="h-2" />
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>Reliability</span>
-                            <span className={getScoreColor(employee.skillScores.reliability)}>
-                              {employee.skillScores.reliability}%
-                            </span>
-                          </div>
-                          <Progress value={employee.skillScores.reliability} className="h-2" />
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>Teamwork</span>
-                            <span className={getScoreColor(employee.skillScores.teamwork)}>
-                              {employee.skillScores.teamwork}%
-                            </span>
-                          </div>
-                          <Progress value={employee.skillScores.teamwork} className="h-2" />
-                        </div>
-                      </div>
-                      <div className="border-t pt-2">
-                        <h5 className="text-sm font-medium mb-1">AI Recommendations</h5>
-                        <p className="text-sm text-muted-foreground">
-                          {index === 0 
-                            ? "Continue mentoring junior team members. Consider advanced leadership training."
-                            : "Focus on improving technical skills with additional training sessions. Communication skills are strong."}
-                        </p>
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
               </div>
             </div>
-          ))}
-        </div>
-      </CardContent>
+          </div>
+        </CardContent>
+      </Tabs>
     </Card>
   );
 }
