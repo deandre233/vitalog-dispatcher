@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { Calendar } from "lucide-react";
+import { Calendar, Brain, TrendingUp, AlertTriangle, HelpCircle } from "lucide-react";
 import { TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { shiftRecordsService } from "@/services/shiftRecords";
-import type { ShiftRecord } from "@/types/shift-records";
+import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
+import { useToast } from "@/components/ui/use-toast";
+import { ShiftFilters } from "@/components/shifts/ShiftFilters";
+import type { ShiftRecord, ShiftFilter } from "@/types/shift-records";
+import type { AIInsight } from "@/types/ai";
 
 interface ShiftsTabProps {
   employeeId?: string;
@@ -40,10 +45,79 @@ const calculateShiftPayment = (shift: ShiftRecord, hourlyRate: number = 25): num
   return (regularHours * hourlyRate) + (overtimeHours * hourlyRate * 1.5);
 };
 
+// AI-based shift insights generator
+const generateShiftInsights = (shifts: ShiftWithStatus[]): AIInsight[] => {
+  const insights: AIInsight[] = [];
+  
+  // Analyze work patterns
+  const totalHours = shifts.reduce((sum, shift) => {
+    if (!shift.start_time || !shift.end_time) return sum;
+    const start = new Date(shift.shift_date + "T" + shift.start_time);
+    const end = new Date(shift.shift_date + "T" + shift.end_time);
+    return sum + ((end.getTime() - start.getTime()) / (1000 * 60 * 60));
+  }, 0);
+  
+  // Check for overtime patterns
+  const overtimeShifts = shifts.filter(shift => shift.overtime);
+  if (overtimeShifts.length > 1) {
+    insights.push({
+      type: 'warning',
+      message: `You have ${overtimeShifts.length} shifts with overtime scheduled. Consider rest periods between long shifts.`,
+      confidence: 0.85,
+      impact: 'medium'
+    });
+  }
+  
+  // Analyze earning potential
+  const potentialEarnings = shifts
+    .filter(shift => shift.status === 'available')
+    .reduce((sum, shift) => sum + (shift.payment || 0), 0);
+  
+  if (potentialEarnings > 200) {
+    insights.push({
+      type: 'optimization',
+      message: `There's a potential to earn an additional $${potentialEarnings.toFixed(2)} by picking up available shifts.`,
+      confidence: 0.9,
+      impact: 'high'
+    });
+  }
+  
+  // Predict best shifts to take based on earnings/hour
+  const availableShifts = shifts.filter(shift => shift.status === 'available');
+  if (availableShifts.length > 0) {
+    // Sort by hourly rate
+    const bestShift = availableShifts.reduce((best, current) => {
+      const currentHourlyRate = (current.payment || 0) / 
+        (current.start_time && current.end_time ? 
+          ((new Date(current.shift_date + "T" + current.end_time).getTime() - 
+            new Date(current.shift_date + "T" + current.start_time).getTime()) / (1000 * 60 * 60)) : 8);
+      
+      const bestHourlyRate = (best.payment || 0) / 
+        (best.start_time && best.end_time ? 
+          ((new Date(best.shift_date + "T" + best.end_time).getTime() - 
+            new Date(best.shift_date + "T" + best.start_time).getTime()) / (1000 * 60 * 60)) : 8);
+      
+      return currentHourlyRate > bestHourlyRate ? current : best;
+    }, availableShifts[0]);
+    
+    insights.push({
+      type: 'prediction',
+      message: `Based on hourly rate analysis, the ${bestShift.shift_type} shift on ${format(new Date(bestShift.shift_date), "MMM dd")} offers the best earnings potential.`,
+      confidence: 0.7,
+      impact: 'medium'
+    });
+  }
+  
+  return insights;
+};
+
 export function ShiftsTab({ employeeId }: ShiftsTabProps) {
   const [activeFilter, setActiveFilter] = useState<ShiftStatus>("upcoming");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedShift, setSelectedShift] = useState<ShiftWithStatus | null>(null);
+  const [expandedInsights, setExpandedInsights] = useState(false);
+  const [activeFilterOptions, setActiveFilterOptions] = useState<ShiftFilter>({});
+  const { toast } = useToast();
   
   // Mock data for shifts - in a real app, this would come from a hook or service
   const mockShifts: ShiftWithStatus[] = [
@@ -109,6 +183,31 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
       payment: 200,
       vehicle_id: "AMB-104",
       notes: "Volunteer opportunity",
+    },
+    {
+      id: "shift-006",
+      employee_id: null,
+      shift_date: "2024-07-15",
+      shift_type: "Night",
+      start_time: "20:00:00",
+      end_time: "08:00:00",
+      status: "available",
+      payment: 300,
+      overtime: true,
+      vehicle_id: "AMB-106",
+      notes: "Night shift with overtime premium",
+    },
+    {
+      id: "shift-007",
+      employee_id: null,
+      shift_date: "2024-07-20",
+      shift_type: "Weekend",
+      start_time: "12:00:00",
+      end_time: "20:00:00",
+      status: "available",
+      payment: 240,
+      vehicle_id: "AMB-107",
+      notes: "Weekend premium pay",
     }
   ];
 
@@ -123,11 +222,29 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
     return "default";
   };
 
+  // Generate AI insights for shifts
+  const shiftInsights = generateShiftInsights(mockShifts);
+
+  const handleFilterChange = (filters: ShiftFilter) => {
+    setActiveFilterOptions(filters);
+    console.log("Applying filters:", filters);
+    // In a real app, this would filter the data
+  };
+
   const filteredShifts = mockShifts.filter(shift => {
+    // Apply status filter
     if (activeFilter === "available") {
       return shift.status === "available";
     }
-    return shift.status === activeFilter && shift.employee_id === employeeId;
+    if (activeFilter === "upcoming" || activeFilter === "completed") {
+      if (shift.status !== activeFilter) return false;
+      if (shift.employee_id !== employeeId) return false;
+    }
+    
+    // Here we would apply the additional filters from activeFilterOptions
+    // This is a placeholder for actual filter implementation
+    
+    return true;
   });
 
   const handlePickUpShift = (shift: ShiftWithStatus) => {
@@ -138,6 +255,10 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
   const confirmPickUpShift = () => {
     // In a real app, this would call an API to assign the shift
     console.log(`Shift ${selectedShift?.id} picked up`);
+    toast({
+      title: "Shift assigned",
+      description: `You have been assigned to the ${selectedShift?.shift_type} shift on ${format(new Date(selectedShift?.shift_date || ""), "MMM dd, yyyy")}`,
+    });
     setShowConfirmation(false);
     // Would refresh data here
   };
@@ -246,6 +367,53 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
           </div>
         </div>
 
+        {/* Shift Insights Panel */}
+        <Card className="mb-6 border-blue-100 bg-blue-50/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-blue-500" />
+              <span>Shift AI Insights</span>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="ml-2 h-6 w-6 p-0 rounded-full" 
+                onClick={() => setExpandedInsights(!expandedInsights)}
+              >
+                {expandedInsights ? "-" : "+"}
+              </Button>
+            </CardTitle>
+            {!expandedInsights && (
+              <CardDescription>
+                {shiftInsights.length > 0 
+                  ? shiftInsights[0].message 
+                  : "No insights available for your current shifts."}
+              </CardDescription>
+            )}
+          </CardHeader>
+          {expandedInsights && (
+            <CardContent>
+              <AIInsightsPanel insights={shiftInsights} />
+            </CardContent>
+          )}
+        </Card>
+
+        {/* Shift Filters Panel - Only show for Available and Completed tabs */}
+        {(activeFilter === "available" || activeFilter === "completed") && (
+          <div className="mb-6">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <HelpCircle className="h-4 w-4" />
+                  Advanced Filters
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-4" align="start">
+                <ShiftFilters onFilterChange={handleFilterChange} />
+              </PopoverContent>
+            </Popover>
+          </div>
+        )}
+
         {activeFilter === "upcoming" && (
           <div className="space-y-6">
             <Card>
@@ -314,6 +482,7 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
               <DataTable 
                 columns={upcomingShiftsColumns} 
                 data={filteredShifts} 
+                searchKey="shift_type" 
               />
             </CardContent>
             <CardFooter className="flex justify-between">
@@ -345,6 +514,7 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
               <DataTable 
                 columns={availableShiftsColumns} 
                 data={filteredShifts} 
+                searchKey="shift_type"
               />
             </CardContent>
             <CardFooter>
@@ -363,7 +533,7 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
             <DialogHeader>
               <DialogTitle>Confirm Shift Pickup</DialogTitle>
               <DialogDescription>
-                Are you sure you want to take this shift on {selectedShift?.shift_date}?
+                Are you sure you want to take this shift on {selectedShift && format(new Date(selectedShift.shift_date), "MMM dd, yyyy")}?
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">
@@ -371,7 +541,7 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
                 <TableBody>
                   <TableRow>
                     <TableCell className="font-medium">Date</TableCell>
-                    <TableCell>{selectedShift?.shift_date}</TableCell>
+                    <TableCell>{selectedShift && format(new Date(selectedShift.shift_date), "MMM dd, yyyy")}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-medium">Time</TableCell>
@@ -385,6 +555,12 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
                     <TableCell className="font-medium">Payment</TableCell>
                     <TableCell>${selectedShift?.payment?.toFixed(2)}</TableCell>
                   </TableRow>
+                  {selectedShift?.overtime && (
+                    <TableRow>
+                      <TableCell className="font-medium">Overtime</TableCell>
+                      <TableCell><Badge>Overtime Pay</Badge></TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
