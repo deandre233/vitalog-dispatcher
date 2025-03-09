@@ -1,92 +1,116 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { handleError } from "@/utils/errorHandling";
-import { logger } from "@/utils/logger";
-import { Database } from "@/integrations/supabase/types";
 
-type TableNames = keyof Database['public']['Tables'];
+export async function fetchPatients(params?: {
+  search?: string;
+  filters?: Record<string, any>;
+  limit?: number;
+  offset?: number;
+}) {
+  try {
+    let query = supabase.from("patients").select("*");
 
-export const api = {
-  async get<T>(table: TableNames, query: any = {}): Promise<T[]> {
-    try {
-      logger.info(`Fetching data from ${table}`, query);
-      const { data, error } = await supabase
-        .from(table)
-        .select(query.select || '*')
-        .order(query.orderBy || 'created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as T[];
-    } catch (error) {
-      handleError(error);
-      throw error;
+    if (params?.search) {
+      query = query.or(
+        `first_name.ilike.%${params.search}%,last_name.ilike.%${params.search}%,email.ilike.%${params.search}%`
+      );
     }
-  },
 
-  async getById<T>(table: TableNames, id: string, query: any = {}): Promise<T | null> {
-    try {
-      logger.info(`Fetching ${table} by id: ${id}`, query);
-      const { data, error } = await supabase
-        .from(table)
-        .select(query.select || '*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      return data as T;
-    } catch (error) {
-      handleError(error);
-      throw error;
+    if (params?.filters) {
+      Object.entries(params.filters).forEach(([key, value]) => {
+        if (value) {
+          query = query.eq(key, value);
+        }
+      });
     }
-  },
 
-  async create<T>(table: TableNames, data: Record<string, any>): Promise<T> {
-    try {
-      logger.info(`Creating new ${table}`, data);
-      const { data: created, error } = await supabase
-        .from(table)
-        .insert(data)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return created as T;
-    } catch (error) {
-      handleError(error);
-      throw error;
+    if (params?.limit) {
+      query = query.limit(params.limit);
     }
-  },
 
-  async update<T>(table: TableNames, id: string, data: Record<string, any>): Promise<T> {
-    try {
-      logger.info(`Updating ${table} ${id}`, data);
-      const { data: updated, error } = await supabase
-        .from(table)
-        .update(data)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return updated as T;
-    } catch (error) {
-      handleError(error);
-      throw error;
+    if (params?.offset) {
+      query = query.range(params.offset, params.offset + (params.limit || 10) - 1);
     }
-  },
 
-  async delete(table: TableNames, id: string): Promise<void> {
-    try {
-      logger.info(`Deleting ${table} ${id}`);
-      const { error } = await supabase
-        .from(table)
-        .delete()
-        .eq('id', id);
+    const { data, error } = await query;
 
-      if (error) throw error;
-    } catch (error) {
-      handleError(error);
-      throw error;
+    if (error) {
+      throw new Error(error.message);
     }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error("Error fetching patients:", error);
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : "An unknown error occurred",
+    };
   }
-};
+}
+
+// Fixed version for deeply nested types
+export interface PaginationParams {
+  page: number;
+  pageSize: number;
+}
+
+export interface FetchResourceParams {
+  search?: string;
+  filters?: Record<string, any>;
+  pagination?: PaginationParams;
+  sort?: {
+    field: string;
+    direction: 'asc' | 'desc';
+  };
+}
+
+// The problem was in this generic function with deeply nested generics
+export async function fetchResource<T>(
+  resourceName: string,
+  params?: FetchResourceParams
+): Promise<{ data: T[] | null; count: number | null; error: string | null }> {
+  try {
+    let query = supabase.from(resourceName).select("*", { count: "exact" });
+
+    if (params?.search) {
+      // Simplified search condition to avoid deep nesting
+      query = query.or(`name.ilike.%${params.search}%,description.ilike.%${params.search}%`);
+    }
+
+    if (params?.filters) {
+      Object.entries(params.filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          query = query.eq(key, value);
+        }
+      });
+    }
+
+    if (params?.sort) {
+      query = query.order(params.sort.field, {
+        ascending: params.sort.direction === 'asc',
+      });
+    }
+
+    if (params?.pagination) {
+      const { page, pageSize } = params.pagination;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize - 1;
+      query = query.range(start, end);
+    }
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { data, count, error: null };
+  } catch (error) {
+    console.error(`Error fetching ${resourceName}:`, error);
+    return {
+      data: null,
+      count: null,
+      error: error instanceof Error ? error.message : "An unknown error occurred",
+    };
+  }
+}
