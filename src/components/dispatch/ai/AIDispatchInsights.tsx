@@ -1,258 +1,300 @@
 
-import { Brain, Zap, TrendingUp, AlertTriangle, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
-import { optimizeRoute, RouteRecommendation } from "@/utils/aiDispatchOptimization";
-import { analyzeDispatchEfficiency, DispatchAnalytics } from "@/utils/aiDispatchAnalytics";
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
+import { AIInsightsPanel } from "./AIInsightsPanel";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { 
+  Brain, 
+  TrendingUp, 
+  AlertTriangle, 
+  Lightbulb, 
+  MapPin, 
+  BarChart4, 
+  RefreshCw,
+  Clock
+} from "lucide-react";
 
-interface AIDispatchInsightsProps {
-  origin?: { lat: number; lng: number };
-  destination?: { lat: number; lng: number };
-  departureTime?: Date;
-  serviceType?: string;
-  priority?: string;
-  elapsedTime?: string;
+// Define the shape of AI insights
+type InsightType = "optimization" | "warning" | "prediction";
+type ImpactLevel = "high" | "medium" | "low";
+
+interface AIInsight {
+  type: InsightType;
+  message: string;
+  confidence: number;
+  impact: ImpactLevel;
 }
 
-export function AIDispatchInsights({
-  origin = { lat: 33.7488, lng: -84.3877 }, // Default to Atlanta
-  destination = { lat: 33.9526, lng: -84.5499 }, // Default to Marietta
-  departureTime = new Date(),
-  serviceType = "BLS",
-  priority = "medium",
-  elapsedTime = "0"
-}: AIDispatchInsightsProps) {
-  const [routeRecommendation, setRouteRecommendation] = useState<RouteRecommendation | null>(null);
-  const [analytics, setAnalytics] = useState<DispatchAnalytics | null>(null);
-  const [activeTab, setActiveTab] = useState("route");
-  const [isGenerating, setIsGenerating] = useState(false);
+interface TrafficInfo {
+  location: string;
+  congestionLevel: "high" | "medium" | "low";
+  estimatedDelay: number;
+  alternateRouteAvailable: boolean;
+}
 
-  useEffect(() => {
-    generateInsights();
-  }, [origin, destination]);
+const mockTrafficInfo: TrafficInfo[] = [
+  {
+    location: "Main Street & 5th Avenue",
+    congestionLevel: "high",
+    estimatedDelay: 15,
+    alternateRouteAvailable: true
+  },
+  {
+    location: "Highway 101 North",
+    congestionLevel: "medium",
+    estimatedDelay: 8,
+    alternateRouteAvailable: true
+  },
+  {
+    location: "Downtown Medical District",
+    congestionLevel: "medium",
+    estimatedDelay: 10,
+    alternateRouteAvailable: false
+  },
+  {
+    location: "Hospital Access Road",
+    congestionLevel: "low",
+    estimatedDelay: 2,
+    alternateRouteAvailable: false
+  }
+];
 
-  const generateInsights = () => {
-    setIsGenerating(true);
-    try {
-      // Get route optimization insights
-      const routeRecommendation = optimizeRoute(origin, destination, departureTime);
-      setRouteRecommendation(routeRecommendation);
+// Mock insights
+const mockInsights: AIInsight[] = [
+  {
+    type: "optimization",
+    message: "Crew assignment can be optimized by assigning Unit 103 to the north sector dispatches",
+    confidence: 82,
+    impact: "medium"
+  },
+  {
+    type: "warning",
+    message: "Possible hospital overcrowding at Memorial Hospital in the next 2 hours",
+    confidence: 78,
+    impact: "high"
+  },
+  {
+    type: "optimization",
+    message: "Route optimization available for 3 current transports to avoid construction on Main St",
+    confidence: 95,
+    impact: "high"
+  },
+  {
+    type: "prediction",
+    message: "Expect increased call volume between 3-5 PM based on historical patterns",
+    confidence: 89,
+    impact: "medium"
+  },
+  {
+    type: "warning",
+    message: "Weather alert: Freezing rain may impact response times in the northeastern sector",
+    confidence: 85,
+    impact: "medium"
+  }
+];
+
+// Define the badge colors based on congestion level
+const congestionBadgeColor = {
+  low: "bg-green-100 text-green-800 hover:bg-green-200",
+  medium: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
+  high: "bg-red-100 text-red-800 hover:bg-red-200"
+};
+
+export function AIDispatchInsights() {
+  const [insights, setInsights] = useState<AIInsight[]>(mockInsights);
+  const [trafficInfo, setTrafficInfo] = useState<TrafficInfo[]>(mockTrafficInfo);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  const refreshInsights = () => {
+    setIsLoading(true);
+    // Simulate an API call delay
+    setTimeout(() => {
+      // Randomize the confidence values slightly to simulate updated data
+      const updatedInsights = insights.map(insight => ({
+        ...insight,
+        confidence: Math.min(100, Math.max(50, insight.confidence + (Math.random() * 10 - 5))),
+      }));
       
-      // Get efficiency analytics
-      const analytics = analyzeDispatchEfficiency(origin, destination, undefined, elapsedTime);
-      setAnalytics(analytics);
+      // Randomize congestion levels
+      const congestionLevels: Array<"high" | "medium" | "low"> = ["high", "medium", "low"];
+      const updatedTrafficInfo = trafficInfo.map(info => ({
+        ...info,
+        congestionLevel: congestionLevels[Math.floor(Math.random() * congestionLevels.length)],
+        estimatedDelay: Math.max(1, Math.floor(info.estimatedDelay + (Math.random() * 6 - 3))),
+      }));
       
-      toast.success("AI insights generated successfully");
-    } catch (error) {
-      console.error("Error generating AI insights:", error);
-      toast.error("Failed to generate AI insights");
-    } finally {
-      setIsGenerating(false);
-    }
+      setInsights(updatedInsights);
+      setTrafficInfo(updatedTrafficInfo);
+      setLastUpdated(new Date());
+      setIsLoading(false);
+    }, 1500);
   };
-
-  const aiInsights = [
-    {
-      type: 'optimization' as const,
-      message: routeRecommendation ? 
-        `Optimal route found with ${routeRecommendation.trafficPrediction.predictedDelayMinutes} min estimated delay.` : 
-        "Route optimization available.",
-      confidence: 0.93,
-      impact: 'high'
-    },
-    {
-      type: 'warning' as const,
-      message: routeRecommendation?.trafficPrediction.congestionLevel === 'high' ? 
-        "High traffic congestion detected on primary route." : 
-        "Weather conditions may affect transport speed.",
-      confidence: 0.87,
-      impact: 'medium'
-    },
-    {
-      type: 'prediction' as const,
-      message: analytics ? 
-        `Dispatch efficiency predicted at ${analytics.efficiency}%.` : 
-        "Dispatch efficiency prediction available.",
-      confidence: 0.91,
-      impact: 'high'
-    }
-  ];
+  
+  useEffect(() => {
+    // Initial load with delay to simulate API fetch
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    
+    // Regular refresh every 2 minutes
+    const interval = setInterval(refreshInsights, 120000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <Card className="p-4 shadow-lg border border-medical-secondary/10 overflow-hidden bg-gradient-to-br from-white to-blue-50/30">
+    <Card className="p-4 shadow-md bg-gradient-to-br from-white to-blue-50/30 overflow-hidden transition-all duration-300">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Brain className="h-5 w-5 text-medical-primary" />
-          <h3 className="font-semibold text-lg text-medical-primary">AI Dispatch Intelligence</h3>
+          <h3 className="font-semibold text-lg text-medical-primary">AI Dispatch Insights</h3>
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={generateInsights}
-          disabled={isGenerating}
-          className="bg-white hover:bg-blue-50 text-medical-primary border-medical-secondary/30"
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={refreshInsights}
+          disabled={isLoading}
+          className="text-xs"
         >
-          {isGenerating ? "Analyzing..." : "Refresh Analysis"}
+          {isLoading ? (
+            <LoadingSpinner size={14} className="mr-1" />
+          ) : (
+            <RefreshCw className="h-3 w-3 mr-1" />
+          )}
+          Refresh
         </Button>
       </div>
-
-      <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full mb-4 bg-gray-100">
-          <TabsTrigger value="route" className="flex-1">
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Route Optimization
+      
+      <div className="text-xs text-gray-500 mb-4 flex items-center">
+        <Clock className="h-3 w-3 mr-1" />
+        Last updated: {lastUpdated.toLocaleTimeString()}
+      </div>
+      
+      <Tabs defaultValue="traffic">
+        <TabsList className="grid w-full grid-cols-3 mb-4">
+          <TabsTrigger value="traffic" className="text-xs">
+            Traffic
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex-1">
-            <Zap className="h-4 w-4 mr-2" />
-            Performance Analytics
-          </TabsTrigger>
-          <TabsTrigger value="insights" className="flex-1">
-            <Brain className="h-4 w-4 mr-2" />
+          <TabsTrigger value="insights" className="text-xs">
             AI Insights
           </TabsTrigger>
+          <TabsTrigger value="metrics" className="text-xs">
+            Metrics
+          </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="route" className="space-y-4">
-          {routeRecommendation ? (
+        
+        <TabsContent value="traffic" className="space-y-3">
+          {isLoading ? (
+            <div className="flex justify-center py-6">
+              <LoadingSpinner />
+            </div>
+          ) : (
             <>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Traffic Condition</span>
-                  <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${
-                    routeRecommendation.trafficPrediction.congestionLevel === 'high' 
-                      ? 'bg-red-100 text-red-700' 
-                      : routeRecommendation.trafficPrediction.congestionLevel === 'medium'
-                      ? 'bg-yellow-100 text-yellow-700'
-                      : 'bg-green-100 text-green-700'
-                  }`}>
-                    {routeRecommendation.trafficPrediction.congestionLevel.charAt(0).toUpperCase() + 
-                     routeRecommendation.trafficPrediction.congestionLevel.slice(1)} Congestion
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">Estimated Delay</span>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">
-                    {routeRecommendation.trafficPrediction.predictedDelayMinutes} minutes
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Route Efficiency</span>
-                  <div className="flex items-center gap-2">
-                    <Progress 
-                      value={100 - (routeRecommendation.trafficPrediction.predictedDelayMinutes * 3)} 
-                      className="w-24 h-2" 
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      {100 - (routeRecommendation.trafficPrediction.predictedDelayMinutes * 3)}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {routeRecommendation.alternativeRoutes.length > 0 && (
-                <div className="mt-4 bg-blue-50 p-3 rounded-md">
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-blue-700 font-medium">Alternative Route Available</p>
-                      <p className="text-xs text-blue-600 mt-1">
-                        {Math.round(routeRecommendation.alternativeRoutes[0].distance / 1.1)} km, 
-                        {Math.round(routeRecommendation.alternativeRoutes[0].duration / 1.2)} min estimated time
-                      </p>
+              <div className="text-sm font-medium mb-2">Live Traffic Conditions</div>
+              {trafficInfo.map((info, index) => (
+                <div key={index} className="bg-white p-3 rounded-md shadow-sm border border-gray-100">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="h-4 w-4 text-gray-500 mt-0.5" />
+                      <div>
+                        <div className="text-sm font-medium">{info.location}</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          Delay: ~{info.estimatedDelay} min
+                        </div>
+                      </div>
                     </div>
+                    <Badge 
+                      variant="outline" 
+                      className={congestionBadgeColor[info.congestionLevel]}
+                    >
+                      {info.congestionLevel === "high" ? "Heavy" : 
+                       info.congestionLevel === "medium" ? "Moderate" : "Light"}
+                    </Badge>
                   </div>
+                  {info.congestionLevel !== "low" && info.alternateRouteAvailable && (
+                    <div className="mt-2 text-xs text-blue-600 flex items-center">
+                      <AlertTriangle className="h-3 w-3 mr-1" />
+                      Alternate route available
+                    </div>
+                  )}
                 </div>
-              )}
+              ))}
             </>
-          ) : (
-            <div className="flex items-center justify-center h-40">
-              <p className="text-gray-500">Generating route optimization...</p>
-            </div>
           )}
         </TabsContent>
-
-        <TabsContent value="analytics" className="space-y-4">
-          {analytics ? (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Dispatch Efficiency</span>
-                  <div className="flex items-center gap-2">
-                    <Progress value={analytics.efficiency} className="w-24 h-2" />
-                    <span className="text-sm font-medium text-gray-700">{analytics.efficiency}%</span>
-                  </div>
+        
+        <TabsContent value="insights">
+          {isLoading ? (
+            <div className="flex justify-center py-6">
+              <LoadingSpinner />
+            </div>
+          ) : (
+            <AIInsightsPanel insights={insights} />
+          )}
+        </TabsContent>
+        
+        <TabsContent value="metrics" className="space-y-4">
+          {isLoading ? (
+            <div className="flex justify-center py-6">
+              <LoadingSpinner />
+            </div>
+          ) : (
+            <>
+              <div>
+                <div className="text-sm font-medium mb-2 flex items-center">
+                  <TrendingUp className="h-4 w-4 mr-1 text-emerald-500" />
+                  Dispatch Efficiency
                 </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Risk Level</span>
-                  <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${
-                    analytics.riskLevel === 'high' 
-                      ? 'bg-red-100 text-red-700' 
-                      : analytics.riskLevel === 'medium'
-                      ? 'bg-yellow-100 text-yellow-700'
-                      : 'bg-green-100 text-green-700'
-                  }`}>
-                    {analytics.riskLevel.charAt(0).toUpperCase() + analytics.riskLevel.slice(1)}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 mt-4">
-                  <div className="bg-gray-50 p-2 rounded-md text-center">
-                    <p className="text-xs text-gray-500">Response Time</p>
-                    <p className="text-sm font-medium text-gray-700">
-                      {analytics.performanceMetrics.responseTime} min
-                    </p>
+                <div className="bg-white p-3 rounded-md shadow-sm border border-gray-100">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-xs text-gray-600">Current fleet utilization</span>
+                    <span className="text-xs font-medium">85%</span>
                   </div>
-                  <div className="bg-gray-50 p-2 rounded-md text-center">
-                    <p className="text-xs text-gray-500">Patient Satisfaction</p>
-                    <p className="text-sm font-medium text-gray-700">
-                      {analytics.performanceMetrics.patientSatisfaction}%
-                    </p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                    <div className="bg-emerald-500 h-2 rounded-full" style={{ width: "85%" }}></div>
                   </div>
-                  <div className="bg-gray-50 p-2 rounded-md text-center">
-                    <p className="text-xs text-gray-500">Route Efficiency</p>
-                    <p className="text-sm font-medium text-gray-700">
-                      {analytics.performanceMetrics.routeEfficiency}%
-                    </p>
+                  
+                  <div className="flex justify-between mb-1">
+                    <span className="text-xs text-gray-600">Average response time</span>
+                    <span className="text-xs font-medium">8.2 min</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                    <div className="bg-blue-500 h-2 rounded-full" style={{ width: "70%" }}></div>
+                  </div>
+                  
+                  <div className="flex justify-between mb-1">
+                    <span className="text-xs text-gray-600">Crew assignment speed</span>
+                    <span className="text-xs font-medium">3.5 min</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-violet-500 h-2 rounded-full" style={{ width: "92%" }}></div>
                   </div>
                 </div>
               </div>
-
-              {analytics.suggestedActions.length > 0 && (
-                <div className="bg-blue-50 p-3 rounded-md">
-                  <p className="text-sm text-blue-700 font-medium mb-2">Suggested Actions</p>
-                  <ul className="space-y-1">
-                    {analytics.suggestedActions.map((action, index) => (
-                      <li key={index} className="text-xs text-blue-600 flex items-start gap-2">
-                        <span className="inline-block h-4 w-4 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center mt-0.5">
-                          {index + 1}
-                        </span>
-                        {action}
-                      </li>
-                    ))}
-                  </ul>
+              
+              <div>
+                <div className="text-sm font-medium mb-2 flex items-center">
+                  <BarChart4 className="h-4 w-4 mr-1 text-blue-500" />
+                  Prediction Accuracy
                 </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-40">
-              <p className="text-gray-500">Generating analytics...</p>
-            </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-white p-3 rounded-md shadow-sm border border-gray-100">
+                    <div className="text-xl font-bold text-emerald-600">93%</div>
+                    <div className="text-xs text-gray-500">Traffic predictions</div>
+                  </div>
+                  <div className="bg-white p-3 rounded-md shadow-sm border border-gray-100">
+                    <div className="text-xl font-bold text-blue-600">87%</div>
+                    <div className="text-xs text-gray-500">ETA accuracy</div>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
-        </TabsContent>
-
-        <TabsContent value="insights">
-          <AIInsightsPanel insights={aiInsights} className="mt-0" />
         </TabsContent>
       </Tabs>
     </Card>
