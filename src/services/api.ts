@@ -48,7 +48,7 @@ export async function fetchPatients(params?: {
   }
 }
 
-// Fixed version for deeply nested types
+// Simplified pagination params
 export interface PaginationParams {
   page: number;
   pageSize: number;
@@ -64,16 +64,17 @@ export interface FetchResourceParams {
   };
 }
 
-// The problem was in this generic function with deeply nested generics
+// Fixed generic function to avoid excessive type instantiation
 export async function fetchResource<T>(
   resourceName: string,
   params?: FetchResourceParams
 ): Promise<{ data: T[] | null; count: number | null; error: string | null }> {
   try {
-    let query = supabase.from(resourceName).select("*", { count: "exact" });
+    // Type casting to any to avoid excessive type instantiation errors
+    // This is safe because we're explicitly controlling the query building
+    let query = supabase.from(resourceName as any).select("*", { count: "exact" });
 
     if (params?.search) {
-      // Simplified search condition to avoid deep nesting
       query = query.or(`name.ilike.%${params.search}%,description.ilike.%${params.search}%`);
     }
 
@@ -104,7 +105,7 @@ export async function fetchResource<T>(
       throw new Error(error.message);
     }
 
-    return { data, count, error: null };
+    return { data: data as T[], count, error: null };
   } catch (error) {
     console.error(`Error fetching ${resourceName}:`, error);
     return {
