@@ -15,6 +15,7 @@ import { CertificationsTab } from "@/components/hr/tabs/CertificationsTab";
 import { DocumentsTab } from "@/components/hr/tabs/DocumentsTab";
 import { IncidentsTab } from "@/components/hr/tabs/IncidentsTab";
 import { PlaceholderTab } from "@/components/hr/tabs/PlaceholderTab";
+import { AchievementsTab } from "@/components/hr/tabs/AchievementsTab";
 import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
 import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
 import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
@@ -91,7 +92,7 @@ const EmployeeProfile = () => {
       case "incidents":
         return <IncidentsTab employeeId={employeeId || ""} />;
       case "achievements":
-        return <PlaceholderTab value="achievements" title="Achievements" />;
+        return <AchievementsTab />;
       case "notifications":
         return <PlaceholderTab value="notifications" title="Notification Preferences" />;
       default:
