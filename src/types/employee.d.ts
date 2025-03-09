@@ -3,11 +3,11 @@ export interface Employee {
   id: string;
   first_name: string;
   last_name: string;
-  mobile?: string;
-  station?: string;
+  mobile: string;
+  station: string;
   status: string;
-  employee_type?: string;
-  certification_level?: string;
+  employee_type: string;
+  certification_level: string;
   created_at: string;
   updated_at: string;
   readable_id?: string;
@@ -17,6 +17,29 @@ export interface Employee {
   uses_timeclock?: boolean;
   access_codes?: string;
   photo_url?: string;
+  
+  // Demographics fields
+  date_of_birth?: string;
+  gender?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  race_ethnicity?: string;
+  secondary_race?: string;
+  citizenship?: string;
+  certification_number?: string;
+  certification_expiry?: string;
+  years_experience?: number;
+  email?: string;
+  home_phone?: string;
+  work_phone?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  preferred_contact_method?: string;
+  consent_to_background_check?: boolean;
+  consent_to_drug_testing?: boolean;
 }
 
 export interface EmployeeRole {
@@ -24,7 +47,7 @@ export interface EmployeeRole {
   employee_id: string;
   is_crew_member: boolean;
   is_supervisor: boolean;
-  supervisor_role: "Captain" | "Lieutenant" | "Full privileges" | "Call-taker / Self-dispatch";
+  supervisor_role: string;
   is_biller: boolean;
   is_dispatcher: boolean;
   is_qa_reviewer: boolean;
@@ -33,9 +56,9 @@ export interface EmployeeRole {
   is_salesperson: boolean;
   is_medical_director: boolean;
   is_onlooker: boolean;
-  onlooker_facility?: string;
-  onlooker_city?: string;
-  onlooker_county?: string;
+  onlooker_facility: string;
+  onlooker_city: string;
+  onlooker_county: string;
   can_see_non_emergent: boolean;
   is_administrator: boolean;
   is_principal: boolean;
@@ -63,38 +86,4 @@ export interface EmployeePrivileges {
   can_use_ai_assistance: boolean;
   created_at: string;
   updated_at: string;
-}
-
-export interface EmployeePayroll {
-  id: string;
-  employee_id: string;
-  effective_date: string;
-  end_date?: string;
-  pay_type: "hourly" | "salary";
-  pay_rate: number;
-  uses_timeclock: boolean;
-  access_codes?: string;
-  created_by: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface EmployeeNotification {
-  id: string;
-  employee_id: string;
-  event_type: string;
-  is_enabled: boolean;
-  channel: "sms" | "email" | "push" | "in_app";
-}
-
-export interface EmployeeCertification {
-  id: string;
-  employee_id: string;
-  certification_type: string;
-  certification_number: string;
-  issue_date: string;
-  expiration_date: string;
-  issuing_authority: string;
-  status: "active" | "expired" | "pending" | "revoked";
 }
