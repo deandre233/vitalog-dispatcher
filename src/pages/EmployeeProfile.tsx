@@ -21,7 +21,7 @@ const EmployeeProfile = () => {
   const [activeTab, setActiveTab] = useState("identity");
   
   const { roles, isLoading: loadingRoles, updateRole } = useEmployeeRoles(employeeId);
-  const { privileges, isLoading: loadingPrivileges, updatePrivileges, getAIRecommendations } = useEmployeePrivileges(employeeId);
+  const { privileges, isLoading: loadingPrivileges, updatePrivileges } = useEmployeePrivileges(employeeId);
   const { employee, isLoading: loadingEmployee, updateEmployee } = useEmployeeDetails(employeeId);
 
   const isLoading = loadingRoles || loadingPrivileges || loadingEmployee;
@@ -52,8 +52,7 @@ const EmployeeProfile = () => {
 
           <PrivilegesTab 
             privileges={privileges} 
-            updatePrivileges={updatePrivileges}
-            getAIRecommendations={getAIRecommendations}
+            updatePrivileges={updatePrivileges} 
           />
 
           <DemographicsTab

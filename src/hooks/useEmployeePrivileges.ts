@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -21,23 +20,6 @@ const defaultPrivileges: EmployeePrivileges = {
   can_edit_reports: false,
   can_delete_reports: false,
   can_use_ai_assistance: false,
-  
-  // Extended PCR privileges with defaults
-  pcr_auto_duplication: false,
-  pcr_submit_incomplete: false,
-  pcr_narrative_composer: false,
-  pcr_narrative_cut_paste: false,
-  pcr_auto_launch: false,
-  
-  // Timeclock privileges with defaults
-  timeclock_flagging: false,
-  remote_timeclock: false,
-  
-  // System access privileges with defaults
-  system_admin_access: false,
-  audit_log_access: false,
-  quality_assurance_access: false,
-  
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString()
 };
@@ -68,9 +50,7 @@ export const useEmployeePrivileges = (employeeId?: string) => {
 
       if (!data) return defaultPrivileges;
 
-      // Ensure backward compatibility by providing defaults for new fields
       return {
-        ...defaultPrivileges,
         ...data,
         created_at: data.created_at || new Date().toISOString(),
         updated_at: data.updated_at || new Date().toISOString()
@@ -109,63 +89,10 @@ export const useEmployeePrivileges = (employeeId?: string) => {
     }
   });
 
-  // Generate AI recommendations based on employee role and experience
-  const getAIRecommendations = async (roleType: string) => {
-    // Get employee roles
-    const { data: roles } = await supabase
-      .from("employee_roles")
-      .select("*")
-      .eq("employee_id", employeeId)
-      .maybeSingle();
-
-    let recommendations: Record<string, boolean> = {};
-
-    // Base recommendations on role type
-    switch(roleType) {
-      case "pcr":
-        recommendations = {
-          pcr_auto_duplication: roles?.is_crew_member || false,
-          pcr_narrative_composer: true,
-          pcr_narrative_cut_paste: true,
-          pcr_submit_incomplete: roles?.is_supervisor || false,
-          pcr_auto_launch: roles?.is_crew_member || false
-        };
-        break;
-      case "timeclock":
-        recommendations = {
-          timeclock_flagging: roles?.is_supervisor || roles?.is_hr || false,
-          remote_timeclock: roles?.is_supervisor || false
-        };
-        break;
-      case "system":
-        recommendations = {
-          system_admin_access: roles?.is_administrator || false,
-          audit_log_access: roles?.is_qa_reviewer || roles?.is_administrator || false,
-          quality_assurance_access: roles?.is_qa_reviewer || false
-        };
-        break;
-      default:
-        // Core privileges
-        recommendations = {
-          can_view_patient_info: true,
-          can_edit_patient_info: roles?.is_crew_member || false,
-          can_delete_patient_info: roles?.is_supervisor || false,
-          can_view_dispatch_info: true,
-          can_edit_dispatch_info: roles?.is_dispatcher || roles?.is_supervisor || false,
-          can_view_billing_info: roles?.is_biller || roles?.is_supervisor || false,
-          can_edit_billing_info: roles?.is_biller || false,
-          can_use_ai_assistance: true
-        };
-    }
-
-    return recommendations;
-  };
-
   return {
     privileges,
     isLoading,
     error,
-    updatePrivileges,
-    getAIRecommendations
+    updatePrivileges
   };
 };

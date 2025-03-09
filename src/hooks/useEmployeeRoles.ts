@@ -54,33 +54,23 @@ export const useEmployeeRoles = (employeeId?: string) => {
         throw error;
       }
 
-      // Get employee experience separately
-      let employeeExperience = 0;
-      try {
-        const { data: employee } = await supabase
-          .from("employees")
-          .select("years_experience")
-          .eq("id", employeeId)
-          .single();
-          
-        if (employee && employee.years_experience) {
-          employeeExperience = employee.years_experience;
-        }
-      } catch (err) {
-        console.log("Could not get years_experience, using default value", err);
-      }
+      // Get employee to check experience
+      const { data: employee } = await supabase
+        .from("employees")
+        .select("years_experience")
+        .eq("id", employeeId)
+        .single();
 
       if (!data) {
         return {
           ...defaultRole,
-          employee_id: employeeId,
-          years_experience: employeeExperience
+          years_experience: employee?.years_experience || 0
         };
       }
 
       return {
         ...data,
-        years_experience: employeeExperience,
+        years_experience: employee?.years_experience || 0,
         created_at: data.created_at || new Date().toISOString(),
         updated_at: data.updated_at || new Date().toISOString()
       } as EmployeeRole;
