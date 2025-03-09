@@ -29,10 +29,7 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
 
   return (
     <div className="flex flex-col bg-[#1e293b] border-b border-[#334155]">
-      <div className="flex justify-between items-center p-6">
-        <h1 className="text-2xl font-semibold text-white">
-          Command Center
-        </h1>
+      <div className="flex justify-end items-center p-6">
         <div className="flex items-center gap-4">
           <Button
             variant={unattendedMode ? "default" : "outline"}
