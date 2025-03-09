@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useMobile } from "@/hooks/use-mobile";
+import { DarkModeToggle } from "@/components/theme/DarkModeToggle";
 
 export function Header({ className = "" }) {
   const isMobile = useMobile();
@@ -58,42 +59,46 @@ export function Header({ className = "" }) {
             </Link>
           </div>
           
-          {isMobile ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white">
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-[#1e293b] border-[#334155] text-white">
+          <div className="flex items-center">
+            <DarkModeToggle />
+            
+            {isMobile ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="text-white">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-[#1e293b] border-[#334155] text-white">
+                  {navItems.map((item) => (
+                    <DropdownMenuItem key={item.name} asChild className="text-gray-300 hover:text-white hover:bg-[#334155] focus:bg-[#334155]">
+                      <Link 
+                        to={item.path}
+                        className="flex items-center gap-2 w-full px-2 py-1.5"
+                      >
+                        <item.icon className="w-4 h-4" />
+                        <span>{item.name}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <nav className="hidden sm:flex sm:space-x-1 ml-4">
                 {navItems.map((item) => (
-                  <DropdownMenuItem key={item.name} asChild className="text-gray-300 hover:text-white hover:bg-[#334155] focus:bg-[#334155]">
-                    <Link 
-                      to={item.path}
-                      className="flex items-center gap-2 w-full px-2 py-1.5"
-                    >
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </DropdownMenuItem>
+                  <Link 
+                    key={item.name}
+                    to={item.path}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-[#1e293b] rounded-md transition-all duration-300 relative group"
+                  >
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.name}</span>
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 rounded-md transition-opacity duration-300"></div>
+                  </Link>
                 ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <nav className="hidden sm:flex sm:space-x-1">
-              {navItems.map((item) => (
-                <Link 
-                  key={item.name}
-                  to={item.path}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-[#1e293b] rounded-md transition-all duration-300 relative group"
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.name}</span>
-                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 rounded-md transition-opacity duration-300"></div>
-                </Link>
-              ))}
-            </nav>
-          )}
+              </nav>
+            )}
+          </div>
         </div>
       </div>
     </header>

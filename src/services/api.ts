@@ -64,30 +64,29 @@ export interface FetchResourceParams {
   };
 }
 
-// Fixed function with properly typed parameters to avoid excessive type instantiation
+// Fixed function with a non-generic implementation to avoid type instantiation issues
 export async function fetchResource<T>(
   resourceName: string,
   params?: FetchResourceParams
 ): Promise<{ data: T[] | null; count: number | null; error: string | null }> {
   try {
-    // Using type assertion to handle the dynamic table name
-    // This bypasses TypeScript's type checking for the table name
-    const query = supabase.from(resourceName as any).select("*", { count: "exact" });
-
+    // Cast as any to bypass TypeScript's type checking for the dynamic table name
+    const selectQuery = supabase.from(resourceName as any).select("*", { count: "exact" });
+    
     if (params?.search) {
-      query.or(`name.ilike.%${params.search}%,description.ilike.%${params.search}%`);
+      selectQuery.or(`name.ilike.%${params.search}%,description.ilike.%${params.search}%`);
     }
 
     if (params?.filters) {
-      Object.entries(params.filters).forEach(([key, value]) => {
+      Object.entries(params?.filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          query.eq(key, value);
+          selectQuery.eq(key, value);
         }
       });
     }
 
     if (params?.sort) {
-      query.order(params.sort.field, {
+      selectQuery.order(params.sort.field, {
         ascending: params.sort.direction === 'asc',
       });
     }
@@ -96,18 +95,17 @@ export async function fetchResource<T>(
       const { page, pageSize } = params.pagination;
       const start = (page - 1) * pageSize;
       const end = start + pageSize - 1;
-      query.range(start, end);
+      selectQuery.range(start, end);
     }
 
-    const { data, error, count } = await query;
+    const { data, error, count } = await selectQuery;
 
     if (error) {
       throw new Error(error.message);
     }
 
-    // Using type assertion to safely convert the dynamic data to the expected type
     return { 
-      data: data as unknown as T[], 
+      data: data as T[], 
       count, 
       error: null 
     };

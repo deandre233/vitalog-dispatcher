@@ -1,6 +1,7 @@
 
 import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import { Button } from "./components/ui/button";
+import { ThemeProvider } from "./components/theme/ThemeProvider";
 import Index from "./pages/Index";
 import ActiveDispatches from "./pages/ActiveDispatches";
 import ClosedDispatches from "./pages/ClosedDispatches";
@@ -155,7 +156,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
+  );
 }
 
 export default App;
