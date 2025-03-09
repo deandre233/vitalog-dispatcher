@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Trophy } from "lucide-react";
+import { ArrowLeft, Trophy, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "@/types/employee";
 import { useEmployeeAchievements } from "@/hooks/useEmployeeAchievements";
@@ -30,9 +30,17 @@ export function EmployeeHeader({ employee }: EmployeeHeaderProps) {
               <h1 className="text-2xl font-bold">
                 {employee?.first_name} {employee?.last_name}
               </h1>
-              <div className="flex items-center bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-sm">
-                <Trophy className="h-4 w-4 mr-1 text-amber-600" />
-                <span>Level {employeeLevel}</span>
+              <div className="flex items-center gap-1">
+                <div className="flex items-center bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-sm">
+                  <Trophy className="h-4 w-4 mr-1 text-amber-600" />
+                  <span>Level {employeeLevel}</span>
+                </div>
+                <Badge variant="outline" className="bg-blue-50">
+                  <div className="flex items-center">
+                    <Star className="h-3 w-3 mr-1 text-blue-500" />
+                    <span>Achievements: {!isLevelLoading ? (employeeLevel - 1) * 5 : "..."}</span>
+                  </div>
+                </Badge>
               </div>
             </div>
             <p className="text-gray-500 text-sm">

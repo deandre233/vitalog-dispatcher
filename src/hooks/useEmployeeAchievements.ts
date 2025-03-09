@@ -52,7 +52,38 @@ export const useEmployeeAchievements = (employeeId?: string) => {
     return { success: true };
   };
 
-  // Calculate employee level based on achievements (placeholder implementation)
+  // Analyze employee performance for achievements
+  const analyzePerformanceForAchievements = async () => {
+    if (!employeeId) {
+      throw new Error("Employee ID is required");
+    }
+    
+    setIsProcessing(true);
+    
+    try {
+      // This would be a real API call in production
+      const { data, error } = await supabase.functions.invoke('analyze-employee-achievements', {
+        body: { 
+          employeeId
+        }
+      });
+      
+      if (error) {
+        console.error("Error analyzing employee performance:", error);
+        throw error;
+      }
+      
+      if (data.newAchievements && data.newAchievements.length > 0) {
+        toast.success(`Found ${data.newAchievements.length} new achievements!`);
+      }
+      
+      return data;
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Calculate employee level based on achievements
   const { data: employeeLevel = 1, isLoading: isLevelLoading } = useQuery({
     queryKey: ['employee-level', employeeId],
     queryFn: async () => {
@@ -81,11 +112,58 @@ export const useEmployeeAchievements = (employeeId?: string) => {
     enabled: !!employeeId
   });
 
+  // Get achievement progress predictions
+  const getAchievementPredictions = async () => {
+    if (!employeeId) {
+      throw new Error("Employee ID is required");
+    }
+    
+    setIsProcessing(true);
+    
+    try {
+      // This would call a real AI analysis endpoint in production
+      // Here we're simulating it with a placeholder
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Simulated response
+      return [
+        {
+          achievementId: "dispatch-001",
+          name: "Dispatch Veteran",
+          currentProgress: 772,
+          maxProgress: 1000,
+          estimatedCompletionDate: "2024-03-15",
+          confidence: 0.89
+        },
+        {
+          achievementId: "shifts-001",
+          name: "Shift Master",
+          currentProgress: 202,
+          maxProgress: 300,
+          estimatedCompletionDate: "2024-05-10",
+          confidence: 0.78
+        },
+        {
+          achievementId: "miles-001",
+          name: "Road Warrior",
+          currentProgress: 5601,
+          maxProgress: 10000,
+          estimatedCompletionDate: "2024-06-22",
+          confidence: 0.64
+        }
+      ];
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return {
     employeeLevel,
     isLevelLoading,
     isProcessing,
     getAchievementIdeas,
-    createAchievementFromIdea
+    createAchievementFromIdea,
+    analyzePerformanceForAchievements,
+    getAchievementPredictions
   };
 };
