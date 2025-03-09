@@ -55,6 +55,14 @@ export function EmployeeProfileTabs({ activeTab, onTabChange, children }: Employ
             Payroll
           </TabsTrigger>
           <TabsTrigger 
+            value="shifts" 
+            className={cn(
+              "py-3 px-4 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary font-medium transition-all",
+            )}
+          >
+            Shifts
+          </TabsTrigger>
+          <TabsTrigger 
             value="certifications" 
             className={cn(
               "py-3 px-4 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary font-medium transition-all",

@@ -8,6 +8,7 @@ import { IdentityTab } from "@/components/hr/tabs/IdentityTab";
 import { RolesTab } from "@/components/hr/tabs/RolesTab";
 import { PrivilegesTab } from "@/components/hr/tabs/PrivilegesTab";
 import { PayrollTab } from "@/components/hr/tabs/PayrollTab";
+import { ShiftsTab } from "@/components/hr/tabs/ShiftsTab";
 import { PlaceholderTab } from "@/components/hr/tabs/PlaceholderTab";
 import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
 import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
@@ -56,6 +57,10 @@ const EmployeeProfile = () => {
             employee={employee}
             isLoading={isLoading}
             onSave={handleEmployeeUpdate}
+          />
+
+          <ShiftsTab
+            employeeId={employeeId}
           />
 
           <PlaceholderTab 
