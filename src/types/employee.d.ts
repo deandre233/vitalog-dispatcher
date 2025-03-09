@@ -103,3 +103,43 @@ export interface EmployeePrivileges {
   created_at: string;
   updated_at: string;
 }
+
+export interface Certificate {
+  id: string;
+  employee_id: string;
+  cert_class: string;
+  cert_type: string;
+  state: string;
+  id_number: string;
+  valid_from: string;
+  expires: string;
+  notes?: string;
+  status: "Active" | "Expired" | "Revoked" | "Pending";
+  created_at: string;
+  updated_at: string;
+  modified_by?: string;
+}
+
+export interface ContinuingEducation {
+  id: string;
+  employee_id: string;
+  title: string;
+  hours: number;
+  applies_to: string;
+  earned_date: string;
+  notes?: string;
+  status: "Approved" | "Pending" | "Rejected";
+  created_at: string;
+  updated_at: string;
+  modified_by?: string;
+}
+
+export interface PracticeLevel {
+  id: string;
+  employee_id: string;
+  nemesis_id: string;
+  practice_level: string;
+  achieved_date?: string;
+  created_at: string;
+  updated_at: string;
+}
