@@ -63,6 +63,7 @@ export interface EmployeeRole {
   is_provisional: boolean;
   created_at: string;
   updated_at: string;
+  years_experience?: number; // Added to fix TypeScript error
 }
 
 export interface EmployeePrivileges {
@@ -118,6 +119,7 @@ export interface Certificate {
   created_at: string;
   updated_at: string;
   modified_by?: string;
+  daysUntilExpiry?: number; // Added to fix TypeScript error
 }
 
 export interface ContinuingEducation {

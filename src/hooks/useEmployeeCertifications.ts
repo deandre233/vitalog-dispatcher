@@ -3,9 +3,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { Certificate, ContinuingEducation, PracticeLevel } from "@/types/employee";
+import { differenceInDays } from "date-fns";
 
-// Mock data - would be replaced by actual API calls
-const mockCertificates = [
+// Mock data for certificates - enhanced with more realistic data
+const mockCertificates: Certificate[] = [
   {
     id: "1",
     employee_id: "5003c1b9-5deb-4558-9fb0-c292eb72eabf",
@@ -16,14 +17,45 @@ const mockCertificates = [
     valid_from: "2023-03-26",
     expires: "2025-03-31",
     notes: "",
-    status: "Active" as const,
+    status: "Active",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     modified_by: "Karpinski, Danielle"
+  },
+  {
+    id: "2",
+    employee_id: "5003c1b9-5deb-4558-9fb0-c292eb72eabf",
+    cert_class: "Normal",
+    cert_type: "CPR - Healthcare Provider",
+    state: "CA",
+    id_number: "CPR87265",
+    valid_from: "2023-05-12",
+    expires: "2025-05-12",
+    notes: "American Heart Association",
+    status: "Active",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    modified_by: "System Import"
+  },
+  {
+    id: "3",
+    employee_id: "5003c1b9-5deb-4558-9fb0-c292eb72eabf",
+    cert_class: "Advanced",
+    cert_type: "PHTLS - Prehospital Trauma Life Support",
+    state: "CA",
+    id_number: "PH78521",
+    valid_from: "2023-08-05",
+    expires: "2024-08-05",
+    notes: "NAEMT certification",
+    status: "Active",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    modified_by: "Martinez, James"
   }
 ];
 
-const mockPracticeLevels = [
+// Enhanced practice levels with the same data structure but more detail
+const mockPracticeLevels: PracticeLevel[] = [
   {
     id: "9925001",
     employee_id: "5003c1b9-5deb-4558-9fb0-c292eb72eabf",
@@ -71,53 +103,100 @@ const mockPracticeLevels = [
   }
 ];
 
-const mockContinuingEducation: ContinuingEducation[] = [];
+// Mock continuing education data
+const mockContinuingEducation: ContinuingEducation[] = [
+  {
+    id: "ce001",
+    employee_id: "5003c1b9-5deb-4558-9fb0-c292eb72eabf",
+    title: "Advanced Airway Management",
+    hours: 5,
+    applies_to: "EMT Recertification",
+    earned_date: "2023-09-15",
+    notes: "Online training through National Registry",
+    status: "Approved",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    modified_by: "System"
+  },
+  {
+    id: "ce002",
+    employee_id: "5003c1b9-5deb-4558-9fb0-c292eb72eabf",
+    title: "Emergency Cardiac Care Update",
+    hours: 3.5,
+    applies_to: "BLS Recertification",
+    earned_date: "2023-10-22",
+    notes: "Conducted by Dr. Sarah Johnson",
+    status: "Approved",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    modified_by: "Rivera, Maria"
+  },
+  {
+    id: "ce003",
+    employee_id: "5003c1b9-5deb-4558-9fb0-c292eb72eabf",
+    title: "Trauma Assessment Skills Workshop",
+    hours: 8,
+    applies_to: "PHTLS Renewal",
+    earned_date: "2023-11-05",
+    notes: "In-person workshop at Memorial Hospital",
+    status: "Approved",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    modified_by: "Williams, Robert"
+  }
+];
+
+// Calculate days until expiry for all certificates
+const calculateDaysUntilExpiry = (certificates: Certificate[]): Certificate[] => {
+  const today = new Date();
+  
+  return certificates.map(cert => {
+    const expiryDate = new Date(cert.expires);
+    const daysUntilExpiry = differenceInDays(expiryDate, today);
+    
+    return {
+      ...cert,
+      daysUntilExpiry
+    };
+  });
+};
 
 export const useEmployeeCertifications = (employeeId?: string) => {
   const queryClient = useQueryClient();
 
   // Get certificates
-  const { data: certificates = mockCertificates, isLoading: loadingCertificates } = useQuery({
+  const { data: certificates = [], isLoading: loadingCertificates } = useQuery({
     queryKey: ["employee_certificates", employeeId],
     queryFn: async () => {
-      if (!employeeId) return mockCertificates;
+      if (!employeeId) return [];
 
       // In a real implementation, this would fetch from the database
-      // const { data, error } = await supabase
-      //   .from("employee_certificates")
-      //   .select("*")
-      //   .eq("employee_id", employeeId);
-
-      // if (error) throw error;
-      // return data as Certificate[];
-
-      // For now, return mock data filtered by employee ID
-      return mockCertificates.filter(cert => cert.employee_id === employeeId);
+      // For now, return mock data filtered by employee ID and with days until expiry
+      const filteredCerts = mockCertificates.filter(cert => cert.employee_id === employeeId);
+      return calculateDaysUntilExpiry(filteredCerts);
     },
     enabled: !!employeeId
   });
 
   // Get continuing education
-  const { data: continuingEducation = mockContinuingEducation, isLoading: loadingCE } = useQuery({
+  const { data: continuingEducation = [], isLoading: loadingCE } = useQuery({
     queryKey: ["employee_continuing_education", employeeId],
     queryFn: async () => {
-      if (!employeeId) return mockContinuingEducation;
+      if (!employeeId) return [];
       
       // In a real implementation, this would fetch from the database
-      // For now, return mock data
-      return mockContinuingEducation;
+      return mockContinuingEducation.filter(ce => ce.employee_id === employeeId);
     },
     enabled: !!employeeId
   });
 
   // Get practice levels
-  const { data: practiceLevels = mockPracticeLevels, isLoading: loadingLevels } = useQuery({
+  const { data: practiceLevels = [], isLoading: loadingLevels } = useQuery({
     queryKey: ["employee_practice_levels", employeeId],
     queryFn: async () => {
-      if (!employeeId) return mockPracticeLevels;
+      if (!employeeId) return [];
       
       // In a real implementation, this would fetch from the database
-      // For now, return mock data filtered by employee ID
       return mockPracticeLevels.filter(level => level.employee_id === employeeId);
     },
     enabled: !!employeeId
@@ -125,19 +204,10 @@ export const useEmployeeCertifications = (employeeId?: string) => {
 
   // Add certificate mutation
   const addCertificate = useMutation({
-    mutationFn: async (newCertificate: Omit<Certificate, "id" | "created_at" | "updated_at">) => {
+    mutationFn: async (newCertificate: Omit<Certificate, "id" | "created_at" | "updated_at" | "daysUntilExpiry">) => {
       if (!employeeId) throw new Error("Employee ID is required");
       
       // In a real implementation, this would insert into the database
-      // const { data, error } = await supabase
-      //   .from("employee_certificates")
-      //   .insert({ ...newCertificate, employee_id: employeeId })
-      //   .select()
-      //   .single();
-
-      // if (error) throw error;
-      // return data;
-
       // For now, just simulate adding to mock data
       const newCert = {
         ...newCertificate,
@@ -147,6 +217,12 @@ export const useEmployeeCertifications = (employeeId?: string) => {
         updated_at: new Date().toISOString()
       } as Certificate;
       
+      // Calculate days until expiry
+      const expiryDate = new Date(newCert.expires);
+      const today = new Date();
+      const daysUntilExpiry = differenceInDays(expiryDate, today);
+      newCert.daysUntilExpiry = daysUntilExpiry;
+      
       return newCert;
     },
     onSuccess: () => {
@@ -154,6 +230,50 @@ export const useEmployeeCertifications = (employeeId?: string) => {
       toast({
         title: "Success",
         description: "Certificate added successfully",
+      });
+    }
+  });
+
+  // Add continuing education mutation
+  const addContinuingEducation = useMutation({
+    mutationFn: async (newCE: Omit<ContinuingEducation, "id" | "created_at" | "updated_at">) => {
+      if (!employeeId) throw new Error("Employee ID is required");
+      
+      // In a real implementation, this would insert into the database
+      // For now, just simulate adding to mock data
+      const newCEEntry = {
+        ...newCE,
+        id: `ce-${Date.now()}`,
+        employee_id: employeeId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      } as ContinuingEducation;
+      
+      return newCEEntry;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employee_continuing_education", employeeId] });
+      toast({
+        title: "Success",
+        description: "Continuing education record added successfully",
+      });
+    }
+  });
+
+  // Update practice level mutation
+  const updatePracticeLevel = useMutation({
+    mutationFn: async ({ id, achieved_date }: { id: string, achieved_date: string }) => {
+      if (!employeeId) throw new Error("Employee ID is required");
+      
+      // In a real implementation, this would update the database
+      // For now, just simulate updating mock data
+      return { id, achieved_date };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employee_practice_levels", employeeId] });
+      toast({
+        title: "Success",
+        description: "Practice level updated successfully",
       });
     }
   });
@@ -174,9 +294,7 @@ export const useEmployeeCertifications = (employeeId?: string) => {
           "For career advancement, consider pursuing Paramedic certification within the next 12-18 months"
         ],
         expiringCertifications: certificates.filter(cert => {
-          const expiryDate = new Date(cert.expires);
-          const today = new Date();
-          const daysUntilExpiry = Math.floor((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          const daysUntilExpiry = cert.daysUntilExpiry || 0;
           return daysUntilExpiry < 90; // Expiring in less than 90 days
         }),
         missingRequiredCertifications: [
@@ -198,6 +316,8 @@ export const useEmployeeCertifications = (employeeId?: string) => {
     practiceLevels,
     isLoading: loadingCertificates || loadingCE || loadingLevels,
     addCertificate,
+    addContinuingEducation,
+    updatePracticeLevel,
     getAICertificationRecommendations
   };
 };
