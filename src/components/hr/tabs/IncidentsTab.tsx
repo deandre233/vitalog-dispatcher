@@ -41,7 +41,8 @@ export function IncidentsTab({ employeeId }: { employeeId?: string }) {
     description: "",
     severity: "Medium",
     vehicle_involved: false,
-    followup_required: false
+    followup_required: false,
+    subject: ""
   };
   
   const [formData, setFormData] = useState<IncidentFormData>(initialFormData);
@@ -128,7 +129,8 @@ export function IncidentsTab({ employeeId }: { employeeId?: string }) {
         description: incident.description,
         severity: incident.severity,
         vehicleInvolved: incident.vehicle_involved,
-        shift_id: incident.shift_id
+        shift_id: incident.shift_id,
+        subject: incident.subject
       });
       
       if (analysis) {
@@ -252,6 +254,9 @@ export function IncidentsTab({ employeeId }: { employeeId?: string }) {
                           {format(new Date(incident.incident_date), "PPP")}
                           {incident.location && (
                             <span className="ml-2">· {incident.location}</span>
+                          )}
+                          {incident.subject && (
+                            <span className="ml-2 font-medium">· Subject: {incident.subject}</span>
                           )}
                         </CardDescription>
                       </div>
@@ -451,6 +456,35 @@ export function IncidentsTab({ employeeId }: { employeeId?: string }) {
                     </div>
                     
                     <div className="space-y-2">
+                      <Label htmlFor="subject">Subject*</Label>
+                      <Select
+                        onValueChange={(value) => handleSelectChange("subject", value)}
+                        value={formData.subject}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Subject" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="missed punch">Missed Punch</SelectItem>
+                          <SelectItem value="tardiness">Tardiness</SelectItem>
+                          <SelectItem value="inservice">Inservice</SelectItem>
+                          <SelectItem value="pcr">PCR Documentation</SelectItem>
+                          <SelectItem value="vehicle">Vehicle</SelectItem>
+                          <SelectItem value="protocol">Protocol Deviation</SelectItem>
+                          <SelectItem value="equipment">Equipment</SelectItem>
+                          <SelectItem value="conduct">Conduct</SelectItem>
+                          <SelectItem value="attendance">Attendance</SelectItem>
+                          <SelectItem value="patient care">Patient Care</SelectItem>
+                          <SelectItem value="safety">Safety</SelectItem>
+                          <SelectItem value="communication">Communication</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
                       <Label htmlFor="severity">Severity*</Label>
                       <Select required
                         onValueChange={(value) => handleSelectChange("severity", value)}
@@ -467,25 +501,12 @@ export function IncidentsTab({ employeeId }: { employeeId?: string }) {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-4">
+                    
                     <div className="space-y-2">
                       <Label htmlFor="incident_date">Incident Date*</Label>
                       <DatePicker
                         date={formData.incident_date}
                         onDateChange={(date) => handleDateChange("incident_date", date)}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="location">Location</Label>
-                      <Input
-                        id="location"
-                        name="location"
-                        value={formData.location || ""}
-                        onChange={handleInputChange}
-                        placeholder="Where did the incident occur?"
                       />
                     </div>
                   </div>
@@ -521,6 +542,17 @@ export function IncidentsTab({ employeeId }: { employeeId?: string }) {
                       </SelectContent>
                     </Select>
                     <p className="text-sm text-muted-foreground">Selecting a shift will auto-fill some incident details</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location</Label>
+                    <Input
+                      id="location"
+                      name="location"
+                      value={formData.location || ""}
+                      onChange={handleInputChange}
+                      placeholder="Where did the incident occur?"
+                    />
                   </div>
                   
                   <div className="space-y-2">
