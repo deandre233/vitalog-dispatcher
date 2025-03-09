@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { TabsContent } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Brain, CheckCircle, AlertTriangle, Info, Map, Calendar, Flag, MapPin, Phone, AtSign } from "lucide-react";
+import { Brain, CheckCircle, Info, Map, Calendar, Phone, AtSign } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
 import { toast } from "@/hooks/use-toast";
@@ -18,9 +18,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import type { AIInsight } from "@/types/ai";
 import type { Employee } from "@/types/employee";
-import { CertificationSelector } from "@/components/hr/demographics/CertificationSelector";
 import { AddressAutocomplete } from "@/components/hr/demographics/AddressAutocomplete";
-import { PrivacyConsentForm } from "@/components/hr/demographics/PrivacyConsentForm";
 import { DemographicsSummary } from "@/components/hr/demographics/DemographicsSummary";
 
 interface DemographicsTabProps {
@@ -182,9 +180,7 @@ export function DemographicsTab({ employee, isLoading, onSave }: DemographicsTab
     work_phone: employee?.work_phone || "",
     emergency_contact_name: employee?.emergency_contact_name || "",
     emergency_contact_phone: employee?.emergency_contact_phone || "",
-    preferred_contact_method: employee?.preferred_contact_method || "mobile",
-    consent_to_background_check: employee?.consent_to_background_check || false,
-    consent_to_drug_testing: employee?.consent_to_drug_testing || false
+    preferred_contact_method: employee?.preferred_contact_method || "mobile"
   });
 
   // Generate AI insights based on current form data
@@ -224,13 +220,6 @@ export function DemographicsTab({ employee, isLoading, onSave }: DemographicsTab
       });
     }
     setIsCertExpiryOpen(false);
-  };
-  
-  const handleSwitchChange = (field: string, checked: boolean) => {
-    setFormData({
-      ...formData,
-      [field]: checked
-    });
   };
   
   const handleAddressAutocomplete = (addressData: any) => {
@@ -545,10 +534,19 @@ export function DemographicsTab({ employee, isLoading, onSave }: DemographicsTab
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="certification_level">Certification Level</Label>
-                    <CertificationSelector 
-                      value={formData.certification_level}
-                      onChange={(value) => handleSelectChange("certification_level", value)}
-                    />
+                    <Select 
+                      value={formData.certification_level} 
+                      onValueChange={(value) => handleSelectChange("certification_level", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select certification level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CERTIFICATION_LEVELS.map((option) => (
+                          <SelectItem key={option} value={option}>{option}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   
                   <div className="space-y-2">
@@ -719,25 +717,6 @@ export function DemographicsTab({ employee, isLoading, onSave }: DemographicsTab
                     </ToggleGroup>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            
-            {/* Consents and Agreements */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-blue-500" />
-                  Consents and Agreements
-                </CardTitle>
-                <CardDescription>Required consents for employment</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PrivacyConsentForm 
-                  consentToBackgroundCheck={formData.consent_to_background_check}
-                  consentToDrugTesting={formData.consent_to_drug_testing}
-                  onBackgroundCheckChange={(checked) => handleSwitchChange("consent_to_background_check", checked)}
-                  onDrugTestingChange={(checked) => handleSwitchChange("consent_to_drug_testing", checked)}
-                />
               </CardContent>
             </Card>
             

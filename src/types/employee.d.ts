@@ -38,8 +38,6 @@ export interface Employee {
   emergency_contact_name?: string;
   emergency_contact_phone?: string;
   preferred_contact_method?: string;
-  consent_to_background_check?: boolean;
-  consent_to_drug_testing?: boolean;
 }
 
 export interface EmployeeRole {
