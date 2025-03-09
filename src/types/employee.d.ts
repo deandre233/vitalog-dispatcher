@@ -47,7 +47,7 @@ export interface EmployeeRole {
   employee_id: string;
   is_crew_member: boolean;
   is_supervisor: boolean;
-  supervisor_role: string;
+  supervisor_role: "Captain" | "Lieutenant" | "Full privileges" | "Call-taker / Self-dispatch" | string;
   is_biller: boolean;
   is_dispatcher: boolean;
   is_qa_reviewer: boolean;

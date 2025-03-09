@@ -54,6 +54,12 @@ const EmployeeProfile = () => {
             updatePrivileges={updatePrivileges} 
           />
 
+          <DemographicsTab
+            employee={employee}
+            isLoading={isLoading}
+            onSave={handleEmployeeUpdate}
+          />
+
           <PayrollTab
             employee={employee}
             isLoading={isLoading}
@@ -62,12 +68,6 @@ const EmployeeProfile = () => {
 
           <ShiftsTab
             employeeId={employeeId}
-          />
-
-          <DemographicsTab
-            employee={employee}
-            isLoading={isLoading}
-            onSave={handleEmployeeUpdate}
           />
 
           <PlaceholderTab 

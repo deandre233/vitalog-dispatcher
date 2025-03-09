@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -93,7 +92,7 @@ const generateDemographicInsights = (formData: any): AIInsight[] => {
   // Address completion check
   if (!formData.address_line1 || !formData.city || !formData.state || !formData.zip_code) {
     insights.push({
-      type: 'info',
+      type: 'optimization',
       message: 'Complete address information is essential for emergency contact and scheduling purposes.',
       confidence: 0.9,
       impact: 'medium'
@@ -106,7 +105,7 @@ const generateDemographicInsights = (formData: any): AIInsight[] => {
   
   if (missingFields.length > 0) {
     insights.push({
-      type: 'info',
+      type: 'optimization',
       message: `${missingFields.length} essential profile fields are incomplete. Complete profile improves scheduling accuracy.`,
       confidence: 0.85,
       impact: 'medium'
@@ -443,7 +442,7 @@ export function DemographicsTab({ employee, isLoading, onSave }: DemographicsTab
                         <SelectValue placeholder="Select secondary race/ethnicity" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value=" ">None</SelectItem>
                         {RACE_ETHNICITY_OPTIONS.filter(option => option !== formData.race_ethnicity).map((option) => (
                           <SelectItem key={option} value={option}>{option}</SelectItem>
                         ))}
