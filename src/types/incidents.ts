@@ -21,7 +21,6 @@ export interface Incident {
   created_at: string;
   updated_at: string;
   shift_id?: string;
-  subject?: string;
 }
 
 export interface IncidentFormData {
@@ -38,7 +37,6 @@ export interface IncidentFormData {
   followup_required: boolean;
   followup_date?: Date;
   shift_id?: string;
-  subject?: string;
 }
 
 export interface IncidentAnalysisData {
@@ -48,7 +46,6 @@ export interface IncidentAnalysisData {
   vehicleInvolved: boolean;
   shiftData?: any;
   shift_id?: string;
-  subject?: string;
 }
 
 export interface IncidentAnalysisResult {
@@ -57,31 +54,4 @@ export interface IncidentAnalysisResult {
   recommendedActions: string[];
   similarIncidents: string;
   preventionTips: string[];
-}
-
-export type PerformanceWriteUpSubject = 
-  | "missed_punch" 
-  | "tardiness" 
-  | "pcr_quality" 
-  | "pcr_completion" 
-  | "inservice_attendance" 
-  | "protocol_adherence" 
-  | "patient_feedback"
-  | "teamwork"
-  | "overall_performance";
-
-export interface PerformanceWriteUpData {
-  employeeId: string;
-  employeeName: string;
-  subject: PerformanceWriteUpSubject;
-  score: number;
-  trend: string;
-  grade: 'A' | 'B' | 'C' | 'D' | 'F';
-  departmentAvg: number;
-}
-
-export interface PerformanceWriteUpResult {
-  content: string;
-  severity: "recognition" | "advisory" | "warning" | "critical";
-  title: string;
 }

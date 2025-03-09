@@ -42,8 +42,7 @@ export const useEmployeeIncidents = (employeeId?: string) => {
             description: data.description,
             severity: data.severity,
             vehicleInvolved: data.vehicle_involved,
-            shift_id: data.shift_id,
-            subject: formData.subject || undefined
+            shift_id: data.shift_id
           });
         }
         

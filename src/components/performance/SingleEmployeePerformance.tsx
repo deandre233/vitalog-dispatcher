@@ -23,7 +23,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { PerformanceWriteUpSubject } from "@/types/incidents";
 
 interface EmployeePerformanceProps {
   employeeId: string;
@@ -38,7 +37,6 @@ interface PerformanceMetric {
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
   departmentAvg: number;
   icon: React.ReactNode;
-  writeUpSubject: PerformanceWriteUpSubject;
 }
 
 export function SingleEmployeePerformance({ employeeId, employeeName }: EmployeePerformanceProps) {
@@ -61,8 +59,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
       trend: "Improved by 2.4% this quarter",
       grade: 'B',
       departmentAvg: 84,
-      icon: <Award className="h-5 w-5 text-primary" />,
-      writeUpSubject: "overall_performance"
+      icon: <Award className="h-5 w-5 text-primary" />
     },
     pcrCompletion: {
       category: "PCR Completion",
@@ -71,8 +68,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
       trend: "Improved by 5.2% this quarter",
       grade: 'A',
       departmentAvg: 82,
-      icon: <FileText className="h-5 w-5 text-primary" />,
-      writeUpSubject: "pcr_completion"
+      icon: <FileText className="h-5 w-5 text-primary" />
     },
     pcrQuality: {
       category: "PCR Quality",
@@ -81,8 +77,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
       trend: "Stable (+0.3%) this quarter",
       grade: 'B',
       departmentAvg: 80,
-      icon: <Star className="h-5 w-5 text-primary" />,
-      writeUpSubject: "pcr_quality"
+      icon: <Star className="h-5 w-5 text-primary" />
     },
     punctuality: {
       category: "Punctuality",
@@ -91,8 +86,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
       trend: "Improved by 3.1% this quarter",
       grade: 'A',
       departmentAvg: 87,
-      icon: <Clock className="h-5 w-5 text-primary" />,
-      writeUpSubject: "tardiness"
+      icon: <Clock className="h-5 w-5 text-primary" />
     },
     inserviceAttendance: {
       category: "Inservice Attendance",
@@ -101,8 +95,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
       trend: "Declined by 2.5% this quarter",
       grade: 'B',
       departmentAvg: 79,
-      icon: <Calendar className="h-5 w-5 text-primary" />,
-      writeUpSubject: "inservice_attendance"
+      icon: <Calendar className="h-5 w-5 text-primary" />
     },
     patientFeedback: {
       category: "Patient Feedback",
@@ -111,8 +104,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
       trend: "Improved by 4.2% this quarter",
       grade: 'A',
       departmentAvg: 83,
-      icon: <TrendingUp className="h-5 w-5 text-primary" />,
-      writeUpSubject: "patient_feedback"
+      icon: <TrendingUp className="h-5 w-5 text-primary" />
     },
     protocolAdherence: {
       category: "Protocol Adherence",
@@ -121,8 +113,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
       trend: "Improved by 1.7% this quarter",
       grade: 'B',
       departmentAvg: 85,
-      icon: <BookOpen className="h-5 w-5 text-primary" />,
-      writeUpSubject: "protocol_adherence"
+      icon: <BookOpen className="h-5 w-5 text-primary" />
     },
     teamwork: {
       category: "Teamwork",
@@ -131,8 +122,7 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
       trend: "Improved by 3.8% this quarter",
       grade: 'A',
       departmentAvg: 80,
-      icon: <Users2 className="h-5 w-5 text-primary" />,
-      writeUpSubject: "teamwork"
+      icon: <Users2 className="h-5 w-5 text-primary" />
     }
   };
 
@@ -173,7 +163,6 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
       const metric = performanceMetrics[activeCategory];
       
       let writeUpTemplate = "";
-      const subject = metric.writeUpSubject;
       
       if (metric.score < 70) {
         writeUpTemplate = `PERFORMANCE IMPROVEMENT PLAN\n\nEmployee: ${employeeName}\nCategory: ${metric.category}\nCurrent Score: ${metric.score}/100 (Grade: ${metric.grade})\nDepartment Average: ${metric.departmentAvg}/100\n\nConcern:\nYour performance in ${metric.category.toLowerCase()} is significantly below organizational standards. Recent analysis shows ${metric.trend.toLowerCase()}. This requires immediate and substantial improvement.\n\nExpectations:\n1. Increase your score to at least 80 points within 30 days\n2. Complete additional training in this area\n3. Weekly check-ins with your supervisor\n\nConsequences if not improved:\nFailure to show significant improvement may result in further disciplinary action up to and including termination of employment.`;
@@ -183,36 +172,6 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
         writeUpTemplate = `PERFORMANCE ADVISORY\n\nEmployee: ${employeeName}\nCategory: ${metric.category}\nCurrent Score: ${metric.score}/100 (Grade: ${metric.grade})\nDepartment Average: ${metric.departmentAvg}/100\n\nObservation:\nYour performance in ${metric.category.toLowerCase()} meets minimum standards but has room for improvement. Recent analysis shows ${metric.trend.toLowerCase()}.\n\nRecommendations:\n1. Target increasing your score to 90+ points\n2. Consider additional training opportunities\n3. Monthly review of your progress in this area\n\nThis is not a disciplinary action but an opportunity for professional growth.`;
       } else {
         writeUpTemplate = `PERFORMANCE RECOGNITION\n\nEmployee: ${employeeName}\nCategory: ${metric.category}\nCurrent Score: ${metric.score}/100 (Grade: ${metric.grade})\nDepartment Average: ${metric.departmentAvg}/100\n\nRecognition:\nYour performance in ${metric.category.toLowerCase()} exceeds organizational standards. Recent analysis shows ${metric.trend.toLowerCase()}. This level of excellence contributes significantly to our team's success.\n\nContinued Growth Opportunities:\n1. Consider mentoring other team members in this area\n2. Explore advanced training to further enhance your skills\n3. Participate in developing department best practices\n\nThank you for your outstanding contribution to our organization.`;
-      }
-      
-      switch (subject) {
-        case "missed_punch":
-          writeUpTemplate += "\n\nSpecific to Missed Punches:\n• Ensure you are using the timeclock app correctly\n• Set reminders at the beginning and end of shifts\n• Report any technical issues immediately to your supervisor";
-          break;
-        case "tardiness":
-          writeUpTemplate += "\n\nSpecific to Punctuality:\n• Plan to arrive 10-15 minutes before shift start\n• Consider alternate routes during high traffic periods\n• Communicate with dispatch if delays are unavoidable";
-          break;
-        case "pcr_completion":
-          writeUpTemplate += "\n\nSpecific to PCR Completion:\n• Allocate time after each call to complete documentation\n• Use mobile documentation when possible\n• Review documentation requirements for common call types";
-          break;
-        case "pcr_quality":
-          writeUpTemplate += "\n\nSpecific to PCR Quality:\n• Focus on narrative completeness and accuracy\n• Document all assessment findings completely\n• Review QA feedback carefully and implement suggestions";
-          break;
-        case "inservice_attendance":
-          writeUpTemplate += "\n\nSpecific to Inservice Attendance:\n• Schedule inservice sessions in your calendar\n• Explore online options when in-person attendance is difficult\n• Complete make-up sessions promptly";
-          break;
-        case "protocol_adherence":
-          writeUpTemplate += "\n\nSpecific to Protocol Adherence:\n• Review updated protocols monthly\n• Attend protocol update sessions\n• Use decision support tools when available";
-          break;
-        case "patient_feedback":
-          writeUpTemplate += "\n\nSpecific to Patient Feedback:\n• Focus on clear communication with patients\n• Address comfort issues proactively\n• Practice empathetic care techniques";
-          break;
-        case "teamwork":
-          writeUpTemplate += "\n\nSpecific to Teamwork:\n• Communicate clearly with partners and colleagues\n• Participate actively in team meetings\n• Support colleagues during high-stress situations";
-          break;
-        case "overall_performance":
-          writeUpTemplate += "\n\nOverall Development Plan:\n• Focus on continuous improvement in all areas\n• Identify personal strengths and leverage them\n• Address performance gaps with targeted training";
-          break;
       }
       
       setGeneratedWriteUp(writeUpTemplate);
