@@ -87,7 +87,7 @@ export const useEmployeeDocuments = (employeeId?: string) => {
       
       // 4. Analyze the document if it's a suitable type
       if (['Medical Clearance', 'Doctor\'s Note', 'Certification Documentation'].includes(type)) {
-        await analyzeDocument(documentData.id);
+        await analyzeDocument((documentData as any).id);
       }
       
       // 5. Refresh the documents list
@@ -195,12 +195,31 @@ export const useEmployeeDocuments = (employeeId?: string) => {
     return { success: true, analysis: data.analysis };
   };
 
+  // Get AI recommendations for document types
+  const getAiDocumentRecommendations = async () => {
+    if (!employeeId) {
+      throw new Error("Employee ID is required");
+    }
+    
+    const { data, error } = await supabase.functions.invoke('get-document-recommendations', {
+      body: { employeeId }
+    });
+    
+    if (error) {
+      console.error("Error getting document recommendations:", error);
+      throw error;
+    }
+    
+    return data.recommendations;
+  };
+
   return {
     documents,
     isLoading,
     isProcessing,
     uploadDocument,
     deleteDocument,
-    analyzeDocument
+    analyzeDocument,
+    getAiDocumentRecommendations
   };
 };

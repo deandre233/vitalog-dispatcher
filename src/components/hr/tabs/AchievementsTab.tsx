@@ -8,8 +8,11 @@ import { AchievementSection } from "./achievements/components/AchievementSection
 import { CategoryFilter } from "./achievements/components/CategoryFilter";
 import { AchievementSummary } from "./achievements/components/AchievementSummary";
 import { AchievementDetailDialog } from "./achievements/components/AchievementDetailDialog";
+import { AIAchievementIdeas } from "@/components/hr/achievements/AIAchievementIdeas";
+import { useParams } from "react-router-dom";
 
 export function AchievementsTab() {
+  const { employeeId } = useParams<{ employeeId: string }>();
   const [activeCategory, setActiveCategory] = useState<AchievementCategory | 'all'>('all');
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -91,6 +94,8 @@ export function AchievementsTab() {
           unlockedAchievements={summary.unlockedAchievements}
           categorySummaries={summary.categorySummaries}
         />
+        
+        {employeeId && <AIAchievementIdeas employeeId={employeeId} />}
         
         <CategoryFilter 
           activeCategory={activeCategory} 

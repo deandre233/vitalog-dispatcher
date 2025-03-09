@@ -1,8 +1,10 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "@/types/employee";
+import { useEmployeeAchievements } from "@/hooks/useEmployeeAchievements";
 
 interface EmployeeHeaderProps {
   employee: Employee | undefined;
@@ -10,6 +12,7 @@ interface EmployeeHeaderProps {
 
 export function EmployeeHeader({ employee }: EmployeeHeaderProps) {
   const navigate = useNavigate();
+  const { employeeLevel, isLevelLoading } = useEmployeeAchievements(employee?.id);
   
   return (
     <div className="bg-white border-b">
@@ -23,9 +26,15 @@ export function EmployeeHeader({ employee }: EmployeeHeaderProps) {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">
-              {employee?.first_name} {employee?.last_name}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold">
+                {employee?.first_name} {employee?.last_name}
+              </h1>
+              <div className="flex items-center bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-sm">
+                <Trophy className="h-4 w-4 mr-1 text-amber-600" />
+                <span>Level {employeeLevel}</span>
+              </div>
+            </div>
             <p className="text-gray-500 text-sm">
               {employee?.certification_level} • ID: {employee?.readable_id || employee?.id?.substring(0, 8)}
             </p>
