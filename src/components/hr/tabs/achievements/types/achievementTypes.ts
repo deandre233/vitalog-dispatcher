@@ -38,3 +38,8 @@ export interface AchievementSummaryProps {
   unlockedAchievements: number;
   categorySummaries: CategorySummary[];
 }
+
+export interface CategoryFilterProps {
+  activeCategory: AchievementCategory | 'all';
+  onCategoryChange: (category: AchievementCategory | 'all') => void;
+}
