@@ -7,6 +7,7 @@ import { FileUp, FileText, FileSearch } from "lucide-react";
 import { useEmployeeDocuments } from "@/hooks/useEmployeeDocuments";
 import { AIDocumentRecommendations } from "@/components/hr/documents/AIDocumentRecommendations";
 import { UploadDocumentDialog } from "@/components/performance/components/UploadDocumentDialog";
+import { EmployeeDocument } from "@/types/employee-documents";
 
 interface DocumentsTabProps {
   employeeId: string;
@@ -37,7 +38,7 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
 
   const filteredDocuments = activeTab === "all" 
     ? documents 
-    : documents.filter(doc => doc.type === activeTab);
+    : documents.filter(doc => (doc as any).type === activeTab);
 
   return (
     <div className="space-y-6">
@@ -75,23 +76,23 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
                   ) : filteredDocuments.length > 0 ? (
                     <div className="space-y-4">
                       {filteredDocuments.map(doc => (
-                        <div key={doc.id} className="flex items-start p-4 border rounded-lg">
+                        <div key={(doc as any).id} className="flex items-start p-4 border rounded-lg">
                           <div className="mr-3">
-                            {getDocumentIcon(doc.type || "")}
+                            {getDocumentIcon((doc as any).type || "")}
                           </div>
                           <div className="flex-1">
                             <div className="flex justify-between">
-                              <h4 className="font-medium">{doc.description || doc.filename}</h4>
-                              <span className="text-sm text-gray-500">{formatDate(doc.date)}</span>
+                              <h4 className="font-medium">{(doc as any).description || (doc as any).filename}</h4>
+                              <span className="text-sm text-gray-500">{formatDate((doc as any).date)}</span>
                             </div>
-                            <p className="text-sm text-gray-500">{doc.type}</p>
-                            {doc.ai_analysis && (
+                            <p className="text-sm text-gray-500">{(doc as any).type}</p>
+                            {(doc as any).ai_analysis && (
                               <div className="mt-2 p-2 bg-blue-50 rounded text-sm">
                                 <div className="flex items-center gap-1">
                                   <FileSearch className="h-4 w-4 text-blue-500" />
                                   <span className="font-medium text-blue-700">AI Analysis</span>
                                 </div>
-                                <p className="mt-1 text-blue-800">{doc.ai_analysis.summary || "Document analyzed by AI"}</p>
+                                <p className="mt-1 text-blue-800">{(doc as any).ai_analysis.summary || "Document analyzed by AI"}</p>
                               </div>
                             )}
                           </div>

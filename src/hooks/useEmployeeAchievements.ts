@@ -62,13 +62,17 @@ export const useEmployeeAchievements = (employeeId?: string) => {
       // the employee's points or achievements in the database
       
       // Placeholder implementation
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('achievements' as any)
         .select('*')
-        .eq('employee_id', employeeId)
-        .count();
+        .eq('employee_id', employeeId);
         
-      const achievementCount = data || 0;
+      if (error) {
+        console.error("Error fetching achievements:", error);
+        return 1;
+      }
+      
+      const achievementCount = data ? data.length : 0;
       // Simple formula: 1 level per 5 achievements, starting at level 1
       const level = Math.floor(achievementCount / 5) + 1;
       
