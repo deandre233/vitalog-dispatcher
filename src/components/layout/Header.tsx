@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings, User, Menu, Plus, Zap } from "lucide-react";
+import { Bell, User, Menu, Plus, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,13 +15,13 @@ export function Header({ className = "" }) {
   const isMobile = useMobile();
   
   const navItems = [
-    { name: "Home", icon: Home, path: "/" },
-    { name: "Dispatch", icon: Truck, path: "/dispatch" },
-    { name: "Schedule", icon: Calendar, path: "/schedule" },
-    { name: "Performance", icon: BarChart, path: "/performance" },
-    { name: "Billing", icon: DollarSign, path: "/billing" },
-    { name: "Patients", icon: User, path: "/patients" },
-    { name: "Settings", icon: Settings, path: "/settings" }
+    { name: "Home", path: "/" },
+    { name: "Dispatch", path: "/dispatch" },
+    { name: "Schedule", path: "/schedule" },
+    { name: "Performance", path: "/performance" },
+    { name: "Billing", path: "/billing" },
+    { name: "Patients", path: "/patients" },
+    { name: "Settings", path: "/settings" }
   ];
 
   return (
@@ -76,7 +76,6 @@ export function Header({ className = "" }) {
                         to={item.path}
                         className="flex items-center gap-2 w-full px-2 py-1.5"
                       >
-                        <item.icon className="w-4 h-4" />
                         <span>{item.name}</span>
                       </Link>
                     </DropdownMenuItem>
@@ -91,13 +90,35 @@ export function Header({ className = "" }) {
                     to={item.path}
                     className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-[#1e293b] rounded-md transition-all duration-300 relative group"
                   >
-                    <item.icon className="w-4 h-4" />
                     <span>{item.name}</span>
                     <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 rounded-md transition-opacity duration-300"></div>
                   </Link>
                 ))}
               </nav>
             )}
+            
+            <div className="flex items-center ml-4">
+              <button className="relative p-2 hover:bg-[#334155] rounded-full transition-colors">
+                <Bell className="w-5 h-5 text-gray-300" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full"></span>
+              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-2 p-2 hover:bg-[#334155] rounded-full transition-colors">
+                  <User className="w-5 h-5 text-gray-300" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-[#1e293b] border-[#334155] text-white">
+                  <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-[#334155] focus:bg-[#334155]">
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-[#334155] focus:bg-[#334155]">
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-[#334155] focus:bg-[#334155]">
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </div>

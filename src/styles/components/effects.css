@@ -1,49 +1,47 @@
 
 @layer components {
-  /* Notification badge */
-  .notification-badge {
-    @apply absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs
-           flex items-center justify-center rounded-full font-bold z-10;
+  /* Glass button effects */
+  .glass-button {
+    @apply backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden;
   }
   
-  /* Glowing accent for important elements */
-  .glow-accent {
-    @apply shadow-[0_0_15px_rgba(139,92,246,0.5)];
-    animation: pulse-glow 2s infinite;
+  .purple-glass {
+    @apply bg-purple-600/90 text-white border-purple-500/50 shadow-purple-500/20;
   }
   
-  /* Glass morphism effects */
-  .glass-morphism {
-    @apply backdrop-blur-xl bg-white/5 border border-white/10;
+  .blue-glass {
+    @apply bg-blue-600/90 text-white border-blue-500/50 shadow-blue-500/20;
   }
   
-  .dark-glass {
-    @apply backdrop-blur-xl bg-black/30 border border-white/10;
+  .hover-glow {
+    @apply hover:shadow-[0_0_15px_rgba(139,92,246,0.5)];
   }
   
-  /* Interactive hover effects */
-  .hover-scale {
-    @apply transition-transform duration-200;
+  .text-shadow-sm {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
   
-  .hover-scale:hover {
-    @apply transform scale-105;
+  /* Animated glass effect */
+  .glass-shimmer {
+    @apply relative overflow-hidden;
   }
   
-  .hover-lift {
-    @apply transition-all duration-200;
+  .glass-shimmer::after {
+    @apply absolute inset-0;
+    content: '';
+    background: linear-gradient(
+      90deg, 
+      rgba(255, 255, 255, 0) 0%, 
+      rgba(255, 255, 255, 0.1) 50%, 
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-100%);
+    animation: glass-shimmer 3s infinite;
   }
   
-  .hover-lift:hover {
-    @apply transform -translate-y-1 shadow-lg;
-  }
-  
-  /* Button effects */
-  .btn-glow {
-    @apply transition-all duration-300;
-  }
-  
-  .btn-glow:hover {
-    @apply shadow-[0_0_15px_rgba(167,139,250,0.5)];
+  @keyframes glass-shimmer {
+    100% {
+      transform: translateX(100%);
+    }
   }
 }

@@ -1,5 +1,5 @@
 
-import { Bell, Settings, User, Calendar, Clock, Menu as MenuIcon } from "lucide-react";
+import { Bell, Settings, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,7 +81,6 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
               : 'bg-transparent border-[#334155] text-gray-300 hover:text-white hover:bg-[#334155]'}
           `}
         >
-          <Clock className="w-4 h-4" />
           Active
         </Button>
         <Button
@@ -94,7 +93,6 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
               : 'bg-transparent border-[#334155] text-gray-300 hover:text-white hover:bg-[#334155]'}
           `}
         >
-          <Clock className="w-4 h-4" />
           Schedule
         </Button>
         <Button
@@ -107,7 +105,6 @@ export function DashboardHeader({ onViewChange, defaultView = 'active' }: Dashbo
               : 'bg-transparent border-[#334155] text-gray-300 hover:text-white hover:bg-[#334155]'}
           `}
         >
-          <Calendar className="w-4 h-4" />
           Calendar
         </Button>
       </div>
