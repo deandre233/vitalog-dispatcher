@@ -61,6 +61,7 @@ export interface EmployeeRole {
   is_administrator: boolean;
   is_principal: boolean;
   is_provisional: boolean;
+  years_experience?: number;
   created_at: string;
   updated_at: string;
 }
@@ -68,6 +69,7 @@ export interface EmployeeRole {
 export interface EmployeePrivileges {
   id: string;
   employee_id: string;
+  // Core privileges
   can_view_patient_info: boolean;
   can_edit_patient_info: boolean;
   can_delete_patient_info: boolean;
@@ -82,6 +84,23 @@ export interface EmployeePrivileges {
   can_edit_reports: boolean;
   can_delete_reports: boolean;
   can_use_ai_assistance: boolean;
+  
+  // Extended PCR privileges
+  pcr_auto_duplication: boolean;
+  pcr_submit_incomplete: boolean;
+  pcr_narrative_composer: boolean;
+  pcr_narrative_cut_paste: boolean;
+  pcr_auto_launch: boolean;
+  
+  // Timeclock privileges
+  timeclock_flagging: boolean;
+  remote_timeclock: boolean;
+  
+  // System access privileges
+  system_admin_access: boolean;
+  audit_log_access: boolean;
+  quality_assurance_access: boolean;
+  
   created_at: string;
   updated_at: string;
 }

@@ -25,6 +25,7 @@ const defaultRole: EmployeeRole = {
   is_administrator: false,
   is_principal: false,
   is_provisional: false,
+  years_experience: 0,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString()
 };
@@ -53,10 +54,20 @@ export const useEmployeeRoles = (employeeId?: string) => {
         throw error;
       }
 
-      if (!data) return defaultRole;
+      // Default to 0 years of experience since we're not fetching it separately anymore
+      let employeeExperience = 0;
+
+      if (!data) {
+        return {
+          ...defaultRole,
+          employee_id: employeeId,
+          years_experience: employeeExperience
+        };
+      }
 
       return {
         ...data,
+        years_experience: data.years_experience || employeeExperience,
         created_at: data.created_at || new Date().toISOString(),
         updated_at: data.updated_at || new Date().toISOString()
       } as EmployeeRole;
