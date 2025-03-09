@@ -1,32 +1,18 @@
-import { ErrorBoundary } from "@/components/common/ErrorBoundary";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { SidebarProvider } from "@/components/ui/sidebar";
+
+import { useEffect } from "react";
 import { HRSidebar } from "@/components/hr/HRSidebar";
+import { createBucketIfNotExists } from "@/hooks/useStorage";
 
-interface HRLayoutProps {
-  children: React.ReactNode;
-}
+export function HRLayout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    // Ensure we have the required storage buckets
+    createBucketIfNotExists('documents');
+  }, []);
 
-export const HRLayout = ({ children }: HRLayoutProps) => {
   return (
-    <ErrorBoundary>
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <Header />
-        <div className="flex-1 flex">
-          <SidebarProvider>
-            <div className="min-h-screen flex w-full">
-              <HRSidebar />
-              <div className="flex-1 bg-[#f4f7fc] overflow-auto">
-                <main className="p-6">
-                  {children}
-                </main>
-              </div>
-            </div>
-          </SidebarProvider>
-        </div>
-        <Footer />
-      </div>
-    </ErrorBoundary>
+    <div className="flex">
+      <HRSidebar />
+      <div className="flex-1">{children}</div>
+    </div>
   );
-};
+}

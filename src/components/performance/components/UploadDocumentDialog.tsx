@@ -37,7 +37,7 @@ export function UploadDocumentDialog({
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const { error } = await supabase
-        .from('employee_documents')
+        .from('employee_documents' as any)
         .insert({
           employee_id: employeeId,
           document_type: 'performance_note',

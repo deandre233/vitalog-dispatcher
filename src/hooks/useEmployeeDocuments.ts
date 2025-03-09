@@ -3,26 +3,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-
-interface DocumentUploadParams {
-  file: File;
-  type: string;
-  description: string;
-  date: Date;
-}
-
-interface Document {
-  id: string;
-  employee_id: string;
-  filename: string;
-  type: string;
-  description: string;
-  url: string;
-  created_at: string;
-  date: string;
-  storage_path: string;
-  ai_analysis?: any;
-}
+import { EmployeeDocument, DocumentUploadParams } from "@/types/employee-documents";
 
 export const useEmployeeDocuments = (employeeId?: string) => {
   const queryClient = useQueryClient();
@@ -34,8 +15,9 @@ export const useEmployeeDocuments = (employeeId?: string) => {
     queryFn: async () => {
       if (!employeeId) return [];
       
+      // Use a type assertion to tell TypeScript that this table exists
       const { data, error } = await supabase
-        .from('employee_documents')
+        .from('employee_documents' as any)
         .select('*')
         .eq('employee_id', employeeId)
         .order('created_at', { ascending: false });
@@ -82,7 +64,7 @@ export const useEmployeeDocuments = (employeeId?: string) => {
       
       // 3. Create a record in the database
       const { data: documentData, error: documentError } = await supabase
-        .from('employee_documents')
+        .from('employee_documents' as any)
         .insert([
           {
             employee_id: employeeId,
@@ -92,6 +74,7 @@ export const useEmployeeDocuments = (employeeId?: string) => {
             type,
             description,
             date: date.toISOString(),
+            document_type: type // Ensure document_type is set, as it's required
           }
         ])
         .select('*')
@@ -124,7 +107,7 @@ export const useEmployeeDocuments = (employeeId?: string) => {
     
     // 1. Get the document to get the storage path
     const { data: documentData, error: fetchError } = await supabase
-      .from('employee_documents')
+      .from('employee_documents' as any)
       .select('storage_path')
       .eq('id', documentId)
       .single();
@@ -148,7 +131,7 @@ export const useEmployeeDocuments = (employeeId?: string) => {
     
     // 3. Delete the record from the database
     const { error: deleteError } = await supabase
-      .from('employee_documents')
+      .from('employee_documents' as any)
       .delete()
       .eq('id', documentId);
     
@@ -169,7 +152,7 @@ export const useEmployeeDocuments = (employeeId?: string) => {
     
     // 1. Get the document to get the URL and other details
     const { data: documentData, error: fetchError } = await supabase
-      .from('employee_documents')
+      .from('employee_documents' as any)
       .select('*')
       .eq('id', documentId)
       .single();
@@ -197,7 +180,7 @@ export const useEmployeeDocuments = (employeeId?: string) => {
     
     // 3. Update the document with the analysis results
     const { error: updateError } = await supabase
-      .from('employee_documents')
+      .from('employee_documents' as any)
       .update({ ai_analysis: data.analysis })
       .eq('id', documentId);
     

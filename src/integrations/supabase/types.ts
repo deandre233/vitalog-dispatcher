@@ -1093,6 +1093,57 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_documents: {
+        Row: {
+          ai_analysis: Json | null
+          created_at: string | null
+          date: string | null
+          description: string | null
+          document_type: string
+          employee_id: string
+          filename: string | null
+          id: string
+          notes: string | null
+          status: string | null
+          storage_path: string | null
+          type: string | null
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          created_at?: string | null
+          date?: string | null
+          description?: string | null
+          document_type: string
+          employee_id: string
+          filename?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          storage_path?: string | null
+          type?: string | null
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          ai_analysis?: Json | null
+          created_at?: string | null
+          date?: string | null
+          description?: string | null
+          document_type?: string
+          employee_id?: string
+          filename?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          storage_path?: string | null
+          type?: string | null
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       employee_incidents: {
         Row: {
           ai_analysis: Json | null
