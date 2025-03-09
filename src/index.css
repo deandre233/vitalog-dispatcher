@@ -79,14 +79,14 @@
   
   /* Improved text rendering for better readability */
   h1, h2, h3, h4, h5, h6 {
-    @apply text-white/95 tracking-tight;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    @apply text-white/95 tracking-tight font-bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
   }
   
   /* Better paragraph and general text readability */
   p, span, li, label, div {
     @apply text-white/90;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
   }
 }
 
@@ -117,41 +117,58 @@
            rounded-lg;
   }
 
-  /* New color-themed panels */
+  /* Enhanced color-themed panels with deeper colors and better contrast */
   .purple-glass {
-    @apply bg-purple-900/20 backdrop-blur-md 
-           border border-purple-500/20
+    @apply bg-purple-900/30 backdrop-blur-md 
+           border border-purple-500/30
            text-purple-100
-           shadow-lg hover:shadow-purple-500/20
+           shadow-lg hover:shadow-purple-500/30
            transition-all duration-300
            rounded-lg;
   }
   
   .blue-glass {
-    @apply bg-blue-900/20 backdrop-blur-md 
-           border border-blue-500/20
+    @apply bg-blue-900/30 backdrop-blur-md 
+           border border-blue-500/30
            text-blue-100
-           shadow-lg hover:shadow-blue-500/20 
+           shadow-lg hover:shadow-blue-500/30 
            transition-all duration-300
            rounded-lg;
   }
   
   .green-glass {
-    @apply bg-green-900/20 backdrop-blur-md 
-           border border-green-500/20
+    @apply bg-green-900/30 backdrop-blur-md 
+           border border-green-500/30
            text-green-100
-           shadow-lg hover:shadow-green-500/20
+           shadow-lg hover:shadow-green-500/30
            transition-all duration-300
            rounded-lg;
   }
   
   .red-glass {
-    @apply bg-red-900/20 backdrop-blur-md 
-           border border-red-500/20
+    @apply bg-red-900/30 backdrop-blur-md 
+           border border-red-500/30
            text-red-100
-           shadow-lg hover:shadow-red-500/20
+           shadow-lg hover:shadow-red-500/30
            transition-all duration-300
            rounded-lg;
+  }
+
+  /* New status panels with high contrast */
+  .status-critical {
+    @apply bg-red-900/50 border-red-500/50 text-red-100;
+  }
+  
+  .status-warning {
+    @apply bg-orange-900/50 border-orange-500/50 text-orange-100;
+  }
+  
+  .status-normal {
+    @apply bg-green-900/50 border-green-500/50 text-green-100;
+  }
+  
+  .status-info {
+    @apply bg-blue-900/50 border-blue-500/50 text-blue-100;
   }
 
   .shimmer {
@@ -200,7 +217,7 @@
     box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
   }
   
-  /* Text styling classes */
+  /* Enhanced text styling classes */
   .text-gradient-purple {
     @apply bg-gradient-to-r from-purple-300 to-purple-100 bg-clip-text text-transparent;
   }
@@ -215,5 +232,27 @@
   
   .text-shadow-sm {
     text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  
+  .text-shadow-md {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .text-shadow-lg {
+    text-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  }
+  
+  /* New animation for alerts and critical elements */
+  @keyframes attention-pulse {
+    0%, 100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  
+  .attention-pulse {
+    animation: attention-pulse 2s infinite;
   }
 }

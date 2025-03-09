@@ -1,3 +1,4 @@
+
 interface HospitalStatus {
   name: string;
   nedocsScore?: number;
@@ -56,10 +57,10 @@ export const getNedocsLabel = (score: number): string => {
 };
 
 export const getNedocsColor = (score: number): string => {
-  if (score <= 20) return 'text-green-600 bg-green-100';
-  if (score <= 60) return 'text-blue-600 bg-blue-100';
-  if (score <= 100) return 'text-yellow-600 bg-yellow-100';
-  if (score <= 140) return 'text-orange-600 bg-orange-100';
-  if (score <= 180) return 'text-red-600 bg-red-100';
-  return 'text-purple-600 bg-purple-100';
+  if (score <= 20) return 'bg-green-900/60 text-green-100 border-green-500/40';
+  if (score <= 60) return 'bg-blue-900/60 text-blue-100 border-blue-500/40';
+  if (score <= 100) return 'bg-yellow-900/60 text-yellow-100 border-yellow-500/40';
+  if (score <= 140) return 'bg-orange-900/60 text-orange-100 border-orange-500/40';
+  if (score <= 180) return 'bg-red-900/60 text-red-100 border-red-500/40';
+  return 'bg-purple-900/60 text-purple-100 border-purple-500/40';
 };
