@@ -7,11 +7,11 @@ export const incidentAnalysisService = {
     try {
       // Get shift data if available
       let shiftData = null;
-      if (data.shiftData?.shift_id) {
+      if (data.shift_id) {
         const { data: shiftRecord } = await supabase
           .from('shift_records')
           .select('*')
-          .eq('id', data.shiftData.shift_id)
+          .eq('id', data.shift_id)
           .single();
         
         shiftData = shiftRecord;
@@ -24,7 +24,8 @@ export const incidentAnalysisService = {
           description: data.description,
           severity: data.severity,
           vehicleInvolved: data.vehicleInvolved,
-          shiftData
+          shiftData,
+          subject: data.subject || inferSubjectFromDescription(data.description, data.incidentType)
         }
       });
       
@@ -51,4 +52,35 @@ export const incidentAnalysisService = {
       return null;
     }
   }
+};
+
+// Helper function to infer the subject from the incident description
+const inferSubjectFromDescription = (description: string, incidentType: string): string => {
+  const descriptionLower = description.toLowerCase();
+  
+  // Common subject keywords
+  const subjectKeywords = {
+    "missed punch": ["missed punch", "clock in", "clock out", "time clock", "forgot to punch"],
+    "tardiness": ["late", "tardy", "tardiness", "delayed arrival", "late arrival", "late for shift"],
+    "inservice": ["inservice", "training", "class", "continuing education", "ce hours"],
+    "pcr": ["pcr", "patient care report", "documentation", "chart", "paperwork", "reporting"],
+    "vehicle": ["vehicle", "ambulance", "truck", "car", "transport unit", "fleet"],
+    "protocol": ["protocol", "guideline", "procedure", "policy", "standard operating procedure", "sop"],
+    "equipment": ["equipment", "supplies", "gear", "device", "tool", "kit"],
+    "conduct": ["behavior", "conduct", "attitude", "unprofessional", "conflict", "argument"],
+    "attendance": ["absent", "no show", "attendance", "sick call", "call out"],
+    "patient care": ["patient care", "treatment", "assessment", "medical error", "medication", "clinical"],
+    "safety": ["safety", "hazard", "unsafe", "injury", "accident", "risk"],
+    "communication": ["communication", "dispatch", "radio", "notification", "report", "handoff"]
+  };
+  
+  // Check for keywords in the description
+  for (const [subject, keywords] of Object.entries(subjectKeywords)) {
+    if (keywords.some(keyword => descriptionLower.includes(keyword))) {
+      return subject;
+    }
+  }
+  
+  // If no subject is found, default to the incident type as the subject
+  return incidentType;
 };
