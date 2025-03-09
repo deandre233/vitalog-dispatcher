@@ -1,0 +1,9 @@
+
+/* Import all component style files */
+@import "./panels.css";
+@import "./cards.css";
+@import "./status.css";
+@import "./effects.css";
+@import "./shimmer.css";
+
+@tailwind components;

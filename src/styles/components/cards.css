@@ -1,0 +1,29 @@
+
+@layer components {
+  /* Card styles */
+  .futuristic-card {
+    @apply bg-gradient-to-br from-slate-800/80 to-slate-900/80
+           border border-slate-700/50
+           shadow-md hover:shadow-primary/20
+           transition-all duration-300 
+           backdrop-blur-md
+           rounded-xl;
+  }
+
+  /* Light mode variants */
+  .light .futuristic-card {
+    @apply bg-gradient-to-br from-white to-slate-50
+           border border-slate-200
+           shadow-sm hover:shadow-md;
+  }
+
+  /* Advanced card styles */
+  .floating-card {
+    @apply transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+  
+  .interactive-card {
+    @apply transform transition-all duration-300 cursor-pointer 
+           hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-md;
+  }
+}

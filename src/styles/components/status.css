@@ -1,0 +1,118 @@
+
+@layer components {
+  /* Color-themed glass panels */
+  .purple-glass {
+    @apply bg-purple-900/30 backdrop-blur-xl
+           border border-purple-500/30
+           text-purple-50
+           shadow-lg hover:shadow-purple-500/30
+           transition-all duration-300
+           rounded-xl;
+  }
+  
+  .blue-glass {
+    @apply bg-blue-900/30 backdrop-blur-xl
+           border border-blue-500/30
+           text-blue-50
+           shadow-lg hover:shadow-blue-500/30 
+           transition-all duration-300
+           rounded-xl;
+  }
+  
+  .green-glass {
+    @apply bg-green-900/30 backdrop-blur-xl
+           border border-green-500/30
+           text-green-50
+           shadow-lg hover:shadow-green-500/30
+           transition-all duration-300
+           rounded-xl;
+  }
+  
+  .red-glass {
+    @apply bg-red-900/30 backdrop-blur-xl
+           border border-red-500/30
+           text-red-50
+           shadow-lg hover:shadow-red-500/30
+           transition-all duration-300
+           rounded-xl;
+  }
+  
+  .yellow-glass {
+    @apply bg-amber-900/30 backdrop-blur-xl
+           border border-amber-500/30
+           text-amber-50
+           shadow-lg hover:shadow-amber-500/30
+           transition-all duration-300
+           rounded-xl;
+  }
+
+  /* Light mode variants */
+  .light .purple-glass {
+    @apply bg-purple-50 backdrop-blur-md
+           border border-purple-200
+           text-purple-900
+           shadow-md hover:shadow-purple-200;
+  }
+
+  .light .blue-glass {
+    @apply bg-blue-50 backdrop-blur-md
+           border border-blue-200
+           text-blue-900
+           shadow-md hover:shadow-blue-200;
+  }
+
+  .light .green-glass {
+    @apply bg-green-50 backdrop-blur-md
+           border border-green-200
+           text-green-900
+           shadow-md hover:shadow-green-200;
+  }
+
+  .light .red-glass {
+    @apply bg-red-50 backdrop-blur-md
+           border border-red-200
+           text-red-900
+           shadow-md hover:shadow-red-200;
+  }
+  
+  .light .yellow-glass {
+    @apply bg-amber-50 backdrop-blur-md
+           border border-amber-200
+           text-amber-900
+           shadow-md hover:shadow-amber-200;
+  }
+
+  /* Status panel styles */
+  .status-critical {
+    @apply bg-red-800/60 border-red-400/60 text-red-50;
+  }
+  
+  .status-warning {
+    @apply bg-amber-800/60 border-amber-400/60 text-amber-50;
+  }
+  
+  .status-normal {
+    @apply bg-green-800/60 border-green-400/60 text-green-50;
+  }
+  
+  .status-info {
+    @apply bg-blue-800/60 border-blue-400/60 text-blue-50;
+  }
+
+  /* Light mode status variants */
+  .light .status-critical {
+    @apply bg-red-50 border-red-200 text-red-800;
+  }
+  
+  .light .status-warning {
+    @apply bg-amber-50 border-amber-200 text-amber-800;
+  }
+  
+  .light .status-normal {
+    @apply bg-green-50 border-green-200 text-green-800;
+  }
+  
+  .light .status-info {
+    @apply bg-blue-50 border-blue-200 text-blue-800;
+  }
+}

@@ -1,0 +1,49 @@
+
+@layer components {
+  /* Notification badge */
+  .notification-badge {
+    @apply absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs
+           flex items-center justify-center rounded-full font-bold z-10;
+  }
+  
+  /* Glowing accent for important elements */
+  .glow-accent {
+    @apply shadow-[0_0_15px_rgba(139,92,246,0.5)];
+    animation: pulse-glow 2s infinite;
+  }
+  
+  /* Glass morphism effects */
+  .glass-morphism {
+    @apply backdrop-blur-xl bg-white/5 border border-white/10;
+  }
+  
+  .dark-glass {
+    @apply backdrop-blur-xl bg-black/30 border border-white/10;
+  }
+  
+  /* Interactive hover effects */
+  .hover-scale {
+    @apply transition-transform duration-200;
+  }
+  
+  .hover-scale:hover {
+    @apply transform scale-105;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-200;
+  }
+  
+  .hover-lift:hover {
+    @apply transform -translate-y-1 shadow-lg;
+  }
+  
+  /* Button effects */
+  .btn-glow {
+    @apply transition-all duration-300;
+  }
+  
+  .btn-glow:hover {
+    @apply shadow-[0_0_15px_rgba(167,139,250,0.5)];
+  }
+}
