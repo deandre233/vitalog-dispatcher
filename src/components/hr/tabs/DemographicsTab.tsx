@@ -52,7 +52,11 @@ export function DemographicsTab({ employee, isLoading, onSave }: DemographicsTab
       <div className="p-6">
         <div className="grid gap-6 md:grid-cols-2">
           {/* Summary Card */}
-          <DemographicsSummary employee={employee} />
+          <DemographicsSummary 
+            data={employee || {}} 
+            onEdit={() => {}} 
+            insights={0} 
+          />
 
           {/* Personal Information */}
           <Card>
@@ -140,7 +144,7 @@ export function DemographicsTab({ employee, isLoading, onSave }: DemographicsTab
             <CardContent>
               <div className="space-y-4">
                 <AddressAutocomplete
-                  onAddressSelected={(address) => {
+                  onAddressSelect={(address) => {
                     setFormValues((prev) => ({
                       ...prev,
                       address_line1: address.addressLine1,

@@ -7,10 +7,16 @@ import { MapPin, Search } from "lucide-react";
 
 interface AddressAutocompleteProps {
   onAddressSelect: (addressData: any) => void;
+  currentAddress: {
+    addressLine1: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
 }
 
-export function AddressAutocomplete({ onAddressSelect }: AddressAutocompleteProps) {
-  const [searchValue, setSearchValue] = useState("");
+export function AddressAutocomplete({ onAddressSelect, currentAddress }: AddressAutocompleteProps) {
+  const [searchValue, setSearchValue] = useState(currentAddress.addressLine1 || "");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -89,9 +95,25 @@ export function AddressAutocomplete({ onAddressSelect }: AddressAutocompleteProp
 
   const handleSelectAddress = (suggestion: any) => {
     setSearchValue(suggestion.description);
-    onAddressSelect(suggestion.address_components);
+    
+    // Format the address data to match the expected format
+    const addressData = {
+      addressLine1: `${suggestion.address_components.street_number} ${suggestion.address_components.route}`,
+      city: suggestion.address_components.locality,
+      state: suggestion.address_components.administrative_area_level_1,
+      zipCode: suggestion.address_components.postal_code
+    };
+    
+    onAddressSelect(addressData);
     setShowSuggestions(false);
   };
+
+  // Update searchValue when currentAddress changes
+  useEffect(() => {
+    if (currentAddress.addressLine1) {
+      setSearchValue(currentAddress.addressLine1);
+    }
+  }, [currentAddress.addressLine1]);
 
   // Close suggestions when clicking outside
   useEffect(() => {

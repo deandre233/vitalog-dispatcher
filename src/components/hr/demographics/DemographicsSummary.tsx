@@ -278,32 +278,7 @@ export function DemographicsSummary({ data, onEdit, insights }: DemographicsSumm
             </CardContent>
           </Card>
           
-          {/* Consents Summary */}
-          <Card className="mt-6 bg-slate-50/70">
-            <CardHeader className="py-4">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-green-500" />
-                <CardTitle className="text-md">Consents & Agreements</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="py-2">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Background Check Consent:</div>
-                  <Badge variant={data.consent_to_background_check ? "success" : "destructive"}>
-                    {data.consent_to_background_check ? "Provided" : "Not Provided"}
-                  </Badge>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Drug Testing Consent:</div>
-                  <Badge variant={data.consent_to_drug_testing ? "success" : "destructive"}>
-                    {data.consent_to_drug_testing ? "Provided" : "Not Provided"}
-                  </Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Consents removed as requested */}
         </CardContent>
       </Card>
     </div>
