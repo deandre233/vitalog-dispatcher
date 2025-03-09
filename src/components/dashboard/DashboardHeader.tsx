@@ -1,4 +1,5 @@
-import { Bell, Settings, User, Calendar, Clock } from "lucide-react";
+
+import { Bell, Settings, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,77 +19,47 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onViewChange, defaultView = 'active' }: DashboardHeaderProps) {
-  const [view, setView] = useState<ViewType>(defaultView);
   const [unattendedMode, setUnattendedMode] = useState(false);
 
-  const handleViewChange = (newView: ViewType) => {
-    setView(newView);
-    onViewChange?.(newView);
-  };
-
   return (
-    <div className="flex flex-col bg-white border-b">
-      <div className="flex justify-between items-center p-6">
-        <h1 className="text-2xl font-semibold text-medical-primary">
-          Dispatch Control
-        </h1>
+    <div className="bg-white border-b shadow-sm backdrop-blur-sm bg-white/80">
+      <div className="flex justify-end items-center p-4">
         <div className="flex items-center gap-4">
           <Button
             variant={unattendedMode ? "default" : "outline"}
             onClick={() => setUnattendedMode(!unattendedMode)}
+            className={`transition-all duration-300 ${
+              unattendedMode 
+                ? "bg-gradient-to-r from-medical-gradient-start to-medical-gradient-end text-white shadow-md" 
+                : "hover:bg-medical-accent/20"
+            }`}
           >
             {unattendedMode ? "Exit Unattended Mode" : "Enter Unattended Mode"}
           </Button>
-          <button className="relative p-2 hover:bg-medical-accent rounded-full">
+          <button className="relative p-2 hover:bg-medical-accent rounded-full transition-colors duration-200">
             <Bell className="w-6 h-6 text-medical-primary" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
           </button>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-2 p-2 hover:bg-medical-accent rounded-full">
+            <DropdownMenuTrigger className="flex items-center gap-2 p-2 hover:bg-medical-accent rounded-full transition-colors duration-200">
               <User className="w-6 h-6 text-medical-primary" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-56 shadow-md border border-gray-100">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">Log out</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
-      <div className="flex gap-2 px-6 pb-2">
-        <Button
-          variant={view === 'active' ? 'default' : 'outline'}
-          onClick={() => handleViewChange('active')}
-          className="gap-2"
-        >
-          <Clock className="w-4 h-4" />
-          Active
-        </Button>
-        <Button
-          variant={view === 'schedule' ? 'default' : 'outline'}
-          onClick={() => handleViewChange('schedule')}
-          className="gap-2"
-        >
-          <Clock className="w-4 h-4" />
-          Schedule
-        </Button>
-        <Button
-          variant={view === 'calendar' ? 'default' : 'outline'}
-          onClick={() => handleViewChange('calendar')}
-          className="gap-2"
-        >
-          <Calendar className="w-4 h-4" />
-          Calendar
-        </Button>
       </div>
     </div>
   );

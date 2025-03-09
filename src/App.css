@@ -1,7 +1,7 @@
+
 #root {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -35,8 +35,92 @@
 
 .card {
   padding: 2em;
+  transition: all 0.3s ease;
 }
 
-.read-the-docs {
-  color: #888;
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Glass Morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* Modern Card */
+.modern-card {
+  background: linear-gradient(145deg, #ffffff, #f5f7f9);
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.modern-card:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+}
+
+/* Advanced Animations */
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Animated Gradient Buttons */
+.gradient-button {
+  background-size: 200% auto;
+  transition: 0.5s;
+  background-image: linear-gradient(to right, #2CA3DC 0%, #6B9BE6 51%, #2CA3DC 100%);
+}
+
+.gradient-button:hover {
+  background-position: right center;
+}
+
+/* Enhanced Cards with depth */
+.depth-card {
+  position: relative;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 
+    0 1px 3px rgba(0,0,0,0.12), 
+    0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+.depth-card:hover {
+  box-shadow: 
+    0 14px 28px rgba(0,0,0,0.1), 
+    0 10px 10px rgba(0,0,0,0.1);
+}
+
+/* Advanced inputs */
+.advanced-input {
+  border: none;
+  border-bottom: 2px solid #e2e8f0;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.advanced-input:focus {
+  border-bottom: 2px solid #2CA3DC;
+  box-shadow: 0 5px 15px rgba(44, 163, 220, 0.1);
 }

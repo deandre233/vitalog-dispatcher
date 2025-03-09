@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -74,6 +75,11 @@
   body {
     @apply bg-background text-foreground antialiased;
     background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
   }
 }
 
@@ -119,5 +125,41 @@
     );
     content: '';
     animation: shimmer 2s infinite;
+  }
+
+  .btn-gradient {
+    @apply relative overflow-hidden bg-gradient-to-r from-medical-gradient-start to-medical-gradient-end text-white 
+           rounded-md shadow-md 
+           transition-all duration-300;
+  }
+
+  .btn-gradient:hover {
+    @apply shadow-lg opacity-95;
+  }
+
+  .btn-gradient::before {
+    content: '';
+    @apply absolute top-0 left-0 h-full w-full opacity-0;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.2)
+    );
+    transform: translateX(-100%);
+    transition: opacity 0.3s ease, transform 0.4s ease;
+  }
+
+  .btn-gradient:hover::before {
+    @apply opacity-100;
+    transform: translateX(100%);
+  }
+
+  .advanced-input {
+    @apply transition-all duration-200 
+           border-b-2 border-medical-secondary/30 
+           focus:border-medical-secondary 
+           focus:ring-0 focus:ring-offset-0 
+           rounded-t-md rounded-b-none 
+           shadow-none focus:shadow-sm;
   }
 }
