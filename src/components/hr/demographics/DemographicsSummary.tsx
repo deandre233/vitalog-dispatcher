@@ -4,21 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, UserCircle, MapPin, FileCheck, Phone, ShieldCheck, Brain } from "lucide-react";
+import { Employee } from "@/types/employee";
 
 interface DemographicsSummaryProps {
-  data: any;
+  data: Partial<Employee>;
   onEdit: () => void;
   insights: number;
 }
 
 export function DemographicsSummary({ data, onEdit, insights }: DemographicsSummaryProps) {
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "Not provided";
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   };
   
-  const calculateAge = (birthDate: string) => {
+  const calculateAge = (birthDate: string | undefined) => {
     if (!birthDate) return "";
     const today = new Date();
     const birth = new Date(birthDate);
@@ -32,7 +33,7 @@ export function DemographicsSummary({ data, onEdit, insights }: DemographicsSumm
     return age;
   };
   
-  const formatPhone = (phone: string) => {
+  const formatPhone = (phone: string | undefined) => {
     if (!phone) return "Not provided";
     // Simple formatter for US phone numbers
     const cleaned = ('' + phone).replace(/\D/g, '');
@@ -52,7 +53,7 @@ export function DemographicsSummary({ data, onEdit, insights }: DemographicsSumm
     
     let completed = 0;
     requiredFields.forEach(field => {
-      if (data[field]) completed++;
+      if (data[field as keyof typeof data]) completed++;
     });
     
     return Math.round((completed / requiredFields.length) * 100);
@@ -277,8 +278,6 @@ export function DemographicsSummary({ data, onEdit, insights }: DemographicsSumm
               </div>
             </CardContent>
           </Card>
-          
-          {/* Consents removed as requested */}
         </CardContent>
       </Card>
     </div>
