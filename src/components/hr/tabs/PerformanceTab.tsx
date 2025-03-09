@@ -1,9 +1,9 @@
 
 import { useParams } from "react-router-dom";
-import { PerformanceRankings } from "@/components/performance/PerformanceRankings";
 import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Award } from "lucide-react";
+import { SingleEmployeePerformance } from "@/components/performance/SingleEmployeePerformance";
 
 export function PerformanceTab() {
   const { employeeId } = useParams<{ employeeId: string }>();
@@ -22,13 +22,13 @@ export function PerformanceTab() {
         </CardHeader>
         <CardContent className="pt-0 pb-2">
           <p className="text-muted-foreground">
-            Comprehensive performance metrics and rankings based on AI analysis of work history, timeliness, and protocol adherence.
+            Comprehensive performance metrics and AI analysis of work history, timeliness, and protocol adherence.
           </p>
         </CardContent>
       </Card>
       
-      <div className="grid grid-cols-1 gap-6">
-        <PerformanceRankings />
+      <div className="space-y-6">
+        <SingleEmployeePerformance employeeId={employeeId || ''} employeeName={employeeName} />
       </div>
     </div>
   );
