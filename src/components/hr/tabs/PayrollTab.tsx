@@ -1,17 +1,16 @@
 
 import { useState } from "react";
 import { TabsContent } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Radio, RadioGroup, RadioItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Sparkles, Save, Calendar, DollarSign, Clock, ArrowUpDown, Download, Trash2 } from "lucide-react";
-import { format, addDays } from "date-fns";
-import { Employee } from "@/types/employee";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ArrowUpDown, CreditCard, DollarSign, Clock, Calendar, BarChart3, Wallet, ChevronRight, AlertCircle } from "lucide-react";
 import { useEmployeePayroll } from "@/hooks/useEmployeePayroll";
+import type { Employee } from "@/types/employee";
 
 interface PayrollTabProps {
   employee: Employee | undefined;
@@ -20,384 +19,406 @@ interface PayrollTabProps {
 }
 
 export function PayrollTab({ employee, isLoading, onSave }: PayrollTabProps) {
-  const [payType, setPayType] = useState(employee?.pay_type || "hourly");
-  const [payRate, setPayRate] = useState(employee?.pay_rate?.toString() || "20.00");
-  const [usesTimeclock, setUsesTimeclock] = useState(employee?.uses_timeclock || false);
-  const [accessCodes, setAccessCodes] = useState(employee?.access_codes || "");
-  
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    pay_type: employee?.pay_type || "hourly",
+    pay_rate: employee?.pay_rate || 0,
+    uses_timeclock: employee?.uses_timeclock || true,
+    access_codes: employee?.access_codes || ""
+  });
+
   const { 
     payrollHistory, 
     payrollProjections, 
-    isLoading: loadingPayroll, 
     aiRecommendations, 
+    updatePayroll, 
     generatePayrollReport 
   } = useEmployeePayroll(employee?.id);
 
-  const handleSave = () => {
-    onSave({
-      pay_type: payType,
-      pay_rate: parseFloat(payRate),
-      uses_timeclock: usesTimeclock,
-      access_codes: accessCodes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value
     });
   };
 
-  // Calculate service years
-  const yearsOfService = employee?.first_hired_date 
-    ? Math.floor((new Date().getTime() - new Date(employee.first_hired_date).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) 
-    : 0;
+  const handleRadioChange = (value: string) => {
+    setFormData({
+      ...formData,
+      pay_type: value
+    });
+  };
+
+  const handleSave = () => {
+    onSave({
+      pay_type: formData.pay_type,
+      pay_rate: Number(formData.pay_rate),
+      uses_timeclock: formData.uses_timeclock,
+      access_codes: formData.access_codes
+    });
+    
+    updatePayroll.mutate({
+      employee_id: employee?.id,
+      pay_type: formData.pay_type,
+      pay_rate: Number(formData.pay_rate),
+      uses_timeclock: formData.uses_timeclock,
+      access_codes: formData.access_codes,
+      effective_date: new Date().toISOString()
+    });
+    
+    setIsEditing(false);
+  };
 
   return (
     <TabsContent value="payroll" className="mt-0 animate-in fade-in-50">
-      <div className="p-6">
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Payroll Information */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+        <div className="lg:col-span-1 space-y-6">
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-xl flex items-center justify-between">
-                Payroll Information
-                <Button variant="outline" size="sm" onClick={handleSave}>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Changes
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="grid gap-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <label className="w-1/3 text-sm font-medium">Active:</label>
-                    <div className="w-2/3 flex items-center gap-2">
-                      <Checkbox 
-                        id="can-access" 
-                        checked={true} 
-                        disabled={isLoading}
-                      />
-                      <label htmlFor="can-access" className="text-sm">
-                        Can access EmergencyTrack and perform assigned roles
-                      </label>
-                    </div>
-                  </div>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold">Payroll Information</h3>
+                {!isEditing && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
 
-                  <div className="flex items-center justify-between gap-4">
-                    <label className="w-1/3 text-sm font-medium">Employee type:</label>
-                    <Select defaultValue={employee?.employee_type || "full-time"} disabled={isLoading}>
-                      <SelectTrigger className="w-2/3">
-                        <SelectValue placeholder="Select employee type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="full-time">Full-time</SelectItem>
-                        <SelectItem value="part-time">Part-time</SelectItem>
-                        <SelectItem value="contract">Contract</SelectItem>
-                        <SelectItem value="temporary">Temporary</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <label className="w-1/3 text-sm font-medium">Responsibilities:</label>
-                    <Select defaultValue="provider" disabled={isLoading}>
-                      <SelectTrigger className="w-2/3">
-                        <SelectValue placeholder="Select responsibility" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="provider">Patient care provider</SelectItem>
-                        <SelectItem value="dispatcher">Dispatcher</SelectItem>
-                        <SelectItem value="supervisor">Supervisor</SelectItem>
-                        <SelectItem value="administrator">Administrator</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <label className="w-1/3 text-sm font-medium">Secondary role:</label>
-                    <Select defaultValue="none" disabled={isLoading}>
-                      <SelectTrigger className="w-2/3">
-                        <SelectValue placeholder="Select secondary role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        <SelectItem value="trainer">Trainer</SelectItem>
-                        <SelectItem value="field-supervisor">Field Supervisor</SelectItem>
-                        <SelectItem value="quality-assurance">Quality Assurance</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <label className="w-1/3 text-sm font-medium">First hired:</label>
-                    <div className="w-2/3 flex items-center gap-2">
-                      <Input 
-                        type="date" 
-                        value={employee?.first_hired_date ? format(new Date(employee.first_hired_date), 'yyyy-MM-dd') : ''} 
-                        disabled={isLoading}
-                        className="w-full"
-                      />
-                      <Calendar className="h-4 w-4 text-gray-500" />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <label className="w-1/3 text-sm font-medium">Years of service:</label>
-                    <div className="w-2/3 flex items-center gap-2">
-                      <Input 
-                        type="text" 
-                        value={yearsOfService.toString()} 
-                        disabled={true}
-                        className="w-1/3 bg-gray-100"
-                      />
-                      <span className="text-sm text-gray-500">as of {format(new Date(), 'MM/dd/yyyy')}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <label className="w-1/3 text-sm font-medium">Pay type:</label>
+              {isEditing ? (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Pay Type</Label>
                     <RadioGroup 
-                      className="w-2/3 flex flex-row gap-4" 
-                      value={payType} 
-                      onValueChange={setPayType}
-                      disabled={isLoading}
+                      value={formData.pay_type} 
+                      onValueChange={handleRadioChange}
                     >
                       <div className="flex items-center space-x-2">
-                        <RadioItem value="hourly" id="hourly" />
-                        <label htmlFor="hourly" className="text-sm">Hourly</label>
+                        <RadioGroupItem value="hourly" id="hourly" />
+                        <Label htmlFor="hourly" className="cursor-pointer">Hourly</Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioItem value="salary" id="salary" />
-                        <label htmlFor="salary" className="text-sm">Exempt (Salaried)</label>
+                        <RadioGroupItem value="salary" id="salary" />
+                        <Label htmlFor="salary" className="cursor-pointer">Salary</Label>
                       </div>
                     </RadioGroup>
                   </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="w-1/3"></div>
-                    <div className="w-2/3 flex items-center gap-2">
-                      <Checkbox 
-                        id="uses-timeclock" 
-                        checked={usesTimeclock} 
-                        onCheckedChange={(checked) => setUsesTimeclock(!!checked)}
-                        disabled={isLoading}
-                      />
-                      <label htmlFor="uses-timeclock" className="text-sm">
-                        Uses the timeclock
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <label className="w-1/3 text-sm font-medium">Pay rate:</label>
-                    <div className="w-2/3 flex items-center gap-2">
-                      <span className="text-sm">$</span>
-                      <Input 
-                        type="text" 
-                        value={payRate} 
-                        onChange={(e) => setPayRate(e.target.value)}
-                        disabled={isLoading}
-                        className="w-1/3"
-                      />
-                      <span className="text-sm">per hour</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <label className="w-1/3 text-sm font-medium">Keys and codes:</label>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="pay_rate">
+                      {formData.pay_type === "hourly" ? "Hourly Rate ($)" : "Annual Salary ($)"}
+                    </Label>
                     <Input 
-                      type="text" 
-                      placeholder="optional" 
-                      value={accessCodes}
-                      onChange={(e) => setAccessCodes(e.target.value)}
-                      disabled={isLoading}
-                      className="w-2/3"
+                      id="pay_rate"
+                      name="pay_rate"
+                      type="number"
+                      value={formData.pay_rate}
+                      onChange={handleChange}
                     />
                   </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="uses_timeclock"
+                      name="uses_timeclock"
+                      checked={formData.uses_timeclock}
+                      onChange={handleChange}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <Label htmlFor="uses_timeclock">Uses Time Clock</Label>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="access_codes">Access Codes</Label>
+                    <Input 
+                      id="access_codes"
+                      name="access_codes"
+                      placeholder="Enter building access codes"
+                      value={formData.access_codes}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  
+                  <div className="flex space-x-2 pt-2">
+                    <Button onClick={handleSave}>
+                      Save Changes
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsEditing(false)}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <span className="text-sm text-gray-500">Pay Type</span>
+                      <div className="font-medium capitalize">
+                        {employee?.pay_type || "Hourly"}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-sm text-gray-500">Pay Rate</span>
+                      <div className="font-medium">
+                        ${employee?.pay_rate?.toFixed(2) || "0.00"}
+                        {employee?.pay_type === "hourly" ? "/hr" : "/year"}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-sm text-gray-500">Status</span>
+                      <div className="font-medium">
+                        {employee?.status || "Active"}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-sm text-gray-500">Time Clock</span>
+                      <div className="font-medium">
+                        {employee?.uses_timeclock ? "Enabled" : "Disabled"}
+                      </div>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="space-y-1">
+                    <span className="text-sm text-gray-500">Access Codes</span>
+                    <div className="font-medium font-mono">
+                      {employee?.access_codes || "No access codes assigned"}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Labor Cost Overview</h3>
+              
+              {payrollProjections && payrollProjections.length > 0 ? (
+                <div className="space-y-4">
+                  {payrollProjections.map((projection, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <div className="text-sm">{projection.period}</div>
+                      <div className="text-right">
+                        <div className="font-medium">${projection.amount.toFixed(2)}</div>
+                        <div className="text-xs text-gray-500">{projection.hours} hours</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-gray-500 text-sm">
+                  No payroll projections available.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-4">AI Recommendations</h3>
+              
+              {aiRecommendations && aiRecommendations.length > 0 ? (
+                <div className="space-y-4">
+                  {aiRecommendations.map((rec, index) => (
+                    <div key={index} className="bg-blue-50 p-3 rounded-md border border-blue-100">
+                      <div className="flex items-start space-x-2">
+                        <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-blue-800">{rec.type}</div>
+                          <div className="text-sm text-blue-700">{rec.description}</div>
+                          <div className="text-xs text-blue-600 mt-1">
+                            Confidence: {(rec.confidence * 100).toFixed(0)}%
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-gray-500 text-sm">
+                  No AI recommendations available.
+                </div>
+              )}
+              
+              <Button 
+                variant="outline"
+                size="sm"
+                className="w-full mt-4"
+                onClick={() => generatePayrollReport()}
+              >
+                Generate Full AI Analysis
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-6">Payroll History</h3>
+              
+              {payrollHistory && payrollHistory.length > 0 ? (
+                <div className="space-y-6">
+                  {payrollHistory.map((entry, index) => (
+                    <div key={index} className="border rounded-md overflow-hidden">
+                      <div className="bg-gray-50 px-4 py-3 flex justify-between items-center">
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="h-4 w-4 text-gray-500" />
+                          <span className="font-medium">
+                            {new Date(entry.effective_date).toLocaleDateString()}
+                          </span>
+                          {entry.is_active && (
+                            <Badge className="ml-2 bg-green-100 text-green-800 hover:bg-green-100">
+                              Current
+                            </Badge>
+                          )}
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="p-4 grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="text-sm text-gray-500">Pay Type</div>
+                          <div>{entry.pay_type}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-500">Pay Rate</div>
+                          <div>${entry.pay_rate.toFixed(2)}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-500">Employee Type</div>
+                          <div>{entry.employee_type}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-500">Entered By</div>
+                          <div>{entry.author}</div>
+                        </div>
+                      </div>
+                      {entry.end_date && (
+                        <div className="px-4 py-2 bg-gray-50 border-t text-sm">
+                          <span className="text-gray-500">End Date:</span> {new Date(entry.end_date).toLocaleDateString()}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-gray-500 text-center py-8">
+                  No payroll history records available.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Payroll Analytics</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-blue-50 rounded-md p-3 flex items-center space-x-3">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <Clock className="h-5 w-5 text-blue-700" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-blue-700">Average Hours</div>
+                    <div className="text-lg font-semibold">38.5 hrs/week</div>
+                  </div>
+                </div>
+                
+                <div className="bg-green-50 rounded-md p-3 flex items-center space-x-3">
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <DollarSign className="h-5 w-5 text-green-700" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-green-700">YTD Earnings</div>
+                    <div className="text-lg font-semibold">$18,240.00</div>
+                  </div>
+                </div>
+                
+                <div className="bg-purple-50 rounded-md p-3 flex items-center space-x-3">
+                  <div className="bg-purple-100 p-2 rounded-full">
+                    <ArrowUpDown className="h-5 w-5 text-purple-700" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-purple-700">Increase</div>
+                    <div className="text-lg font-semibold">+5.2% YoY</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border rounded-md p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-medium">Earnings Trend (Last 6 Months)</h4>
+                  <Button variant="outline" size="sm">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Full Report
+                  </Button>
+                </div>
+                
+                <div className="h-40 flex items-end space-x-2">
+                  {[65, 40, 75, 50, 85, 90].map((height, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center">
+                      <div 
+                        className="w-full bg-blue-100 rounded-t" 
+                        style={{ height: `${height}%` }}
+                      ></div>
+                      <div className="text-xs mt-1">
+                        {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'][i]}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Labor Cost & AI Insights */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-xl">Labor Cost Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span>Daily @ 8 hours</span>
+          
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Payment Methods</h3>
+              
+              <div className="space-y-4">
+                <div className="border rounded-md p-4 flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-gray-100 p-2 rounded-full">
+                      <CreditCard className="h-5 w-5 text-gray-700" />
                     </div>
-                    <span className="font-medium">$ {(parseFloat(payRate) * 8).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span>Weekly @ 40 hours</span>
+                    <div>
+                      <div className="font-medium">Direct Deposit</div>
+                      <div className="text-sm text-gray-500">Bank of America ••••3456</div>
                     </div>
-                    <span className="font-medium">$ {(parseFloat(payRate) * 40).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span>Bi-weekly @ 80 hours</span>
-                    </div>
-                    <span className="font-medium">$ {(parseFloat(payRate) * 80).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span>Monthly @ 166.7 hours</span>
-                    </div>
-                    <span className="font-medium">$ {(parseFloat(payRate) * 166.7).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span>Annually @ 2000 hours</span>
-                    </div>
-                    <span className="font-medium">$ {(parseFloat(payRate) * 2000).toFixed(2)}</span>
-                  </div>
+                  <Badge>Primary</Badge>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-blue-500" />
-                  AI Payroll Insights
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {loadingPayroll ? (
-                    <p>Loading AI insights...</p>
-                  ) : (
-                    <>
-                      <div className="bg-white p-3 rounded-md border border-blue-100">
-                        <p className="text-sm text-blue-800 font-medium mb-1">Payroll Efficiency</p>
-                        <p className="text-sm">
-                          Based on timesheet analysis, this employee has consistently worked 
-                          <span className="font-semibold"> 42.5 hours/week</span> over the past quarter, 
-                          with <span className="font-semibold">2.5 hours</span> of overtime weekly.
-                        </p>
-                      </div>
-                      
-                      <div className="bg-white p-3 rounded-md border border-indigo-100">
-                        <p className="text-sm text-indigo-800 font-medium mb-1">Cost Analysis</p>
-                        <p className="text-sm">
-                          This employee's cost ratio is <span className="font-semibold">1.15x</span> compared 
-                          to others with similar roles, with <span className="font-semibold">15% higher productivity</span> 
-                          metrics.
-                        </p>
-                      </div>
-                      
-                      <div className="bg-white p-3 rounded-md border border-purple-100">
-                        <p className="text-sm text-purple-800 font-medium mb-1">Recommendations</p>
-                        <p className="text-sm">
-                          Consider initiating a <span className="font-semibold">5% merit increase</span> 
-                          based on performance metrics and industry standards.
-                        </p>
-                      </div>
-                    </>
-                  )}
-
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full mt-2 border-blue-200 text-blue-700 hover:bg-blue-50"
-                  >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Generate Full AI Analysis
-                  </Button>
+                
+                <div className="border rounded-md p-4 flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-gray-100 p-2 rounded-full">
+                      <Wallet className="h-5 w-5 text-gray-700" />
+                    </div>
+                    <div>
+                      <div className="font-medium">Pay Card</div>
+                      <div className="text-sm text-gray-500">Visa ••••5678</div>
+                    </div>
+                  </div>
+                  <Badge variant="outline">Backup</Badge>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Payroll History */}
-        <Card className="mt-6">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl flex items-center justify-between">
-              Payroll History
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export
-                </Button>
-                <Button variant="outline" size="sm">
-                  <ArrowUpDown className="mr-2 h-4 w-4" />
-                  Sort
+                
+                <Button variant="outline" className="w-full">
+                  Add Payment Method
                 </Button>
               </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">ID</TableHead>
-                  <TableHead>Effective Date</TableHead>
-                  <TableHead>End Date</TableHead>
-                  <TableHead>Author</TableHead>
-                  <TableHead>Active?</TableHead>
-                  <TableHead>Emp Type</TableHead>
-                  <TableHead>Keys and Codes</TableHead>
-                  <TableHead>Pay Type</TableHead>
-                  <TableHead>Pay Rate</TableHead>
-                  <TableHead className="w-24">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loadingPayroll ? (
-                  <TableRow>
-                    <TableCell colSpan={10} className="text-center py-4">Loading payroll history...</TableCell>
-                  </TableRow>
-                ) : (
-                  <>
-                    <TableRow>
-                      <TableCell className="font-medium">15</TableCell>
-                      <TableCell>{format(new Date('2023-06-14'), 'yyyy-MM-dd HH:mm')}</TableCell>
-                      <TableCell>[Current]</TableCell>
-                      <TableCell>Baker, Justin</TableCell>
-                      <TableCell>✓</TableCell>
-                      <TableCell>Full-time</TableCell>
-                      <TableCell>{accessCodes || "—"}</TableCell>
-                      <TableCell>Hourly</TableCell>
-                      <TableCell>${payRate}/hr</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">8</TableCell>
-                      <TableCell>{format(new Date('2022-05-23'), 'yyyy-MM-dd HH:mm')}</TableCell>
-                      <TableCell>{format(new Date('2023-06-14'), 'yyyy-MM-dd HH:mm')}</TableCell>
-                      <TableCell>Administrator</TableCell>
-                      <TableCell>✓</TableCell>
-                      <TableCell>Full-time</TableCell>
-                      <TableCell>—</TableCell>
-                      <TableCell>Hourly</TableCell>
-                      <TableCell>$20.00/hr</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  </>
-                )}
-              </TableBody>
-            </Table>
-            <p className="text-xs text-gray-500 mt-4">
-              A new row will be created whenever the settings in this tab are changed and saved.
-            </p>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </TabsContent>
   );
