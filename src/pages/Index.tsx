@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
@@ -13,7 +14,9 @@ import {
   BarChart,
   TrendingUp,
   Truck,
-  UserCheck
+  UserCheck,
+  Zap,
+  Brain
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -27,8 +30,8 @@ const menuItems = [
     icon: Ambulance,
     description: "Manage active dispatches and transport requests",
     path: "/dispatch",
-    color: "text-medical-secondary",
-    gradient: "from-medical-gradient-start to-medical-gradient-middle"
+    color: "text-purple-500",
+    gradient: "from-purple-400 to-indigo-500"
   },
   {
     title: "Billing",
@@ -121,16 +124,19 @@ const Index = () => {
   console.log("Menu items loaded:", menuItems.length);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#0f172a]">
       <Header />
-      <div className="flex-1 bg-gradient-to-br from-medical-accent to-white overflow-auto">
+      <div className="flex-1 bg-gradient-to-br from-[#0f172a] to-[#1e293b] overflow-auto">
         <main className="p-6 md:p-8 max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-medical-primary mb-2">
-            Welcome to Dispatch Control
-          </h1>
-          <p className="text-medical-primary/60 mb-8">
-            Select a module to get started
-          </p>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
+              <Zap className="mr-2 h-8 w-8 text-purple-400" />
+              Command Center
+            </h1>
+            <p className="text-gray-400 text-lg">
+              Select a module to begin operations
+            </p>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {(() => {
@@ -145,25 +151,20 @@ const Index = () => {
                 >
                   <Card className={`
                     h-full relative overflow-hidden
-                    bg-gradient-to-br ${item.gradient}
-                    border-0 shadow-lg hover:shadow-xl
+                    bg-[#1e293b]
+                    border border-[#334155]/50 hover:border-[#64748b]/50
+                    shadow-xl hover:shadow-2xl
                     group transition-all duration-500
-                    before:absolute before:inset-0
-                    before:bg-white before:z-10 before:opacity-95
-                    before:transition-opacity before:duration-500
-                    hover:before:opacity-90
-                    after:absolute after:inset-0 after:-z-10
-                    after:bg-gradient-to-br ${item.gradient}
-                    after:opacity-0 hover:after:opacity-100
-                    after:transition-opacity after:duration-500
-                    backdrop-blur-sm
-                    hover:shadow-glow
+                    backdrop-blur-lg rounded-xl
                   `}>
+                    <div className="absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-500"></div>
+                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br ${item.gradient} rounded-full opacity-10 blur-2xl group-hover:opacity-20 transition-opacity duration-500"></div>
+                    
                     <div className="relative z-20 p-6">
                       <div className="flex flex-col items-center text-center space-y-4">
                         <div className={`
                           p-3 rounded-xl ${item.color}
-                          bg-white/80 shadow-lg
+                          bg-[#0f172a]/60 shadow-lg
                           group-hover:scale-110 group-hover:shadow-xl
                           transform transition-all duration-500
                           backdrop-blur-sm
@@ -171,10 +172,10 @@ const Index = () => {
                         `}>
                           <item.icon className="w-8 h-8" />
                         </div>
-                        <h2 className="text-xl font-semibold text-medical-primary group-hover:text-medical-secondary transition-colors duration-300">
+                        <h2 className="text-xl font-semibold text-white group-hover:text-purple-300 transition-colors duration-300">
                           {item.title}
                         </h2>
-                        <p className="text-sm text-medical-primary/70 group-hover:text-medical-primary/90 transition-colors duration-300">
+                        <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                           {item.description}
                         </p>
                       </div>
@@ -196,25 +197,20 @@ const Index = () => {
                 >
                   <Card className={`
                     h-full relative overflow-hidden
-                    bg-gradient-to-br ${item.gradient}
-                    border-0 shadow-lg hover:shadow-xl
+                    bg-[#1e293b]
+                    border border-[#334155]/50 hover:border-[#64748b]/50
+                    shadow-xl hover:shadow-2xl
                     group transition-all duration-500
-                    before:absolute before:inset-0
-                    before:bg-white before:z-10 before:opacity-95
-                    before:transition-opacity before:duration-500
-                    hover:before:opacity-90
-                    after:absolute after:inset-0 after:-z-10
-                    after:bg-gradient-to-br ${item.gradient}
-                    after:opacity-0 hover:after:opacity-100
-                    after:transition-opacity after:duration-500
-                    backdrop-blur-sm
-                    hover:shadow-glow
+                    backdrop-blur-lg rounded-xl
                   `}>
+                    <div className="absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-500"></div>
+                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br ${item.gradient} rounded-full opacity-10 blur-2xl group-hover:opacity-20 transition-opacity duration-500"></div>
+                    
                     <div className="relative z-20 p-6">
                       <div className="flex items-center space-x-6">
                         <div className={`
                           p-3 rounded-xl ${item.color}
-                          bg-white/80 shadow-lg
+                          bg-[#0f172a]/60 shadow-lg
                           group-hover:scale-110 group-hover:shadow-xl
                           transform transition-all duration-500
                           backdrop-blur-sm
@@ -223,10 +219,10 @@ const Index = () => {
                           <item.icon className="w-8 h-8" />
                         </div>
                         <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-medical-primary group-hover:text-medical-secondary transition-colors duration-300">
+                          <h2 className="text-xl font-semibold text-white group-hover:text-purple-300 transition-colors duration-300">
                             {item.title}
                           </h2>
-                          <p className="text-sm text-medical-primary/70 group-hover:text-medical-primary/90 transition-colors duration-300">
+                          <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                             {item.description}
                           </p>
                         </div>
@@ -237,6 +233,22 @@ const Index = () => {
                 );
               });
             })()}
+            
+            {/* AI Assistant Floating Card */}
+            <div className="fixed bottom-6 right-6 z-50">
+              <Card className="bg-gradient-to-br from-purple-600 to-indigo-700 border-none shadow-xl hover:shadow-2xl transition-all duration-300 p-4 rounded-2xl">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/10 rounded-xl backdrop-blur-sm relative">
+                    <Brain className="w-6 h-6 text-white" />
+                    <div className="absolute inset-0 bg-white/5 rounded-xl animate-pulse"></div>
+                  </div>
+                  <div>
+                    <p className="text-white text-sm font-medium">AI Assistant</p>
+                    <p className="text-white/70 text-xs">Ready to help</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
         </main>
       </div>

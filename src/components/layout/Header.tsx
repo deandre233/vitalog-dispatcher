@@ -1,5 +1,6 @@
+
 import { Link } from "react-router-dom";
-import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings, User, Menu, Plus } from "lucide-react";
+import { Heart, Home, Truck, Calendar, BarChart, DollarSign, Settings, User, Menu, Plus, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,17 +24,17 @@ export function Header({ className = "" }) {
   ];
 
   return (
-    <header className={`bg-gradient-to-r from-[#ea384c] to-[#ff6b81] backdrop-blur-sm border-b border-red-600/20 shadow-lg ${className}`}>
+    <header className={`bg-[#0f172a] backdrop-blur-lg border-b border-[#1e293b] shadow-lg ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Heart className="w-6 h-6 text-white animate-pulse" />
-                <div className="absolute inset-0 bg-white/20 blur-sm rounded-full animate-pulse"></div>
+                <Zap className="w-6 h-6 text-purple-400 animate-pulse" />
+                <div className="absolute inset-0 bg-purple-500/20 blur-sm rounded-full animate-pulse"></div>
               </div>
-              <div className="text-xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
-                Vitalog
+              <div className="text-xl font-bold text-white">
+                NexaCore
               </div>
             </div>
             <Link to="/create">
@@ -64,9 +65,9 @@ export function Header({ className = "" }) {
                   <Menu className="h-6 w-6" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-56 bg-[#1e293b] border-[#334155] text-white">
                 {navItems.map((item) => (
-                  <DropdownMenuItem key={item.name} asChild>
+                  <DropdownMenuItem key={item.name} asChild className="text-gray-300 hover:text-white hover:bg-[#334155] focus:bg-[#334155]">
                     <Link 
                       to={item.path}
                       className="flex items-center gap-2 w-full px-2 py-1.5"
@@ -84,7 +85,7 @@ export function Header({ className = "" }) {
                 <Link 
                   key={item.name}
                   to={item.path}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-md transition-all duration-300 relative group"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-[#1e293b] rounded-md transition-all duration-300 relative group"
                 >
                   <item.icon className="w-4 h-4" />
                   <span>{item.name}</span>

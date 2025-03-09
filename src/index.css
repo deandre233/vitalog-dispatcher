@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -73,14 +74,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+    background: #0f172a;
   }
 }
 
 @layer components {
   .futuristic-panel {
-    @apply bg-gradient-to-br from-medical-card-start to-medical-card-end 
-           border border-medical-secondary/20 
+    @apply bg-gradient-to-br from-[#1e293b] to-[#0f172a] 
+           border border-[#334155]/50 
            shadow-lg hover:shadow-xl 
            transition-all duration-300 
            backdrop-blur-sm 
@@ -88,17 +89,17 @@
   }
 
   .futuristic-card {
-    @apply bg-gradient-to-br from-white to-medical-accent 
-           border border-medical-secondary/20 
-           shadow-md hover:shadow-glow 
+    @apply bg-gradient-to-br from-[#1e293b] to-[#0f172a] 
+           border border-[#334155]/50 
+           shadow-md hover:shadow-purple-500/20 
            transition-all duration-300 
            backdrop-blur-sm 
            rounded-lg;
   }
 
   .glass-panel {
-    @apply bg-white/80 backdrop-blur-md 
-           border border-white/20 
+    @apply bg-white/5 backdrop-blur-md 
+           border border-white/10 
            shadow-lg hover:shadow-xl 
            transition-all duration-300 
            rounded-lg;
@@ -113,11 +114,40 @@
     background: linear-gradient(
       90deg,
       rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.2) 20%,
-      rgba(255, 255, 255, 0.5) 60%,
+      rgba(255, 255, 255, 0.05) 20%,
+      rgba(255, 255, 255, 0.1) 60%,
       rgba(255, 255, 255, 0)
     );
     content: '';
     animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+  }
+  
+  .pulse-glow {
+    animation: pulse-glow 2s infinite;
+  }
+  
+  .hover-glow {
+    transition: all 0.3s ease;
+  }
+  
+  .hover-glow:hover {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
   }
 }
