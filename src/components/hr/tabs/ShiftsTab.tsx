@@ -112,6 +112,17 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
     }
   ];
 
+  // Count available shifts
+  const availableShiftsCount = mockShifts.filter(shift => shift.status === "available").length;
+
+  // Determine badge color based on count
+  const getBadgeVariant = (count: number): "default" | "success" | "warning" | "info" => {
+    if (count >= 5) return "success";
+    if (count >= 3) return "info";
+    if (count >= 1) return "warning";
+    return "default";
+  };
+
   const filteredShifts = mockShifts.filter(shift => {
     if (activeFilter === "available") {
       return shift.status === "available";
@@ -220,8 +231,17 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
             <Button 
               variant={activeFilter === "available" ? "default" : "outline"} 
               onClick={() => setActiveFilter("available")}
+              className="relative"
             >
               Available
+              {availableShiftsCount > 0 && (
+                <Badge 
+                  variant={getBadgeVariant(availableShiftsCount)}
+                  className="absolute -top-2 -right-2 flex items-center justify-center min-w-[1.5rem] h-[1.5rem] rounded-full text-xs font-bold"
+                >
+                  {availableShiftsCount}
+                </Badge>
+              )}
             </Button>
           </div>
         </div>
@@ -229,9 +249,27 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
         {activeFilter === "upcoming" && (
           <div className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Upcoming Shifts</CardTitle>
-                <CardDescription>Your scheduled shifts for the next two weeks</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Upcoming Shifts</CardTitle>
+                  <CardDescription>Your scheduled shifts for the next two weeks</CardDescription>
+                </div>
+                {availableShiftsCount > 0 && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setActiveFilter("available")}
+                    className="flex items-center gap-2"
+                  >
+                    <span>Available Shifts</span>
+                    <Badge 
+                      variant={getBadgeVariant(availableShiftsCount)}
+                      className="ml-1 flex items-center justify-center min-w-[1.5rem] h-[1.5rem] rounded-full"
+                    >
+                      {availableShiftsCount}
+                    </Badge>
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
                 <DataTable 
@@ -292,7 +330,15 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
         {activeFilter === "available" && (
           <Card>
             <CardHeader>
-              <CardTitle>Available Shifts</CardTitle>
+              <CardTitle className="flex items-center gap-3">
+                Available Shifts
+                <Badge 
+                  variant={getBadgeVariant(filteredShifts.length)}
+                  className="ml-2 flex items-center justify-center min-w-[1.75rem] h-[1.75rem] rounded-full text-sm"
+                >
+                  {filteredShifts.length}
+                </Badge>
+              </CardTitle>
               <CardDescription>Open shifts you can pick up for extra hours</CardDescription>
             </CardHeader>
             <CardContent>
@@ -302,8 +348,11 @@ export function ShiftsTab({ employeeId }: ShiftsTabProps) {
               />
             </CardContent>
             <CardFooter>
-              <div className="text-sm text-muted-foreground">
-                Available opportunities: {filteredShifts.length}
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Available opportunities:</span>
+                <Badge variant={getBadgeVariant(filteredShifts.length)}>
+                  {filteredShifts.length} {filteredShifts.length === 1 ? 'shift' : 'shifts'}
+                </Badge>
               </div>
             </CardFooter>
           </Card>
