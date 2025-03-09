@@ -314,7 +314,7 @@ export function DemographicsTab({ employee, isLoading, onSave }: DemographicsTab
                             <SelectValue placeholder="Not recorded" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Not recorded</SelectItem>
+                            <SelectItem value="not-recorded">Not recorded</SelectItem>
                             <SelectItem value="american-indian">American Indian or Alaska Native</SelectItem>
                             <SelectItem value="asian">Asian</SelectItem>
                             <SelectItem value="black">Black or African American</SelectItem>
