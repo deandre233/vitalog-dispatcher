@@ -43,13 +43,13 @@ export function EmployeeProfileTabs({ activeTab, onTabChange, children }: Employ
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
       <div className="border-b sticky top-0 bg-white z-10">
-        <TabsList className="h-auto p-0 bg-transparent flex w-full overflow-x-auto no-scrollbar">
+        <TabsList className="h-auto p-0 bg-transparent flex w-full flex-wrap justify-start">
           {Object.entries(tabIcons).map(([key, icon]) => (
             <TabsTrigger 
               key={key}
               value={key} 
               className={cn(
-                "py-3 px-4 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary font-medium transition-all flex items-center",
+                "py-2 px-3 text-sm rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary font-medium transition-all flex items-center shrink-0",
               )}
             >
               {icon}
