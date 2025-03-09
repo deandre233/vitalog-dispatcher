@@ -45,6 +45,7 @@ export interface IncidentAnalysisData {
   severity: string;
   vehicleInvolved: boolean;
   shiftData?: any;
+  shift_id?: string;
 }
 
 export interface IncidentAnalysisResult {

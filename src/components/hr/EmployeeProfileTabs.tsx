@@ -12,7 +12,6 @@ import {
   Award, 
   FileText, 
   AlertTriangle, 
-  LineChart, 
   Medal, 
   Bell
 } from "lucide-react";
@@ -35,7 +34,6 @@ export function EmployeeProfileTabs({ activeTab, onTabChange, children }: Employ
     certifications: <Award className="mr-1 h-4 w-4" />,
     documents: <FileText className="mr-1 h-4 w-4" />,
     incidents: <AlertTriangle className="mr-1 h-4 w-4" />,
-    stats: <LineChart className="mr-1 h-4 w-4" />,
     achievements: <Medal className="mr-1 h-4 w-4" />,
     notifications: <Bell className="mr-1 h-4 w-4" />,
   };

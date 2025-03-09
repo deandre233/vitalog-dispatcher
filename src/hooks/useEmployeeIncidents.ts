@@ -4,9 +4,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { incidentService } from "@/services/incidentService";
 import { incidentAnalysisService } from "@/services/incidentAnalysisService";
-import { Incident, IncidentFormData, IncidentAnalysisData } from "@/types/incidents";
+import type { Incident, IncidentFormData, IncidentAnalysisData } from "@/types/incidents";
 
-export { Incident, IncidentFormData } from "@/types/incidents";
+export type { Incident, IncidentFormData } from "@/types/incidents";
 
 export const useEmployeeIncidents = (employeeId?: string) => {
   const queryClient = useQueryClient();
@@ -41,7 +41,8 @@ export const useEmployeeIncidents = (employeeId?: string) => {
             incidentType: data.incident_type,
             description: data.description,
             severity: data.severity,
-            vehicleInvolved: data.vehicle_involved
+            vehicleInvolved: data.vehicle_involved,
+            shift_id: data.shift_id
           });
         }
         
