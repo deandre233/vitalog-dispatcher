@@ -15,12 +15,10 @@ import { PlaceholderTab } from "@/components/hr/tabs/PlaceholderTab";
 import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
 import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
 import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
-import { AlertTriangle } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 
 const EmployeeProfile = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
-  const [activeTab, setActiveTab] = useState("roles"); // Set to roles tab by default
+  const [activeTab, setActiveTab] = useState("identity");
   
   const { roles, isLoading: loadingRoles, updateRole } = useEmployeeRoles(employeeId);
   const { privileges, isLoading: loadingPrivileges, updatePrivileges } = useEmployeePrivileges(employeeId);
@@ -32,28 +30,9 @@ const EmployeeProfile = () => {
     updateEmployee.mutate(data);
   };
 
-  // Check for roles that require attention
-  const needsAttention = () => {
-    if (!roles) return false;
-    // If they're an onlooker but missing facility or city
-    if (roles.is_onlooker && (!roles.onlooker_facility || !roles.onlooker_city)) return true;
-    // If they have high-risk roles
-    if (roles.is_administrator || roles.is_principal) return true;
-    return false;
-  };
-
   return (
     <HRLayout>
       <EmployeeHeader employee={employee} />
-
-      {needsAttention() && (
-        <div className="mx-auto container bg-amber-50 border border-amber-200 rounded-md p-3 mb-4 flex items-center">
-          <AlertTriangle className="h-5 w-5 text-amber-500 mr-2" />
-          <p className="text-sm text-amber-700">
-            This employee has roles that need attention or have high security privileges.
-          </p>
-        </div>
-      )}
 
       <div className="container mx-auto">
         <EmployeeProfileTabs
