@@ -44,12 +44,12 @@ export const ServiceQueue = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
       <Header />
       <div className="flex-1 flex">
         <SidebarProvider>
           <AppSidebar />
-          <div className="flex-1 bg-[#f4f7fc] overflow-auto">
+          <div className="flex-1 bg-[#f4f7fc] overflow-auto rounded-tl-2xl shadow-inner">
             <DashboardHeader />
             <main className="p-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -57,35 +57,37 @@ export const ServiceQueue = () => {
                 <div className="lg:col-span-2 space-y-6">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h2 className="text-2xl font-semibold">Service Queue</h2>
+                      <h2 className="text-2xl font-semibold bg-gradient-to-r from-medical-primary to-medical-secondary bg-clip-text text-transparent">
+                        Service Queue
+                      </h2>
                       <p className="text-gray-500">Manage transport requests and scheduling</p>
                     </div>
                     <Button 
                       onClick={handleNewRequest}
-                      className="bg-medical-secondary hover:bg-medical-secondary/90 text-white"
+                      className="bg-gradient-to-r from-medical-gradient-start to-medical-gradient-end text-white hover:shadow-md transition-all duration-300"
                     >
                       New Request
                     </Button>
                   </div>
 
-                  <Card className="p-6">
+                  <Card className="p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-none">
                     <Tabs defaultValue="pending" onValueChange={setSelectedTab}>
-                      <TabsList className="mb-4">
-                        <TabsTrigger value="pending">
+                      <TabsList className="mb-4 bg-gray-100/80">
+                        <TabsTrigger value="pending" className="data-[state=active]:bg-white data-[state=active]:text-medical-primary">
                           Pending
-                          <Badge variant="secondary" className="ml-2">
+                          <Badge variant="secondary" className="ml-2 bg-medical-secondary/20 text-medical-primary">
                             {requests?.pending?.length || 0}
                           </Badge>
                         </TabsTrigger>
-                        <TabsTrigger value="inProgress">
+                        <TabsTrigger value="inProgress" className="data-[state=active]:bg-white data-[state=active]:text-medical-primary">
                           In Progress
-                          <Badge variant="secondary" className="ml-2">
+                          <Badge variant="secondary" className="ml-2 bg-medical-secondary/20 text-medical-primary">
                             {requests?.inProgress?.length || 0}
                           </Badge>
                         </TabsTrigger>
-                        <TabsTrigger value="completed">
+                        <TabsTrigger value="completed" className="data-[state=active]:bg-white data-[state=active]:text-medical-primary">
                           Completed
-                          <Badge variant="secondary" className="ml-2">
+                          <Badge variant="secondary" className="ml-2 bg-medical-secondary/20 text-medical-primary">
                             {requests?.completed?.length || 0}
                           </Badge>
                         </TabsTrigger>
@@ -94,10 +96,10 @@ export const ServiceQueue = () => {
                       <ScrollArea className="h-[600px] pr-4">
                         <TabsContent value="pending" className="space-y-4">
                           {requests?.pending?.map((request) => (
-                            <Card key={request.id} className="p-4 hover:shadow-md transition-shadow">
+                            <Card key={request.id} className="p-4 hover:shadow-md transition-shadow border border-gray-100 hover:border-medical-secondary/20">
                               <div className="flex justify-between items-start">
                                 <div>
-                                  <h3 className="font-medium">{request.patientName}</h3>
+                                  <h3 className="font-medium text-medical-primary">{request.patientName}</h3>
                                   <div className="flex items-center text-sm text-gray-500 mt-1">
                                     <Calendar className="h-4 w-4 mr-1" />
                                     {request.serviceDate}
@@ -115,7 +117,11 @@ export const ServiceQueue = () => {
                                     </Badge>
                                   </div>
                                 </div>
-                                <Button variant="outline" size="sm">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="border-medical-secondary/30 text-medical-primary hover:bg-medical-secondary/10"
+                                >
                                   View Details
                                 </Button>
                               </div>
@@ -131,42 +137,58 @@ export const ServiceQueue = () => {
 
                 {/* AI Insights & Metrics Section */}
                 <div className="space-y-6">
-                  <Card className="p-6">
+                  <Card className="p-6 shadow-lg border-l-4 border-l-medical-primary bg-gradient-to-br from-white to-blue-50/30">
                     <AIInsightsPanel 
                       insights={aiInsights}
                     />
                   </Card>
 
-                  <Card className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">Queue Metrics</h3>
+                  <Card className="p-6 shadow-lg border-l-4 border-l-medical-secondary">
+                    <h3 className="text-lg font-semibold mb-4 text-medical-primary">Queue Metrics</h3>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Users className="h-5 w-5 text-blue-500 mr-2" />
-                          <span>Active Requests</span>
+                          <span className="text-gray-700">Active Requests</span>
                         </div>
-                        <span className="font-semibold">{metrics.activeRequests}</span>
+                        <span className="font-semibold text-medical-primary">{metrics.activeRequests}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Timer className="h-5 w-5 text-green-500 mr-2" />
-                          <span>Avg. Response Time</span>
+                          <span className="text-gray-700">Avg. Response Time</span>
                         </div>
-                        <span className="font-semibold">{metrics.avgResponseTime}</span>
+                        <span className="font-semibold text-medical-primary">{metrics.avgResponseTime}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <ArrowUpRight className="h-5 w-5 text-purple-500 mr-2" />
-                          <span>Completion Rate</span>
+                          <span className="text-gray-700">Completion Rate</span>
                         </div>
-                        <span className="font-semibold">{metrics.completionRate}%</span>
+                        <span className="font-semibold text-medical-primary">{metrics.completionRate}%</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Brain className="h-5 w-5 text-indigo-500 mr-2" />
-                          <span>AI Efficiency Score</span>
+                          <span className="text-gray-700">AI Efficiency Score</span>
                         </div>
-                        <span className="font-semibold">{metrics.efficiency}%</span>
+                        <span className="font-semibold text-medical-primary">{metrics.efficiency}%</span>
+                      </div>
+                    </div>
+                  </Card>
+                  
+                  <Card className="p-4 shadow-md border-l-4 border-l-[#6E59A5] bg-gradient-to-br from-white to-[#F1F0FB]">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Brain className="h-5 w-5 text-[#6E59A5]" />
+                      <h3 className="font-semibold text-[#6E59A5]">AI Recommendations</h3>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-600">Based on current queue status:</p>
+                      <div className="bg-white p-3 rounded-md shadow-sm border border-[#6E59A5]/10">
+                        <p className="text-sm text-[#6E59A5]">Consider reassigning Crew #12 to handle the high-priority requests in the northern district.</p>
+                      </div>
+                      <div className="bg-white p-3 rounded-md shadow-sm border border-[#6E59A5]/10">
+                        <p className="text-sm text-[#6E59A5]">Traffic congestion detected on I-85. Suggest alternative routes for dispatches #1234 and #1235.</p>
                       </div>
                     </div>
                   </Card>
