@@ -1,446 +1,447 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { EmployeePrivileges } from "@/types/employee";
+import { Switch } from "@/components/ui/switch";
+import { TabsContent } from "@/components/ui/tabs";
+import { UseMutationResult } from "@tanstack/react-query";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
-  Lock, 
-  ShieldAlert, 
-  ChevronDown, 
+  AlertCircle, 
   FileText, 
   Clock, 
-  Cog, 
-  Info,
-  AlertTriangle,
-  Server
+  Shield, 
+  Robot, 
+  Database, 
+  User, 
+  Settings,
+  DollarSign,
+  Ambulance,
+  ChevronDown,
+  ChevronUp,
+  Sparkles
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface PrivilegesTabProps {
-  privileges: EmployeePrivileges;
-  updatePrivileges: any;
-  getAIRecommendations: (category: string) => Promise<Record<string, boolean>>;
+  privileges: EmployeePrivileges | undefined;
+  updatePrivileges: UseMutationResult<void, Error, Partial<EmployeePrivileges>, unknown>;
+  getAIRecommendations?: (roleType: string) => Promise<Record<string, boolean>>;
 }
 
 export function PrivilegesTab({ privileges, updatePrivileges, getAIRecommendations }: PrivilegesTabProps) {
-  const [expandedSections, setExpandedSections] = useState<string[]>(["core"]);
-  const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({
-    core: false,
-    pcr: false,
-    timeclock: false,
-    system: false
+  const [expandedSections, setExpandedSections] = useState({
+    patient: true,
+    billing: true,
+    dispatch: true,
+    reports: true,
+    pcr: true,
+    timeclock: true,
+    system: true,
+    ai: true
   });
 
-  const toggleSection = (section: string) => {
-    setExpandedSections(prev => 
-      prev.includes(section) 
-        ? prev.filter(s => s !== section) 
-        : [...prev, section]
-    );
-  };
+  const [isApplyingAI, setIsApplyingAI] = useState(false);
 
-  const isSectionExpanded = (section: string) => {
-    return expandedSections.includes(section);
-  };
-
-  const handleToggle = (key: keyof EmployeePrivileges) => {
-    updatePrivileges.mutate({
-      [key]: !privileges[key]
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections({
+      ...expandedSections,
+      [section]: !expandedSections[section]
     });
   };
 
-  const getAIRecommendationsForCategory = async (category: string) => {
-    setAiLoading(prev => ({ ...prev, [category]: true }));
+  const handleApplyAIRecommendations = async (section: string) => {
+    if (!getAIRecommendations) return;
+    
+    setIsApplyingAI(true);
     try {
-      const recommendations = await getAIRecommendations(category);
-      
-      const updates: Partial<EmployeePrivileges> = {};
-      Object.entries(recommendations).forEach(([key, value]) => {
-        updates[key as keyof EmployeePrivileges] = value;
-      });
-      
-      updatePrivileges.mutate(updates);
+      const recommendations = await getAIRecommendations(section);
+      updatePrivileges.mutate(recommendations);
     } catch (error) {
-      console.error("Error getting AI recommendations:", error);
+      console.error("Error applying AI recommendations:", error);
     } finally {
-      setAiLoading(prev => ({ ...prev, [category]: false }));
+      setIsApplyingAI(false);
     }
   };
 
-  const PrivilegeSwitch = ({ 
-    name, 
-    value, 
-    label, 
-    description 
-  }: { 
-    name: keyof EmployeePrivileges; 
-    value: boolean; 
-    label: string; 
-    description: string;
-  }) => (
-    <div className="flex items-center justify-between py-2">
-      <div className="space-y-0.5">
-        <div className="flex items-center">
-          <span className="text-sm font-medium">{label}</span>
+  const renderSectionHeader = (
+    title: string, 
+    section: keyof typeof expandedSections, 
+    icon: React.ReactNode,
+    aiRecommendable: boolean = true
+  ) => (
+    <div className="flex items-center justify-between border-b pb-2 mb-4">
+      <div className="flex items-center gap-2">
+        {icon}
+        <h3 className="font-semibold text-lg">{title}</h3>
+      </div>
+      <div className="flex items-center gap-2">
+        {aiRecommendable && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Info className="h-4 w-4 text-muted-foreground ml-1.5 cursor-help" />
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleApplyAIRecommendations(section)}
+                  disabled={isApplyingAI || updatePrivileges.isPending}
+                  className="flex items-center gap-1"
+                >
+                  <Sparkles className="h-4 w-4 text-yellow-500" />
+                  <span>AI Suggest</span>
+                </Button>
               </TooltipTrigger>
-              <TooltipContent side="right" className="max-w-xs">
-                <p className="text-xs">{description}</p>
+              <TooltipContent>
+                <p>Apply AI-recommended privileges based on employee role</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          
-          {(name === "system_admin_access" || name === "can_delete_patient_info") && (
-            <Badge className="ml-2 bg-red-100 text-red-800 hover:bg-red-100" variant="outline">
-              <ShieldAlert className="h-3 w-3 mr-1" />
-              Security Risk
-            </Badge>
+        )}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => toggleSection(section)}
+          className="p-1 h-auto"
+        >
+          {expandedSections[section] ? (
+            <ChevronUp className="h-5 w-5" />
+          ) : (
+            <ChevronDown className="h-5 w-5" />
           )}
-        </div>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        </Button>
       </div>
-      <Switch 
-        checked={value} 
-        onCheckedChange={() => handleToggle(name)} 
-      />
     </div>
   );
 
-  return (
-    <TabsContent value="privileges" className="space-y-6 py-4">
-      <div className="grid grid-cols-1 gap-6">
-        <div className="space-y-0.5">
-          <h2 className="text-2xl font-bold tracking-tight">Access Privileges</h2>
-          <p className="text-muted-foreground">
-            Manage this employee's system access and privileges.
-          </p>
+  const renderPrivilegeItem = (
+    label: string,
+    field: keyof EmployeePrivileges,
+    description?: string,
+    isHighSecurity?: boolean
+  ) => {
+    if (!privileges) return null;
+
+    return (
+      <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">{label}</span>
+            {isHighSecurity && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant="destructive" className="ml-2 px-1.5 py-0">
+                      <Shield className="h-3 w-3 mr-1" />
+                      <span className="text-xs">High Security</span>
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">This privilege grants significant system access and should be assigned carefully</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+          {description && <p className="text-xs text-gray-500 mt-1">{description}</p>}
         </div>
+        <Checkbox
+          checked={privileges[field] as boolean}
+          onCheckedChange={() => 
+            updatePrivileges.mutate({ [field]: !privileges[field] })
+          }
+          disabled={updatePrivileges.isPending}
+          className="h-5 w-5"
+        />
+      </div>
+    );
+  };
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Core Privileges */}
+  return (
+    <TabsContent value="privileges" className="mt-0 animate-in fade-in-50">
+      <div className="p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader className="pb-3">
-              <Collapsible open={isSectionExpanded("core")}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Lock className="mr-2 h-5 w-5 text-muted-foreground" />
-                    <CardTitle>Core Access Privileges</CardTitle>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      disabled={aiLoading.core}
-                      onClick={() => getAIRecommendationsForCategory("core")}
-                    >
-                      {aiLoading.core ? "Processing..." : "AI Recommend"}
-                    </Button>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" onClick={() => toggleSection("core")}>
-                        <ChevronDown className={`h-4 w-4 transition-transform ${isSectionExpanded("core") ? "" : "-rotate-90"}`} />
-                      </Button>
-                    </CollapsibleTrigger>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Basic access controls for patient data and core functionality
-                </p>
-                <CollapsibleContent>
-                  <CardContent className="pt-3">
-                    <div className="space-y-4">
-                      <PrivilegeSwitch
-                        name="can_view_patient_info"
-                        value={privileges.can_view_patient_info}
-                        label="View Patient Info"
-                        description="Can view patient personal and medical information"
-                      />
-                      <PrivilegeSwitch
-                        name="can_edit_patient_info"
-                        value={privileges.can_edit_patient_info}
-                        label="Edit Patient Info"
-                        description="Can modify patient personal and medical information"
-                      />
-                      <PrivilegeSwitch
-                        name="can_delete_patient_info"
-                        value={privileges.can_delete_patient_info}
-                        label="Delete Patient Info"
-                        description="Can permanently remove patient information from the system"
-                      />
-                      <Separator />
-                      <PrivilegeSwitch
-                        name="can_view_billing_info"
-                        value={privileges.can_view_billing_info}
-                        label="View Billing Info"
-                        description="Can access patient billing and insurance information"
-                      />
-                      <PrivilegeSwitch
-                        name="can_edit_billing_info"
-                        value={privileges.can_edit_billing_info}
-                        label="Edit Billing Info"
-                        description="Can modify billing records and payment information"
-                      />
-                      <PrivilegeSwitch
-                        name="can_delete_billing_info"
-                        value={privileges.can_delete_billing_info}
-                        label="Delete Billing Info"
-                        description="Can remove billing records from the system"
-                      />
-                      <Separator />
-                      <PrivilegeSwitch
-                        name="can_view_dispatch_info"
-                        value={privileges.can_view_dispatch_info}
-                        label="View Dispatch Info"
-                        description="Can see transport and dispatch information"
-                      />
-                      <PrivilegeSwitch
-                        name="can_edit_dispatch_info"
-                        value={privileges.can_edit_dispatch_info}
-                        label="Edit Dispatch Info"
-                        description="Can modify transport and dispatch details"
-                      />
-                      <PrivilegeSwitch
-                        name="can_delete_dispatch_info"
-                        value={privileges.can_delete_dispatch_info}
-                        label="Delete Dispatch Info"
-                        description="Can remove dispatch records from the system"
-                      />
-                      <Separator />
-                      <PrivilegeSwitch
-                        name="can_view_reports"
-                        value={privileges.can_view_reports}
-                        label="View Reports"
-                        description="Can access system reports and analytics"
-                      />
-                      <PrivilegeSwitch
-                        name="can_create_reports"
-                        value={privileges.can_create_reports}
-                        label="Create Reports"
-                        description="Can generate new reports in the system"
-                      />
-                      <PrivilegeSwitch
-                        name="can_edit_reports"
-                        value={privileges.can_edit_reports}
-                        label="Edit Reports"
-                        description="Can modify existing reports"
-                      />
-                      <PrivilegeSwitch
-                        name="can_delete_reports"
-                        value={privileges.can_delete_reports}
-                        label="Delete Reports"
-                        description="Can remove reports from the system"
-                      />
-                      <Separator />
-                      <PrivilegeSwitch
-                        name="can_use_ai_assistance"
-                        value={privileges.can_use_ai_assistance}
-                        label="Use AI Assistance"
-                        description="Can use AI tools for recommendations and insights"
-                      />
-                    </div>
-                  </CardContent>
-                </CollapsibleContent>
-              </Collapsible>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5 text-blue-500" />
+                Patient Information Access
+              </CardTitle>
+              <CardDescription>
+                Control employee access to patient data
+              </CardDescription>
             </CardHeader>
+            <CardContent>
+              {renderSectionHeader("Patient Info", "patient", <User className="h-5 w-5 text-blue-500" />)}
+              {expandedSections.patient && (
+                <>
+                  {renderPrivilegeItem(
+                    "View Patient Information", 
+                    "can_view_patient_info",
+                    "Access to view patient demographics, medical history, and contact details"
+                  )}
+                  {renderPrivilegeItem(
+                    "Edit Patient Information", 
+                    "can_edit_patient_info",
+                    "Ability to update patient records and modify patient data"
+                  )}
+                  {renderPrivilegeItem(
+                    "Delete Patient Information", 
+                    "can_delete_patient_info",
+                    "Permission to remove patient records from the system",
+                    true
+                  )}
+                </>
+              )}
+            </CardContent>
           </Card>
 
-          {/* PCR Privileges */}
           <Card>
             <CardHeader className="pb-3">
-              <Collapsible open={isSectionExpanded("pcr")}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <FileText className="mr-2 h-5 w-5 text-muted-foreground" />
-                    <CardTitle>PCR Privileges</CardTitle>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      disabled={aiLoading.pcr}
-                      onClick={() => getAIRecommendationsForCategory("pcr")}
-                    >
-                      {aiLoading.pcr ? "Processing..." : "AI Recommend"}
-                    </Button>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" onClick={() => toggleSection("pcr")}>
-                        <ChevronDown className={`h-4 w-4 transition-transform ${isSectionExpanded("pcr") ? "" : "-rotate-90"}`} />
-                      </Button>
-                    </CollapsibleTrigger>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  PCR creation and management capabilities
-                </p>
-                <CollapsibleContent>
-                  <CardContent className="pt-3">
-                    <div className="space-y-4">
-                      <PrivilegeSwitch
-                        name="pcr_auto_duplication"
-                        value={privileges.pcr_auto_duplication}
-                        label="PCR Auto-Duplication"
-                        description="Can use automated duplication features for PCRs"
-                      />
-                      <PrivilegeSwitch
-                        name="pcr_submit_incomplete"
-                        value={privileges.pcr_submit_incomplete}
-                        label="Submit Incomplete PCR"
-                        description="Can submit PCRs with incomplete information"
-                      />
-                      <PrivilegeSwitch
-                        name="pcr_narrative_composer"
-                        value={privileges.pcr_narrative_composer}
-                        label="Narrative Composer"
-                        description="Can use the advanced narrative composition tool"
-                      />
-                      <PrivilegeSwitch
-                        name="pcr_narrative_cut_paste"
-                        value={privileges.pcr_narrative_cut_paste}
-                        label="Cut & Paste Narratives"
-                        description="Can copy and paste content into PCR narratives"
-                      />
-                      <PrivilegeSwitch
-                        name="pcr_auto_launch"
-                        value={privileges.pcr_auto_launch}
-                        label="Auto-Launch PCR"
-                        description="PCR automatically launches with dispatch"
-                      />
-                    </div>
-                  </CardContent>
-                </CollapsibleContent>
-              </Collapsible>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-green-500" />
+                Billing System Access
+              </CardTitle>
+              <CardDescription>
+                Manage access to financial and billing functions
+              </CardDescription>
             </CardHeader>
+            <CardContent>
+              {renderSectionHeader("Billing Info", "billing", <DollarSign className="h-5 w-5 text-green-500" />)}
+              {expandedSections.billing && (
+                <>
+                  {renderPrivilegeItem(
+                    "View Billing Information", 
+                    "can_view_billing_info",
+                    "Access to view invoices, payments, and financial records"
+                  )}
+                  {renderPrivilegeItem(
+                    "Edit Billing Information", 
+                    "can_edit_billing_info",
+                    "Ability to update financial records, process payments, and modify billing data"
+                  )}
+                  {renderPrivilegeItem(
+                    "Delete Billing Information", 
+                    "can_delete_billing_info",
+                    "Permission to remove financial records from the system",
+                    true
+                  )}
+                </>
+              )}
+            </CardContent>
           </Card>
 
-          {/* Timeclock Privileges */}
           <Card>
             <CardHeader className="pb-3">
-              <Collapsible open={isSectionExpanded("timeclock")}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Clock className="mr-2 h-5 w-5 text-muted-foreground" />
-                    <CardTitle>Timeclock Privileges</CardTitle>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      disabled={aiLoading.timeclock}
-                      onClick={() => getAIRecommendationsForCategory("timeclock")}
-                    >
-                      {aiLoading.timeclock ? "Processing..." : "AI Recommend"}
-                    </Button>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" onClick={() => toggleSection("timeclock")}>
-                        <ChevronDown className={`h-4 w-4 transition-transform ${isSectionExpanded("timeclock") ? "" : "-rotate-90"}`} />
-                      </Button>
-                    </CollapsibleTrigger>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Timeclock and shift management access
-                </p>
-                <CollapsibleContent>
-                  <CardContent className="pt-3">
-                    <div className="space-y-4">
-                      <PrivilegeSwitch
-                        name="timeclock_flagging"
-                        value={privileges.timeclock_flagging}
-                        label="Timeclock Flagging"
-                        description="Can flag unusual timeclock entries for review"
-                      />
-                      <PrivilegeSwitch
-                        name="remote_timeclock"
-                        value={privileges.remote_timeclock}
-                        label="Remote Timeclock"
-                        description="Can clock in/out from remote locations"
-                      />
-                    </div>
-                  </CardContent>
-                </CollapsibleContent>
-              </Collapsible>
+              <CardTitle className="flex items-center gap-2">
+                <Ambulance className="h-5 w-5 text-red-500" />
+                Dispatch System Access
+              </CardTitle>
+              <CardDescription>
+                Control permissions for dispatch operations
+              </CardDescription>
             </CardHeader>
+            <CardContent>
+              {renderSectionHeader("Dispatch Info", "dispatch", <Ambulance className="h-5 w-5 text-red-500" />)}
+              {expandedSections.dispatch && (
+                <>
+                  {renderPrivilegeItem(
+                    "View Dispatch Information", 
+                    "can_view_dispatch_info",
+                    "Access to view dispatch records, crew assignments, and transport details"
+                  )}
+                  {renderPrivilegeItem(
+                    "Edit Dispatch Information", 
+                    "can_edit_dispatch_info",
+                    "Ability to update dispatch records, assign crews, and modify transport details"
+                  )}
+                  {renderPrivilegeItem(
+                    "Delete Dispatch Information", 
+                    "can_delete_dispatch_info",
+                    "Permission to remove dispatch records from the system",
+                    true
+                  )}
+                </>
+              )}
+            </CardContent>
           </Card>
 
-          {/* System Administration Privileges */}
           <Card>
             <CardHeader className="pb-3">
-              <Collapsible open={isSectionExpanded("system")}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Server className="mr-2 h-5 w-5 text-muted-foreground" />
-                    <CardTitle>System Administration</CardTitle>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      disabled={aiLoading.system}
-                      onClick={() => getAIRecommendationsForCategory("system")}
-                    >
-                      {aiLoading.system ? "Processing..." : "AI Recommend"}
-                    </Button>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" onClick={() => toggleSection("system")}>
-                        <ChevronDown className={`h-4 w-4 transition-transform ${isSectionExpanded("system") ? "" : "-rotate-90"}`} />
-                      </Button>
-                    </CollapsibleTrigger>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Advanced system administration privileges
-                </p>
-                <CollapsibleContent>
-                  <CardContent className="pt-3">
-                    <Alert className="mb-4 bg-amber-50 text-amber-800 border-amber-200">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription className="text-xs">
-                        These privileges grant extensive access to sensitive parts of the system.
-                        Only assign them to trusted administrators.
-                      </AlertDescription>
-                    </Alert>
-                    <div className="space-y-4">
-                      <PrivilegeSwitch
-                        name="system_admin_access"
-                        value={privileges.system_admin_access}
-                        label="System Admin Access"
-                        description="Full administrative access to system settings"
-                      />
-                      <PrivilegeSwitch
-                        name="audit_log_access"
-                        value={privileges.audit_log_access}
-                        label="Audit Log Access"
-                        description="Can view system audit logs and user activity"
-                      />
-                      <PrivilegeSwitch
-                        name="quality_assurance_access"
-                        value={privileges.quality_assurance_access}
-                        label="Quality Assurance Access"
-                        description="Can access quality assurance tools and reviews"
-                      />
-                    </div>
-                  </CardContent>
-                </CollapsibleContent>
-              </Collapsible>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-purple-500" />
+                Reports & Analytics
+              </CardTitle>
+              <CardDescription>
+                Manage report generation and analytics access
+              </CardDescription>
             </CardHeader>
+            <CardContent>
+              {renderSectionHeader("Reports", "reports", <FileText className="h-5 w-5 text-purple-500" />)}
+              {expandedSections.reports && (
+                <>
+                  {renderPrivilegeItem(
+                    "View Reports", 
+                    "can_view_reports",
+                    "Access to view system reports and analytics dashboards"
+                  )}
+                  {renderPrivilegeItem(
+                    "Create Reports", 
+                    "can_create_reports",
+                    "Ability to generate new reports and analytics"
+                  )}
+                  {renderPrivilegeItem(
+                    "Edit Reports", 
+                    "can_edit_reports",
+                    "Permission to modify existing reports and dashboards"
+                  )}
+                  {renderPrivilegeItem(
+                    "Delete Reports", 
+                    "can_delete_reports",
+                    "Ability to remove reports from the system"
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-orange-500" />
+                PCR Special Features
+              </CardTitle>
+              <CardDescription>
+                Patient Care Report specific privileges
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {renderSectionHeader("PCR Features", "pcr", <FileText className="h-5 w-5 text-orange-500" />)}
+              {expandedSections.pcr && (
+                <>
+                  {renderPrivilegeItem(
+                    "PCR Auto-Duplication", 
+                    "pcr_auto_duplication",
+                    "Create PCR records faster by duplicating previous records or using templates"
+                  )}
+                  {renderPrivilegeItem(
+                    "PCR Submit While Incomplete", 
+                    "pcr_submit_incomplete",
+                    "Allowed to submit PCRs to QA even though required fields are incomplete",
+                    true
+                  )}
+                  {renderPrivilegeItem(
+                    "PCR Narrative Composer", 
+                    "pcr_narrative_composer",
+                    "Allowed to use AutoCompose when writing the narrative"
+                  )}
+                  {renderPrivilegeItem(
+                    "PCR Narrative Cut and Paste", 
+                    "pcr_narrative_cut_paste",
+                    "Allowed to cut and paste text for the narrative"
+                  )}
+                  {renderPrivilegeItem(
+                    "Auto-launch Offline PCR", 
+                    "pcr_auto_launch",
+                    "Automatically launch the offline PCR when the crew member clicks 'Enroute'"
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-blue-500" />
+                Timeclock Management
+              </CardTitle>
+              <CardDescription>
+                Time tracking and management privileges
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {renderSectionHeader("Timeclock Features", "timeclock", <Clock className="h-5 w-5 text-blue-500" />)}
+              {expandedSections.timeclock && (
+                <>
+                  {renderPrivilegeItem(
+                    "Timeclock Flagging", 
+                    "timeclock_flagging",
+                    "Allowed to set and clear flags in the timeclock system. Captains, dispatchers, and HR typically have this privilege"
+                  )}
+                  {renderPrivilegeItem(
+                    "Remote Timeclock", 
+                    "remote_timeclock",
+                    "Allowed to clock-in and clock-out from anywhere, not restricted to station locations",
+                    true
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-gray-500" />
+                System Administration
+              </CardTitle>
+              <CardDescription>
+                High-level system access controls
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {renderSectionHeader("System Access", "system", <Settings className="h-5 w-5 text-gray-500" />)}
+              {expandedSections.system && (
+                <>
+                  {renderPrivilegeItem(
+                    "System Administrator Access", 
+                    "system_admin_access",
+                    "Full administrative access to configure system settings",
+                    true
+                  )}
+                  {renderPrivilegeItem(
+                    "Audit Log Access", 
+                    "audit_log_access",
+                    "Ability to view detailed system audit logs and user activity",
+                    true
+                  )}
+                  {renderPrivilegeItem(
+                    "Quality Assurance Access", 
+                    "quality_assurance_access",
+                    "Access to QA tools and ability to review PCRs"
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Robot className="h-5 w-5 text-indigo-500" />
+                AI & Automation Features
+              </CardTitle>
+              <CardDescription>
+                Access to AI-assisted tools and automation
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {renderSectionHeader("AI Features", "ai", <Robot className="h-5 w-5 text-indigo-500" />)}
+              {expandedSections.ai && (
+                <>
+                  {renderPrivilegeItem(
+                    "Use AI Assistance", 
+                    "can_use_ai_assistance",
+                    "Access to AI-powered tools for reports, narratives, and suggestions"
+                  )}
+                </>
+              )}
+            </CardContent>
           </Card>
         </div>
       </div>
     </TabsContent>
-  );
-}
-
-function TabsContent({ value, className, children }: { value: string; className?: string; children: React.ReactNode }) {
-  return (
-    <div role="tabpanel" hidden={value !== "privileges"} className={className}>
-      {children}
-    </div>
   );
 }
