@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { HRLayout } from "@/components/layout/HRLayout";
@@ -16,6 +15,7 @@ import { DocumentsTab } from "@/components/hr/tabs/DocumentsTab";
 import { IncidentsTab } from "@/components/hr/tabs/IncidentsTab";
 import { PlaceholderTab } from "@/components/hr/tabs/PlaceholderTab";
 import { AchievementsTab } from "@/components/hr/tabs/AchievementsTab";
+import { NotificationsTab } from "@/components/hr/tabs/NotificationsTab";
 import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
 import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
 import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
@@ -35,7 +35,6 @@ const EmployeeProfile = () => {
     updateEmployee.mutate(data);
   };
 
-  // Render the active tab content
   const renderActiveTabContent = () => {
     switch (activeTab) {
       case "identity":
@@ -94,7 +93,7 @@ const EmployeeProfile = () => {
       case "achievements":
         return <AchievementsTab />;
       case "notifications":
-        return <PlaceholderTab value="notifications" title="Notification Preferences" />;
+        return <NotificationsTab employeeId={employeeId} />;
       default:
         return null;
     }
