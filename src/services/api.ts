@@ -65,29 +65,27 @@ export interface FetchResourceParams {
 }
 
 // Fixed generic function to avoid excessive type instantiation
-export async function fetchResource<T>(
+export async function fetchResource<T extends Record<string, any>>(
   resourceName: string,
   params?: FetchResourceParams
 ): Promise<{ data: T[] | null; count: number | null; error: string | null }> {
   try {
-    // Type casting to any to avoid excessive type instantiation errors
-    // This is safe because we're explicitly controlling the query building
-    let query = supabase.from(resourceName as any).select("*", { count: "exact" });
+    const query = supabase.from(resourceName).select("*", { count: "exact" });
 
     if (params?.search) {
-      query = query.or(`name.ilike.%${params.search}%,description.ilike.%${params.search}%`);
+      query.or(`name.ilike.%${params.search}%,description.ilike.%${params.search}%`);
     }
 
     if (params?.filters) {
       Object.entries(params.filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          query = query.eq(key, value);
+          query.eq(key, value);
         }
       });
     }
 
     if (params?.sort) {
-      query = query.order(params.sort.field, {
+      query.order(params.sort.field, {
         ascending: params.sort.direction === 'asc',
       });
     }
@@ -96,7 +94,7 @@ export async function fetchResource<T>(
       const { page, pageSize } = params.pagination;
       const start = (page - 1) * pageSize;
       const end = start + pageSize - 1;
-      query = query.range(start, end);
+      query.range(start, end);
     }
 
     const { data, error, count } = await query;
