@@ -24,7 +24,8 @@ export const incidentAnalysisService = {
           description: data.description,
           severity: data.severity,
           vehicleInvolved: data.vehicleInvolved,
-          shiftData
+          shiftData,
+          subject: data.subject // Pass the subject to the edge function
         }
       });
       
@@ -37,7 +38,10 @@ export const incidentAnalysisService = {
       if (analysisResult.analysis) {
         const { error: updateError } = await supabase
           .from('employee_incidents')
-          .update({ ai_analysis: analysisResult.analysis })
+          .update({ 
+            ai_analysis: analysisResult.analysis,
+            subject: data.subject // Also store the subject in the database
+          })
           .eq('id', incidentId);
         
         if (updateError) {

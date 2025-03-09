@@ -23,7 +23,7 @@ export function PerformanceTab() {
         <CardContent className="pt-0 pb-2">
           <p className="text-muted-foreground">
             Comprehensive performance metrics and AI analysis of work history, timeliness, and protocol adherence.
-            AI can generate performance write-ups based on employee data.
+            AI can generate performance write-ups for various subjects including missed punches, tardiness, PCR completion, and more.
           </p>
         </CardContent>
       </Card>
