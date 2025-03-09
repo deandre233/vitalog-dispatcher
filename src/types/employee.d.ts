@@ -1,3 +1,4 @@
+
 export interface Employee {
   id: string;
   first_name: string;
@@ -62,4 +63,23 @@ export interface EmployeePrivileges {
   can_use_ai_assistance: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface EmployeeNotification {
+  id: string;
+  employee_id: string;
+  event_type: string;
+  is_enabled: boolean;
+  channel: "sms" | "email" | "push" | "in_app";
+}
+
+export interface EmployeeCertification {
+  id: string;
+  employee_id: string;
+  certification_type: string;
+  certification_number: string;
+  issue_date: string;
+  expiration_date: string;
+  issuing_authority: string;
+  status: "active" | "expired" | "pending" | "revoked";
 }

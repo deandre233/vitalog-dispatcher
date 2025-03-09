@@ -1,61 +1,88 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { HRLayout } from "@/components/layout/HRLayout";
+import { EmployeeProfileTabs } from "@/components/hr/EmployeeProfileTabs";
+import { IdentityTab } from "@/components/hr/tabs/IdentityTab";
 import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
 import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
+import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
 import { Button } from "@/components/ui/button";
+import { TabsContent } from "@/components/ui/tabs";
+import { ArrowLeft, Save } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
-import type { EmployeeRole, EmployeePrivileges } from "@/types/employee";
 
 const EmployeeProfile = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("identity");
+  
   const { roles, isLoading: loadingRoles, updateRole } = useEmployeeRoles(employeeId);
   const { privileges, isLoading: loadingPrivileges, updatePrivileges } = useEmployeePrivileges(employeeId);
+  const { employee, isLoading: loadingEmployee, updateEmployee } = useEmployeeDetails(employeeId);
 
-  const [loading, setLoading] = useState(true);
+  const isLoading = loadingRoles || loadingPrivileges || loadingEmployee;
 
-  useEffect(() => {
-    if (!loadingRoles && !loadingPrivileges) {
-      setLoading(false);
-    }
-  }, [loadingRoles, loadingPrivileges]);
-
-  const handleRoleToggle = (role: keyof EmployeeRole) => {
-    if (!roles) return;
-    updateRole.mutate({
-      [role]: !roles[role]
-    });
+  const handleEmployeeUpdate = (data: Partial<typeof employee>) => {
+    updateEmployee.mutate(data);
   };
-
-  const handleSupervisorRoleChange = (value: EmployeeRole['supervisor_role']) => {
-    updateRole.mutate({
-      supervisor_role: value
-    });
-  };
-
-  const handlePrivilegeToggle = (privilege: keyof EmployeePrivileges) => {
-    if (!privileges) return;
-    updatePrivileges.mutate({
-      [privilege]: !privileges[privilege]
-    });
-  };
-
-  if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-2xl font-bold">Employee Profile</h1>
-      
-      <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Roles</h2>
+    <HRLayout>
+      <div className="bg-white border-b">
+        <div className="container mx-auto py-4 px-6 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate("/employees")}
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">
+                {employee?.first_name} {employee?.last_name}
+              </h1>
+              <p className="text-gray-500 text-sm">
+                {employee?.certification_level} • ID: {employee?.readable_id || employee?.id?.substring(0, 8)}
+              </p>
+            </div>
+          </div>
+          <div className="flex space-x-2">
+            <Button variant="outline">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Previous Employee
+            </Button>
+            <Button variant="outline">
+              Next Employee <ArrowLeft className="ml-2 h-4 w-4 rotate-180" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto">
+        <EmployeeProfileTabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        >
+          <IdentityTab 
+            employee={employee} 
+            isLoading={isLoading} 
+            onSave={handleEmployeeUpdate} 
+          />
+          
+          <TabsContent value="roles" className="mt-0 animate-in fade-in-50">
+            <div className="p-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Employee Roles</h2>
+                <div className="space-y-6">
         
         <div className="grid gap-4">
           <div className="flex items-center justify-between">
             <label className="font-medium">Crew Member</label>
             <Switch
               checked={roles?.is_crew_member}
-              onCheckedChange={() => handleRoleToggle('is_crew_member')}
+              onCheckedChange={() => updateRole.mutate({is_crew_member: !roles?.is_crew_member})}
             />
           </div>
 
@@ -63,7 +90,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">Supervisor</label>
             <Switch
               checked={roles?.is_supervisor}
-              onCheckedChange={() => handleRoleToggle('is_supervisor')}
+              onCheckedChange={() => updateRole.mutate({is_supervisor: !roles?.is_supervisor})}
             />
           </div>
 
@@ -72,7 +99,7 @@ const EmployeeProfile = () => {
               <label className="font-medium block mb-2">Supervisor Role</label>
               <Select
                 value={roles.supervisor_role}
-                onValueChange={handleSupervisorRoleChange}
+                onValueChange={(value) => updateRole.mutate({supervisor_role: value})}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select role" />
@@ -91,7 +118,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">Biller</label>
             <Switch
               checked={roles?.is_biller}
-              onCheckedChange={() => handleRoleToggle('is_biller')}
+              onCheckedChange={() => updateRole.mutate({is_biller: !roles?.is_biller})}
             />
           </div>
 
@@ -99,7 +126,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">Dispatcher</label>
             <Switch
               checked={roles?.is_dispatcher}
-              onCheckedChange={() => handleRoleToggle('is_dispatcher')}
+              onCheckedChange={() => updateRole.mutate({is_dispatcher: !roles?.is_dispatcher})}
             />
           </div>
 
@@ -107,7 +134,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">QA Reviewer</label>
             <Switch
               checked={roles?.is_qa_reviewer}
-              onCheckedChange={() => handleRoleToggle('is_qa_reviewer')}
+              onCheckedChange={() => updateRole.mutate({is_qa_reviewer: !roles?.is_qa_reviewer})}
             />
           </div>
 
@@ -115,7 +142,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">HR</label>
             <Switch
               checked={roles?.is_hr}
-              onCheckedChange={() => handleRoleToggle('is_hr')}
+              onCheckedChange={() => updateRole.mutate({is_hr: !roles?.is_hr})}
             />
           </div>
 
@@ -123,7 +150,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">Mechanic</label>
             <Switch
               checked={roles?.is_mechanic}
-              onCheckedChange={() => handleRoleToggle('is_mechanic')}
+              onCheckedChange={() => updateRole.mutate({is_mechanic: !roles?.is_mechanic})}
             />
           </div>
 
@@ -131,7 +158,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">Salesperson</label>
             <Switch
               checked={roles?.is_salesperson}
-              onCheckedChange={() => handleRoleToggle('is_salesperson')}
+              onCheckedChange={() => updateRole.mutate({is_salesperson: !roles?.is_salesperson})}
             />
           </div>
 
@@ -139,7 +166,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">Medical Director</label>
             <Switch
               checked={roles?.is_medical_director}
-              onCheckedChange={() => handleRoleToggle('is_medical_director')}
+              onCheckedChange={() => updateRole.mutate({is_medical_director: !roles?.is_medical_director})}
             />
           </div>
 
@@ -147,7 +174,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">Onlooker</label>
             <Switch
               checked={roles?.is_onlooker}
-              onCheckedChange={() => handleRoleToggle('is_onlooker')}
+              onCheckedChange={() => updateRole.mutate({is_onlooker: !roles?.is_onlooker})}
             />
           </div>
 
@@ -187,7 +214,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">Can See Non-Emergent</label>
             <Switch
               checked={roles?.can_see_non_emergent}
-              onCheckedChange={() => handleRoleToggle('can_see_non_emergent')}
+              onCheckedChange={() => updateRole.mutate({can_see_non_emergent: !roles?.can_see_non_emergent})}
             />
           </div>
 
@@ -195,7 +222,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">Administrator</label>
             <Switch
               checked={roles?.is_administrator}
-              onCheckedChange={() => handleRoleToggle('is_administrator')}
+              onCheckedChange={() => updateRole.mutate({is_administrator: !roles?.is_administrator})}
             />
           </div>
 
@@ -203,7 +230,7 @@ const EmployeeProfile = () => {
             <label className="font-medium">Principal</label>
             <Switch
               checked={roles?.is_principal}
-              onCheckedChange={() => handleRoleToggle('is_principal')}
+              onCheckedChange={() => updateRole.mutate({is_principal: !roles?.is_principal})}
             />
           </div>
 
@@ -211,16 +238,20 @@ const EmployeeProfile = () => {
             <label className="font-medium">Provisional</label>
             <Switch
               checked={roles?.is_provisional}
-              onCheckedChange={() => handleRoleToggle('is_provisional')}
+              onCheckedChange={() => updateRole.mutate({is_provisional: !roles?.is_provisional})}
             />
           </div>
         </div>
       </div>
+              </div>
+            </div>
+          </TabsContent>
 
-      <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Privileges</h2>
-        
-        <div className="grid gap-4">
+          <TabsContent value="privileges" className="mt-0 animate-in fade-in-50">
+            <div className="p-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Employee Privileges</h2>
+                <div className="grid gap-4">
           <div className="space-y-4">
             <h3 className="font-medium">Patient Information</h3>
             <div className="ml-4 space-y-2">
@@ -228,21 +259,21 @@ const EmployeeProfile = () => {
                 <label>View</label>
                 <Switch
                   checked={privileges?.can_view_patient_info}
-                  onCheckedChange={() => handlePrivilegeToggle('can_view_patient_info')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_view_patient_info: !privileges?.can_view_patient_info})}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <label>Edit</label>
                 <Switch
                   checked={privileges?.can_edit_patient_info}
-                  onCheckedChange={() => handlePrivilegeToggle('can_edit_patient_info')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_edit_patient_info: !privileges?.can_edit_patient_info})}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <label>Delete</label>
                 <Switch
                   checked={privileges?.can_delete_patient_info}
-                  onCheckedChange={() => handlePrivilegeToggle('can_delete_patient_info')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_delete_patient_info: !privileges?.can_delete_patient_info})}
                 />
               </div>
             </div>
@@ -255,21 +286,21 @@ const EmployeeProfile = () => {
                 <label>View</label>
                 <Switch
                   checked={privileges?.can_view_billing_info}
-                  onCheckedChange={() => handlePrivilegeToggle('can_view_billing_info')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_view_billing_info: !privileges?.can_view_billing_info})}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <label>Edit</label>
                 <Switch
                   checked={privileges?.can_edit_billing_info}
-                  onCheckedChange={() => handlePrivilegeToggle('can_edit_billing_info')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_edit_billing_info: !privileges?.can_edit_billing_info})}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <label>Delete</label>
                 <Switch
                   checked={privileges?.can_delete_billing_info}
-                  onCheckedChange={() => handlePrivilegeToggle('can_delete_billing_info')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_delete_billing_info: !privileges?.can_delete_billing_info})}
                 />
               </div>
             </div>
@@ -282,21 +313,21 @@ const EmployeeProfile = () => {
                 <label>View</label>
                 <Switch
                   checked={privileges?.can_view_dispatch_info}
-                  onCheckedChange={() => handlePrivilegeToggle('can_view_dispatch_info')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_view_dispatch_info: !privileges?.can_view_dispatch_info})}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <label>Edit</label>
                 <Switch
                   checked={privileges?.can_edit_dispatch_info}
-                  onCheckedChange={() => handlePrivilegeToggle('can_edit_dispatch_info')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_edit_dispatch_info: !privileges?.can_edit_dispatch_info})}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <label>Delete</label>
                 <Switch
                   checked={privileges?.can_delete_dispatch_info}
-                  onCheckedChange={() => handlePrivilegeToggle('can_delete_dispatch_info')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_delete_dispatch_info: !privileges?.can_delete_dispatch_info})}
                 />
               </div>
             </div>
@@ -309,28 +340,28 @@ const EmployeeProfile = () => {
                 <label>View</label>
                 <Switch
                   checked={privileges?.can_view_reports}
-                  onCheckedChange={() => handlePrivilegeToggle('can_view_reports')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_view_reports: !privileges?.can_view_reports})}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <label>Create</label>
                 <Switch
                   checked={privileges?.can_create_reports}
-                  onCheckedChange={() => handlePrivilegeToggle('can_create_reports')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_create_reports: !privileges?.can_create_reports})}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <label>Edit</label>
                 <Switch
                   checked={privileges?.can_edit_reports}
-                  onCheckedChange={() => handlePrivilegeToggle('can_edit_reports')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_edit_reports: !privileges?.can_edit_reports})}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <label>Delete</label>
                 <Switch
                   checked={privileges?.can_delete_reports}
-                  onCheckedChange={() => handlePrivilegeToggle('can_delete_reports')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_delete_reports: !privileges?.can_delete_reports})}
                 />
               </div>
             </div>
@@ -343,14 +374,90 @@ const EmployeeProfile = () => {
                 <label>Use AI Assistance</label>
                 <Switch
                   checked={privileges?.can_use_ai_assistance}
-                  onCheckedChange={() => handlePrivilegeToggle('can_use_ai_assistance')}
+                  onCheckedChange={() => updatePrivileges.mutate({can_use_ai_assistance: !privileges?.can_use_ai_assistance})}
                 />
               </div>
             </div>
           </div>
         </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="demographics" className="mt-0 animate-in fade-in-50">
+            <div className="p-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Demographics</h2>
+                <p className="text-gray-600">This section contains demographic information about the employee.</p>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="payroll" className="mt-0 animate-in fade-in-50">
+            <div className="p-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Payroll Information</h2>
+                <p className="text-gray-600">This section contains payroll and compensation information.</p>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="certifications" className="mt-0 animate-in fade-in-50">
+            <div className="p-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Certifications</h2>
+                <p className="text-gray-600">This section contains employee certifications and licenses.</p>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="documents" className="mt-0 animate-in fade-in-50">
+            <div className="p-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Documents</h2>
+                <p className="text-gray-600">This section contains employee documents and files.</p>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="incidents" className="mt-0 animate-in fade-in-50">
+            <div className="p-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Incidents</h2>
+                <p className="text-gray-600">This section contains incident records related to this employee.</p>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="stats" className="mt-0 animate-in fade-in-50">
+            <div className="p-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Performance Statistics</h2>
+                <p className="text-gray-600">This section contains performance metrics and statistics.</p>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="achievements" className="mt-0 animate-in fade-in-50">
+            <div className="p-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Achievements</h2>
+                <p className="text-gray-600">This section contains employee achievements and recognition.</p>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="mt-0 animate-in fade-in-50">
+            <div className="p-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Notification Preferences</h2>
+                <p className="text-gray-600">This section contains notification settings for this employee.</p>
+              </div>
+            </div>
+          </TabsContent>
+        </EmployeeProfileTabs>
       </div>
-    </div>
+    </HRLayout>
   );
 };
 
