@@ -1,5 +1,6 @@
 
 import { DispatchStatus } from "../DispatchStatusBar";
+import { CongestionLevel } from "../../../types/service-queue";
 
 export const getProgressForStatus = (status: DispatchStatus): number => {
   switch (status) {
@@ -43,5 +44,29 @@ export const getStatusColor = (status: DispatchStatus): string => {
   }
 };
 
-// Define CongestionLevel type if not available in service-queue
-export type CongestionLevel = "low" | "medium" | "high" | "critical" | "unknown";
+// Add the missing functions for DispatchBoard.tsx
+export const filterDispatches = (dispatches: any[], type: string) => {
+  if (type === "unassigned") {
+    return dispatches.filter(dispatch => !dispatch.assigned);
+  } else if (type === "assigned") {
+    return dispatches.filter(dispatch => dispatch.assigned);
+  }
+  return dispatches;
+};
+
+export const simulateRealTimeUpdates = async (dispatch: any) => {
+  // Mock function to simulate real-time updates
+  // In a real implementation, this would likely connect to a websocket or similar
+  if (Math.random() > 0.8) {
+    const statuses = ["dispatch", "enroute", "onscene", "transporting", "destination", "available"];
+    const currentIndex = statuses.indexOf(dispatch.status);
+    if (currentIndex < statuses.length - 1) {
+      return {
+        ...dispatch,
+        status: statuses[currentIndex + 1],
+        lastUpdate: new Date().toISOString()
+      };
+    }
+  }
+  return dispatch;
+};

@@ -2,35 +2,25 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ApiResponse } from "@/types/api";
+import { Tables } from "@/integrations/supabase/types";
 import { PartnerTable } from "@/components/partner/PartnerTable";
 import { PartnerAdvancedSearch } from "@/components/partner/PartnerAdvancedSearch";
 import { PartnerMetrics } from "@/components/partner/PartnerMetrics";
 import { PartnerInsights } from "@/components/partner/PartnerInsights";
 import { MainLayout } from "@/components/layout/MainLayout";
 
-type Partner = {
-  id: string;
-  name: string;
-  partner_type: string;
-  status: string;
-  location: string;
-  contact_name: string;
-  contact_email: string;
-  contact_phone: string;
-  contract_start_date: string;
-  contract_end_date: string;
-  notes: string;
-  ai_recommendations: any;
-  created_at: string;
-  updated_at: string;
-};
+type Partner = Tables<"partners">;
 
 export function PartnerList() {
   const { toast } = useToast();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [filteredPartners, setFilteredPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hideInactive, setHideInactive] = useState(false);
+  const [nameFilter, setNameFilter] = useState<{ type: string; query: string }>({ 
+    type: "contains", 
+    query: "" 
+  });
 
   useEffect(() => {
     const fetchPartners = async () => {
@@ -67,6 +57,51 @@ export function PartnerList() {
     fetchPartners();
   }, [toast]);
 
+  // Apply filters when they change
+  useEffect(() => {
+    if (!partners.length) return;
+    
+    let filtered = [...partners];
+    
+    // Apply name filter
+    if (nameFilter.query) {
+      const query = nameFilter.query.toLowerCase();
+      
+      switch (nameFilter.type) {
+        case "contains":
+          filtered = filtered.filter(p => 
+            p.name.toLowerCase().includes(query)
+          );
+          break;
+        case "starts_with":
+          filtered = filtered.filter(p => 
+            p.name.toLowerCase().startsWith(query)
+          );
+          break;
+        case "exact_match":
+          filtered = filtered.filter(p => 
+            p.name.toLowerCase() === query
+          );
+          break;
+      }
+    }
+    
+    // Apply status filter
+    if (hideInactive) {
+      filtered = filtered.filter(p => p.status === "active");
+    }
+    
+    setFilteredPartners(filtered);
+  }, [partners, nameFilter, hideInactive]);
+
+  const handleNameFilterChange = (filter: { type: string; query: string }) => {
+    setNameFilter(filter);
+  };
+
+  const handleHideInactiveChange = (checked: boolean) => {
+    setHideInactive(checked);
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6 p-6">
@@ -74,17 +109,18 @@ export function PartnerList() {
           <div className="lg:w-3/4 space-y-6">
             <h1 className="text-3xl font-bold">Partner Management</h1>
             <PartnerAdvancedSearch 
-              partners={partners} 
-              setFilteredPartners={setFilteredPartners} 
+              onNameFilterChange={handleNameFilterChange}
+              onHideInactiveChange={handleHideInactiveChange}
+              hideInactive={hideInactive}
             />
             <PartnerTable 
               partners={filteredPartners} 
-              loading={loading} 
+              showInactive={!hideInactive}
             />
           </div>
           <div className="lg:w-1/4 space-y-6">
             <PartnerMetrics partners={partners} />
-            <PartnerInsights partners={partners} />
+            <PartnerInsights />
           </div>
         </div>
       </div>

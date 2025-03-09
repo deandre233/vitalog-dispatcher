@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -28,6 +27,11 @@ import {
   Phone
 } from "lucide-react";
 
+interface ExtendedEmployee extends Employee {
+  years_experience?: number;
+  phone?: string;
+}
+
 /**
  * Enhanced EmployeeDirectory Component
  * 
@@ -40,15 +44,14 @@ import {
 export function EmployeeDirectory() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
+  const [employees, setEmployees] = useState<ExtendedEmployee[]>([]);
+  const [filteredEmployees, setFilteredEmployees] = useState<ExtendedEmployee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [certFilter, setCertFilter] = useState<string>("all");
   const [stationFilter, setStationFilter] = useState<string>("all");
 
-  // Get unique stations and certification levels for filters
   const stations = useMemo(() => {
     const stationSet = new Set(employees.map(emp => emp.station || 'Unassigned'));
     return Array.from(stationSet);
@@ -75,8 +78,16 @@ export function EmployeeDirectory() {
           throw error;
         }
 
-        setEmployees(data || []);
-        setFilteredEmployees(data || []);
+        const employeesWithExperience = data?.map(emp => ({
+          ...emp,
+          years_experience: emp.first_hired_date 
+            ? Math.floor((new Date().getTime() - new Date(emp.first_hired_date).getTime()) / (1000 * 60 * 60 * 24 * 365))
+            : undefined,
+          phone: emp.mobile
+        })) || [];
+
+        setEmployees(employeesWithExperience);
+        setFilteredEmployees(employeesWithExperience);
         logger.info(`Successfully fetched ${data?.length || 0} employees`);
       } catch (error) {
         console.error('Error fetching employees:', error);
@@ -93,11 +104,9 @@ export function EmployeeDirectory() {
     fetchEmployees();
   }, [toast]);
 
-  // Filter employees based on search and filters
   useEffect(() => {
     let result = [...employees];
     
-    // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -108,14 +117,12 @@ export function EmployeeDirectory() {
       );
     }
     
-    // Apply certification filter
     if (certFilter !== "all") {
       result = result.filter(
         employee => employee.certification_level === certFilter
       );
     }
     
-    // Apply station filter
     if (stationFilter !== "all") {
       result = result.filter(
         employee => employee.station === stationFilter
@@ -333,7 +340,7 @@ export function EmployeeDirectory() {
                             >
                               {employee.certification_level || 'Uncertified'}
                             </Badge>
-                            {employee.years_experience && (
+                            {employee.years_experience !== undefined && (
                               <Badge variant="outline" className="bg-[#F1F0FB] text-gray-700 border-[#E5DEFF]">
                                 <Clock className="h-3 w-3 mr-1" />
                                 {employee.years_experience} yrs
