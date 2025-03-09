@@ -5,16 +5,22 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Calendar, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useParams } from "react-router-dom";
+import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
 
 export function StatisticsSection() {
+  const { employeeId } = useParams<{ employeeId: string }>();
+  const { employee } = useEmployeeDetails(employeeId);
   const [startDate, setStartDate] = useState("12/09/2024");
   const [endDate, setEndDate] = useState("03/10/2025");
+
+  const employeeName = `${employee?.first_name || ''} ${employee?.last_name || ''}`;
 
   return (
     <Card className="mt-6">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle>Statistics</CardTitle>
+          <CardTitle>Performance Statistics for {employeeName}</CardTitle>
         </div>
       </CardHeader>
       <CardContent>
@@ -45,7 +51,7 @@ export function StatisticsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Employee Statistics */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-center bg-slate-100 py-2">As an employee</h3>
+            <h3 className="text-lg font-semibold mb-4 text-center bg-slate-100 py-2">{employeeName} as an employee</h3>
             <Table>
               <TableBody>
                 <TableRow className="bg-slate-200">
@@ -95,7 +101,7 @@ export function StatisticsSection() {
           {/* Crew Member Statistics */}
           <div>
             <div className="flex justify-between">
-              <h3 className="text-lg font-semibold mb-4 text-center bg-slate-100 py-2 flex-grow">As a crew member</h3>
+              <h3 className="text-lg font-semibold mb-4 text-center bg-slate-100 py-2 flex-grow">{employeeName} as a crew member</h3>
               <h3 className="text-lg font-semibold mb-4 text-center bg-slate-100 py-2 flex-grow">QA objection rates</h3>
               <div className="flex items-center justify-center mb-4 bg-slate-100 py-2 px-3">
                 <Download className="h-5 w-5 text-blue-600" />

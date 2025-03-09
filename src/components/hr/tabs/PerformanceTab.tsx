@@ -8,9 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { useParams } from "react-router-dom";
 import { StatisticsSection } from "./performance/StatisticsSection";
 import { PCRCompletenessSection } from "./performance/PCRCompletenessSection";
+import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
 
 export function PerformanceTab() {
   const { employeeId } = useParams<{ employeeId: string }>();
+  const { employee } = useEmployeeDetails(employeeId);
+
+  const employeeName = `${employee?.first_name || ''} ${employee?.last_name || ''}`;
 
   return (
     <TabsContent value="performance" className="mt-0 animate-in fade-in-50">
@@ -20,7 +24,10 @@ export function PerformanceTab() {
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Award className="h-6 w-6 text-amber-500" />
-              <CardTitle>Performance Summary</CardTitle>
+              <div>
+                <CardTitle>Performance Summary</CardTitle>
+                <p className="text-sm text-muted-foreground">Performance metrics for {employeeName}</p>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -72,7 +79,7 @@ export function PerformanceTab() {
 
             {/* Skills Breakdown */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Skills Breakdown</h3>
+              <h3 className="text-lg font-semibold">Skills Breakdown for {employeeName}</h3>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-1">
@@ -118,7 +125,10 @@ export function PerformanceTab() {
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Activity className="h-6 w-6 text-blue-600" />
-              <CardTitle>Performance Details</CardTitle>
+              <div>
+                <CardTitle>Performance Details</CardTitle>
+                <p className="text-sm text-muted-foreground">Detailed metrics for {employeeName}</p>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -203,7 +213,7 @@ export function PerformanceTab() {
                   </div>
                   
                   <div>
-                    <h3 className="text-lg font-semibold mb-3">Recent Achievements</h3>
+                    <h3 className="text-lg font-semibold mb-3">{employeeName}'s Recent Achievements</h3>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 p-2 rounded-md bg-amber-50 border border-amber-200">
                         <Award className="h-4 w-4 text-amber-600" />
@@ -224,7 +234,7 @@ export function PerformanceTab() {
               
               <TabsContent value="history">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold mb-3">Performance History</h3>
+                  <h3 className="text-lg font-semibold mb-3">{employeeName}'s Performance History</h3>
                   <div className="h-[300px] flex items-center justify-center border rounded-lg bg-muted/20">
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
                       <LineChart className="h-10 w-10" />
@@ -270,7 +280,7 @@ export function PerformanceTab() {
               
               <TabsContent value="goals">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold mb-3">Performance Goals</h3>
+                  <h3 className="text-lg font-semibold mb-3">Personal Performance Goals for {employeeName}</h3>
                   
                   <Card className="p-4 border-green-200 bg-green-50">
                     <h4 className="font-medium mb-2 flex items-center gap-2">
@@ -303,7 +313,7 @@ export function PerformanceTab() {
                   </Card>
                   
                   <div className="space-y-3 mt-6">
-                    <h4 className="font-medium">AI Recommendations</h4>
+                    <h4 className="font-medium">AI Recommendations for {employeeName}</h4>
                     <div className="space-y-2">
                       <div className="p-3 border rounded-md">
                         <div className="flex items-center gap-2 mb-1">

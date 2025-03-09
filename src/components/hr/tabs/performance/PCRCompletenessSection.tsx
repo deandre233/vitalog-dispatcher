@@ -1,12 +1,19 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useParams } from "react-router-dom";
+import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
 
 export function PCRCompletenessSection() {
+  const { employeeId } = useParams<{ employeeId: string }>();
+  const { employee } = useEmployeeDetails(employeeId);
+
+  const employeeName = `${employee?.first_name || ''} ${employee?.last_name || ''}`;
+
   return (
     <Card className="mt-6">
       <CardHeader className="pb-3">
-        <CardTitle>PCR completeness over time</CardTitle>
+        <CardTitle>{employeeName}'s PCR completeness over time</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="relative h-[400px] w-full bg-white">
@@ -97,7 +104,7 @@ export function PCRCompletenessSection() {
           
           <div className="mt-8 text-center">
             <Button variant="link" className="text-blue-600">
-              Export the list of PCR procedures performed
+              Export {employeeName}'s list of PCR procedures performed
             </Button>
           </div>
         </div>
