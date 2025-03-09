@@ -7,6 +7,7 @@ import { EmployeeHeader } from "@/components/hr/EmployeeHeader";
 import { IdentityTab } from "@/components/hr/tabs/IdentityTab";
 import { RolesTab } from "@/components/hr/tabs/RolesTab";
 import { PrivilegesTab } from "@/components/hr/tabs/PrivilegesTab";
+import { PayrollTab } from "@/components/hr/tabs/PayrollTab";
 import { PlaceholderTab } from "@/components/hr/tabs/PlaceholderTab";
 import { useEmployeeRoles } from "@/hooks/useEmployeeRoles";
 import { useEmployeePrivileges } from "@/hooks/useEmployeePrivileges";
@@ -51,14 +52,15 @@ const EmployeeProfile = () => {
             updatePrivileges={updatePrivileges} 
           />
 
-          <PlaceholderTab 
-            value="demographics" 
-            title="Demographics" 
+          <PayrollTab
+            employee={employee}
+            isLoading={isLoading}
+            onSave={handleEmployeeUpdate}
           />
 
           <PlaceholderTab 
-            value="payroll" 
-            title="Payroll Information" 
+            value="demographics" 
+            title="Demographics" 
           />
 
           <PlaceholderTab 

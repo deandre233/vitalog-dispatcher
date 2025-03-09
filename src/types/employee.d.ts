@@ -65,6 +65,21 @@ export interface EmployeePrivileges {
   updated_at: string;
 }
 
+export interface EmployeePayroll {
+  id: string;
+  employee_id: string;
+  effective_date: string;
+  end_date?: string;
+  pay_type: "hourly" | "salary";
+  pay_rate: number;
+  uses_timeclock: boolean;
+  access_codes?: string;
+  created_by: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface EmployeeNotification {
   id: string;
   employee_id: string;
