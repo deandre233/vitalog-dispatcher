@@ -87,9 +87,9 @@ const EmployeeProfile = () => {
       case "certifications":
         return <CertificationsTab />;
       case "documents":
-        return <DocumentsTab employeeId={employeeId} />;
+        return <DocumentsTab employeeId={employeeId || ""} />;
       case "incidents":
-        return <IncidentsTab employeeId={employeeId} />;
+        return <IncidentsTab employeeId={employeeId || ""} />;
       case "stats":
         return <PlaceholderTab value="stats" title="Performance Statistics" />;
       case "achievements":

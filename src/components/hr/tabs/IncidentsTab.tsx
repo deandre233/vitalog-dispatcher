@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,8 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useEmployeeIncidents, IncidentFormData } from "@/hooks/useEmployeeIncidents";
-import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
+import { useEmployeeIncidents, IncidentFormData, Incident } from "@/hooks/useEmployeeIncidents";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Calendar, CheckCircle, ChevronDown, Clock, FileText, Loader2, Shield, Truck, User } from "lucide-react";
 import { format } from "date-fns";
@@ -28,7 +26,7 @@ import {
 } from "@/components/ui/accordion";
 import { shiftRecordsService } from "@/services/shiftRecords";
 import { toast } from "sonner";
-import { Incident } from "@/hooks/useEmployeeIncidents";
+import { IncidentAnalysisResult } from "@/types/incidents";
 
 export function IncidentsTab({ employeeId }: { employeeId?: string }) {
   const { incidents, isLoading, isProcessing, createIncident, updateIncident, deleteIncident, getAIAnalysis } = useEmployeeIncidents(employeeId);
@@ -157,6 +155,35 @@ export function IncidentsTab({ employeeId }: { employeeId?: string }) {
     } catch (error) {
       console.error("Error resolving incident:", error);
       toast.error("Failed to resolve incident");
+    }
+  };
+
+  const getAnalysisData = (incident: Incident): IncidentAnalysisResult => {
+    const defaultData: IncidentAnalysisResult = {
+      summary: "Analysis not available",
+      riskLevel: "medium",
+      recommendedActions: [],
+      similarIncidents: "No data available",
+      preventionTips: []
+    };
+    
+    if (!incident.ai_analysis) return defaultData;
+    
+    try {
+      const analysis = typeof incident.ai_analysis === 'string' 
+        ? JSON.parse(incident.ai_analysis) 
+        : incident.ai_analysis;
+        
+      return {
+        summary: analysis.summary || defaultData.summary,
+        riskLevel: analysis.riskLevel || defaultData.riskLevel,
+        recommendedActions: Array.isArray(analysis.recommendedActions) ? analysis.recommendedActions : defaultData.recommendedActions,
+        similarIncidents: analysis.similarIncidents || defaultData.similarIncidents,
+        preventionTips: Array.isArray(analysis.preventionTips) ? analysis.preventionTips : defaultData.preventionTips
+      };
+    } catch (e) {
+      console.error("Error parsing analysis data:", e);
+      return defaultData;
     }
   };
 
@@ -318,54 +345,61 @@ export function IncidentsTab({ employeeId }: { employeeId?: string }) {
                               </AccordionTrigger>
                               <AccordionContent>
                                 <div className="space-y-3 p-2 text-sm">
-                                  {incident.ai_analysis.summary && (
-                                    <div>
-                                      <h5 className="font-medium">Summary</h5>
-                                      <p className="text-muted-foreground">{incident.ai_analysis.summary}</p>
-                                    </div>
-                                  )}
-                                  
-                                  {incident.ai_analysis.riskLevel && (
-                                    <div>
-                                      <h5 className="font-medium">Risk Level</h5>
-                                      <Badge variant={
-                                        incident.ai_analysis.riskLevel === "high" ? "destructive" : 
-                                        incident.ai_analysis.riskLevel === "medium" ? "default" : 
-                                        "outline"
-                                      }>
-                                        {incident.ai_analysis.riskLevel.charAt(0).toUpperCase() + incident.ai_analysis.riskLevel.slice(1)}
-                                      </Badge>
-                                    </div>
-                                  )}
-                                  
-                                  {incident.ai_analysis.recommendedActions && incident.ai_analysis.recommendedActions.length > 0 && (
-                                    <div>
-                                      <h5 className="font-medium">Recommended Actions</h5>
-                                      <ul className="list-disc pl-5 text-muted-foreground">
-                                        {incident.ai_analysis.recommendedActions.map((action: string, index: number) => (
-                                          <li key={index}>{action}</li>
-                                        ))}
-                                      </ul>
-                                    </div>
-                                  )}
-                                  
-                                  {incident.ai_analysis.preventionTips && incident.ai_analysis.preventionTips.length > 0 && (
-                                    <div>
-                                      <h5 className="font-medium">Prevention Tips</h5>
-                                      <ul className="list-disc pl-5 text-muted-foreground">
-                                        {incident.ai_analysis.preventionTips.map((tip: string, index: number) => (
-                                          <li key={index}>{tip}</li>
-                                        ))}
-                                      </ul>
-                                    </div>
-                                  )}
-                                  
-                                  {incident.ai_analysis.similarIncidents && (
-                                    <div>
-                                      <h5 className="font-medium">Similar Incidents</h5>
-                                      <p className="text-muted-foreground">{incident.ai_analysis.similarIncidents}</p>
-                                    </div>
-                                  )}
+                                  {(() => {
+                                    const analysis = getAnalysisData(incident);
+                                    return (
+                                      <>
+                                        {analysis.summary && (
+                                          <div>
+                                            <h5 className="font-medium">Summary</h5>
+                                            <p className="text-muted-foreground">{analysis.summary}</p>
+                                          </div>
+                                        )}
+                                        
+                                        {analysis.riskLevel && (
+                                          <div>
+                                            <h5 className="font-medium">Risk Level</h5>
+                                            <Badge variant={
+                                              analysis.riskLevel === "high" ? "destructive" : 
+                                              analysis.riskLevel === "medium" ? "default" : 
+                                              "outline"
+                                            }>
+                                              {analysis.riskLevel.charAt(0).toUpperCase() + analysis.riskLevel.slice(1)}
+                                            </Badge>
+                                          </div>
+                                        )}
+                                        
+                                        {analysis.recommendedActions && analysis.recommendedActions.length > 0 && (
+                                          <div>
+                                            <h5 className="font-medium">Recommended Actions</h5>
+                                            <ul className="list-disc pl-5 text-muted-foreground">
+                                              {analysis.recommendedActions.map((action: string, index: number) => (
+                                                <li key={index}>{action}</li>
+                                              ))}
+                                            </ul>
+                                          </div>
+                                        )}
+                                        
+                                        {analysis.preventionTips && analysis.preventionTips.length > 0 && (
+                                          <div>
+                                            <h5 className="font-medium">Prevention Tips</h5>
+                                            <ul className="list-disc pl-5 text-muted-foreground">
+                                              {analysis.preventionTips.map((tip: string, index: number) => (
+                                                <li key={index}>{tip}</li>
+                                              ))}
+                                            </ul>
+                                          </div>
+                                        )}
+                                        
+                                        {analysis.similarIncidents && (
+                                          <div>
+                                            <h5 className="font-medium">Similar Incidents</h5>
+                                            <p className="text-muted-foreground">{analysis.similarIncidents}</p>
+                                          </div>
+                                        )}
+                                      </>
+                                    )
+                                  })()}
                                 </div>
                               </AccordionContent>
                             </AccordionItem>

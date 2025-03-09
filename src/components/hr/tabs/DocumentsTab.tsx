@@ -1,486 +1,408 @@
 
-import { useState, useRef } from "react";
-import { useParams } from "react-router-dom";
-import { useEmployeeDetails } from "@/hooks/useEmployeeDetails";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { useEmployeeDocuments } from "@/hooks/useEmployeeDocuments";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
-} from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { 
-  FileText, 
-  Upload, 
-  Folder, 
-  Clock, 
-  Calendar,
-  CheckCircle2, 
-  AlertTriangle, 
-  FileQuestion,
-  Brain,
-  Search,
-  Download,
-  Trash2,
-  Plus,
-  FileUp,
-  Paperclip
-} from "lucide-react";
-import { format } from "date-fns";
-import { useEmployeeDocuments } from "@/hooks/useEmployeeDocuments";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { FileIcon, Shield, Calendar, Loader2, FileText, Download, Trash2, Microscope } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
-export function DocumentsTab() {
-  const { employeeId } = useParams<{ employeeId: string }>();
-  const { employee } = useEmployeeDetails(employeeId);
-  const { 
-    documents, 
-    isLoading, 
-    uploadDocument, 
-    deleteDocument, 
-    analyzeDocument 
-  } = useEmployeeDocuments(employeeId);
-  
-  const [activeTab, setActiveTab] = useState("all");
-  const [showUploadDialog, setShowUploadDialog] = useState(false);
+export function DocumentsTab({ employeeId }: { employeeId: string }) {
+  const { documents, isLoading, isProcessing, uploadDocument, deleteDocument, analyzeDocument } = useEmployeeDocuments(employeeId);
+  const [activeTab, setActiveTab] = useState("documents");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [documentType, setDocumentType] = useState("");
-  const [documentDate, setDocumentDate] = useState<Date | undefined>(undefined);
-  const [description, setDescription] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isUploading, setIsUploading] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const employeeName = `${employee?.first_name || ''} ${employee?.last_name || ''}`;
-  
-  const documentTypes = [
-    "Medical Clearance",
-    "Certification Documentation",
-    "Doctor's Note",
-    "Performance Review",
-    "Training Record",
-    "Accommodation Request",
-    "Incident Report",
-    "Corrective Action",
-    "Commendation",
-    "Compliance Documentation",
-    "Equipment Sign-off",
-    "Other"
-  ];
+  const [formData, setFormData] = useState({
+    type: "",
+    description: "",
+    date: new Date(),
+  });
+  const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setSelectedFile(file);
-    
-    // Auto-detect document type based on filename if possible
-    if (file) {
-      const filename = file.name.toLowerCase();
-      
-      if (filename.includes("cert") || filename.includes("certification")) {
-        setDocumentType("Certification Documentation");
-      } else if (filename.includes("doctor") || filename.includes("medical") || filename.includes("health")) {
-        setDocumentType("Doctor's Note");
-      } else if (filename.includes("review") || filename.includes("performance")) {
-        setDocumentType("Performance Review");
-      } else if (filename.includes("training")) {
-        setDocumentType("Training Record");
-      } else if (filename.includes("incident")) {
-        setDocumentType("Incident Report");
-      } else if (filename.includes("compliance")) {
-        setDocumentType("Compliance Documentation");
-      }
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
     }
   };
   
-  const handleSubmit = async () => {
-    if (!selectedFile || !documentType) {
-      toast.error("Please select a file and document type");
+  const handleFormChange = (key: string, value: string | Date) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedFile) {
       return;
     }
-    
-    setIsUploading(true);
     
     try {
       await uploadDocument({
         file: selectedFile,
-        type: documentType,
-        description: description,
-        date: documentDate || new Date(),
+        type: formData.type,
+        description: formData.description,
+        date: formData.date,
       });
       
-      toast.success("Document uploaded successfully");
-      setShowUploadDialog(false);
-      resetForm();
+      // Reset form
+      setSelectedFile(null);
+      setFormData({
+        type: "",
+        description: "",
+        date: new Date(),
+      });
+      setActiveTab("documents");
     } catch (error) {
       console.error("Error uploading document:", error);
-      toast.error("Failed to upload document");
-    } finally {
-      setIsUploading(false);
-    }
-  };
-  
-  const resetForm = () => {
-    setSelectedFile(null);
-    setDocumentType("");
-    setDocumentDate(undefined);
-    setDescription("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-  
-  const handleAnalyze = async (documentId: string) => {
-    setIsAnalyzing(documentId);
-    
-    try {
-      const result = await analyzeDocument(documentId);
-      
-      if (result?.success) {
-        toast.success("Document analyzed successfully");
-      } else {
-        toast.error("Failed to analyze document");
-      }
-    } catch (error) {
-      console.error("Error analyzing document:", error);
-      toast.error("Failed to analyze document");
-    } finally {
-      setIsAnalyzing(null);
     }
   };
   
   const handleDelete = async (documentId: string) => {
-    if (window.confirm("Are you sure you want to delete this document?")) {
-      try {
-        await deleteDocument(documentId);
-        toast.success("Document deleted successfully");
-      } catch (error) {
-        console.error("Error deleting document:", error);
-        toast.error("Failed to delete document");
-      }
+    try {
+      await deleteDocument(documentId);
+    } catch (error) {
+      console.error("Error deleting document:", error);
     }
   };
   
-  const getDocumentIcon = (type: string) => {
+  const handleAnalyze = async (documentId: string) => {
+    setIsAnalyzing(true);
+    try {
+      await analyzeDocument(documentId);
+      setSelectedDocument(null); // Reset to refresh the view
+    } catch (error) {
+      console.error("Error analyzing document:", error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+  
+  const getDocumentTypeColor = (type: string) => {
     switch (type) {
       case "Medical Clearance":
-      case "Doctor's Note":
-        return <FileText className="h-8 w-8 text-blue-600" />;
-      case "Certification Documentation":
-        return <CheckCircle2 className="h-8 w-8 text-green-600" />;
+        return "text-green-500";
+      case "Training Certificate":
+        return "text-blue-500";
+      case "License":
+        return "text-purple-500";
+      case "Certification":
+        return "text-indigo-500";
       case "Performance Review":
-        return <FileText className="h-8 w-8 text-purple-600" />;
-      case "Training Record":
-        return <FileText className="h-8 w-8 text-orange-600" />;
-      case "Incident Report":
-        return <AlertTriangle className="h-8 w-8 text-red-600" />;
-      case "Corrective Action":
-        return <AlertTriangle className="h-8 w-8 text-amber-600" />;
-      case "Commendation":
-        return <CheckCircle2 className="h-8 w-8 text-emerald-600" />;
+        return "text-orange-500";
+      case "Doctor's Note":
+        return "text-red-500";
       default:
-        return <FileQuestion className="h-8 w-8 text-gray-600" />;
+        return "text-gray-500";
     }
   };
   
-  const filteredDocuments = documents.filter(doc => {
-    // Filter by tab
-    if (activeTab !== "all" && doc.type !== activeTab) {
-      return false;
-    }
+  // Helper function to safely get document analysis data
+  const getDocumentAnalysis = (document: any) => {
+    if (!document.ai_analysis) return null;
     
-    // Filter by search
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        doc.type.toLowerCase().includes(query) ||
-        doc.description.toLowerCase().includes(query) ||
-        doc.filename.toLowerCase().includes(query) ||
-        (doc.ai_analysis && JSON.stringify(doc.ai_analysis).toLowerCase().includes(query))
-      );
+    try {
+      // Handle case where ai_analysis might be a string
+      return typeof document.ai_analysis === 'string' 
+        ? JSON.parse(document.ai_analysis) 
+        : document.ai_analysis;
+    } catch (e) {
+      console.error("Error parsing document analysis:", e);
+      return null;
     }
-    
-    return true;
-  });
-  
-  const renderDocumentList = () => {
-    if (isLoading) {
-      return (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-medical-primary"></div>
-        </div>
-      );
-    }
-    
-    if (filteredDocuments.length === 0) {
-      return (
-        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-          <Folder className="h-16 w-16 mb-4" />
-          <p className="text-lg font-medium">No documents found</p>
-          <p className="text-sm mt-2">
-            {searchQuery 
-              ? "Try adjusting your search query" 
-              : activeTab !== "all" 
-                ? `No ${activeTab} documents uploaded yet` 
-                : "Upload documents to get started"}
-          </p>
-          <Button 
-            className="mt-4" 
-            onClick={() => setShowUploadDialog(true)}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Upload Document
-          </Button>
-        </div>
-      );
-    }
-    
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredDocuments.map((doc) => (
-          <Card key={doc.id} className="overflow-hidden">
-            <div className="flex items-center p-4 bg-gray-50 border-b">
-              {getDocumentIcon(doc.type)}
-              <div className="ml-3 flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-gray-900 truncate">
-                  {doc.filename}
-                </h3>
-                <Badge variant="outline" className="mt-1">
-                  {doc.type}
-                </Badge>
-              </div>
-            </div>
-            <CardContent className="p-4">
-              <div className="flex flex-col space-y-3">
-                <div className="flex items-center text-sm text-gray-500">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  {format(new Date(doc.date), "MMM d, yyyy")}
-                </div>
-                
-                <div className="flex items-center text-sm text-gray-500">
-                  <Clock className="h-4 w-4 mr-2" />
-                  {format(new Date(doc.created_at), "MMM d, yyyy")}
-                </div>
-                
-                <p className="text-sm text-gray-700">
-                  {doc.description || "No description provided"}
-                </p>
-                
-                {doc.ai_analysis && (
-                  <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-100">
-                    <div className="flex items-center mb-1">
-                      <Brain className="h-4 w-4 text-blue-600 mr-1" />
-                      <span className="text-xs font-medium text-blue-700">AI Analysis</span>
-                    </div>
-                    <p className="text-xs text-blue-800">
-                      {typeof doc.ai_analysis === 'string' 
-                        ? doc.ai_analysis 
-                        : doc.ai_analysis.summary || JSON.stringify(doc.ai_analysis)}
-                    </p>
-                  </div>
-                )}
-                
-                <div className="flex space-x-2 mt-3">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1"
-                    onClick={() => window.open(doc.url, '_blank')}
-                  >
-                    <Download className="h-4 w-4 mr-1" />
-                    Download
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => handleAnalyze(doc.id)}
-                    disabled={!!isAnalyzing}
-                  >
-                    {isAnalyzing === doc.id ? (
-                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full mr-1" />
-                    ) : (
-                      <Brain className="h-4 w-4 mr-1" />
-                    )}
-                    Analyze
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-red-500 hover:bg-red-50 hover:text-red-600"
-                    onClick={() => handleDelete(doc.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
   };
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center">
-              <FileText className="mr-2 h-5 w-5 text-primary" />
-              Employee Documents: {employeeName}
-            </CardTitle>
-            <Button onClick={() => setShowUploadDialog(true)}>
-              <Upload className="mr-2 h-4 w-4" />
-              Upload Document
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Alert className="mb-6 bg-blue-50 border-blue-200">
-            <Brain className="h-4 w-4 text-blue-700" />
-            <AlertTitle className="text-blue-800">AI-Powered Document Processing</AlertTitle>
-            <AlertDescription className="text-blue-700">
-              Upload medical clearances, doctor's notes, and other documents. Our AI will analyze the content, 
-              extract important information, and flag any critical items for attention.
-            </AlertDescription>
-          </Alert>
-          
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input
-                placeholder="Search documents..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="flex justify-between items-center mb-4">
+          <TabsList>
+            <TabsTrigger value="documents" className="flex items-center">
+              <FileText className="mr-2 h-4 w-4" />
+              Documents
+            </TabsTrigger>
+            <TabsTrigger value="upload" className="flex items-center">
+              <FileIcon className="mr-2 h-4 w-4" />
+              Upload New
+            </TabsTrigger>
+          </TabsList>
+        </div>
+        
+        <TabsContent value="documents" className="space-y-4">
+          {isLoading ? (
+            <div className="flex justify-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-            
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
-              <TabsList>
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="Medical Clearance">Medical</TabsTrigger>
-                <TabsTrigger value="Doctor's Note">Notes</TabsTrigger>
-                <TabsTrigger value="Certification Documentation">Certs</TabsTrigger>
-                <TabsTrigger value="Performance Review">Performance</TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-          
-          <ScrollArea className="h-[600px] rounded-md">
-            {renderDocumentList()}
-          </ScrollArea>
-        </CardContent>
-      </Card>
-      
-      <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-        <DialogContent className="sm:max-w-[525px]">
-          <DialogHeader>
-            <DialogTitle>Upload Employee Document</DialogTitle>
-            <DialogDescription>
-              Upload a document for {employeeName}. The system will automatically process and analyze the document.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="file">Document File</Label>
-              <div className="flex items-center gap-2">
-                <Button
+          ) : documents.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground">No documents found</p>
+                <Button 
+                  className="mt-4" 
                   variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full h-24 flex flex-col items-center justify-center border-dashed"
+                  onClick={() => setActiveTab("upload")}
                 >
-                  <FileUp className="h-8 w-8 mb-2 text-gray-400" />
-                  <span className="text-sm text-gray-500">
-                    {selectedFile ? selectedFile.name : "Click to select a file"}
-                  </span>
-                  {selectedFile && (
-                    <span className="text-xs text-gray-400">
-                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                    </span>
-                  )}
+                  Upload a Document
                 </Button>
-                <input
-                  id="file"
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                />
-              </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4">
+              {documents.map((document: any) => {
+                const fileExt = document.filename.split('.').pop()?.toLowerCase();
+                const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(fileExt || '');
+                const isPDF = fileExt === 'pdf';
+                const documentType = document.type || "Unknown Type";
+                const typeColor = getDocumentTypeColor(documentType);
+                const analysis = getDocumentAnalysis(document);
+                
+                return (
+                  <Card key={document.id} className="overflow-hidden">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <CardTitle>{document.filename}</CardTitle>
+                            <Badge variant="outline">{documentType}</Badge>
+                          </div>
+                          <CardDescription className="mt-1 flex items-center">
+                            <Calendar className="mr-1 h-3 w-3" />
+                            {document.date ? format(new Date(document.date), "PPP") : 
+                             document.created_at ? format(new Date(document.created_at), "PPP") : "Unknown date"}
+                          </CardDescription>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              •••
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <a href={document.url} target="_blank" rel="noopener noreferrer">
+                                <Download className="mr-2 h-4 w-4" />
+                                Download
+                              </a>
+                            </DropdownMenuItem>
+                            {!analysis && (
+                              <DropdownMenuItem 
+                                onClick={() => handleAnalyze(document.id)}
+                                disabled={isAnalyzing}
+                              >
+                                <Microscope className="mr-2 h-4 w-4" />
+                                {isAnalyzing ? "Analyzing..." : "Analyze with AI"}
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem 
+                              onClick={() => setSelectedDocument(selectedDocument === document.id ? null : document.id)}
+                            >
+                              <FileText className="mr-2 h-4 w-4" />
+                              {selectedDocument === document.id ? "Hide Details" : "View Details"}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleDelete(document.id)}
+                              className="text-red-500 focus:text-red-500"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </CardHeader>
+                    
+                    {selectedDocument === document.id && (
+                      <CardContent className="pt-2 pb-4">
+                        <div className="space-y-4">
+                          <div>
+                            <h4 className="font-medium mb-1">Description</h4>
+                            <p className="text-sm text-muted-foreground">{document.description || "No description provided"}</p>
+                          </div>
+                          
+                          {isImage && (
+                            <div>
+                              <h4 className="font-medium mb-1">Preview</h4>
+                              <div className="mt-2 rounded-md overflow-hidden border border-gray-200">
+                                <a href={document.url} target="_blank" rel="noopener noreferrer">
+                                  <img src={document.url} alt={document.filename} className="max-w-full h-auto" />
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {isPDF && (
+                            <div>
+                              <h4 className="font-medium mb-1">PDF Document</h4>
+                              <Button asChild variant="outline" className="mt-2">
+                                <a href={document.url} target="_blank" rel="noopener noreferrer">
+                                  <FileText className="mr-2 h-4 w-4" />
+                                  Open PDF
+                                </a>
+                              </Button>
+                            </div>
+                          )}
+                          
+                          {analysis && (
+                            <Accordion type="single" collapsible className="w-full">
+                              <AccordionItem value="ai-analysis">
+                                <AccordionTrigger>
+                                  <span className="flex items-center text-sm font-medium">
+                                    <Shield className="mr-2 h-4 w-4" />
+                                    AI Analysis
+                                  </span>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                  <div className="space-y-3 p-2 text-sm">
+                                    {analysis.summary && (
+                                      <div>
+                                        <h5 className="font-medium">Summary</h5>
+                                        <p className="text-muted-foreground">{analysis.summary}</p>
+                                      </div>
+                                    )}
+                                    
+                                    {analysis.keyPoints && analysis.keyPoints.length > 0 && (
+                                      <div>
+                                        <h5 className="font-medium">Key Points</h5>
+                                        <ul className="list-disc pl-5 text-muted-foreground">
+                                          {analysis.keyPoints.map((point: string, index: number) => (
+                                            <li key={index}>{point}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                    
+                                    {analysis.recommendations && analysis.recommendations.length > 0 && (
+                                      <div>
+                                        <h5 className="font-medium">Recommendations</h5>
+                                        <ul className="list-disc pl-5 text-muted-foreground">
+                                          {analysis.recommendations.map((rec: string, index: number) => (
+                                            <li key={index}>{rec}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                    
+                                    {analysis.expiryDate && (
+                                      <div>
+                                        <h5 className="font-medium">Expiry Date</h5>
+                                        <p className="text-muted-foreground">{analysis.expiryDate}</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
+                          )}
+                        </div>
+                      </CardContent>
+                    )}
+                  </Card>
+                );
+              })}
             </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="type">Document Type</Label>
-              <Select value={documentType} onValueChange={setDocumentType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select document type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {documentTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="date">Document Date</Label>
-              <DatePicker
-                date={documentDate}
-                onDateChange={setDocumentDate}
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="description">Description (Optional)</Label>
-              <Input
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter a description of the document"
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowUploadDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} disabled={isUploading || !selectedFile || !documentType}>
-              {isUploading ? (
-                <>
-                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Paperclip className="mr-2 h-4 w-4" />
-                  Upload Document
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="upload">
+          <Card>
+            <CardHeader>
+              <CardTitle>Upload Document</CardTitle>
+              <CardDescription>
+                Upload employee-related documents such as certificates, licenses, or medical clearances
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit}>
+                <div className="grid gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="file">Select File</Label>
+                    <Input
+                      id="file"
+                      type="file"
+                      onChange={handleFileChange}
+                      required
+                    />
+                    {selectedFile && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Selected: {selectedFile.name} ({Math.round(selectedFile.size / 1024)} KB)
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="type">Document Type</Label>
+                    <Select 
+                      value={formData.type}
+                      onValueChange={(value) => handleFormChange("type", value)}
+                      required
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select document type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Medical Clearance">Medical Clearance</SelectItem>
+                        <SelectItem value="Training Certificate">Training Certificate</SelectItem>
+                        <SelectItem value="License">License</SelectItem>
+                        <SelectItem value="Certification">Certification</SelectItem>
+                        <SelectItem value="Performance Review">Performance Review</SelectItem>
+                        <SelectItem value="Doctor's Note">Doctor's Note</SelectItem>
+                        <SelectItem value="Certification Documentation">Certification Documentation</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="date">Document Date</Label>
+                    <DatePicker
+                      date={formData.date}
+                      onDateChange={(date) => date && handleFormChange("date", date)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => handleFormChange("description", e.target.value)}
+                      placeholder="Enter a description of the document..."
+                      rows={4}
+                    />
+                  </div>
+                </div>
+              </form>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={() => setActiveTab("documents")}>
+                Cancel
+              </Button>
+              <Button onClick={handleSubmit} disabled={isProcessing || !selectedFile}>
+                {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Upload Document
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

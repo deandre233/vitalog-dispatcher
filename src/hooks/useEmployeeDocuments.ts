@@ -20,7 +20,8 @@ interface Document {
   url: string;
   created_at: string;
   date: string;
-  ai_analysis: any;
+  storage_path: string;
+  ai_analysis?: any;
 }
 
 export const useEmployeeDocuments = (employeeId?: string) => {
@@ -182,10 +183,10 @@ export const useEmployeeDocuments = (employeeId?: string) => {
     const { data, error } = await supabase.functions.invoke('analyze-employee-document', {
       body: { 
         documentId,
-        documentUrl: documentData.url,
-        documentType: documentData.type,
-        documentName: documentData.filename,
-        employeeId: documentData.employee_id
+        documentUrl: documentData?.url,
+        documentType: documentData?.type,
+        documentName: documentData?.filename,
+        employeeId: documentData?.employee_id
       }
     });
     
