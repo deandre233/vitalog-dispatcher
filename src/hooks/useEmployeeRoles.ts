@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -67,11 +68,20 @@ export const useEmployeeRoles = (employeeId?: string) => {
     mutationFn: async (updates: Partial<EmployeeRole>) => {
       if (!employeeId) throw new Error("Employee ID is required");
 
+      // Ensure supervisor_role is one of the allowed values to fix type error
+      const validatedUpdates = {
+        ...updates,
+        // Only include supervisor_role if it's one of the allowed values
+        ...(updates.supervisor_role && {
+          supervisor_role: updates.supervisor_role as "Captain" | "Lieutenant" | "Full privileges" | "Call-taker / Self-dispatch"
+        })
+      };
+
       const { error } = await supabase
         .from("employee_roles")
         .upsert({ 
           employee_id: employeeId,
-          ...updates
+          ...validatedUpdates
         });
 
       if (error) {
