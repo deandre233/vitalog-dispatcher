@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -10,11 +9,20 @@ import {
   Star,
   BookOpen,
   Users2,
-  TrendingUp
+  TrendingUp,
+  Zap,
+  AlertCircle,
+  FileUp
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EmployeePerformanceProps {
   employeeId: string;
@@ -34,8 +42,15 @@ interface PerformanceMetric {
 export function SingleEmployeePerformance({ employeeId, employeeName }: EmployeePerformanceProps) {
   const [activeCategory, setActiveCategory] = useState<string>("overall");
   const [timeRange, setTimeRange] = useState<string>("quarter");
+  const [isGeneratingWriteUp, setIsGeneratingWriteUp] = useState(false);
+  const [generatedWriteUp, setGeneratedWriteUp] = useState<string>("");
+  const [writeUpSeverity, setWriteUpSeverity] = useState<string>("warning");
+  const [writeUpDialogOpen, setWriteUpDialogOpen] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [customNotes, setCustomNotes] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
-  // This would come from an API in a real app based on employeeId
   const performanceMetrics: Record<string, PerformanceMetric> = {
     overall: {
       category: "Overall Performance",
@@ -139,6 +154,82 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
     }
   };
 
+  const handleGenerateWriteUp = async () => {
+    setIsGeneratingWriteUp(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const metric = performanceMetrics[activeCategory];
+      
+      let writeUpTemplate = "";
+      
+      if (metric.score < 70) {
+        writeUpTemplate = `PERFORMANCE IMPROVEMENT PLAN\n\nEmployee: ${employeeName}\nCategory: ${metric.category}\nCurrent Score: ${metric.score}/100 (Grade: ${metric.grade})\nDepartment Average: ${metric.departmentAvg}/100\n\nConcern:\nYour performance in ${metric.category.toLowerCase()} is significantly below organizational standards. Recent analysis shows ${metric.trend.toLowerCase()}. This requires immediate and substantial improvement.\n\nExpectations:\n1. Increase your score to at least 80 points within 30 days\n2. Complete additional training in this area\n3. Weekly check-ins with your supervisor\n\nConsequences if not improved:\nFailure to show significant improvement may result in further disciplinary action up to and including termination of employment.`;
+      } else if (metric.score < 80) {
+        writeUpTemplate = `PERFORMANCE WARNING\n\nEmployee: ${employeeName}\nCategory: ${metric.category}\nCurrent Score: ${metric.score}/100 (Grade: ${metric.grade})\nDepartment Average: ${metric.departmentAvg}/100\n\nConcern:\nYour performance in ${metric.category.toLowerCase()} is below expected standards. Recent analysis shows ${metric.trend.toLowerCase()}. This requires attention and improvement.\n\nExpectations:\n1. Increase your score to at least 85 points within 60 days\n2. Review departmental protocols related to this area\n3. Bi-weekly check-ins with your supervisor\n\nThis warning will be placed in your employment file. Please take this opportunity to improve your performance.`;
+      } else if (metric.score < 85) {
+        writeUpTemplate = `PERFORMANCE ADVISORY\n\nEmployee: ${employeeName}\nCategory: ${metric.category}\nCurrent Score: ${metric.score}/100 (Grade: ${metric.grade})\nDepartment Average: ${metric.departmentAvg}/100\n\nObservation:\nYour performance in ${metric.category.toLowerCase()} meets minimum standards but has room for improvement. Recent analysis shows ${metric.trend.toLowerCase()}.\n\nRecommendations:\n1. Target increasing your score to 90+ points\n2. Consider additional training opportunities\n3. Monthly review of your progress in this area\n\nThis is not a disciplinary action but an opportunity for professional growth.`;
+      } else {
+        writeUpTemplate = `PERFORMANCE RECOGNITION\n\nEmployee: ${employeeName}\nCategory: ${metric.category}\nCurrent Score: ${metric.score}/100 (Grade: ${metric.grade})\nDepartment Average: ${metric.departmentAvg}/100\n\nRecognition:\nYour performance in ${metric.category.toLowerCase()} exceeds organizational standards. Recent analysis shows ${metric.trend.toLowerCase()}. This level of excellence contributes significantly to our team's success.\n\nContinued Growth Opportunities:\n1. Consider mentoring other team members in this area\n2. Explore advanced training to further enhance your skills\n3. Participate in developing department best practices\n\nThank you for your outstanding contribution to our organization.`;
+      }
+      
+      setGeneratedWriteUp(writeUpTemplate);
+      setWriteUpDialogOpen(true);
+    } catch (error) {
+      console.error("Error generating write-up:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate performance write-up",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingWriteUp(false);
+    }
+  };
+
+  const handleUploadWriteUp = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const finalWriteUp = customNotes || generatedWriteUp;
+      
+      const { error } = await supabase
+        .from('corrective_actions')
+        .insert({
+          employee_id: employeeId,
+          action_type: writeUpSeverity,
+          description: finalWriteUp,
+          improvement_plan: `Improvement plan for ${performanceMetrics[activeCategory].category.toLowerCase()}`,
+          issue_date: new Date().toISOString(),
+          follow_up_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+        
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Performance write-up has been saved to employee record",
+        variant: "success",
+      });
+      
+      setWriteUpDialogOpen(false);
+      setCustomNotes("");
+      setGeneratedWriteUp("");
+    } catch (error) {
+      console.error("Error saving write-up:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save performance write-up",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const currentMetric = performanceMetrics[activeCategory];
 
   return (
@@ -182,6 +273,30 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
         
         <CardContent>
           <div className="space-y-6">
+            <div className="flex flex-wrap gap-3 mb-2">
+              <Button
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={handleGenerateWriteUp}
+                disabled={isGeneratingWriteUp}
+              >
+                {isGeneratingWriteUp ? (
+                  <div className="h-4 w-4 border-t-2 border-b-2 border-primary rounded-full animate-spin"></div>
+                ) : (
+                  <Zap className="h-4 w-4 text-amber-500" />
+                )}
+                {isGeneratingWriteUp ? "Generating..." : "Generate AI Write-up"}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => setUploadDialogOpen(true)}
+              >
+                <FileUp className="h-4 w-4 text-blue-500" />
+                Upload Document
+              </Button>
+            </div>
+
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1 bg-accent/40 rounded-lg p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -327,87 +442,87 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
               </div>
             </div>
             
-            <div className="bg-accent/40 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Detailed Analysis</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-background p-4 rounded-md">
-                  <h4 className="font-medium mb-2">Strengths</h4>
-                  <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                    {activeCategory === "overall" ? (
-                      <>
-                        <li>Consistently high PCR completion rate</li>
-                        <li>Excellent punctuality record</li>
-                        <li>Strong patient feedback ratings</li>
-                      </>
-                    ) : activeCategory === "pcrCompletion" ? (
-                      <>
-                        <li>96% completion within 24 hours</li>
-                        <li>Detailed and accurate documentation</li>
-                        <li>Minimal revision requests from QA</li>
-                      </>
-                    ) : (
-                      <>
-                        <li>Performance above department average</li>
-                        <li>Consistent improvement over time</li>
-                        <li>Positive feedback from supervisors</li>
-                      </>
-                    )}
-                  </ul>
-                </div>
-                
-                <div className="bg-background p-4 rounded-md">
-                  <h4 className="font-medium mb-2">Areas for Growth</h4>
-                  <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                    {activeCategory === "overall" ? (
-                      <>
-                        <li>Inservice attendance could be improved</li>
-                        <li>Protocol adherence has room for improvement</li>
-                        <li>PCR quality good but could be more detailed</li>
-                      </>
-                    ) : activeCategory === "inserviceAttendance" ? (
-                      <>
-                        <li>Attendance rate below personal target</li>
-                        <li>Missing 2 required sessions this quarter</li>
-                        <li>Schedule conflicts identified as main issue</li>
-                      </>
-                    ) : (
-                      <>
-                        <li>Some inconsistency in performance</li>
-                        <li>Minor areas of improvement identified</li>
-                        <li>Additional training may be beneficial</li>
-                      </>
-                    )}
-                  </ul>
-                </div>
-                
-                <div className="bg-background p-4 rounded-md">
-                  <h4 className="font-medium mb-2">Recommendations</h4>
-                  <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                    {activeCategory === "overall" ? (
-                      <>
-                        <li>Schedule inservice sessions in advance</li>
-                        <li>Review clinical protocols quarterly</li>
-                        <li>Consider additional CE opportunities</li>
-                      </>
-                    ) : activeCategory === "protocolAdherence" ? (
-                      <>
-                        <li>Review updated cardiac protocols</li>
-                        <li>Attend advanced clinical sessions</li>
-                        <li>Consider protocol update study group</li>
-                      </>
-                    ) : (
-                      <>
-                        <li>Continue current improvement path</li>
-                        <li>Share best practices with team members</li>
-                        <li>Schedule quarterly performance review</li>
-                      </>
-                    )}
-                  </ul>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-accent/40 rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">Detailed Analysis</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-background p-4 rounded-md">
+                    <h4 className="font-medium mb-2">Strengths</h4>
+                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                      {activeCategory === "overall" ? (
+                        <>
+                          <li>Consistently high PCR completion rate</li>
+                          <li>Excellent punctuality record</li>
+                          <li>Strong patient feedback ratings</li>
+                        </>
+                      ) : activeCategory === "pcrCompletion" ? (
+                        <>
+                          <li>96% completion within 24 hours</li>
+                          <li>Detailed and accurate documentation</li>
+                          <li>Minimal revision requests from QA</li>
+                        </>
+                      ) : (
+                        <>
+                          <li>Performance above department average</li>
+                          <li>Consistent improvement over time</li>
+                          <li>Positive feedback from supervisors</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-background p-4 rounded-md">
+                    <h4 className="font-medium mb-2">Areas for Growth</h4>
+                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                      {activeCategory === "overall" ? (
+                        <>
+                          <li>Inservice attendance could be improved</li>
+                          <li>Protocol adherence has room for improvement</li>
+                          <li>PCR quality good but could be more detailed</li>
+                        </>
+                      ) : activeCategory === "inserviceAttendance" ? (
+                        <>
+                          <li>Attendance rate below personal target</li>
+                          <li>Missing 2 required sessions this quarter</li>
+                          <li>Schedule conflicts identified as main issue</li>
+                        </>
+                      ) : (
+                        <>
+                          <li>Some inconsistency in performance</li>
+                          <li>Minor areas of improvement identified</li>
+                          <li>Additional training may be beneficial</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-background p-4 rounded-md">
+                    <h4 className="font-medium mb-2">Recommendations</h4>
+                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                      {activeCategory === "overall" ? (
+                        <>
+                          <li>Schedule inservice sessions in advance</li>
+                          <li>Review clinical protocols quarterly</li>
+                          <li>Consider additional CE opportunities</li>
+                        </>
+                      ) : activeCategory === "protocolAdherence" ? (
+                        <>
+                          <li>Review updated cardiac protocols</li>
+                          <li>Attend advanced clinical sessions</li>
+                          <li>Consider protocol update study group</li>
+                        </>
+                      ) : (
+                        <>
+                          <li>Continue current improvement path</li>
+                          <li>Share best practices with team members</li>
+                          <li>Schedule quarterly performance review</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
               <div className="bg-accent/40 rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4">Historical Performance</h3>
                 <div className="space-y-4">
@@ -444,7 +559,9 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
                   </div>
                 </div>
               </div>
-              
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-accent/40 rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4">Achievement Goals</h3>
                 <div className="space-y-4">
@@ -495,6 +612,134 @@ export function SingleEmployeePerformance({ employeeId, employeeName }: Employee
           </div>
         </CardContent>
       </Tabs>
+
+      <Dialog open={writeUpDialogOpen} onOpenChange={setWriteUpDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              AI-Generated Performance Write-up
+            </DialogTitle>
+            <DialogDescription>
+              Based on performance data for {employeeName} in {currentMetric.category}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 my-4">
+            <div className="flex justify-between items-center">
+              <h4 className="text-sm font-medium">Write-up Severity</h4>
+              <Select value={writeUpSeverity} onValueChange={setWriteUpSeverity}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select severity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recognition">Recognition</SelectItem>
+                  <SelectItem value="advisory">Advisory</SelectItem>
+                  <SelectItem value="warning">Warning</SelectItem>
+                  <SelectItem value="critical">Critical</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="p-4 border rounded-md bg-gray-50 whitespace-pre-line font-mono text-sm">
+              {generatedWriteUp}
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Additional Notes or Edits</h4>
+              <Textarea 
+                value={customNotes} 
+                onChange={(e) => setCustomNotes(e.target.value)}
+                placeholder="Add your own notes or edit the AI-generated content..."
+                className="min-h-[150px]"
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setWriteUpDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleUploadWriteUp} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <div className="h-4 w-4 border-t-2 border-b-2 border-primary-foreground rounded-full animate-spin mr-2"></div>
+                  Saving...
+                </>
+              ) : (
+                "Save to Employee Record"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileUp className="h-5 w-5" />
+              Upload Performance Document
+            </DialogTitle>
+            <DialogDescription>
+              Attach performance-related documents to {employeeName}'s record
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 my-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Document Type</label>
+                <Select defaultValue="write-up">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select document type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="write-up">Performance Write-up</SelectItem>
+                    <SelectItem value="review">Performance Review</SelectItem>
+                    <SelectItem value="improvement">Improvement Plan</SelectItem>
+                    <SelectItem value="recognition">Recognition</SelectItem>
+                    <SelectItem value="certification">Certification</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Related Area</label>
+                <Select defaultValue={activeCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select related area" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="overall">Overall Performance</SelectItem>
+                    <SelectItem value="pcrCompletion">PCR Completion</SelectItem>
+                    <SelectItem value="pcrQuality">PCR Quality</SelectItem>
+                    <SelectItem value="punctuality">Punctuality</SelectItem>
+                    <SelectItem value="inserviceAttendance">Inservice Attendance</SelectItem>
+                    <SelectItem value="patientFeedback">Patient Feedback</SelectItem>
+                    <SelectItem value="protocolAdherence">Protocol Adherence</SelectItem>
+                    <SelectItem value="teamwork">Teamwork</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Document Description</label>
+              <Textarea placeholder="Enter a description of this document..." className="min-h-[80px]" />
+            </div>
+            
+            <div className="border-2 border-dashed rounded-md p-8 text-center">
+              <FileUp className="mx-auto h-12 w-12 text-gray-400" />
+              <p className="mt-2 text-sm text-gray-600">Drag & drop files here, or click to browse</p>
+              <Button variant="outline" className="mt-4">Select File</Button>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUploadDialogOpen(false)}>Cancel</Button>
+            <Button>Upload Document</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
