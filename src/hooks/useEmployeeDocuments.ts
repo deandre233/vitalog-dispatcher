@@ -118,10 +118,10 @@ export const useEmployeeDocuments = (employeeId?: string) => {
     }
     
     // 2. Delete the file from storage
-    if (documentData?.storage_path) {
+    if ((documentData as any)?.storage_path) {
       const { error: storageError } = await supabase.storage
         .from('documents')
-        .remove([documentData.storage_path]);
+        .remove([(documentData as any).storage_path]);
       
       if (storageError) {
         console.error("Error deleting file from storage:", storageError);
@@ -166,10 +166,10 @@ export const useEmployeeDocuments = (employeeId?: string) => {
     const { data, error } = await supabase.functions.invoke('analyze-employee-document', {
       body: { 
         documentId,
-        documentUrl: documentData?.url,
-        documentType: documentData?.type,
-        documentName: documentData?.filename,
-        employeeId: documentData?.employee_id
+        documentUrl: (documentData as any)?.url,
+        documentType: (documentData as any)?.type,
+        documentName: (documentData as any)?.filename,
+        employeeId: (documentData as any)?.employee_id
       }
     });
     
