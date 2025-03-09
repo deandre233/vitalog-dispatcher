@@ -19,6 +19,7 @@ import {
   Brain
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 const logStartup = () => {
   console.log("Index component starting to render...");
@@ -122,18 +123,25 @@ const menuItems = [
 const Index = () => {
   logStartup();
   console.log("Menu items loaded:", menuItems.length);
+  
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0f172a]">
+    <div className={`min-h-screen flex flex-col ${isDark ? 'bg-[#0f172a]' : 'bg-gray-50'} transition-colors duration-300`}>
       <Header />
-      <div className="flex-1 bg-gradient-to-br from-[#0f172a] to-[#1e293b] overflow-auto">
-        <main className="p-6 md:p-8 max-w-7xl mx-auto">
+      <div className={`flex-1 ${
+        isDark 
+          ? 'bg-gradient-to-br from-[#0f172a] to-[#1e293b]' 
+          : 'bg-gradient-to-br from-gray-50 to-gray-100'
+        } overflow-auto transition-colors duration-300`}>
+        <main className="p-6 md:p-8 max-w-7xl mx-auto fade-in">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
-              <Zap className="mr-2 h-8 w-8 text-purple-400" />
+            <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-800'} mb-2 flex items-center transition-colors duration-300`}>
+              <Zap className={`mr-2 h-8 w-8 ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
               Command Center
             </h1>
-            <p className="text-gray-400 text-lg">
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-lg transition-colors duration-300`}>
               Select a module to begin operations
             </p>
           </div>
@@ -151,20 +159,22 @@ const Index = () => {
                 >
                   <Card className={`
                     h-full relative overflow-hidden
-                    bg-[#1e293b]
-                    border border-[#334155]/50 hover:border-[#64748b]/50
+                    ${isDark 
+                      ? 'bg-[#1e293b] border-[#334155]/50 hover:border-[#64748b]/50' 
+                      : 'bg-white border-gray-200/80 hover:border-gray-300/80'}
                     shadow-xl hover:shadow-2xl
                     group transition-all duration-500
                     backdrop-blur-lg rounded-xl
                   `}>
-                    <div className="absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-500"></div>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} ${isDark ? 'opacity-5 group-hover:opacity-10' : 'opacity-3 group-hover:opacity-7'} transition-opacity duration-500`}></div>
                     <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br ${item.gradient} rounded-full opacity-10 blur-2xl group-hover:opacity-20 transition-opacity duration-500"></div>
                     
                     <div className="relative z-20 p-6">
                       <div className="flex flex-col items-center text-center space-y-4">
                         <div className={`
                           p-3 rounded-xl ${item.color}
-                          bg-[#0f172a]/60 shadow-lg
+                          ${isDark ? 'bg-[#0f172a]/60' : 'bg-gray-50/80'}
+                          shadow-lg
                           group-hover:scale-110 group-hover:shadow-xl
                           transform transition-all duration-500
                           backdrop-blur-sm
@@ -172,10 +182,18 @@ const Index = () => {
                         `}>
                           <item.icon className="w-8 h-8" />
                         </div>
-                        <h2 className="text-xl font-semibold text-white group-hover:text-purple-300 transition-colors duration-300">
+                        <h2 className={`text-xl font-semibold ${
+                          isDark 
+                            ? 'text-white group-hover:text-purple-300' 
+                            : 'text-gray-800 group-hover:text-purple-600'
+                          } transition-colors duration-300`}>
                           {item.title}
                         </h2>
-                        <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+                        <p className={`text-sm ${
+                          isDark 
+                            ? 'text-gray-400 group-hover:text-gray-300' 
+                            : 'text-gray-600 group-hover:text-gray-700'
+                          } transition-colors duration-300`}>
                           {item.description}
                         </p>
                       </div>
@@ -197,20 +215,22 @@ const Index = () => {
                 >
                   <Card className={`
                     h-full relative overflow-hidden
-                    bg-[#1e293b]
-                    border border-[#334155]/50 hover:border-[#64748b]/50
+                    ${isDark 
+                      ? 'bg-[#1e293b] border-[#334155]/50 hover:border-[#64748b]/50' 
+                      : 'bg-white border-gray-200/80 hover:border-gray-300/80'}
                     shadow-xl hover:shadow-2xl
                     group transition-all duration-500
                     backdrop-blur-lg rounded-xl
                   `}>
-                    <div className="absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-500"></div>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} ${isDark ? 'opacity-5 group-hover:opacity-10' : 'opacity-3 group-hover:opacity-7'} transition-opacity duration-500`}></div>
                     <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br ${item.gradient} rounded-full opacity-10 blur-2xl group-hover:opacity-20 transition-opacity duration-500"></div>
                     
                     <div className="relative z-20 p-6">
                       <div className="flex items-center space-x-6">
                         <div className={`
                           p-3 rounded-xl ${item.color}
-                          bg-[#0f172a]/60 shadow-lg
+                          ${isDark ? 'bg-[#0f172a]/60' : 'bg-gray-50/80'}
+                          shadow-lg
                           group-hover:scale-110 group-hover:shadow-xl
                           transform transition-all duration-500
                           backdrop-blur-sm
@@ -219,10 +239,18 @@ const Index = () => {
                           <item.icon className="w-8 h-8" />
                         </div>
                         <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-white group-hover:text-purple-300 transition-colors duration-300">
+                          <h2 className={`text-xl font-semibold ${
+                            isDark 
+                              ? 'text-white group-hover:text-purple-300' 
+                              : 'text-gray-800 group-hover:text-purple-600'
+                            } transition-colors duration-300`}>
                             {item.title}
                           </h2>
-                          <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+                          <p className={`text-sm ${
+                            isDark 
+                              ? 'text-gray-400 group-hover:text-gray-300' 
+                              : 'text-gray-600 group-hover:text-gray-700'
+                            } transition-colors duration-300`}>
                             {item.description}
                           </p>
                         </div>

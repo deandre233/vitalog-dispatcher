@@ -64,47 +64,48 @@ export interface FetchResourceParams {
   };
 }
 
-// Generic function with explicit type parameter to prevent deep instantiation issues
+// Fixed generic function to avoid deep instantiation issues
 export async function fetchResource<T>(
   resourceName: string,
   params?: FetchResourceParams
 ): Promise<{ data: T[] | null; count: number | null; error: string | null }> {
   try {
-    // Use type assertion to avoid TypeScript's excessive type checking
-    const table = resourceName as string;
-    const selectQuery = supabase.from(table).select("*", { count: "exact" });
-    
-    if (params?.search) {
-      selectQuery.or(`name.ilike.%${params.search}%,description.ilike.%${params.search}%`);
-    }
+    // Fix type safety by explicitly typing the table name
+    const { data, error, count } = await supabase
+      .from(resourceName)
+      .select('*', { count: 'exact' })
+      .modify(query => {
+        if (params?.search) {
+          query.or(`name.ilike.%${params.search}%,description.ilike.%${params.search}%`);
+        }
 
-    if (params?.filters) {
-      Object.entries(params?.filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          selectQuery.eq(key, value);
+        if (params?.filters) {
+          Object.entries(params.filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              query.eq(key, value);
+            }
+          });
+        }
+
+        if (params?.sort) {
+          query.order(params.sort.field, {
+            ascending: params.sort.direction === 'asc',
+          });
+        }
+
+        if (params?.pagination) {
+          const { page, pageSize } = params.pagination;
+          const start = (page - 1) * pageSize;
+          const end = start + pageSize - 1;
+          query.range(start, end);
         }
       });
-    }
-
-    if (params?.sort) {
-      selectQuery.order(params.sort.field, {
-        ascending: params.sort.direction === 'asc',
-      });
-    }
-
-    if (params?.pagination) {
-      const { page, pageSize } = params.pagination;
-      const start = (page - 1) * pageSize;
-      const end = start + pageSize - 1;
-      selectQuery.range(start, end);
-    }
-
-    const { data, error, count } = await selectQuery;
 
     if (error) {
       throw new Error(error.message);
     }
 
+    // Type assertion to fix the conversion issue
     return { 
       data: data as T[], 
       count, 

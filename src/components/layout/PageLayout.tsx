@@ -1,8 +1,5 @@
 
-import { ErrorBoundary } from "@/components/common/ErrorBoundary";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 
 interface PageLayoutProps {
@@ -11,21 +8,8 @@ interface PageLayoutProps {
 
 export const PageLayout = ({ children }: PageLayoutProps) => {
   return (
-    <ErrorBoundary>
-      <div className="min-h-screen flex flex-col bg-[#0f172a]">
-        <Header />
-        <div className="flex-1 flex">
-          <SidebarProvider>
-            <AppSidebar />
-            <div className="flex-1 bg-[#0f172a] overflow-auto">
-              <main className="p-6">
-                {children}
-              </main>
-            </div>
-          </SidebarProvider>
-        </div>
-        <Footer />
-      </div>
-    </ErrorBoundary>
+    <AppLayout sidebar={<AppSidebar />}>
+      {children}
+    </AppLayout>
   );
 };
