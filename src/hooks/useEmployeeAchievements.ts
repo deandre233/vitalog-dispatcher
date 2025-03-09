@@ -52,6 +52,63 @@ export const useEmployeeAchievements = (employeeId?: string) => {
     return { success: true };
   };
 
+  // Prestige an achievement
+  const prestigeAchievement = useMutation({
+    mutationFn: async (achievementId: string) => {
+      if (!employeeId) {
+        throw new Error("Employee ID is required");
+      }
+      
+      setIsProcessing(true);
+      
+      try {
+        // This would be a real API call in production
+        // For now, we'll simulate it with a timeout
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // In a real implementation, you would update the achievement in the database
+        // For example:
+        /*
+        const { data, error } = await supabase
+          .from('employee_achievements')
+          .update({ 
+            prestige_level: supabase.sql`prestige_level + 1`,
+            prestige_bonus: supabase.sql`prestige_bonus + ${prestigeBonus}`,
+            updated_at: new Date().toISOString()
+          })
+          .eq('employee_id', employeeId)
+          .eq('achievement_id', achievementId)
+          .single();
+        
+        if (error) throw error;
+        */
+        
+        return { 
+          success: true, 
+          message: "Achievement prestiged successfully!",
+          achievementId 
+        };
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    onSuccess: () => {
+      // Invalidate relevant queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['employee-level', employeeId] });
+      queryClient.invalidateQueries({ queryKey: ['employee-achievements', employeeId] });
+      
+      toast.success("Achievement prestiged!", {
+        description: "You've earned bonus points for your achievement!",
+      });
+    },
+    onError: (error) => {
+      console.error("Error prestiging achievement:", error);
+      toast.error("Failed to prestige achievement", {
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+      });
+    }
+  });
+
   // Analyze employee performance for achievements
   const analyzePerformanceForAchievements = async () => {
     if (!employeeId) {
@@ -164,6 +221,7 @@ export const useEmployeeAchievements = (employeeId?: string) => {
     getAchievementIdeas,
     createAchievementFromIdea,
     analyzePerformanceForAchievements,
-    getAchievementPredictions
+    getAchievementPredictions,
+    prestigeAchievement
   };
 };

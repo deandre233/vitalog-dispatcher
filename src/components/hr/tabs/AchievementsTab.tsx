@@ -1,29 +1,34 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Medal, BadgeCheck, Star, Clock } from "lucide-react";
+import { Medal, BadgeCheck, Star, Clock, Trophy } from "lucide-react";
 import { Achievement, AchievementCategory } from "./achievements/types/achievementTypes";
 import { achievements, getAchievementsSummary } from "./achievements/data/achievementsData";
 import { AchievementSection } from "./achievements/components/AchievementSection";
 import { CategoryFilter } from "./achievements/components/CategoryFilter";
 import { AchievementSummary } from "./achievements/components/AchievementSummary";
 import { AchievementDetailDialog } from "./achievements/components/AchievementDetailDialog";
+import { PrestigeAchievementDialog } from "./achievements/components/PrestigeAchievementDialog";
 import { AIAchievementIdeas } from "@/components/hr/achievements/AIAchievementIdeas";
 import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 export function AchievementsTab() {
   const { employeeId } = useParams<{ employeeId: string }>();
   const [activeCategory, setActiveCategory] = useState<AchievementCategory | 'all'>('all');
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [prestigeDialogOpen, setPrestigeDialogOpen] = useState(false);
+  const [prestigeAchievement, setPrestigeAchievement] = useState<Achievement | null>(null);
+  const [localAchievements, setLocalAchievements] = useState<Achievement[]>(achievements);
   
-  const summary = getAchievementsSummary();
+  const summary = getAchievementsSummary(localAchievements);
   
   // Get recently unlocked achievements (last 30 days)
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   
-  const recentAchievements = achievements
+  const recentAchievements = localAchievements
     .filter(a => a.unlocked && a.dateUnlocked && new Date(a.dateUnlocked) >= thirtyDaysAgo)
     .sort((a, b) => {
       const dateA = a.dateUnlocked ? new Date(a.dateUnlocked) : new Date(0);
@@ -32,10 +37,14 @@ export function AchievementsTab() {
     });
   
   // Get unlocked achievements
-  const unlockedAchievements = achievements
+  const unlockedAchievements = localAchievements
     .filter(a => a.unlocked)
     .sort((a, b) => {
-      // Sort by rarity first (legendary -> common)
+      // Sort by prestige level first
+      const prestigeDiff = (b.prestige || 0) - (a.prestige || 0);
+      if (prestigeDiff !== 0) return prestigeDiff;
+      
+      // Then sort by rarity (legendary -> common)
       const rarityOrder = { legendary: 0, epic: 1, rare: 2, uncommon: 3, common: 4 };
       const rarityDiff = rarityOrder[a.rarity as keyof typeof rarityOrder] - rarityOrder[b.rarity as keyof typeof rarityOrder];
       if (rarityDiff !== 0) return rarityDiff;
@@ -47,7 +56,7 @@ export function AchievementsTab() {
     });
   
   // Get in-progress achievements
-  const inProgressAchievements = achievements
+  const inProgressAchievements = localAchievements
     .filter(a => !a.unlocked && a.progress !== undefined && a.progress > 0)
     .sort((a, b) => {
       const aProgress = (a.progress || 0) / (a.maxProgress || 1);
@@ -56,7 +65,7 @@ export function AchievementsTab() {
     });
   
   // Get locked achievements (no progress yet)
-  const lockedAchievements = achievements
+  const lockedAchievements = localAchievements
     .filter(a => !a.unlocked && (!a.progress || a.progress === 0))
     .sort((a, b) => {
       // Sort by rarity (common -> legendary)
@@ -67,6 +76,40 @@ export function AchievementsTab() {
   const handleAchievementClick = (achievement: Achievement) => {
     setSelectedAchievement(achievement);
     setDetailDialogOpen(true);
+  };
+  
+  const handlePrestigeClick = (achievementId: string) => {
+    const achievement = localAchievements.find(a => a.id === achievementId);
+    if (achievement) {
+      setPrestigeAchievement(achievement);
+      setPrestigeDialogOpen(true);
+    }
+  };
+  
+  const handlePrestigeConfirm = (achievementId: string) => {
+    // Update the achievement with prestige status
+    const updatedAchievements = localAchievements.map(achievement => {
+      if (achievement.id === achievementId) {
+        const currentPrestige = achievement.prestige || 0;
+        const prestigeBonus = achievement.prestigeBonus || Math.round(achievement.points * 0.25);
+        
+        return {
+          ...achievement,
+          prestige: currentPrestige + 1,
+          prestigeBonus: (achievement.prestigeBonus || 0) + prestigeBonus
+        };
+      }
+      return achievement;
+    });
+    
+    setLocalAchievements(updatedAchievements);
+    
+    // In a real implementation, you would persist this to the database
+    // For now, just update the local state and show a toast
+    toast.success("Achievement prestiged!", {
+      description: "Your achievement has been prestiged and you've earned bonus points!",
+      icon: <Trophy className="h-5 w-5 text-yellow-500" />
+    });
   };
   
   return (
@@ -81,7 +124,8 @@ export function AchievementsTab() {
         <CardContent className="pt-0 pb-2">
           <p className="text-muted-foreground">
             Track your career accomplishments and earn badges for clinical excellence, teamwork, 
-            education, operational performance, leadership, and community impact.
+            education, operational performance, leadership, and community impact. 
+            Prestige your achievements to earn bonus points and special recognition.
           </p>
         </CardContent>
       </Card>
@@ -108,15 +152,17 @@ export function AchievementsTab() {
             description="Achievements you've earned in the last 30 days"
             achievements={recentAchievements}
             filter={activeCategory === 'all' ? undefined : activeCategory}
+            onPrestige={handlePrestigeClick}
           />
         )}
         
         {unlockedAchievements.length > 0 && (
           <AchievementSection
             title="Unlocked Achievements"
-            description="Achievements you've already earned"
+            description="Achievements you've already earned. Prestige them for bonus points!"
             achievements={unlockedAchievements}
             filter={activeCategory === 'all' ? undefined : activeCategory}
+            onPrestige={handlePrestigeClick}
           />
         )}
         
@@ -143,6 +189,13 @@ export function AchievementsTab() {
         achievement={selectedAchievement}
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
+      />
+      
+      <PrestigeAchievementDialog
+        achievement={prestigeAchievement}
+        open={prestigeDialogOpen}
+        onOpenChange={setPrestigeDialogOpen}
+        onPrestige={handlePrestigeConfirm}
       />
     </div>
   );

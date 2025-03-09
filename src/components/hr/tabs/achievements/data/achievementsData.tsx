@@ -1,4 +1,3 @@
-
 import { 
   Award, 
   Clock, 
@@ -706,14 +705,18 @@ export const achievements: Achievement[] = [
   }
 ];
 
-export const getCategorySummaries = (): CategorySummary[] => {
+export const getCategorySummaries = (achievementsList: Achievement[] = achievements): CategorySummary[] => {
   const categories: AchievementCategory[] = ['clinical', 'teamwork', 'education', 'operational', 'leadership', 'community'];
   
   return categories.map(category => {
-    const categoryAchievements = achievements.filter(a => a.category === category);
+    const categoryAchievements = achievementsList.filter(a => a.category === category);
     const unlockedAchievements = categoryAchievements.filter(a => a.unlocked);
     const totalPoints = categoryAchievements.reduce((sum, a) => sum + a.points, 0);
-    const earnedPoints = unlockedAchievements.reduce((sum, a) => sum + a.points, 0);
+    const earnedPoints = unlockedAchievements.reduce((sum, a) => {
+      const basePoints = a.points;
+      const prestigeBonus = a.prestigeBonus || 0;
+      return sum + basePoints + prestigeBonus;
+    }, 0);
     
     // Find the next achievement to unlock (first locked achievement with highest progress)
     const nextAchievement = categoryAchievements
@@ -735,12 +738,16 @@ export const getCategorySummaries = (): CategorySummary[] => {
   });
 };
 
-export const getAchievementsSummary = () => {
-  const categorySummaries = getCategorySummaries();
-  const totalAchievements = achievements.length;
-  const unlockedAchievements = achievements.filter(a => a.unlocked).length;
-  const totalPoints = achievements.reduce((sum, a) => sum + a.points, 0);
-  const earnedPoints = achievements.filter(a => a.unlocked).reduce((sum, a) => sum + a.points, 0);
+export const getAchievementsSummary = (achievementsList: Achievement[] = achievements) => {
+  const categorySummaries = getCategorySummaries(achievementsList);
+  const totalAchievements = achievementsList.length;
+  const unlockedAchievements = achievementsList.filter(a => a.unlocked).length;
+  const totalPoints = achievementsList.reduce((sum, a) => sum + a.points, 0);
+  const earnedPoints = achievementsList.filter(a => a.unlocked).reduce((sum, a) => {
+    const basePoints = a.points;
+    const prestigeBonus = a.prestigeBonus || 0;
+    return sum + basePoints + prestigeBonus;
+  }, 0);
   
   return {
     totalAchievements,
