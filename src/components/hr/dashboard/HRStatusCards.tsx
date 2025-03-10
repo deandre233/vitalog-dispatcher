@@ -1,8 +1,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, Phone, Flag, Calendar, Users, Activity, Briefcase, Shield, FileCheck, UserCog } from "lucide-react";
+import { Clock, Phone, Flag, Calendar, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
 
 interface HRStatusCardsProps {
   data: {
@@ -18,110 +17,71 @@ interface StatusCardProps {
   title: string;
   value: number;
   icon: React.ReactNode;
-  gradientFrom: string;
-  gradientTo: string;
-  showAnimation?: boolean;
-  subtitle?: string;
+  className?: string;
+  textColor?: string;
+  bgGradient?: string;
 }
 
-const StatusCard = ({ title, value, icon, gradientFrom, gradientTo, showAnimation = false, subtitle }: StatusCardProps) => {
-  const [isAnimating, setIsAnimating] = useState(false);
-  
-  useEffect(() => {
-    if (showAnimation) {
-      const timer = setTimeout(() => setIsAnimating(true), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [showAnimation]);
-
-  return (
-    <Card className={cn(
-      "overflow-hidden border-none shadow-lg transition-all duration-300 hover:shadow-xl",
-      `bg-gradient-to-br from-${gradientFrom} to-${gradientTo}`
-    )}>
-      <CardContent className="p-0">
-        <div className="relative h-full">
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-20 h-20 -mr-10 -mt-10 rounded-full bg-white/10 blur-xl"></div>
-          <div className="absolute bottom-0 left-0 w-16 h-16 -ml-8 -mb-8 rounded-full bg-white/5 blur-lg"></div>
-          
-          <div className="relative p-5 z-10">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-white/80">
-                  {title}
-                </p>
-                {subtitle && (
-                  <p className="text-xs text-white/60 mt-1">{subtitle}</p>
-                )}
-              </div>
-              <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
-                {icon}
-              </div>
-            </div>
-            
-            <div className={cn(
-              "transition-all duration-700 transform",
-              isAnimating ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-            )}>
-              <h2 className="text-3xl font-bold text-white">
-                {value}
-              </h2>
-            </div>
-          </div>
+const StatusCard = ({ title, value, icon, className, textColor, bgGradient }: StatusCardProps) => (
+  <Card className={cn(
+    "overflow-hidden border-none shadow-md hover:shadow-lg transition-all duration-300",
+    className
+  )}>
+    <div className={cn(
+      "absolute inset-0 opacity-90",
+      bgGradient || "bg-gradient-to-br from-blue-500 to-blue-600"
+    )} />
+    <CardContent className="p-6 relative z-10">
+      <div className="flex justify-between items-center">
+        <div>
+          <p className="text-sm font-medium text-white/80">{title}</p>
+          <h2 className={cn(
+            "text-3xl font-bold mt-1 text-white",
+            textColor
+          )}>
+            {value}
+          </h2>
         </div>
-      </CardContent>
-    </Card>
-  );
-};
+        <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
+          {icon}
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 export function HRStatusCards({ data }: HRStatusCardsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
       <StatusCard
-        title="Personnel Active"
+        title="On Duty Personnel"
         value={data.onDuty}
-        icon={<Briefcase className="h-5 w-5 text-white" />}
-        gradientFrom="emerald-500"
-        gradientTo="teal-700"
-        showAnimation={true}
-        subtitle="Currently on shift"
+        icon={<Clock className="h-6 w-6 text-white" />}
+        bgGradient="bg-gradient-to-br from-indigo-500 to-indigo-700"
       />
       <StatusCard
-        title="On Standby"
+        title="On Call Staff"
         value={data.onCall}
-        icon={<Activity className="h-5 w-5 text-white" />}
-        gradientFrom="indigo-500"
-        gradientTo="violet-700"
-        showAnimation={true}
-        subtitle="Available for emergencies"
+        icon={<Phone className="h-6 w-6 text-white" />}
+        bgGradient="bg-gradient-to-br from-purple-500 to-purple-700"
       />
       <StatusCard
-        title="Critical Alerts"
+        title="Active Incidents"
         value={data.incidentsOpen}
-        icon={<Shield className="h-5 w-5 text-white" />}
-        gradientFrom="rose-500"
-        gradientTo="red-700"
-        showAnimation={true}
-        subtitle="Require immediate attention"
+        icon={<Flag className="h-6 w-6 text-white" />}
+        bgGradient="bg-gradient-to-br from-rose-500 to-rose-700"
       />
       <StatusCard
-        title="Pending Approvals"
+        title="Schedule Requests"
         value={data.scheduleRequests}
-        icon={<FileCheck className="h-5 w-5 text-white" />}
-        gradientFrom="amber-500"
-        gradientTo="orange-700"
-        showAnimation={true}
-        subtitle="Awaiting review"
+        icon={<Calendar className="h-6 w-6 text-white" />}
+        bgGradient="bg-gradient-to-br from-emerald-500 to-emerald-700"
       />
       <StatusCard
-        title="Profile Updates"
+        title="Missing HR Data"
         value={data.employeesStale}
-        icon={<UserCog className="h-5 w-5 text-white" />}
-        gradientFrom="slate-500"
-        gradientTo="slate-800"
-        showAnimation={true}
-        subtitle="Need verification"
+        icon={<Users className="h-6 w-6 text-white" />}
+        bgGradient="bg-gradient-to-br from-slate-600 to-slate-800"
       />
     </div>
   );
