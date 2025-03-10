@@ -14,11 +14,14 @@ import {
   Filter, 
   Bell, 
   Plus, 
-  Users
+  Users,
+  Sparkles
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { NewMessageDialog } from "@/components/messaging/NewMessageDialog";
 import { TeamChatView } from "@/components/messaging/TeamChatView";
+import { MessageFilter } from "@/components/messaging/MessageFilter";
+import { EmptyStateMessage } from "@/components/messaging/EmptyStateMessage";
 
 export default function Messages() {
   // Mock employee ID - in a real app, this would come from auth context
@@ -26,6 +29,7 @@ export default function Messages() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("team-chat");
   const [showNewMessageDialog, setShowNewMessageDialog] = useState(false);
+  const [messageFilter, setMessageFilter] = useState("all");
   
   const [messages, setMessages] = useState([
     {
@@ -109,6 +113,23 @@ export default function Messages() {
     { id: "ch-6", name: "Training", type: "training", unread: 0 }
   ]);
   
+  // Filter messages based on selected filter
+  const filteredMessages = messages.filter(message => {
+    if (messageFilter === "unread") return !message.read;
+    if (messageFilter === "recent") {
+      // Consider messages from the last 3 days as recent
+      const isRecent = message.timestamp.includes("MAR") || 
+                       message.timestamp.includes("FEB 28");
+      return isRecent;
+    }
+    return true;
+  }).filter(msg => 
+    searchQuery ? 
+    msg.content.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    msg.sender.toLowerCase().includes(searchQuery.toLowerCase()) : 
+    true
+  );
+  
   const handleNewMessage = (recipients: string[], message: string) => {
     // Add new message to the conversation
     const newMsg = {
@@ -133,7 +154,7 @@ export default function Messages() {
   return (
     <MainLayout>
       <div className="container mx-auto py-6">
-        <div className="flex flex-col space-y-6">
+        <div className="flex flex-col space-y-4">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Message Center</h1>
@@ -142,10 +163,6 @@ export default function Messages() {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="md:flex hidden">
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
               <Button size="sm" className="md:flex hidden bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
                 <Bot className="h-4 w-4 mr-2" />
                 AI Assistant
@@ -154,6 +171,7 @@ export default function Messages() {
                 size="sm" 
                 variant="default" 
                 onClick={() => setShowNewMessageDialog(true)}
+                className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 New Message
@@ -161,13 +179,20 @@ export default function Messages() {
             </div>
           </div>
           
-          <div className="relative w-full max-w-xl">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search messages and notifications..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="relative w-full max-w-xl">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search messages and notifications..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            <MessageFilter 
+              activeFilter={messageFilter}
+              onFilterChange={setMessageFilter}
             />
           </div>
           
@@ -186,18 +211,37 @@ export default function Messages() {
                 <span>AI Interactions</span>
               </TabsTrigger>
               <TabsTrigger value="insights" className="flex gap-1">
-                <MessageSquare className="h-4 w-4" />
+                <Sparkles className="h-4 w-4" />
                 <span>Smart Insights</span>
               </TabsTrigger>
             </TabsList>
             
             <TabsContent value="team-chat" className="w-full">
-              <TeamChatView 
-                messages={messages}
-                channels={channels}
-                searchQuery={searchQuery}
-                onNewMessage={handleNewMessage}
-              />
+              {filteredMessages.length > 0 ? (
+                <TeamChatView 
+                  messages={filteredMessages}
+                  channels={channels}
+                  searchQuery={searchQuery}
+                  onNewMessage={handleNewMessage}
+                />
+              ) : (
+                <Card className="w-full">
+                  <CardContent className="p-0">
+                    <EmptyStateMessage 
+                      title="No messages found"
+                      description={
+                        searchQuery 
+                          ? "We couldn't find any messages matching your search query." 
+                          : messageFilter === "unread" 
+                            ? "You have no unread messages." 
+                            : "Start a conversation or select a different filter."
+                      }
+                      onAction={() => setShowNewMessageDialog(true)}
+                      actionLabel="Start a conversation"
+                    />
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
             
             <TabsContent value="notifications" className="w-full">
@@ -231,7 +275,9 @@ export default function Messages() {
                     <p className="text-sm text-muted-foreground mb-4 max-w-md">
                       Ask questions about HR policies, get help with forms, or request insights about your team
                     </p>
-                    <Button>Start a conversation</Button>
+                    <Button className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700">
+                      Start a conversation
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -247,12 +293,14 @@ export default function Messages() {
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="h-[600px] flex flex-col justify-center items-center text-center p-6 bg-slate-50 rounded-lg border border-dashed">
-                    <MessageSquare className="h-12 w-12 text-slate-400 mb-4" />
+                    <Sparkles className="h-12 w-12 text-slate-400 mb-4" />
                     <h3 className="text-lg font-medium mb-2">Communication Insights</h3>
                     <p className="text-sm text-muted-foreground mb-4 max-w-md">
                       AI-powered analysis of your team communication patterns will appear here
                     </p>
-                    <Button variant="outline">Generate Insights</Button>
+                    <Button variant="outline" className="border-orange-200 text-orange-600 hover:bg-orange-50">
+                      Generate Insights
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

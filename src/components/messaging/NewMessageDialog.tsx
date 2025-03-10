@@ -21,7 +21,9 @@ import {
   User, 
   Check, 
   SendHorizontal,
-  PlusCircle
+  PlusCircle,
+  AlertCircle,
+  Star
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
@@ -59,6 +61,7 @@ export function NewMessageDialog({
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [messageText, setMessageText] = useState("");
   const [isUrgent, setIsUrgent] = useState(false);
+  const [favoriteGroups, setFavoriteGroups] = useState<string[]>(["g1", "g3"]);
   
   // Mock data
   const groups: GroupType[] = [
@@ -106,6 +109,15 @@ export function NewMessageDialog({
     }
   };
   
+  const toggleFavoriteGroup = (groupId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (favoriteGroups.includes(groupId)) {
+      setFavoriteGroups(favoriteGroups.filter(id => id !== groupId));
+    } else {
+      setFavoriteGroups([...favoriteGroups, groupId]);
+    }
+  };
+  
   const deselectAll = () => {
     setSelectedMembers([]);
     setSelectedGroups([]);
@@ -114,7 +126,7 @@ export function NewMessageDialog({
   const getMemberStatus = (status?: 'online' | 'offline' | 'away') => {
     switch(status) {
       case 'online': return 'bg-green-500';
-      case 'away': return 'bg-yellow-500';
+      case 'away': return 'bg-orange-400';
       case 'offline': 
       default: return 'bg-gray-300';
     }
@@ -180,10 +192,14 @@ export function NewMessageDialog({
   // Get total selected count
   const totalSelected = selectedMembers.length + selectedGroups.length;
   
+  // Separate favorite groups
+  const favGroups = groups.filter(g => favoriteGroups.includes(g.id));
+  const otherGroups = groups.filter(g => !favoriteGroups.includes(g.id));
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] p-0">
-        <DialogHeader className="p-4 border-b">
+        <DialogHeader className="p-4 border-b bg-muted/10">
           <div className="flex items-center">
             {step === 'compose' && (
               <Button 
@@ -210,14 +226,57 @@ export function NewMessageDialog({
         
         {step === 'recipients' ? (
           <div className="px-4 py-3">
+            {favGroups.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-sm font-medium mb-2 flex items-center">
+                  <Star className="h-4 w-4 text-orange-400 mr-1" />
+                  Favorite Groups
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {favGroups.map(group => (
+                    <Badge 
+                      key={group.id}
+                      variant={selectedGroups.includes(group.id) ? "default" : "outline"}
+                      className={`cursor-pointer ${
+                        selectedGroups.includes(group.id) 
+                          ? 'bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700' 
+                          : 'bg-background hover:bg-accent'
+                      }`}
+                      onClick={() => toggleGroupSelection(group.id)}
+                    >
+                      {group.name}
+                      {selectedGroups.includes(group.id) && (
+                        <X className="ml-1 h-3 w-3" onClick={(e) => {
+                          e.stopPropagation();
+                          toggleGroupSelection(group.id);
+                        }} />
+                      )}
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-5 w-5 p-0 ml-1"
+                        onClick={(e) => toggleFavoriteGroup(group.id, e)}
+                      >
+                        <Star className="h-3 w-3 fill-orange-400 text-orange-400" />
+                      </Button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            
             <div className="mb-4">
-              <h3 className="text-sm font-medium mb-2">Select a Group</h3>
+              <h3 className="text-sm font-medium mb-2">All Groups</h3>
               <div className="flex flex-wrap gap-2">
-                {groups.map(group => (
+                {otherGroups.map(group => (
                   <Badge 
                     key={group.id}
                     variant={selectedGroups.includes(group.id) ? "default" : "outline"}
-                    className={`cursor-pointer ${selectedGroups.includes(group.id) ? 'bg-primary hover:bg-primary/90' : 'bg-background hover:bg-accent'}`}
+                    className={`cursor-pointer group ${
+                      selectedGroups.includes(group.id) 
+                        ? 'bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700' 
+                        : 'bg-background hover:bg-accent'
+                    }`}
                     onClick={() => toggleGroupSelection(group.id)}
                   >
                     {group.name}
@@ -227,6 +286,14 @@ export function NewMessageDialog({
                         toggleGroupSelection(group.id);
                       }} />
                     )}
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-5 w-5 p-0 ml-1 opacity-0 group-hover:opacity-100"
+                      onClick={(e) => toggleFavoriteGroup(group.id, e)}
+                    >
+                      <Star className="h-3 w-3 text-muted-foreground" />
+                    </Button>
                   </Badge>
                 ))}
               </div>
@@ -240,7 +307,7 @@ export function NewMessageDialog({
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-8 text-sm text-primary"
+                  className="h-8 text-sm text-orange-600"
                   onClick={deselectAll}
                 >
                   Deselect All
@@ -263,8 +330,8 @@ export function NewMessageDialog({
                 {filteredMembers.map(member => (
                   <div 
                     key={member.id}
-                    className={`flex items-center p-2 rounded-md cursor-pointer hover:bg-accent transition-colors ${
-                      selectedMembers.some(m => m.id === member.id) ? 'bg-accent/50' : ''
+                    className={`flex items-center p-2 rounded-md cursor-pointer hover:bg-orange-50 transition-colors ${
+                      selectedMembers.some(m => m.id === member.id) ? 'bg-orange-50' : ''
                     }`}
                     onClick={() => toggleMemberSelection(member)}
                   >
@@ -273,7 +340,7 @@ export function NewMessageDialog({
                         {member.avatar ? (
                           <AvatarImage src={member.avatar} alt={member.name} />
                         ) : (
-                          <AvatarFallback className="bg-primary/10 text-primary">
+                          <AvatarFallback className="bg-orange-100 text-orange-700">
                             {member.initials}
                           </AvatarFallback>
                         )}
@@ -282,7 +349,7 @@ export function NewMessageDialog({
                     </div>
                     <span className="flex-1">{member.name}</span>
                     {selectedMembers.some(m => m.id === member.id) && (
-                      <Check className="h-4 w-4 text-primary" />
+                      <Check className="h-4 w-4 text-orange-600" />
                     )}
                   </div>
                 ))}
@@ -291,7 +358,7 @@ export function NewMessageDialog({
             
             <div className="mt-4 pt-4 border-t">
               <Button
-                className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white"
+                className="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white"
                 disabled={totalSelected === 0}
                 onClick={handleStartMessage}
               >
@@ -307,7 +374,7 @@ export function NewMessageDialog({
                 {selectedGroups.map(groupId => {
                   const group = groups.find(g => g.id === groupId);
                   return group ? (
-                    <Badge key={group.id} variant="outline" className="bg-primary/10 text-primary">
+                    <Badge key={group.id} variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
                       <Users className="h-3 w-3 mr-1" />
                       {group.name}
                       <X 
@@ -319,7 +386,7 @@ export function NewMessageDialog({
                 })}
                 
                 {selectedMembers.map(member => (
-                  <Badge key={member.id} variant="outline" className="bg-primary/10 text-primary">
+                  <Badge key={member.id} variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
                     <User className="h-3 w-3 mr-1" />
                     {member.name}
                     <X 
@@ -359,9 +426,10 @@ export function NewMessageDialog({
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className={isUrgent ? "bg-red-100 text-red-800 border-red-300" : ""}
+                  className={isUrgent ? "bg-red-100 text-red-800 border-red-300 flex items-center gap-1" : "flex items-center gap-1"}
                   onClick={() => setIsUrgent(!isUrgent)}
                 >
+                  <AlertCircle className="h-3.5 w-3.5" />
                   {isUrgent ? "Urgent" : "Mark as Urgent"}
                 </Button>
                 
@@ -373,7 +441,7 @@ export function NewMessageDialog({
             
             <div className="mt-6 flex justify-end">
               <Button
-                className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white"
+                className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white"
                 onClick={handleSendMessage}
                 disabled={!messageText.trim()}
               >
