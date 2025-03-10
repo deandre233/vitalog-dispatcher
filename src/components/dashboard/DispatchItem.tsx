@@ -76,7 +76,7 @@ export function DispatchItem({
 }: DispatchItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState<DispatchStatus>("dispatch");
+  const [currentStatus, setCurrentStatus] = useState<DispatchStatus>(status as DispatchStatus || "dispatch");
   const navigate = useNavigate();
 
   const handleUnassign = () => {
@@ -125,13 +125,37 @@ export function DispatchItem({
   };
 
   const currentProgress = getProgressForStatus(currentStatus);
+  
+  // Get background colors based on status
+  const getBackgroundColorClass = () => {
+    if (priority === "high") {
+      return "bg-red-50 border-red-200";
+    }
+    
+    switch (currentStatus) {
+      case "dispatch":
+        return "bg-gray-50 border-gray-200";
+      case "enroute":
+        return "bg-blue-50 border-blue-200";
+      case "onscene":
+        return "bg-green-50 border-green-200";
+      case "transporting":
+        return "bg-orange-50 border-orange-200";
+      case "destination":
+        return "bg-yellow-50 border-yellow-200";
+      case "available":
+        return "bg-emerald-50 border-emerald-200";
+      case "canceled":
+        return "bg-red-50 border-red-200";
+      default:
+        return "bg-white border-gray-200";
+    }
+  };
 
   return (
     <div
-      className={`border rounded-lg p-4 ${
-        priority === "high"
-          ? "bg-red-50 border-red-200"
-          : "bg-white hover:bg-gray-50"
+      className={`border rounded-lg p-4 hover:bg-opacity-90 transition-colors duration-200 ${
+        getBackgroundColorClass()
       }`}
     >
       <DispatchHeader
@@ -143,6 +167,7 @@ export function DispatchItem({
         activationTime={activationTime}
         lastUpdated={lastUpdated}
         getStatusColor={getStatusColor}
+        priority={priority}
       />
 
       <PatientSummary

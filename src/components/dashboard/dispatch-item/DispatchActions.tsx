@@ -62,6 +62,28 @@ export function DispatchActions({
     }
   };
 
+  // Get the card background color
+  const getMessageCardStyles = () => {
+    switch (currentStatus) {
+      case "dispatch":
+        return "bg-blue-50 border-blue-200";
+      case "enroute":
+        return "bg-indigo-50 border-indigo-200";
+      case "onscene":
+        return "bg-violet-50 border-violet-200";
+      case "transporting":
+        return "bg-orange-50 border-orange-200";
+      case "destination":
+        return "bg-yellow-50 border-yellow-200";
+      case "available":
+        return "bg-emerald-50 border-emerald-200";
+      case "canceled":
+        return "bg-red-50 border-red-200";
+      default:
+        return "bg-indigo-50 border-indigo-200";
+    }
+  };
+
   return (
     <div className="space-y-3">
       <Card className="border border-gray-200 shadow-sm overflow-hidden">
@@ -126,7 +148,7 @@ export function DispatchActions({
             onStatusChange={onStatusChange}
           />
           
-          <Card className={`border shadow-sm overflow-hidden ${currentStatus === "canceled" ? "border-red-200" : `border-${currentStatus}-200`}`}>
+          <Card className={`shadow-sm overflow-hidden ${getMessageCardStyles()}`}>
             <CardContent className="p-3">
               <Button
                 variant="outline"
