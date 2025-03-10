@@ -1,9 +1,9 @@
-
 import { useEffect, useState } from "react";
 import { HRLayout } from "@/components/layout/HRLayout";
 import { HRStatusCards } from "@/components/hr/dashboard/HRStatusCards";
 import { HRWorkforceAnalytics } from "@/components/hr/dashboard/HRWorkforceAnalytics";
 import { HRAIRecommendations } from "@/components/hr/dashboard/HRAIRecommendations";
+import { HRQuickActionPanel } from "@/components/hr/dashboard/HRQuickActionPanel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -35,7 +35,6 @@ export default function HRHome() {
   });
 
   useEffect(() => {
-    // Simulate loading data
     const timer = setTimeout(() => {
       setStatusData({
         onDuty: 11,
@@ -94,6 +93,8 @@ export default function HRHome() {
         ) : (
           <>
             <HRStatusCards data={statusData} />
+            
+            <HRQuickActionPanel />
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
