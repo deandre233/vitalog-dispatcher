@@ -1,4 +1,3 @@
-
 import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import { Button } from "./components/ui/button";
 import Index from "./pages/Index";
@@ -30,6 +29,7 @@ import { Categories } from "./pages/Categories";
 import { HistoricalEntry } from "./pages/HistoricalEntry";
 import { ExternalLink } from "./pages/ExternalLink";
 import HRHome from "./pages/HRHome";
+import Messages from "./pages/Messages";
 
 const router = createBrowserRouter([
   {
@@ -156,6 +156,14 @@ const router = createBrowserRouter([
   {
     path: "/hr",
     element: <HRHome />,
+  },
+  {
+    path: "/messages",
+    element: <Messages />,
+  },
+  {
+    path: "/employees/profile/current",
+    element: <EmployeeProfile />,
   }
 ]);
 

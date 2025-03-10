@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,7 +23,8 @@ import {
   Clock,
   Link2,
   Menu,
-  Shield
+  Shield,
+  MessageSquare
 } from "lucide-react";
 
 // Define navigation categories
@@ -52,6 +52,12 @@ const navigationCategories = [
         label: "Smart Route Optimization",
         icon: Zap,
         href: "/smart-route-optimization",
+      },
+      {
+        label: "Team Messages",
+        icon: MessageSquare,
+        href: "/messages",
+        badge: "New"
       },
     ]
   },
