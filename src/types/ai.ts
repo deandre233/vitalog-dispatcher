@@ -22,9 +22,11 @@ export interface TeamMessage {
   channelId: string;
   message: string;
   isImportant: boolean;
+  isAnnouncement?: boolean;
   createdAt: string;
   sender_name?: string;
   sender_avatar?: string;
+  reactions?: string[];
 }
 
 export interface EmployeeNotification {

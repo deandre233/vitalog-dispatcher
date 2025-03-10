@@ -33,9 +33,11 @@ export const fetchTeamMessages = async (channel: string, teamMembers: TeamMember
           channelId: msg.channel_id,
           message: msg.message,
           isImportant: msg.is_important,
+          isAnnouncement: msg.is_announcement || false,
           createdAt: msg.created_at,
-          sender_name: sender?.name,
-          sender_avatar: sender?.avatar
+          sender_name: msg.sender_name || sender?.name,
+          sender_avatar: sender?.avatar,
+          reactions: msg.reactions || []
         };
       });
       return enhancedMessages;
@@ -51,7 +53,8 @@ export const sendTeamMessage = async (
   employeeId: string, 
   channel: string, 
   message: string, 
-  isImportant: boolean
+  isImportant: boolean,
+  isAnnouncement: boolean = false
 ) => {
   if (!message.trim()) return false;
   
@@ -62,7 +65,8 @@ export const sendTeamMessage = async (
         sender_id: employeeId,
         channel_id: channel,
         message: message,
-        is_important: isImportant
+        is_important: isImportant,
+        is_announcement: isAnnouncement
       });
       
     if (error) throw error;
@@ -75,6 +79,13 @@ export const sendTeamMessage = async (
       });
     }
     
+    if (isAnnouncement) {
+      toast({
+        title: "Announcement created",
+        description: "Your announcement has been sent to the team",
+      });
+    }
+    
     return true;
   } catch (error) {
     console.error("Error sending message:", error);
@@ -83,6 +94,36 @@ export const sendTeamMessage = async (
       description: "Please try again",
       variant: "destructive",
     });
+    return false;
+  }
+};
+
+export const addReactionToMessage = async (messageId: string, reaction: string) => {
+  try {
+    // First get the current message to check existing reactions
+    const { data: currentMessage, error: fetchError } = await supabase
+      .from('team_messages')
+      .select('reactions')
+      .eq('id', messageId)
+      .single();
+      
+    if (fetchError) throw fetchError;
+    
+    // Update the reactions array
+    const currentReactions = currentMessage?.reactions || [];
+    const newReactions = [...currentReactions, reaction];
+    
+    // Update the message with new reactions
+    const { error: updateError } = await supabase
+      .from('team_messages')
+      .update({ reactions: newReactions })
+      .eq('id', messageId);
+      
+    if (updateError) throw updateError;
+    
+    return true;
+  } catch (error) {
+    console.error("Error adding reaction:", error);
     return false;
   }
 };
@@ -109,22 +150,30 @@ export const setupRealtimeSubscription = (
         channelId: newMessageData.channel_id,
         message: newMessageData.message,
         isImportant: newMessageData.is_important,
+        isAnnouncement: newMessageData.is_announcement || false,
         createdAt: newMessageData.created_at,
+        reactions: newMessageData.reactions || [],
       };
       
       // Find sender info if available
       const sender = teamMembers.find(m => m.id === newMessage.senderId);
       if (sender) {
-        newMessage.sender_name = sender.name;
+        newMessage.sender_name = newMessageData.sender_name || sender.name;
         newMessage.sender_avatar = sender.avatar;
       }
       
       onNewMessage(newMessage);
       
-      // Show notification if it's important
-      if (newMessage.isImportant) {
+      // Show notification based on message type
+      if (newMessage.isAnnouncement) {
         toast({
-          title: "Important Team Message",
+          title: "📢 Team Announcement",
+          description: newMessage.message,
+          variant: "default",
+        });
+      } else if (newMessage.isImportant) {
+        toast({
+          title: "⚠️ Important Team Message",
           description: newMessage.message,
           variant: "destructive",
         });
@@ -133,4 +182,18 @@ export const setupRealtimeSubscription = (
     .subscribe();
     
   return teamChannel;
+};
+
+// Helper function to suggest AI responses based on message content
+export const suggestAIResponse = (message: string): string => {
+  // This is a simplified version - in production this would call an API
+  if (message.toLowerCase().includes('meeting')) {
+    return `I'll be there! Thanks for the meeting invite.`;
+  } else if (message.toLowerCase().includes('update') || message.toLowerCase().includes('status')) {
+    return `Thanks for the update. I'll review this information.`;
+  } else if (message.toLowerCase().includes('help') || message.toLowerCase().includes('assist')) {
+    return `I'd be happy to help with this. Let me know what you need.`;
+  } else {
+    return `Thank you for your message. I'll respond as soon as possible.`;
+  }
 };
