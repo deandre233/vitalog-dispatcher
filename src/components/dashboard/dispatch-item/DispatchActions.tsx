@@ -40,6 +40,28 @@ export function DispatchActions({
     }, 800);
   };
 
+  // Get the color styling based on the current status
+  const getMessageButtonStyles = () => {
+    switch (currentStatus) {
+      case "dispatch":
+        return "border-blue-200 text-blue-700 hover:bg-blue-50";
+      case "enroute":
+        return "border-indigo-200 text-indigo-700 hover:bg-indigo-50";
+      case "onscene":
+        return "border-violet-200 text-violet-700 hover:bg-violet-50";
+      case "transporting":
+        return "border-orange-200 text-orange-700 hover:bg-orange-50";
+      case "destination":
+        return "border-yellow-200 text-yellow-700 hover:bg-yellow-50";
+      case "available":
+        return "border-emerald-200 text-emerald-700 hover:bg-emerald-50";
+      case "canceled":
+        return "border-red-200 text-red-700 hover:bg-red-50";
+      default:
+        return "border-indigo-200 text-indigo-700 hover:bg-indigo-50";
+    }
+  };
+
   return (
     <div className="space-y-3">
       <Card className="border border-gray-200 shadow-sm overflow-hidden">
@@ -104,14 +126,14 @@ export function DispatchActions({
             onStatusChange={onStatusChange}
           />
           
-          <Card className="border border-indigo-200 shadow-sm overflow-hidden">
+          <Card className={`border shadow-sm overflow-hidden ${currentStatus === "canceled" ? "border-red-200" : `border-${currentStatus}-200`}`}>
             <CardContent className="p-3">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleMessageCrew}
                 disabled={isSendingMessage}
-                className="w-full flex items-center justify-center gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                className={`w-full flex items-center justify-center gap-1.5 ${getMessageButtonStyles()}`}
               >
                 <MessageCircle className="h-4 w-4" />
                 {isSendingMessage ? "Sending Message..." : "Message Crew"}
