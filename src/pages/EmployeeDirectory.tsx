@@ -9,6 +9,7 @@ import { DirectoryFilters } from "@/components/employee-directory/DirectoryFilte
 import { DirectoryTabs } from "@/components/employee-directory/DirectoryTabs";
 import { EmployeeGrid } from "@/components/employee-directory/EmployeeGrid";
 import { EmployeeList } from "@/components/employee-directory/EmployeeList";
+import { EmployeeTable } from "@/components/employee-directory/EmployeeTable";
 import { EmptyState } from "@/components/employee-directory/EmptyState";
 import { AIDirectoryInsights } from "@/components/employee-directory/AIDirectoryInsights";
 import { motion } from "framer-motion";
@@ -129,10 +130,15 @@ export function EmployeeDirectory() {
               employees={filteredEmployees} 
               getStatusBadgeColor={getStatusBadgeColor} 
             />
-          ) : (
+          ) : viewMode === "list" ? (
             <EmployeeList 
               employees={filteredEmployees} 
               getStatusBadgeColor={getStatusBadgeColor} 
+            />
+          ) : (
+            <EmployeeTable
+              employees={filteredEmployees}
+              getStatusBadgeColor={getStatusBadgeColor}
             />
           )}
         </DirectoryTabs>

@@ -17,7 +17,7 @@ export function useEmployeeDirectory() {
   const [filteredEmployees, setFilteredEmployees] = useState<ExtendedEmployee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "table">("grid");
   const [certFilter, setCertFilter] = useState<string>("all");
   const [stationFilter, setStationFilter] = useState<string>("all");
 

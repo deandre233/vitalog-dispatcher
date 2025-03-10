@@ -10,6 +10,7 @@ import {
   BadgeCheck,
   Grid3X3,
   List,
+  Table as TableIcon,
   Sparkles
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -21,8 +22,8 @@ interface DirectoryFiltersProps {
   setCertFilter: (filter: string) => void;
   stationFilter: string;
   setStationFilter: (filter: string) => void;
-  viewMode: "grid" | "list";
-  setViewMode: (mode: "grid" | "list") => void;
+  viewMode: "grid" | "list" | "table";
+  setViewMode: (mode: "grid" | "list" | "table") => void;
   certificationLevels: string[];
   stations: string[];
   resetFilters: () => void;
@@ -137,6 +138,14 @@ export function DirectoryFilters({
             onClick={() => setViewMode("list")}
           >
             <List className="h-3.5 w-3.5" />
+          </Button>
+          <Button 
+            variant={viewMode === "table" ? "default" : "ghost"}
+            size="sm" 
+            className={`h-7 ${viewMode === "table" ? "bg-white shadow-sm" : ""}`}
+            onClick={() => setViewMode("table")}
+          >
+            <TableIcon className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
