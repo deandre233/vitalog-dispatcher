@@ -14,7 +14,7 @@ export function HRDashboardHeader({ unreadMessages }: HRDashboardHeaderProps) {
   
   const handleMessageClick = () => {
     // Navigate to dedicated messages page
-    navigate(`/messages`);
+    navigate("/messages");
     
     toast({
       title: "Messages",
