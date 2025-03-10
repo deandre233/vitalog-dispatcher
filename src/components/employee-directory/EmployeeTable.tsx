@@ -3,7 +3,7 @@ import { Employee } from "@/types/employee";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Phone, Clock } from "lucide-react";
+import { MapPin, Phone, Clock, Check, Calendar, Mail, Building } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -38,19 +38,18 @@ export function EmployeeTable({ employees, getStatusBadgeColor }: EmployeeTableP
   };
   
   return (
-    <div className="overflow-hidden rounded-md border border-[#E5DEFF]">
+    <div className="overflow-hidden rounded-md border border-[#E5DEFF] bg-white shadow-sm">
       <Table>
         <TableHeader className="bg-[#F9F8FF]">
           <TableRow>
-            <TableHead className="w-[250px]">Employee</TableHead>
-            <TableHead>Certification</TableHead>
-            <TableHead>Station</TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>Experience</TableHead>
+            <TableHead className="w-[250px] font-semibold">Employee</TableHead>
+            <TableHead className="font-semibold">Certification</TableHead>
+            <TableHead className="font-semibold">Station</TableHead>
+            <TableHead className="font-semibold">Phone</TableHead>
+            <TableHead className="font-semibold">Experience</TableHead>
           </TableRow>
         </TableHeader>
         <motion.tbody
-          className="divide-y"
           variants={container}
           initial="hidden"
           animate="show"
@@ -59,12 +58,12 @@ export function EmployeeTable({ employees, getStatusBadgeColor }: EmployeeTableP
             <motion.tr 
               key={employee.id}
               variants={item}
-              className="bg-white hover:bg-[#F9F8FF] cursor-pointer transition-colors"
+              className="bg-white hover:bg-[#F9F8FF] cursor-pointer transition-colors border-b border-[#F1F0FB]"
               onClick={() => handleEmployeeClick(employee.id)}
             >
               <TableCell className="font-medium py-3">
                 <div className="flex items-center space-x-3">
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-9 w-9 ring-2 ring-[#F1F0FB]">
                     <AvatarImage 
                       src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${employee.id}`}
                       alt={`${employee.first_name} ${employee.last_name}`}
@@ -74,7 +73,8 @@ export function EmployeeTable({ employees, getStatusBadgeColor }: EmployeeTableP
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium">{employee.first_name} {employee.last_name}</p>
+                    <p className="font-medium text-gray-900">{employee.first_name} {employee.last_name}</p>
+                    <p className="text-xs text-gray-500">{employee.employee_type || 'Employee'}</p>
                   </div>
                 </div>
               </TableCell>
@@ -88,24 +88,26 @@ export function EmployeeTable({ employees, getStatusBadgeColor }: EmployeeTableP
               </TableCell>
               <TableCell>
                 <div className="flex items-center text-gray-600">
-                  <MapPin className="h-3 w-3 mr-1 text-gray-400" />
+                  <MapPin className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
                   {employee.station || 'Unassigned'}
                 </div>
               </TableCell>
               <TableCell>
                 {employee.phone && (
                   <div className="flex items-center text-gray-600">
-                    <Phone className="h-3 w-3 mr-1 text-gray-400" />
+                    <Phone className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
                     {employee.phone}
                   </div>
                 )}
               </TableCell>
               <TableCell>
-                {employee.years_experience !== undefined && (
+                {employee.years_experience !== undefined ? (
                   <div className="flex items-center text-gray-600">
-                    <Clock className="h-3 w-3 mr-1 text-gray-400" />
+                    <Clock className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
                     {employee.years_experience} years
                   </div>
+                ) : (
+                  <span className="text-gray-400 text-sm italic">No data</span>
                 )}
               </TableCell>
             </motion.tr>
