@@ -29,6 +29,7 @@ import { ResourceLibrary } from "./pages/ResourceLibrary";
 import { Categories } from "./pages/Categories";
 import { HistoricalEntry } from "./pages/HistoricalEntry";
 import { ExternalLink } from "./pages/ExternalLink";
+import HRHome from "./pages/HRHome";
 
 const router = createBrowserRouter([
   {
@@ -151,6 +152,10 @@ const router = createBrowserRouter([
   {
     path: "/external-link",
     element: <ExternalLink />,
+  },
+  {
+    path: "/hr",
+    element: <HRHome />,
   }
 ]);
 

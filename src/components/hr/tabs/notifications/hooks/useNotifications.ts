@@ -62,7 +62,7 @@ export function useNotifications(employeeId: string) {
       if (data) {
         // Process data to enhance team message notifications with sender info
         const enhancedData = await Promise.all(data.map(async (notif) => {
-          let updatedNotif = { ...notif };
+          let mappedNotif = mapNotificationData(notif, employeeId);
           
           // If it's a team message notification, get sender info
           if (notif.team_message_id && notif.team_messages) {
@@ -77,8 +77,9 @@ export function useNotifications(employeeId: string) {
                 .single();
                 
               if (senderData) {
-                updatedNotif = {
-                  ...updatedNotif,
+                // Use optional chaining to safely access and modify properties
+                mappedNotif = {
+                  ...mappedNotif,
                   sender_name: `${senderData.first_name} ${senderData.last_name}`
                 };
               }
@@ -87,7 +88,7 @@ export function useNotifications(employeeId: string) {
             }
           }
           
-          return mapNotificationData(updatedNotif, employeeId);
+          return mappedNotif;
         }));
         
         setNotifications(enhancedData);

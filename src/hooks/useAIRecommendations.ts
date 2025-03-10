@@ -1,58 +1,73 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AIRecommendation } from "@/types/ai";
 
-// Adapter function to transform API data to AIRecommendation type
+// Helper function to adapt data to AIRecommendation type
 const adaptToAIRecommendation = (data: any): AIRecommendation => {
   return {
     recommendation: data.recommendation || data.prediction || "",
-    confidence: data.confidence_score || 0.7,
-    source: data.type || "ai",
-    context: data.metadata ? JSON.stringify(data.metadata) : undefined,
-    timestamp: data.created_at
+    confidence: data.confidence_score ? data.confidence_score / 100 : (data.confidence || 0.7),
+    source: data.source || "AI Analysis",
+    context: data.metadata?.context || data.context || "",
+    timestamp: data.created_at || new Date().toISOString()
   };
 };
 
-export const useAIRecommendations = (entityId: string, entityType: string) => {
-  return useQuery({
-    queryKey: ['ai_recommendations', entityId, entityType],
-    queryFn: async () => {
+export function useAIRecommendations() {
+  const [loading, setLoading] = useState(false);
+  
+  const getRecommendations = async (entity: string, entityId: string): Promise<AIRecommendation[]> => {
+    setLoading(true);
+    try {
       const { data, error } = await supabase
-        .from('ai_analysis_results')
+        .from('ai_recommendations')
         .select('*')
+        .eq('entity_type', entity)
         .eq('entity_id', entityId)
-        .eq('entity_type', entityType);
-
-      if (error) {
-        throw error;
-      }
-
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
       // Transform the data to match AIRecommendation type
-      return (data || []).map(adaptToAIRecommendation);
-    },
-    enabled: !!entityId && !!entityType
-  });
-};
-
-// This is just a placeholder for when we don't have a real entity ID yet
-export const useMockAIRecommendations = () => {
-  return {
-    data: [
-      {
-        recommendation: "Consider updating employee certifications",
-        confidence: 0.95,
-        source: "employee_analysis",
-        timestamp: new Date().toISOString()
-      },
-      {
-        recommendation: "Review shift patterns to optimize scheduling",
-        confidence: 0.82,
-        source: "scheduling_engine",
-        timestamp: new Date().toISOString()
-      }
-    ],
-    isLoading: false,
-    error: null
+      const recommendations = (data || []).map(adaptToAIRecommendation);
+      
+      return recommendations;
+    } catch (error) {
+      console.error('Error fetching AI recommendations:', error);
+      return [];
+    } finally {
+      setLoading(false);
+    }
   };
-};
+  
+  const addRecommendation = async (
+    entity: string, 
+    entityId: string, 
+    recommendation: string,
+    confidence: number = 0.7,
+    metadata: any = {}
+  ) => {
+    try {
+      const { error } = await supabase
+        .from('ai_recommendations')
+        .insert({
+          entity_type: entity,
+          entity_id: entityId,
+          recommendation,
+          confidence_score: confidence * 100, // Store as percentage
+          metadata,
+          created_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      
+      return true;
+    } catch (error) {
+      console.error('Error adding AI recommendation:', error);
+      return false;
+    }
+  };
+  
+  return { getRecommendations, addRecommendation, loading };
+}
