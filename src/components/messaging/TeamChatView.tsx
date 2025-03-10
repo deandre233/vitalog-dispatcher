@@ -1,6 +1,7 @@
 
 import { TeamChatContainer } from "./team-chat/TeamChatContainer";
 import { Message, Channel } from "./team-chat/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface TeamChatViewProps {
   messages: Message[];
