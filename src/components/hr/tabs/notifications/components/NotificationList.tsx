@@ -1,6 +1,7 @@
 
 import { EmployeeNotification } from "@/types/ai";
 import { NotificationItem } from "./NotificationItem";
+import { EmptyNotifications } from "./EmptyNotifications";
 
 interface NotificationListProps {
   notifications: EmployeeNotification[];
@@ -10,11 +11,7 @@ interface NotificationListProps {
 
 export function NotificationList({ notifications, onMarkAsRead, onSwitchToTeamChat }: NotificationListProps) {
   if (notifications.length === 0) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        No notifications to display
-      </div>
-    );
+    return <EmptyNotifications />;
   }
 
   return (

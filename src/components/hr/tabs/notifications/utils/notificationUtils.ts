@@ -1,7 +1,8 @@
 
 import { Bell, CheckCircle, AlertTriangle, InfoIcon, MessageSquare } from "lucide-react";
+import { ReactNode } from "react";
 
-export const getNotificationIcon = (type: string) => {
+export const getNotificationIcon = (type: string): ReactNode => {
   switch (type) {
     case 'info':
       return <InfoIcon className="h-4 w-4 text-blue-500" />;
