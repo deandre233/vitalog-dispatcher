@@ -7,9 +7,9 @@ import { AIRecommendation } from "@/types/ai";
 const adaptToAIRecommendation = (data: any): AIRecommendation => {
   return {
     recommendation: data.recommendation || data.prediction || "",
-    confidence: data.confidence_score ? data.confidence_score / 100 : (data.confidence || 0.7),
-    source: data.source || "AI Analysis",
-    context: data.metadata?.context || data.context || "",
+    confidence: data.confidence_score ? data.confidence_score / 100 : 0.7,
+    source: data.analysis_type || "AI Analysis",
+    context: data.metadata?.context || "",
     timestamp: data.created_at || new Date().toISOString()
   };
 };
@@ -21,10 +21,10 @@ export function useAIRecommendations() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('ai_recommendations')
+        .from('ai_analysis_results')
         .select('*')
-        .eq('entity_type', entity)
-        .eq('entity_id', entityId)
+        .eq('analysis_type', entity)
+        .eq(entity === 'patient' ? 'patient_id' : 'transport_id', entityId)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -50,10 +50,10 @@ export function useAIRecommendations() {
   ) => {
     try {
       const { error } = await supabase
-        .from('ai_recommendations')
+        .from('ai_analysis_results')
         .insert({
-          entity_type: entity,
-          entity_id: entityId,
+          analysis_type: entity,
+          [entity === 'patient' ? 'patient_id' : 'transport_id']: entityId,
           recommendation,
           confidence_score: confidence * 100, // Store as percentage
           metadata,
