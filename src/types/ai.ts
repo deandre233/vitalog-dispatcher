@@ -37,4 +37,15 @@ export interface EmployeeNotification {
   createdAt: string;
   aiMetadata?: AIRecommendation;
   teamMessageId?: string;
+  sender_name?: string;
+}
+
+// Legacy interface for compatibility with existing code
+export interface AIInsight {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  severity: 'low' | 'medium' | 'high';
+  timestamp: string;
 }

@@ -25,10 +25,15 @@ export const fetchTeamMessages = async (channel: string, teamMembers: TeamMember
     
     if (data) {
       // Enhance messages with sender info where available
-      const enhancedMessages = data.map(msg => {
+      const enhancedMessages: TeamMessage[] = data.map(msg => {
         const sender = teamMembers.find(m => m.id === msg.sender_id);
         return {
-          ...msg,
+          id: msg.id,
+          senderId: msg.sender_id,
+          channelId: msg.channel_id,
+          message: msg.message,
+          isImportant: msg.is_important,
+          createdAt: msg.created_at,
           sender_name: sender?.name,
           sender_avatar: sender?.avatar
         };
@@ -95,7 +100,17 @@ export const setupRealtimeSubscription = (
       table: 'team_messages',
       filter: `channel_id=eq.${channel}`
     }, (payload) => {
-      const newMessage = payload.new as TeamMessage;
+      const newMessageData = payload.new as any;
+      
+      // Convert to our TeamMessage type
+      const newMessage: TeamMessage = {
+        id: newMessageData.id,
+        senderId: newMessageData.sender_id,
+        channelId: newMessageData.channel_id,
+        message: newMessageData.message,
+        isImportant: newMessageData.is_important,
+        createdAt: newMessageData.created_at,
+      };
       
       // Find sender info if available
       const sender = teamMembers.find(m => m.id === newMessage.senderId);
