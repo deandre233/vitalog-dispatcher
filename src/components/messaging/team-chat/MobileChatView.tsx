@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -5,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Menu, Search, MessageSquare, Users } from "lucide-react";
+import { Send, Menu, Search, MessageSquare, Users, Sparkles } from "lucide-react";
 import { ChannelSidebar } from "./ChannelSidebar";
 import { MessageList } from "./MessageList";
 import { Message } from "./types";
