@@ -9,11 +9,12 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { Brain, Building2 } from "lucide-react";
 import { useState } from "react";
 import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
-import { AIInsight } from "@/types/ai";
+import type { AIInsight } from "@/types/service-queue";
 import { Json } from "@/integrations/supabase/types";
 import { CenterTable } from "@/components/center/CenterTable";
 import { BillingSidebar } from "@/components/navigation/BillingSidebar";
 import { Header } from "@/components/layout/Header";
+import { adaptLegacyInsightToServiceQueue } from "@/components/hr/tabs/notifications/utils/notificationUtils";
 
 interface AIRecommendations {
   usage_pattern: string;
@@ -60,7 +61,6 @@ export const CenterList = () => {
     hideNonContract: false
   });
 
-  // Generate AI insights based on center data
   const generateAIInsights = (center: Center): AIInsight[] => {
     const insights: AIInsight[] = [];
     

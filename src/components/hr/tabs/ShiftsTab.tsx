@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format } from "date-fns";
 import { Calendar, Brain, TrendingUp, AlertTriangle, HelpCircle } from "lucide-react";
@@ -16,7 +15,7 @@ import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
 import { useToast } from "@/components/ui/use-toast";
 import { ShiftFilters } from "@/components/shifts/ShiftFilters";
 import type { ShiftRecord, ShiftFilter } from "@/types/shift-records";
-import type { AIInsight } from "@/types/ai";
+import type { AIInsight } from "@/types/service-queue";
 
 interface ShiftsTabProps {
   employeeId?: string;

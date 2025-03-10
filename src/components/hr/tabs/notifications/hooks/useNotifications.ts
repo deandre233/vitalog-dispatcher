@@ -50,7 +50,8 @@ export function useNotifications(employeeId: string) {
           *,
           team_messages (
             id,
-            sender_id
+            sender_id,
+            sender_name
           )
         `)
         .eq('employee_id', employeeId)
@@ -69,14 +70,19 @@ export function useNotifications(employeeId: string) {
             const senderId = notif.team_messages.sender_id;
             
             try {
-              const { data: senderData } = await supabase
-                .from('employees')
-                .select('first_name, last_name')
-                .eq('id', senderId)
-                .single();
-                
-              if (senderData) {
-                updatedNotif.sender_name = `${senderData.first_name} ${senderData.last_name}`;
+              // Only fetch if there's no sender_name already
+              if (!notif.sender_name && !notif.team_messages.sender_name) {
+                const { data: senderData } = await supabase
+                  .from('employees')
+                  .select('first_name, last_name')
+                  .eq('id', senderId)
+                  .single();
+                  
+                if (senderData) {
+                  updatedNotif.sender_name = `${senderData.first_name} ${senderData.last_name}`;
+                }
+              } else if (notif.team_messages.sender_name) {
+                updatedNotif.sender_name = notif.team_messages.sender_name;
               }
             } catch (err) {
               console.error("Error fetching sender info:", err);

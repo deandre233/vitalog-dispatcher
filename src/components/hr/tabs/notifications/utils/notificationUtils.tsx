@@ -1,6 +1,33 @@
 
 import { Bell, CheckCircle, AlertTriangle, InfoIcon, MessageSquare } from "lucide-react";
 import { ReactNode } from "react";
+import type { AIInsight as ServiceQueueAIInsight } from "@/types/service-queue";
+import type { AIInsight as AiTsAIInsight } from "@/types/ai";
+
+// Type adapters to convert between different AIInsight formats
+export const adaptAIInsightToServiceQueue = (insight: AiTsAIInsight): ServiceQueueAIInsight => {
+  return {
+    type: insight.type === 'info' ? 'optimization' : 
+           insight.type === 'warning' ? 'warning' : 'prediction',
+    message: insight.description,
+    confidence: typeof insight.severity === 'string' ? 
+               (insight.severity === 'high' ? 0.9 : 
+                insight.severity === 'medium' ? 0.7 : 0.5) : 0.7,
+    impact: typeof insight.severity === 'string' ? 
+            insight.severity as 'low' | 'medium' | 'high' : 'medium'
+  };
+};
+
+export const adaptLegacyInsightToServiceQueue = (insight: any): ServiceQueueAIInsight => {
+  // Ensure we have all required fields with sensible defaults
+  return {
+    type: insight.type || 'optimization',
+    message: insight.message || insight.description || "No message available",
+    confidence: insight.confidence_score ? insight.confidence_score / 100 : 
+               insight.confidence || 0.7,
+    impact: insight.impact || insight.severity || 'medium'
+  };
+};
 
 export const getNotificationIcon = (type: string): JSX.Element => {
   switch (type) {
@@ -46,6 +73,6 @@ export const mapNotificationData = (data: any, employeeId: string) => {
     createdAt: data.created_at,
     aiMetadata: data.ai_metadata,
     teamMessageId: data.team_message_id,
-    sender_name: data.sender_name
+    sender_name: data.sender_name || (data.team_messages?.sender_name) || ''
   };
 };

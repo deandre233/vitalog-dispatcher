@@ -1,6 +1,7 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { AIInsight } from "@/types/ai";
+import type { AIInsight } from "@/types/service-queue";
 import type { AuthorizationRequest, AuthorizationStatus } from "@/types/authorization";
 import { toast } from "sonner";
 
