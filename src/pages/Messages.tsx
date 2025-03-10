@@ -7,31 +7,26 @@ import { AINotificationCenter } from "@/components/hr/tabs/notifications/AINotif
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { 
   MessageSquare, 
   Search, 
   Bot, 
   Filter, 
   Bell, 
-  Send, 
-  Users, 
   Plus, 
-  User, 
-  Clock, 
-  ArrowRight 
+  Users
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import { NewMessageDialog } from "@/components/messaging/NewMessageDialog";
+import { TeamChatView } from "@/components/messaging/TeamChatView";
 
 export default function Messages() {
   // Mock employee ID - in a real app, this would come from auth context
   const employeeId = "emp-123";
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("team-chat");
-  const [newMessage, setNewMessage] = useState("");
+  const [showNewMessageDialog, setShowNewMessageDialog] = useState(false);
+  
   const [messages, setMessages] = useState([
     {
       id: "msg-1",
@@ -113,49 +108,26 @@ export default function Messages() {
     { id: "ch-5", name: "Dispatch", type: "operations", unread: 0 },
     { id: "ch-6", name: "Training", type: "training", unread: 0 }
   ]);
-
-  const [selectedConversation, setSelectedConversation] = useState(null);
-  const [currentChannelName, setCurrentChannelName] = useState("Entire Team");
   
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
-    
-    // Add message to the conversation
+  const handleNewMessage = (recipients: string[], message: string) => {
+    // Add new message to the conversation
     const newMsg = {
       id: `msg-${Date.now()}`,
-      channel: currentChannelName,
+      channel: recipients.length > 1 ? "Group Message" : "Direct Message",
       sender: "You",
       senderAvatar: "",
-      content: newMessage,
+      content: message,
       timestamp: "Just now",
       read: true,
-      participants: [currentChannelName]
+      participants: recipients
     };
     
     setMessages(prev => [newMsg, ...prev]);
-    setNewMessage("");
     
     toast({
       title: "Message sent",
-      description: "Your message has been sent successfully",
+      description: `Your message has been sent to ${recipients.join(", ")}`,
     });
-  };
-  
-  const getChannelIcon = (type) => {
-    switch(type) {
-      case "team": return <Users className="h-4 w-4" />;
-      case "announcement": return <Bell className="h-4 w-4" />;
-      case "celebration": return <User className="h-4 w-4" />;
-      case "applicants": return <User className="h-4 w-4" />;
-      case "operations": return <MessageSquare className="h-4 w-4" />;
-      case "training": return <User className="h-4 w-4" />;
-      default: return <MessageSquare className="h-4 w-4" />;
-    }
-  };
-  
-  const handleSelectConversation = (message) => {
-    setSelectedConversation(message);
-    setCurrentChannelName(message.channel);
   };
   
   return (
@@ -170,15 +142,19 @@ export default function Messages() {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="md:flex hidden">
                 <Filter className="h-4 w-4 mr-2" />
                 Filter
               </Button>
-              <Button size="sm" className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+              <Button size="sm" className="md:flex hidden bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
                 <Bot className="h-4 w-4 mr-2" />
                 AI Assistant
               </Button>
-              <Button size="sm" variant="default">
+              <Button 
+                size="sm" 
+                variant="default" 
+                onClick={() => setShowNewMessageDialog(true)}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 New Message
               </Button>
@@ -196,7 +172,7 @@ export default function Messages() {
           </div>
           
           <Tabs defaultValue="team-chat" className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="mb-4 bg-muted/50">
+            <TabsList className="mb-4 bg-muted/50 overflow-x-auto flex w-full md:w-auto">
               <TabsTrigger value="team-chat" className="flex gap-1">
                 <Users className="h-4 w-4" />
                 <span>Team Chat</span>
@@ -216,159 +192,12 @@ export default function Messages() {
             </TabsList>
             
             <TabsContent value="team-chat" className="w-full">
-              <div className="grid grid-cols-12 gap-4 h-[700px]">
-                {/* Channels/Contacts sidebar */}
-                <div className="col-span-3 border rounded-lg bg-background shadow-sm">
-                  <div className="p-3 border-b">
-                    <h3 className="font-medium">Channels</h3>
-                  </div>
-                  <ScrollArea className="h-[640px]">
-                    <div className="p-2">
-                      {channels.map(channel => (
-                        <Button 
-                          key={channel.id} 
-                          variant="ghost" 
-                          className="w-full justify-start mb-1 font-normal"
-                          onClick={() => setCurrentChannelName(channel.name)}
-                        >
-                          <div className="flex items-center justify-between w-full">
-                            <div className="flex items-center">
-                              {getChannelIcon(channel.type)}
-                              <span className="ml-2">{channel.name}</span>
-                            </div>
-                            {channel.unread > 0 && (
-                              <Badge variant="destructive" className="ml-auto">
-                                {channel.unread}
-                              </Badge>
-                            )}
-                          </div>
-                        </Button>
-                      ))}
-                      
-                      <Separator className="my-2" />
-                      
-                      <h3 className="font-medium mb-2 px-2">Direct Messages</h3>
-                      <Button 
-                        variant="ghost" 
-                        className="w-full justify-start mb-1 font-normal"
-                      >
-                        <User className="h-4 w-4 mr-2" />
-                        <span>Justen B.</span>
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        className="w-full justify-start mb-1 font-normal"
-                      >
-                        <User className="h-4 w-4 mr-2" />
-                        <span>Blake G.</span>
-                        <Badge variant="destructive" className="ml-auto">1</Badge>
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        className="w-full justify-start mb-1 font-normal"
-                      >
-                        <User className="h-4 w-4 mr-2" />
-                        <span>Andrew T.</span>
-                        <Badge variant="destructive" className="ml-auto">2</Badge>
-                      </Button>
-                    </div>
-                  </ScrollArea>
-                </div>
-                
-                {/* Messages List */}
-                <div className="col-span-4 border rounded-lg bg-background shadow-sm overflow-hidden">
-                  <div className="p-3 border-b flex justify-between items-center">
-                    <h3 className="font-medium">Messages</h3>
-                    <Button size="sm" variant="ghost">
-                      <Filter className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <ScrollArea className="h-[640px]">
-                    <div className="divide-y">
-                      {messages
-                        .filter(msg => searchQuery ? 
-                          msg.content.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          msg.sender.toLowerCase().includes(searchQuery.toLowerCase()) : 
-                          true)
-                        .map(message => (
-                        <div 
-                          key={message.id} 
-                          className={`p-3 hover:bg-muted/50 cursor-pointer transition-colors ${!message.read ? 'bg-muted/20' : ''} ${selectedConversation?.id === message.id ? 'bg-muted' : ''}`}
-                          onClick={() => handleSelectConversation(message)}
-                        >
-                          <div className="flex justify-between mb-1">
-                            <div className="font-medium">{message.channel === "Direct Message" ? message.sender : message.channel}</div>
-                            <div className="text-xs text-muted-foreground">{message.timestamp}</div>
-                          </div>
-                          <div className="text-sm text-muted-foreground truncate">{message.content}</div>
-                          {!message.read && (
-                            <div className="mt-1 flex justify-end">
-                              <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-                
-                {/* Conversation View */}
-                <div className="col-span-5 border rounded-lg bg-background shadow-sm flex flex-col">
-                  <div className="p-3 border-b flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Avatar className="h-6 w-6 mr-2">
-                        <AvatarImage src="/lovable-uploads/056f6072-2287-4579-bb29-786c9206ac76.png" />
-                        <AvatarFallback>{currentChannelName.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <h3 className="font-medium">{currentChannelName}</h3>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="ghost">
-                        <User className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost">
-                        <Search className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <ScrollArea className="flex-1 p-4">
-                    <div className="flex flex-col-reverse gap-3">
-                      {/* Current conversation messages would go here */}
-                      <div className="bg-muted/20 p-3 rounded-lg max-w-[80%] ml-auto">
-                        <div className="font-medium text-sm mb-1 text-right">You</div>
-                        <div>I'll follow up with the team on that.</div>
-                        <div className="text-xs text-muted-foreground mt-1 text-right">Just now</div>
-                      </div>
-                      
-                      <div className="bg-muted/10 p-3 rounded-lg max-w-[80%]">
-                        <div className="font-medium text-sm mb-1 flex items-center">
-                          <Avatar className="h-5 w-5 mr-1">
-                            <AvatarFallback>HH</AvatarFallback>
-                          </Avatar>
-                          Heart to Heart Ambulance
-                        </div>
-                        <div>{selectedConversation ? selectedConversation.content : "I felt that one, rest in peace"}</div>
-                        <div className="text-xs text-muted-foreground mt-1">Today at 10:45 AM</div>
-                      </div>
-                    </div>
-                  </ScrollArea>
-                  
-                  <div className="p-3 border-t">
-                    <div className="flex gap-2">
-                      <Input 
-                        placeholder="Type your message..." 
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                      />
-                      <Button onClick={handleSendMessage} className="bg-gradient-to-r from-purple-500 to-indigo-600">
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <TeamChatView 
+                messages={messages}
+                channels={channels}
+                searchQuery={searchQuery}
+                onNewMessage={handleNewMessage}
+              />
             </TabsContent>
             
             <TabsContent value="notifications" className="w-full">
@@ -431,6 +260,13 @@ export default function Messages() {
           </Tabs>
         </div>
       </div>
+      
+      {/* New Message Dialog */}
+      <NewMessageDialog
+        open={showNewMessageDialog}
+        onOpenChange={setShowNewMessageDialog}
+        onMessageSent={handleNewMessage}
+      />
     </MainLayout>
   );
 }
