@@ -7,7 +7,7 @@ import { AINotificationCenter } from "@/components/hr/tabs/notifications/AINotif
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Search, Robot, Filter, Bell } from "lucide-react";
+import { MessageSquare, Search, Bot, Filter, Bell } from "lucide-react";
 
 export default function Messages() {
   // Mock employee ID - in a real app, this would come from auth context
@@ -31,7 +31,7 @@ export default function Messages() {
                 Filter
               </Button>
               <Button size="sm" className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
-                <Robot className="h-4 w-4 mr-2" />
+                <Bot className="h-4 w-4 mr-2" />
                 AI Assistant
               </Button>
             </div>
@@ -54,7 +54,7 @@ export default function Messages() {
                 <span>Notifications</span>
               </TabsTrigger>
               <TabsTrigger value="ai-interactions" className="flex gap-1">
-                <Robot className="h-4 w-4" />
+                <Bot className="h-4 w-4" />
                 <span>AI Interactions</span>
               </TabsTrigger>
               <TabsTrigger value="insights" className="flex gap-1">
@@ -89,7 +89,7 @@ export default function Messages() {
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="h-[600px] flex flex-col justify-center items-center text-center p-6 bg-slate-50 rounded-lg border border-dashed">
-                    <Robot className="h-12 w-12 text-slate-400 mb-4" />
+                    <Bot className="h-12 w-12 text-slate-400 mb-4" />
                     <h3 className="text-lg font-medium mb-2">AI Assistant is ready</h3>
                     <p className="text-sm text-muted-foreground mb-4 max-w-md">
                       Ask questions about HR policies, get help with forms, or request insights about your team
