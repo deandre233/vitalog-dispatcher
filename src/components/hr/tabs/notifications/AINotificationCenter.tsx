@@ -22,12 +22,6 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
     markAllAsRead 
   } = useNotifications(employeeId);
 
-  const handleSwitchToTeamChat = () => {
-    // Find parent component and switch to team chat tab
-    const tabsTrigger = document.querySelector('[value="team-chat"]') as HTMLElement;
-    if (tabsTrigger) tabsTrigger.click();
-  };
-
   const handleToggleShowAll = () => {
     setShowAll(!showAll);
     fetchNotifications();
@@ -46,7 +40,6 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
         <NotificationList
           notifications={notifications}
           onMarkAsRead={markAsRead}
-          onSwitchToTeamChat={handleSwitchToTeamChat}
         />
       )}
       

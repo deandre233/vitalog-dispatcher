@@ -13,8 +13,8 @@ export function HRDashboardHeader({ unreadMessages }: HRDashboardHeaderProps) {
   const navigate = useNavigate();
   
   const handleMessageClick = () => {
-    // Navigate to the employee profile with the notifications tab active
-    navigate(`/employees/profile/current?tab=notifications`);
+    // Navigate to dedicated messages page
+    navigate(`/messages`);
     
     toast({
       title: "Messages",
