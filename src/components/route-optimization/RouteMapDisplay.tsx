@@ -6,63 +6,56 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle, AlertCircle, Map as MapIcon } from "lucide-react";
 import { toast } from "sonner";
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from "@/integrations/supabase/client";
+import { initGoogleMaps, getRouteDetails } from "@/utils/googleMapsService";
 
 export function RouteMapDisplay() {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const map = useRef<google.maps.Map | null>(null);
+  const directionsRenderer = useRef<google.maps.DirectionsRenderer | null>(null);
   const { origin, destination, optimizedRoute, isLoading, error } = useRouteOptimization();
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string | null>(null);
 
   // Initialize map
   useEffect(() => {
     let isMounted = true;
-    let mapInstance: mapboxgl.Map | null = null;
 
     const initializeMap = async () => {
       if (!mapContainer.current || !isMounted) return;
 
       try {
-        // Get Mapbox token from Edge Function
-        const { data: { MAPBOX_PUBLIC_TOKEN }, error } = await supabase.functions.invoke('get-mapbox-token');
-        
-        if (error || !MAPBOX_PUBLIC_TOKEN) {
-          throw new Error('Failed to get Mapbox token');
-        }
-        
-        setMapboxToken(MAPBOX_PUBLIC_TOKEN);
+        // Initialize Google Maps
+        await initGoogleMaps();
         
         if (!isMounted) return;
-
-        mapboxgl.accessToken = MAPBOX_PUBLIC_TOKEN;
         
-        mapInstance = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/streets-v12',
-          center: [-84.3880, 33.7490], // Default to Atlanta
+        const mapOptions: google.maps.MapOptions = {
+          center: { lat: 33.7490, lng: -84.3880 }, // Default to Atlanta
           zoom: 10,
-          pitch: 45,
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          mapTypeControl: true,
+          streetViewControl: true,
+          fullscreenControl: true,
+        };
+        
+        const newMap = new google.maps.Map(mapContainer.current, mapOptions);
+        map.current = newMap;
+        
+        // Initialize the DirectionsRenderer
+        const renderer = new google.maps.DirectionsRenderer({
+          map: newMap,
+          suppressMarkers: true, // We'll add custom markers
+          polylineOptions: {
+            strokeColor: "#4957FB",
+            strokeWeight: 5,
+            strokeOpacity: 0.8,
+          }
         });
-
-        map.current = mapInstance;
-
-        mapInstance.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-        mapInstance.on('style.load', () => {
-          if (!isMounted || !mapInstance) return;
-          
-          mapInstance.setFog({
-            'color': 'rgb(255, 255, 255)',
-            'high-color': 'rgb(200, 200, 225)',
-            'horizon-blend': 0.2,
-          });
-          setMapLoading(false);
-        });
-
+        directionsRenderer.current = renderer;
+        
+        setMapLoading(false);
       } catch (error) {
         console.error('Error initializing map:', error);
         const errorMessage = error instanceof Error ? error.message : 'Failed to initialize map';
@@ -78,11 +71,6 @@ export function RouteMapDisplay() {
 
     return () => {
       isMounted = false;
-      
-      if (mapInstance) {
-        mapInstance.remove();
-      }
-      map.current = null;
     };
   }, []);
 
@@ -91,76 +79,52 @@ export function RouteMapDisplay() {
     if (!map.current || !origin || !destination || !optimizedRoute || mapLoading) return;
 
     const currentMap = map.current;
-
-    // Remove any existing routes
-    if (currentMap.getSource('route')) {
-      currentMap.removeLayer('route-layer');
-      currentMap.removeSource('route');
-    }
-
-    // Add the new route
-    currentMap.addSource('route', {
-      type: 'geojson',
-      data: {
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: optimizedRoute.route.coordinates
-        }
-      }
-    });
-
-    currentMap.addLayer({
-      id: 'route-layer',
-      type: 'line',
-      source: 'route',
-      layout: {
-        'line-join': 'round',
-        'line-cap': 'round'
+    
+    // Clear existing markers
+    const markers = document.querySelectorAll('.marker');
+    markers.forEach(marker => marker.remove());
+    
+    // Create origin marker
+    const originMarker = new google.maps.Marker({
+      position: { lat: origin.lat, lng: origin.lng },
+      map: currentMap,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: "#22c55e", // green-500
+        fillOpacity: 1,
+        strokeColor: "#ffffff",
+        strokeWeight: 2,
       },
-      paint: {
-        'line-color': '#4957FB',
-        'line-width': 5,
-        'line-opacity': 0.8
-      }
+      title: "Origin"
     });
-
-    // Add markers for origin and destination
-    // Remove existing markers first
-    const existingMarkers = document.querySelectorAll('.marker');
-    existingMarkers.forEach(marker => marker.remove());
-
-    // Origin marker
-    const originEl = document.createElement('div');
-    originEl.className = 'marker origin-marker';
-    originEl.innerHTML = `
-      <div class="p-2 bg-green-500 rounded-full shadow-md">
-        <div class="h-4 w-4 bg-white rounded-full"></div>
-      </div>
-    `;
-    new mapboxgl.Marker(originEl)
-      .setLngLat([origin.lng, origin.lat])
-      .addTo(currentMap);
-
-    // Destination marker
-    const destEl = document.createElement('div');
-    destEl.className = 'marker destination-marker';
-    destEl.innerHTML = `
-      <div class="p-2 bg-red-500 rounded-full shadow-md">
-        <div class="h-4 w-4 bg-white rounded-full"></div>
-      </div>
-    `;
-    new mapboxgl.Marker(destEl)
-      .setLngLat([destination.lng, destination.lat])
-      .addTo(currentMap);
-
-    // Fit the map to the route
-    currentMap.fitBounds([
-      [Math.min(origin.lng, destination.lng) - 0.05, Math.min(origin.lat, destination.lat) - 0.05],
-      [Math.max(origin.lng, destination.lng) + 0.05, Math.max(origin.lat, destination.lat) + 0.05]
-    ], { padding: 50 });
-
+    
+    // Create destination marker
+    const destinationMarker = new google.maps.Marker({
+      position: { lat: destination.lat, lng: destination.lng },
+      map: currentMap,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: "#ef4444", // red-500
+        fillOpacity: 1,
+        strokeColor: "#ffffff",
+        strokeWeight: 2,
+      },
+      title: "Destination"
+    });
+    
+    // Display the route
+    if (directionsRenderer.current) {
+      directionsRenderer.current.setDirections(optimizedRoute.route);
+      
+      // Fit the map to the route bounds
+      const bounds = new google.maps.LatLngBounds();
+      bounds.extend({ lat: origin.lat, lng: origin.lng });
+      bounds.extend({ lat: destination.lat, lng: destination.lng });
+      currentMap.fitBounds(bounds);
+    }
+    
   }, [origin, destination, optimizedRoute, mapLoading]);
 
   return (

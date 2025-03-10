@@ -3,6 +3,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Location } from "@/types/operations-map";
+import { getRouteDetails } from "@/utils/googleMapsService";
 
 interface RouteOptimizationContextType {
   origin: Location | null;
@@ -41,6 +42,27 @@ export function RouteOptimizationProvider({ children }: { children: ReactNode })
       setIsLoading(true);
       setError(null);
 
+      // First, try to get route directly using Google Maps
+      try {
+        const routeDetails = await getRouteDetails(origin, destination);
+        
+        // If we successfully get a route from Google Maps
+        setOptimizedRoute({
+          route: routeDetails.route,
+          duration: routeDetails.duration,
+          distance: routeDetails.distance,
+          trafficConditions: routeDetails.trafficDuration || 'Normal'
+        });
+        
+        toast.success("Route optimized successfully");
+        setIsLoading(false);
+        return;
+      } catch (directError) {
+        console.error("Direct Google Maps routing failed, trying backend:", directError);
+        // If direct routing fails, fall back to backend function
+      }
+
+      // Fall back to backend function
       const { data, error: optimizeError } = await supabase.functions.invoke("optimize-route", {
         body: {
           origin,

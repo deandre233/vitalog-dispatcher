@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Location {
@@ -76,6 +77,7 @@ export const initGoogleMaps = async () => {
 };
 
 export const geocodeAddress = async (address: string): Promise<Location> => {
+  await initGoogleMaps();
   const geocoder = new google.maps.Geocoder();
   
   return new Promise((resolve, reject) => {
@@ -97,6 +99,7 @@ export const getRouteDetails = async (
   origin: Location | string,
   destination: Location | string
 ): Promise<RouteDetails> => {
+  await initGoogleMaps();
   const directionsService = new google.maps.DirectionsService();
   
   const request: google.maps.DirectionsRequest = {
@@ -106,7 +109,11 @@ export const getRouteDetails = async (
     drivingOptions: {
       departureTime: new Date(),
       trafficModel: google.maps.TrafficModel.BEST_GUESS
-    }
+    },
+    optimizeWaypoints: true,
+    provideRouteAlternatives: true,
+    avoidHighways: false,
+    avoidTolls: false
   };
   
   return new Promise((resolve, reject) => {

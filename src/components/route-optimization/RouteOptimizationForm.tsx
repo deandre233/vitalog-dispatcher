@@ -11,6 +11,8 @@ import { format } from "date-fns";
 import { Loader2, Calendar as CalendarIcon, Route, ArrowRightLeft, Brain } from "lucide-react";
 import { useRouteOptimization } from "./RouteOptimizationContext";
 import { cn } from "@/lib/utils";
+import { geocodeAddress } from "@/utils/googleMapsService";
+import { toast } from "sonner";
 
 export function RouteOptimizationForm() {
   const { 
@@ -28,17 +30,44 @@ export function RouteOptimizationForm() {
   const [originAddress, setOriginAddress] = useState("");
   const [destinationAddress, setDestinationAddress] = useState("");
   const [selectedTime, setSelectedTime] = useState("12:00");
+  const [geocodingLoading, setGeocodingLoading] = useState(false);
 
   const handleAddressChange = (type: 'origin' | 'destination', address: string) => {
     if (type === 'origin') {
       setOriginAddress(address);
-      // In a real implementation, this would use a geocoding service
-      // For demo purposes, using mock coordinates
-      setOrigin({ lat: 33.7490, lng: -84.3880 });
     } else {
       setDestinationAddress(address);
-      // Mock destination coordinates
-      setDestination({ lat: 33.9480, lng: -84.1480 });
+    }
+  };
+
+  const handleGeocodeAddresses = async () => {
+    try {
+      setGeocodingLoading(true);
+      
+      if (!originAddress) {
+        toast.error("Please enter an origin address");
+        return;
+      }
+      
+      if (!destinationAddress) {
+        toast.error("Please enter a destination address");
+        return;
+      }
+      
+      // Geocode origin
+      const originLocation = await geocodeAddress(originAddress);
+      setOrigin(originLocation);
+      
+      // Geocode destination
+      const destinationLocation = await geocodeAddress(destinationAddress);
+      setDestination(destinationLocation);
+      
+      toast.success("Addresses geocoded successfully");
+    } catch (error) {
+      console.error("Geocoding error:", error);
+      toast.error("Failed to geocode addresses. Please check and try again.");
+    } finally {
+      setGeocodingLoading(false);
     }
   };
 
@@ -59,7 +88,8 @@ export function RouteOptimizationForm() {
     }
   };
 
-  const handleOptimize = () => {
+  const handleOptimize = async () => {
+    await handleGeocodeAddresses();
     optimizeRoute();
   };
 
@@ -162,12 +192,12 @@ export function RouteOptimizationForm() {
             <Button 
               className="flex-1" 
               onClick={handleOptimize}
-              disabled={isLoading || !originAddress || !destinationAddress}
+              disabled={isLoading || geocodingLoading || !originAddress || !destinationAddress}
             >
-              {isLoading ? (
+              {isLoading || geocodingLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Optimizing...
+                  {geocodingLoading ? "Geocoding..." : "Optimizing..."}
                 </>
               ) : (
                 <>
