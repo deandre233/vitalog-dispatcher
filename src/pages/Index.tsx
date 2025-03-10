@@ -27,13 +27,14 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { AIInsightsPanel } from "@/components/dispatch/ai/AIInsightsPanel";
 import { cn } from "@/lib/utils";
+import type { AIInsight } from "@/types/service-queue";
 
 const logStartup = () => {
   console.log("Index component starting to render...");
 };
 
-// Mock AI insights
-const mockAIInsights = [
+// Mock AI insights with the correct type values
+const mockAIInsights: AIInsight[] = [
   {
     type: 'prediction',
     message: 'High volume expected in South District today based on historical patterns',
