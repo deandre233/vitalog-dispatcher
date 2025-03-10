@@ -1,3 +1,4 @@
+
 export interface AIRecommendation {
   recommendation: string;
   confidence: number;

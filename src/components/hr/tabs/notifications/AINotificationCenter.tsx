@@ -17,6 +17,7 @@ interface EmployeeNotification {
   created_at: string;
   ai_metadata?: AIRecommendation;
   team_message_id?: string;
+  team_messages?: any;
   sender_name?: string;
 }
 

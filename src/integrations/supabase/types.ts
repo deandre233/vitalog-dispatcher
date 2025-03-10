@@ -1316,6 +1316,57 @@ export type Database = {
           },
         ]
       }
+      employee_notifications: {
+        Row: {
+          ai_metadata: Json | null
+          created_at: string | null
+          employee_id: string
+          id: string
+          is_read: boolean
+          message: string
+          team_message_id: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          ai_metadata?: Json | null
+          created_at?: string | null
+          employee_id: string
+          id?: string
+          is_read?: boolean
+          message: string
+          team_message_id?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          ai_metadata?: Json | null
+          created_at?: string | null
+          employee_id?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          team_message_id?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_notifications_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_notifications_team_message_id_fkey"
+            columns: ["team_message_id"]
+            isOneToOne: false
+            referencedRelation: "team_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_payroll_history: {
         Row: {
           access_codes: string | null
@@ -3125,6 +3176,44 @@ export type Database = {
           stripe_price_id_monthly?: string | null
         }
         Relationships: []
+      }
+      team_messages: {
+        Row: {
+          channel_id: string
+          created_at: string | null
+          id: string
+          is_important: boolean
+          message: string
+          sender_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string | null
+          id?: string
+          is_important?: boolean
+          message: string
+          sender_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string | null
+          id?: string
+          is_important?: boolean
+          message?: string
+          sender_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       traffic_analysis: {
         Row: {
