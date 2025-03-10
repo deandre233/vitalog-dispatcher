@@ -11,6 +11,7 @@ import {
 import { useMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export function Header({ className = "" }) {
   const isMobile = useMobile();
@@ -63,13 +64,12 @@ export function Header({ className = "" }) {
             
             <div className="hidden md:flex">
               <Button 
-                as={Link} 
-                to="/create"
                 variant="ghost" 
                 size="sm"
                 className="relative overflow-hidden text-white bg-white/10 hover:bg-white/20 
                            shadow-lg hover:shadow-xl transition-all duration-300 gap-2
                            border border-white/30 rounded-full pl-3 pr-4"
+                onClick={() => window.location.href = '/create'}
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300"></span>
                 <Plus className="w-4 h-4" />
