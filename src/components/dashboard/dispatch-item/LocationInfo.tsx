@@ -2,6 +2,7 @@
 import { MapPin, Navigation, User, Clock, Ambulance } from "lucide-react";
 import { HospitalStatus } from "../HospitalStatus";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 interface LocationInfoProps {
   origin: string;
@@ -12,26 +13,28 @@ interface LocationInfoProps {
 
 export function LocationInfo({ origin, destination, patientCondition, eta }: LocationInfoProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {patientCondition && (
-        <div className="p-3 bg-blue-50 rounded-md border border-blue-100">
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-blue-600" />
-            <div className="text-sm font-medium text-blue-700">Patient Condition</div>
-          </div>
-          <div className="ml-6 mt-1 text-sm text-blue-800">{patientCondition}</div>
-        </div>
+        <Card className="border border-blue-100 bg-blue-50 shadow-sm">
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <User className="h-4 w-4 text-blue-600" />
+              <div className="text-sm font-medium text-blue-700">Patient Condition</div>
+            </div>
+            <div className="ml-6 text-sm text-blue-800">{patientCondition}</div>
+          </CardContent>
+        </Card>
       )}
       
-      <div className="bg-gray-50 rounded-md border border-gray-200 overflow-hidden">
-        <div className="bg-gray-100 px-3 py-2 border-b border-gray-200">
+      <Card className="border border-gray-200 shadow-sm overflow-hidden">
+        <CardHeader className="py-2 px-3 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center">
             <Navigation className="h-4 w-4 text-gray-600 mr-1.5" />
             <h4 className="text-sm font-medium text-gray-700">Transport Information</h4>
           </div>
-        </div>
+        </CardHeader>
         
-        <div className="p-3 space-y-3">
+        <CardContent className="p-3 space-y-3">
           <div className="flex items-start gap-3">
             <div className="flex items-center justify-center w-7 h-7 bg-blue-100 rounded-full flex-shrink-0 mt-0.5">
               <MapPin className="h-4 w-4 text-blue-600" />
@@ -63,8 +66,8 @@ export function LocationInfo({ origin, destination, patientCondition, eta }: Loc
               </div>
             </div>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
       
       {destination && (
         <HospitalStatus 

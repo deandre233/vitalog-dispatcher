@@ -2,6 +2,7 @@
 import { Package, Car, MapPin, Ambulance, Flag, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export type DispatchStatus = "dispatch" | "enroute" | "onscene" | "transporting" | "destination" | "available" | "canceled";
 
@@ -84,55 +85,45 @@ export function DispatchStatusBar({ currentStatus, onStatusChange }: DispatchSta
   const currentStatusData = statusConfig.find(s => s.id === currentStatus);
 
   return (
-    <div className="space-y-4">
-      {/* Current status indicator */}
-      <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-3 rounded-lg border border-blue-100">
-        <div className="flex items-center gap-2 mb-2">
-          <div className={`w-3 h-3 rounded-full animate-pulse ${currentStatusData?.progressColor}`}></div>
-          <h3 className="font-medium text-gray-800">Current Status: <span className="font-semibold text-blue-700">{currentStatusData?.label}</span></h3>
+    <Card className="border border-gray-200 shadow-sm">
+      <CardHeader className="pb-2 pt-4 px-4 border-b border-gray-100">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className={`w-3 h-3 rounded-full animate-pulse ${currentStatusData?.progressColor}`}></div>
+            <h3 className="font-medium text-gray-800 text-sm">
+              Current Status: <span className="font-semibold text-blue-700">{currentStatusData?.label}</span>
+            </h3>
+          </div>
+          <div className="text-xs text-gray-500">{currentStatusData?.description}</div>
         </div>
-        <p className="text-sm text-gray-600 ml-5">{currentStatusData?.description}</p>
-      </div>
-
-      {/* Status progression */}
-      <div className="flex items-center justify-between w-full gap-2 p-4 bg-white rounded-lg shadow-sm">
-        {statusConfig.map((status) => {
-          const isActive = currentStatus === status.id;
-          const isPast = getStatusIndex(currentStatus) > getStatusIndex(status.id as DispatchStatus);
-          const Icon = status.icon;
-          
-          return (
-            <div key={status.id} className="flex flex-col items-center gap-1 flex-1">
+      </CardHeader>
+      
+      <CardContent className="pt-3 pb-4 px-4">
+        <div className="flex flex-wrap gap-1.5 items-center justify-center">
+          {statusConfig.map((status) => {
+            const isActive = currentStatus === status.id;
+            const isPast = getStatusIndex(currentStatus) > getStatusIndex(status.id as DispatchStatus);
+            const Icon = status.icon;
+            
+            return (
               <Button
+                key={status.id}
                 variant={isActive ? "default" : isPast ? "secondary" : "outline"}
                 size="sm"
+                onClick={() => onStatusChange(status.id as DispatchStatus)}
                 className={cn(
-                  "w-full transition-all duration-300",
+                  "transition-all duration-300 min-w-24 h-8",
                   isActive && `${status.color} ${status.shadow} shadow-md`,
                   isPast && "bg-gray-100 text-gray-700"
                 )}
-                onClick={() => onStatusChange(status.id as DispatchStatus)}
               >
-                <Icon className={`w-4 h-4 mr-1 ${isActive ? "animate-pulse" : ""}`} />
+                <Icon className={`w-3.5 h-3.5 mr-1 ${isActive ? "animate-pulse" : ""}`} />
                 {status.label}
               </Button>
-              {status.id !== "available" && status.id !== "canceled" && (
-                <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
-                    className={cn(
-                      "h-full transition-all duration-500 rounded-full",
-                      (isActive || isPast) ? status.progressColor : "bg-gray-200"
-                    )}
-                    style={{
-                      width: isPast ? "100%" : isActive ? "50%" : "0%"
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
