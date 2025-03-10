@@ -3,13 +3,11 @@ import { useState, useEffect } from "react";
 import { TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmployeeBeacon } from "./notifications/EmployeeBeacon";
 import { AINotificationCenter } from "./notifications/AINotificationCenter";
-import { TeamMessaging } from "./notifications/TeamMessaging";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageSquare, Bell } from "lucide-react";
+import { Bell } from "lucide-react";
 
 interface NotificationsTabProps {
   employeeId: string;
@@ -17,7 +15,6 @@ interface NotificationsTabProps {
 
 export function NotificationsTab({ employeeId }: NotificationsTabProps) {
   const [isOnClock, setIsOnClock] = useState(false);
-  const [activeTab, setActiveTab] = useState("team-chat"); // Set team-chat as default
   const [teamMembers, setTeamMembers] = useState<{ id: string; name: string; avatar?: string }[]>([]);
   
   useEffect(() => {
@@ -121,11 +118,6 @@ export function NotificationsTab({ employeeId }: NotificationsTabProps) {
                 defaultEnabled={true}
               />
               <NotificationSetting 
-                title="Team Messages" 
-                description="Updates from your team and colleagues"
-                defaultEnabled={true}
-              />
-              <NotificationSetting 
                 title="Important Announcements" 
                 description="Emergency and high-priority messages"
                 defaultEnabled={true}
@@ -139,25 +131,13 @@ export function NotificationsTab({ employeeId }: NotificationsTabProps) {
       
       <Card className="overflow-hidden">
         <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="team-chat" className="gap-2">
-                <MessageSquare className="h-4 w-4" />
-                Team Chat
-              </TabsTrigger>
-              <TabsTrigger value="notifications" className="gap-2">
-                <Bell className="h-4 w-4" />
-                Notifications
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex items-center gap-2">
+            <Bell className="h-4 w-4" />
+            <h3 className="text-lg font-medium">Notifications</h3>
+          </div>
         </CardHeader>
         <CardContent className="p-4 pt-6">
-          {activeTab === "team-chat" ? (
-            <TeamMessaging employeeId={employeeId} teamMembers={teamMembers} />
-          ) : (
-            <AINotificationCenter employeeId={employeeId} />
-          )}
+          <AINotificationCenter employeeId={employeeId} />
         </CardContent>
       </Card>
     </TabsContent>

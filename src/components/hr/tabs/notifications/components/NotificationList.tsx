@@ -6,10 +6,9 @@ import { EmptyNotifications } from "./EmptyNotifications";
 interface NotificationListProps {
   notifications: EmployeeNotification[];
   onMarkAsRead: (id: string) => void;
-  onSwitchToTeamChat: () => void;
 }
 
-export function NotificationList({ notifications, onMarkAsRead, onSwitchToTeamChat }: NotificationListProps) {
+export function NotificationList({ notifications, onMarkAsRead }: NotificationListProps) {
   if (notifications.length === 0) {
     return <EmptyNotifications />;
   }
@@ -21,7 +20,6 @@ export function NotificationList({ notifications, onMarkAsRead, onSwitchToTeamCh
           key={notification.id} 
           notification={notification}
           onMarkAsRead={onMarkAsRead}
-          onSwitchToTeamChat={onSwitchToTeamChat}
         />
       ))}
     </div>

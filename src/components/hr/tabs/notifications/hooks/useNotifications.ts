@@ -46,13 +46,7 @@ export function useNotifications(employeeId: string) {
       // Fetch notifications
       const { data, error } = await supabase
         .from('employee_notifications')
-        .select(`
-          *,
-          team_messages (
-            id,
-            sender_id
-          )
-        `)
+        .select('*')
         .eq('employee_id', employeeId)
         .order('created_at', { ascending: false })
         .limit(showAll ? 50 : 10);
@@ -60,37 +54,8 @@ export function useNotifications(employeeId: string) {
       if (error) throw error;
       
       if (data) {
-        // Process data to enhance team message notifications with sender info
-        const enhancedData = await Promise.all(data.map(async (notif) => {
-          let mappedNotif = mapNotificationData(notif, employeeId);
-          
-          // If it's a team message notification, get sender info
-          if (notif.team_message_id && notif.team_messages) {
-            const senderId = notif.team_messages.sender_id;
-            
-            try {
-              // Fetch sender info if needed
-              const { data: senderData } = await supabase
-                .from('employees')
-                .select('first_name, last_name')
-                .eq('id', senderId)
-                .single();
-                
-              if (senderData) {
-                // Use optional chaining to safely access and modify properties
-                mappedNotif = {
-                  ...mappedNotif,
-                  sender_name: `${senderData.first_name} ${senderData.last_name}`
-                };
-              }
-            } catch (err) {
-              console.error("Error fetching sender info:", err);
-            }
-          }
-          
-          return mappedNotif;
-        }));
-        
+        // Process data to enhance notifications
+        const enhancedData = data.map(notif => mapNotificationData(notif, employeeId));
         setNotifications(enhancedData);
         setUnreadCount(enhancedData.filter(n => !n.isRead).length || 0);
       }
