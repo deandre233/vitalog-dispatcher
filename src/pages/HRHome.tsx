@@ -14,11 +14,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { 
   Activity, Clock, User, FileText, BarChart3, Users, 
   AlertTriangle, Calendar, Zap, CheckCircle2, FileCheck2, 
-  BarChart, FileSpreadsheet, GraduationCap
+  BarChart, FileSpreadsheet, GraduationCap, MessageSquare
 } from "lucide-react";
 
 export default function HRHome() {
   const [isLoading, setIsLoading] = useState(true);
+  const [unreadMessages, setUnreadMessages] = useState(3);
   const [statusData, setStatusData] = useState({
     onDuty: 0,
     onCall: 0,
@@ -61,6 +62,13 @@ export default function HRHome() {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleMessageClick = () => {
+    toast({
+      title: "Messages",
+      description: "Opening your message center...",
+    });
+  };
+
   return (
     <HRLayout>
       <div className="container mx-auto py-6 space-y-8">
@@ -73,6 +81,22 @@ export default function HRHome() {
             <Button variant="outline" size="sm">
               <Clock className="mr-2 h-4 w-4" />
               Daily Report
+            </Button>
+            <Button 
+              size="sm" 
+              onClick={handleMessageClick}
+              className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300 relative animate-pulse"
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Messages
+              {unreadMessages > 0 && (
+                <Badge 
+                  className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-red-500 text-white border-2 border-white" 
+                  variant="destructive"
+                >
+                  {unreadMessages}
+                </Badge>
+              )}
             </Button>
             <Button size="sm">
               <Activity className="mr-2 h-4 w-4" />
