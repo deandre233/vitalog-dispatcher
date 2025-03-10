@@ -1,8 +1,10 @@
 
 import { Button } from "@/components/ui/button";
-import { Users, XCircle, Shield, AlertCircle } from "lucide-react";
+import { Users, XCircle, Shield, AlertCircle, MessageCircle } from "lucide-react";
 import { DispatchStatus, DispatchStatusBar } from "../DispatchStatusBar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface DispatchActionsProps {
   assignedTo: string;
@@ -21,6 +23,23 @@ export function DispatchActions({
   currentStatus,
   onStatusChange
 }: DispatchActionsProps) {
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
+
+  const handleMessageCrew = () => {
+    if (assignedTo === "Unassigned") {
+      toast.error("Cannot message an unassigned crew");
+      return;
+    }
+    
+    setIsSendingMessage(true);
+    
+    // Simulate sending a message
+    setTimeout(() => {
+      setIsSendingMessage(false);
+      toast.success(`Message sent to ${assignedTo}`);
+    }, 800);
+  };
+
   return (
     <div className="space-y-3">
       <Card className="border border-gray-200 shadow-sm overflow-hidden">
@@ -79,10 +98,27 @@ export function DispatchActions({
           </CardContent>
         </Card>
       ) : (
-        <DispatchStatusBar
-          currentStatus={currentStatus}
-          onStatusChange={onStatusChange}
-        />
+        <>
+          <DispatchStatusBar
+            currentStatus={currentStatus}
+            onStatusChange={onStatusChange}
+          />
+          
+          <Card className="border border-indigo-200 shadow-sm overflow-hidden">
+            <CardContent className="p-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleMessageCrew}
+                disabled={isSendingMessage}
+                className="w-full flex items-center justify-center gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+              >
+                <MessageCircle className="h-4 w-4" />
+                {isSendingMessage ? "Sending Message..." : "Message Crew"}
+              </Button>
+            </CardContent>
+          </Card>
+        </>
       )}
     </div>
   );
