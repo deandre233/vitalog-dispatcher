@@ -1,41 +1,34 @@
 
-import { ErrorBoundary } from "@/components/common/ErrorBoundary";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/navigation/AppSidebar";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { ReactNode, useEffect } from "react";
+import { AppSidebar } from "../navigation/AppSidebar";
+import { Header } from "./Header";
+import { useMobile } from "@/hooks/use-mobile";
 
 interface MainLayoutProps {
-  children: React.ReactNode;
-  showDashboardHeader?: boolean;
-  showSidebar?: boolean;
+  children: ReactNode;
 }
 
-export const MainLayout = ({ 
-  children, 
-  showDashboardHeader = true,
-  showSidebar = true 
-}: MainLayoutProps) => {
+export function MainLayout({ children }: MainLayoutProps) {
+  const isMobile = useMobile();
+  
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <ErrorBoundary>
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
-        <Header />
-        <div className="flex-1 flex">
-          <SidebarProvider>
-            {showSidebar && <AppSidebar />}
-            <div className="flex-1 bg-[#f4f7fc] overflow-auto rounded-tl-2xl shadow-inner">
-              {showDashboardHeader && <DashboardHeader />}
-              <main className="p-6">
-                <div className="max-w-[1400px] mx-auto">
-                  {children}
-                </div>
-              </main>
-            </div>
-          </SidebarProvider>
-        </div>
-        <Footer />
+    <div className="flex flex-col min-h-screen bg-slate-50">
+      <Header />
+      
+      <div className="flex flex-1 overflow-hidden">
+        {!isMobile && <AppSidebar />}
+        
+        <main className="flex-1 overflow-y-auto">
+          <div className="container mx-auto p-4 sm:p-6">
+            {children}
+          </div>
+        </main>
       </div>
-    </ErrorBoundary>
+    </div>
   );
-};
+}
