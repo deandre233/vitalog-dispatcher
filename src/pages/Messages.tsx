@@ -1,4 +1,3 @@
-
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useState, useEffect } from "react";
@@ -24,7 +23,6 @@ import { MessageFilter } from "@/components/messaging/MessageFilter";
 import { EmptyStateMessage } from "@/components/messaging/EmptyStateMessage";
 
 export default function Messages() {
-  // Mock employee ID - in a real app, this would come from auth context
   const employeeId = "emp-123";
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("team-chat");
@@ -113,25 +111,7 @@ export default function Messages() {
     { id: "ch-6", name: "Training", type: "training", unread: 0 }
   ]);
   
-  // Filter messages based on selected filter
-  const filteredMessages = messages.filter(message => {
-    if (messageFilter === "unread") return !message.read;
-    if (messageFilter === "recent") {
-      // Consider messages from the last 3 days as recent
-      const isRecent = message.timestamp.includes("MAR") || 
-                       message.timestamp.includes("FEB 28");
-      return isRecent;
-    }
-    return true;
-  }).filter(msg => 
-    searchQuery ? 
-    msg.content.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    msg.sender.toLowerCase().includes(searchQuery.toLowerCase()) : 
-    true
-  );
-  
   const handleNewMessage = (recipients: string[], message: string) => {
-    // Add new message to the conversation
     const newMsg = {
       id: `msg-${Date.now()}`,
       channel: recipients.length > 1 ? "Group Message" : "Direct Message",
@@ -150,6 +130,29 @@ export default function Messages() {
       description: `Your message has been sent to ${recipients.join(", ")}`,
     });
   };
+
+  const handleShowAITools = () => {
+    toast({
+      title: "AI Messaging Tools",
+      description: "Features to help you communicate more effectively",
+      variant: "default",
+    });
+  };
+  
+  const filteredMessages = messages.filter(message => {
+    if (messageFilter === "unread") return !message.read;
+    if (messageFilter === "recent") {
+      const isRecent = message.timestamp.includes("MAR") || 
+                       message.timestamp.includes("FEB 28");
+      return isRecent;
+    }
+    return true;
+  }).filter(msg => 
+    searchQuery ? 
+    msg.content.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    msg.sender.toLowerCase().includes(searchQuery.toLowerCase()) : 
+    true
+  );
   
   return (
     <MainLayout>
@@ -193,6 +196,7 @@ export default function Messages() {
             <MessageFilter 
               activeFilter={messageFilter}
               onFilterChange={setMessageFilter}
+              onShowAITools={handleShowAITools}
             />
           </div>
           
@@ -238,6 +242,20 @@ export default function Messages() {
                       }
                       onAction={() => setShowNewMessageDialog(true)}
                       actionLabel="Start a conversation"
+                      onAIAssist={() => {
+                        toast({
+                          title: "AI Assistant",
+                          description: "What would you like to do?",
+                          action: (
+                            <div className="flex flex-col space-y-2 mt-2">
+                              <Button variant="outline" size="sm" onClick={() => setShowNewMessageDialog(true)}>
+                                <Sparkles className="h-4 w-4 mr-2 text-orange-500" />
+                                Generate new message
+                              </Button>
+                            </div>
+                          ),
+                        });
+                      }}
                     />
                   </CardContent>
                 </Card>
@@ -309,7 +327,6 @@ export default function Messages() {
         </div>
       </div>
       
-      {/* New Message Dialog */}
       <NewMessageDialog
         open={showNewMessageDialog}
         onOpenChange={setShowNewMessageDialog}

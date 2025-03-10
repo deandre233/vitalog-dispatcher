@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,13 +14,17 @@ import {
   ArrowRight,
   ArrowLeft,
   Pin,
-  UserPlus
+  UserPlus,
+  Sparkles
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { EmptyStateMessage } from "./EmptyStateMessage";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { AIMessageGenerator } from "./AIMessageGenerator";
+import { AITextCorrection } from "./AITextCorrection";
 
 interface Message {
   id: string;
@@ -59,6 +62,9 @@ export function TeamChatView({
   const [currentChannelName, setCurrentChannelName] = useState("Entire Team");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [pinnedMessages, setPinnedMessages] = useState<string[]>([]);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [showAICorrection, setShowAICorrection] = useState(false);
+  const { toast } = useToast();
   
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
@@ -116,6 +122,52 @@ export function TeamChatView({
     }
   };
 
+  const handleShowAITools = () => {
+    // Simple toggle menu for AI tools
+    toast({
+      title: "AI Tools",
+      description: "Choose an AI tool to help with your messages",
+      action: (
+        <div className="flex flex-col space-y-2 mt-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-orange-200 text-orange-600 hover:bg-orange-50 justify-start"
+            onClick={() => setShowAIGenerator(true)}
+          >
+            <Sparkles className="h-4 w-4 mr-2 text-orange-500" />
+            Generate Message
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-orange-200 text-orange-600 hover:bg-orange-50 justify-start"
+            onClick={() => setShowAICorrection(true)}
+          >
+            <Sparkles className="h-4 w-4 mr-2 text-orange-500" />
+            Correct Text
+          </Button>
+        </div>
+      ),
+    });
+  };
+  
+  const handleApplyCorrection = (correctedText: string) => {
+    setNewMessage(correctedText);
+    toast({
+      title: "Text Corrected",
+      description: "AI corrections applied to your message",
+    });
+  };
+  
+  const handleSelectGeneratedMessage = (message: string) => {
+    setNewMessage(message);
+    toast({
+      title: "Message Generated",
+      description: "AI generated message added to input",
+    });
+  };
+
   const filteredMessages = messages;
   
   return (
@@ -168,7 +220,7 @@ export function TeamChatView({
             </ScrollArea>
             
             <div className="p-3 border-t">
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center mb-2">
                 <Input 
                   placeholder="Type your message..." 
                   value={newMessage}
@@ -181,6 +233,26 @@ export function TeamChatView({
                   className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700"
                 >
                   <Send className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex justify-between">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs text-muted-foreground"
+                  onClick={() => setShowAICorrection(true)}
+                >
+                  <Sparkles className="h-3 w-3 mr-1 text-orange-400" />
+                  Auto-correct
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-xs text-muted-foreground"
+                  onClick={() => setShowAIGenerator(true)}
+                >
+                  <Sparkles className="h-3 w-3 mr-1 text-orange-400" />
+                  AI Generate
                 </Button>
               </div>
             </div>
@@ -205,6 +277,7 @@ export function TeamChatView({
                   <EmptyStateMessage 
                     title="No messages found"
                     description="Start a conversation with your team"
+                    onAIAssist={() => setShowAIGenerator(true)}
                   />
                 ) : (
                   <div className="divide-y">
@@ -399,8 +472,8 @@ export function TeamChatView({
         <div className="col-span-4 border rounded-lg bg-background shadow-sm overflow-hidden">
           <div className="p-3 border-b bg-muted/10 flex justify-between items-center">
             <h3 className="font-medium">Messages</h3>
-            <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
-              <Filter className="h-4 w-4" />
+            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={handleShowAITools}>
+              <Sparkles className="h-4 w-4 text-orange-500" />
             </Button>
           </div>
           <ScrollArea className="h-[640px]">
@@ -408,6 +481,7 @@ export function TeamChatView({
               <EmptyStateMessage 
                 title="No messages found"
                 description="Start a conversation with your team"
+                onAIAssist={() => setShowAIGenerator(true)}
               />
             ) : (
               <div className="divide-y">
@@ -498,7 +572,7 @@ export function TeamChatView({
           </ScrollArea>
           
           <div className="p-3 border-t">
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center mb-2">
               <Input 
                 placeholder="Type your message..." 
                 value={newMessage}
@@ -513,9 +587,47 @@ export function TeamChatView({
                 <Send className="h-4 w-4" />
               </Button>
             </div>
+            <div className="flex justify-between">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs text-muted-foreground"
+                onClick={() => setShowAICorrection(true)}
+              >
+                <Sparkles className="h-3 w-3 mr-1 text-orange-400" />
+                Auto-correct
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-xs text-muted-foreground"
+                onClick={() => setShowAIGenerator(true)}
+              >
+                <Sparkles className="h-3 w-3 mr-1 text-orange-400" />
+                AI Generate
+              </Button>
+            </div>
           </div>
         </div>
       </div>
+      
+      {/* AI Message Generator Dialog */}
+      <Dialog open={showAIGenerator} onOpenChange={setShowAIGenerator}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+          <AIMessageGenerator 
+            onSelectMessage={handleSelectGeneratedMessage}
+            onClose={() => setShowAIGenerator(false)}
+          />
+        </DialogContent>
+      </Dialog>
+      
+      {/* AI Text Correction Dialog */}
+      <AITextCorrection
+        open={showAICorrection}
+        onOpenChange={setShowAICorrection}
+        initialText={newMessage}
+        onApply={handleApplyCorrection}
+      />
     </>
   );
 }

@@ -2,14 +2,19 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Filter, Clock, Star } from "lucide-react";
+import { Filter, Clock, Star, Sparkles } from "lucide-react";
 
 interface MessageFilterProps {
   activeFilter: string;
   onFilterChange: (filter: string) => void;
+  onShowAITools?: () => void;
 }
 
-export function MessageFilter({ activeFilter, onFilterChange }: MessageFilterProps) {
+export function MessageFilter({ 
+  activeFilter, 
+  onFilterChange,
+  onShowAITools
+}: MessageFilterProps) {
   return (
     <div className="flex items-center justify-between w-full py-2">
       <Tabs 
@@ -34,6 +39,17 @@ export function MessageFilter({ activeFilter, onFilterChange }: MessageFilterPro
       </Tabs>
       
       <div className="hidden md:flex items-center gap-2">
+        {onShowAITools && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-xs border-orange-200 text-orange-600 hover:bg-orange-50"
+            onClick={onShowAITools}
+          >
+            <Sparkles className="h-3.5 w-3.5 mr-1 text-orange-500" />
+            AI Tools
+          </Button>
+        )}
         <Button variant="outline" size="sm" className="text-xs">
           <Filter className="h-3.5 w-3.5 mr-1" />
           More Filters
