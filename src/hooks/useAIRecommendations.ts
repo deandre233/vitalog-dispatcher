@@ -1,30 +1,58 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { AIRecommendation } from "@/types/ai";
+import { AIRecommendation } from "@/types/ai";
 
-export function useAIRecommendations() {
+// Adapter function to transform API data to AIRecommendation type
+const adaptToAIRecommendation = (data: any): AIRecommendation => {
+  return {
+    recommendation: data.recommendation || data.prediction || "",
+    confidence: data.confidence_score || 0.7,
+    source: data.type || "ai",
+    context: data.metadata ? JSON.stringify(data.metadata) : undefined,
+    timestamp: data.created_at
+  };
+};
+
+export const useAIRecommendations = (entityId: string, entityType: string) => {
   return useQuery({
-    queryKey: ['ai_recommendations'],
+    queryKey: ['ai_recommendations', entityId, entityType],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('ai_analysis_results')
         .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
+        .eq('entity_id', entityId)
+        .eq('entity_type', entityType);
 
-      if (error) throw error;
-      
-      // Map the database fields to match our AIRecommendation interface
-      return data.map(item => ({
-        id: item.id,
-        type: item.analysis_type,
-        prediction: item.prediction,
-        confidence_score: item.confidence_score,
-        metadata: item.metadata,
-        created_at: item.created_at,
-        recommendation: item.recommendation,
-        suggestions: item.suggestions
-      })) as AIRecommendation[];
-    }
+      if (error) {
+        throw error;
+      }
+
+      // Transform the data to match AIRecommendation type
+      return (data || []).map(adaptToAIRecommendation);
+    },
+    enabled: !!entityId && !!entityType
   });
-}
+};
+
+// This is just a placeholder for when we don't have a real entity ID yet
+export const useMockAIRecommendations = () => {
+  return {
+    data: [
+      {
+        recommendation: "Consider updating employee certifications",
+        confidence: 0.95,
+        source: "employee_analysis",
+        timestamp: new Date().toISOString()
+      },
+      {
+        recommendation: "Review shift patterns to optimize scheduling",
+        confidence: 0.82,
+        source: "scheduling_engine",
+        timestamp: new Date().toISOString()
+      }
+    ],
+    isLoading: false,
+    error: null
+  };
+};

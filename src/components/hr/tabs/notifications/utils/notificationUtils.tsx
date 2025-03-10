@@ -73,6 +73,6 @@ export const mapNotificationData = (data: any, employeeId: string) => {
     createdAt: data.created_at,
     aiMetadata: data.ai_metadata,
     teamMessageId: data.team_message_id,
-    sender_name: data.sender_name || (data.team_messages?.sender_name) || ''
+    sender_name: data.sender_name || ''
   };
 };
