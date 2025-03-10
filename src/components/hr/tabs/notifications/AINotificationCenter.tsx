@@ -6,9 +6,13 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { AIRecommendation } from "@/types/ai";
+import { AIRecommendation, EmployeeNotification } from "@/types/ai";
 
-interface EmployeeNotification {
+interface AINotificationCenterProps {
+  employeeId: string;
+}
+
+interface NotificationData {
   id: string;
   title: string;
   message: string;
@@ -19,10 +23,6 @@ interface EmployeeNotification {
   team_message_id?: string;
   team_messages?: any;
   sender_name?: string;
-}
-
-interface AINotificationCenterProps {
-  employeeId: string;
 }
 
 export function AINotificationCenter({ employeeId }: AINotificationCenterProps) {
@@ -42,7 +42,7 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
         table: 'employee_notifications',
         filter: `employee_id=eq.${employeeId}`
       }, (payload) => {
-        const newNotification = payload.new as EmployeeNotification;
+        const newNotification = mapNotificationData(payload.new as NotificationData);
         setNotifications(prev => [newNotification, ...prev]);
         setUnreadCount(prev => prev + 1);
         
@@ -58,6 +58,22 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
       supabase.removeChannel(channel);
     };
   }, [employeeId]);
+
+  // Helper function to map database notification to our EmployeeNotification type
+  const mapNotificationData = (data: NotificationData): EmployeeNotification => {
+    return {
+      id: data.id,
+      employeeId: employeeId,
+      title: data.title,
+      message: data.message,
+      type: data.type,
+      isRead: data.is_read,
+      createdAt: data.created_at,
+      aiMetadata: data.ai_metadata,
+      teamMessageId: data.team_message_id,
+      // Add any other needed properties
+    };
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -80,7 +96,7 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
       if (data) {
         // Process data to enhance team message notifications with sender info
         const enhancedData = await Promise.all(data.map(async (notif) => {
-          let enhancedNotif = { ...notif } as EmployeeNotification;
+          let updatedNotif = { ...notif } as NotificationData;
           
           // If it's a team message notification, get sender info
           if (notif.team_message_id && notif.team_messages) {
@@ -94,18 +110,18 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
                 .single();
                 
               if (senderData) {
-                enhancedNotif.sender_name = `${senderData.first_name} ${senderData.last_name}`;
+                updatedNotif.sender_name = `${senderData.first_name} ${senderData.last_name}`;
               }
             } catch (err) {
               console.error("Error fetching sender info:", err);
             }
           }
           
-          return enhancedNotif;
+          return mapNotificationData(updatedNotif);
         }));
         
         setNotifications(enhancedData);
-        setUnreadCount(enhancedData.filter(n => !n.is_read).length || 0);
+        setUnreadCount(enhancedData.filter(n => !n.isRead).length || 0);
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -124,7 +140,7 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
       setNotifications(prev => 
         prev.map(notification => 
           notification.id === notificationId 
-            ? { ...notification, is_read: true } 
+            ? { ...notification, isRead: true } 
             : notification
         )
       );
@@ -145,7 +161,7 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
       if (error) throw error;
       
       setNotifications(prev => 
-        prev.map(notification => ({ ...notification, is_read: true }))
+        prev.map(notification => ({ ...notification, isRead: true }))
       );
       setUnreadCount(0);
     } catch (error) {
@@ -217,7 +233,7 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
           {notifications.map(notification => (
             <div 
               key={notification.id} 
-              className={`p-3 border rounded-md flex items-start gap-3 transition-colors ${!notification.is_read ? 'bg-muted' : ''}`}
+              className={`p-3 border rounded-md flex items-start gap-3 transition-colors ${!notification.isRead ? 'bg-muted' : ''}`}
             >
               <div className="mt-0.5">
                 {getNotificationIcon(notification.type)}
@@ -232,19 +248,19 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
                     )}
                   </h4>
                   <span className="text-xs text-muted-foreground">
-                    {getRelativeTime(notification.created_at)}
+                    {getRelativeTime(notification.createdAt)}
                   </span>
                 </div>
                 <p className="text-sm mt-1">{notification.message}</p>
                 
-                {notification.ai_metadata && (
+                {notification.aiMetadata && (
                   <div className="mt-2 p-2 bg-blue-50 text-blue-800 text-xs rounded">
                     <div className="font-medium">AI Insight:</div>
-                    <p>{notification.ai_metadata.recommendation}</p>
+                    <p>{notification.aiMetadata.recommendation}</p>
                   </div>
                 )}
                 
-                {notification.type === 'message' && notification.team_message_id && (
+                {notification.type === 'message' && notification.teamMessageId && (
                   <div className="mt-2">
                     <Button 
                       variant="link" 
@@ -262,7 +278,7 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
                 )}
               </div>
               
-              {!notification.is_read && (
+              {!notification.isRead && (
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -292,4 +308,37 @@ export function AINotificationCenter({ employeeId }: AINotificationCenterProps) 
       )}
     </div>
   );
+
+  function getNotificationIcon(type: string) {
+    switch (type) {
+      case 'info':
+        return <InfoIcon className="h-4 w-4 text-blue-500" />;
+      case 'warning':
+        return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+      case 'success':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'achievement':
+        return <Bell className="h-4 w-4 text-purple-500" />;
+      case 'message':
+        return <MessageSquare className="h-4 w-4 text-indigo-500" />;
+      default:
+        return <Bell className="h-4 w-4" />;
+    }
+  }
+
+  function getRelativeTime(timestamp: string) {
+    const now = new Date();
+    const date = new Date(timestamp);
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return 'Just now';
+    } else if (diffInSeconds < 3600) {
+      return `${Math.floor(diffInSeconds / 60)}m ago`;
+    } else if (diffInSeconds < 86400) {
+      return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    } else {
+      return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    }
+  }
 }

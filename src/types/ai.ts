@@ -23,6 +23,8 @@ export interface TeamMessage {
   message: string;
   isImportant: boolean;
   createdAt: string;
+  sender_name?: string;
+  sender_avatar?: string;
 }
 
 export interface EmployeeNotification {
