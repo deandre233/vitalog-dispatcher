@@ -1,4 +1,5 @@
 
+import { useState, useMemo } from "react";
 import { HRLayout } from "@/components/layout/HRLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
@@ -9,6 +10,8 @@ import { DirectoryTabs } from "@/components/employee-directory/DirectoryTabs";
 import { EmployeeGrid } from "@/components/employee-directory/EmployeeGrid";
 import { EmployeeList } from "@/components/employee-directory/EmployeeList";
 import { EmptyState } from "@/components/employee-directory/EmptyState";
+import { AIDirectoryInsights } from "@/components/employee-directory/AIDirectoryInsights";
+import { motion } from "framer-motion";
 
 export function EmployeeDirectory() {
   const {
@@ -28,14 +31,42 @@ export function EmployeeDirectory() {
     getStatusBadgeColor
   } = useEmployeeDirectory();
 
+  const [showAIInsights, setShowAIInsights] = useState(false);
+
+  // Compute certification and station counts for AI insights
+  const certificationCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    filteredEmployees.forEach(employee => {
+      const cert = employee.certification_level || 'Uncertified';
+      counts[cert] = (counts[cert] || 0) + 1;
+    });
+    return counts;
+  }, [filteredEmployees]);
+
+  const stationCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    filteredEmployees.forEach(employee => {
+      const station = employee.station || 'Unassigned';
+      counts[station] = (counts[station] || 0) + 1;
+    });
+    return counts;
+  }, [filteredEmployees]);
+
   if (isLoading) {
     return (
       <HRLayout>
-        <div className="space-y-6">
+        <motion.div 
+          className="space-y-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="flex items-center justify-between">
-            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-12 w-64" />
             <Skeleton className="h-10 w-36" />
           </div>
+          
+          <Skeleton className="h-20 w-full" />
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array(8).fill(0).map((_, i) => (
@@ -51,15 +82,28 @@ export function EmployeeDirectory() {
               </Card>
             ))}
           </div>
-        </div>
+        </motion.div>
       </HRLayout>
     );
   }
 
   return (
     <HRLayout>
-      <div className="space-y-6">
+      <motion.div 
+        className="space-y-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         <DirectoryHeader employeeCount={filteredEmployees.length} />
+        
+        <AIDirectoryInsights 
+          isVisible={showAIInsights} 
+          onClose={() => setShowAIInsights(false)}
+          employeeCount={filteredEmployees.length}
+          certificationCounts={certificationCounts}
+          stationCounts={stationCounts}
+        />
         
         <DirectoryFilters
           searchQuery={searchQuery}
@@ -73,6 +117,7 @@ export function EmployeeDirectory() {
           certificationLevels={certificationLevels}
           stations={stations}
           resetFilters={resetFilters}
+          onShowAIInsights={() => setShowAIInsights(!showAIInsights)}
         />
         
         <DirectoryTabs 
@@ -91,7 +136,7 @@ export function EmployeeDirectory() {
             />
           )}
         </DirectoryTabs>
-      </div>
+      </motion.div>
     </HRLayout>
   );
 }

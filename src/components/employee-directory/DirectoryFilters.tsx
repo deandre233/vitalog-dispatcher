@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,8 +9,10 @@ import {
   MapPin,
   BadgeCheck,
   Grid3X3,
-  List
+  List,
+  Sparkles
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface DirectoryFiltersProps {
   searchQuery: string;
@@ -25,6 +26,7 @@ interface DirectoryFiltersProps {
   certificationLevels: string[];
   stations: string[];
   resetFilters: () => void;
+  onShowAIInsights: () => void;
 }
 
 export function DirectoryFilters({
@@ -38,23 +40,29 @@ export function DirectoryFilters({
   setViewMode,
   certificationLevels,
   stations,
-  resetFilters
+  resetFilters,
+  onShowAIInsights
 }: DirectoryFiltersProps) {
   return (
-    <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-[#E5DEFF]">
+    <motion.div 
+      className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-[#E5DEFF]"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.1 }}
+    >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="relative">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search personnel..."
-            className="pl-9 border-[#E5DEFF] focus:border-[#8B5CF6]"
+            className="pl-9 border-[#E5DEFF] focus:border-[#8B5CF6] transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         
         <Select value={certFilter} onValueChange={setCertFilter}>
-          <SelectTrigger className="border-[#E5DEFF]">
+          <SelectTrigger className="border-[#E5DEFF] transition-all">
             <div className="flex items-center gap-2">
               <BadgeCheck className="h-4 w-4 text-[#8B5CF6]" />
               <SelectValue placeholder="Certification Level" />
@@ -69,7 +77,7 @@ export function DirectoryFilters({
         </Select>
         
         <Select value={stationFilter} onValueChange={setStationFilter}>
-          <SelectTrigger className="border-[#E5DEFF]">
+          <SelectTrigger className="border-[#E5DEFF] transition-all">
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-[#8B5CF6]" />
               <SelectValue placeholder="Station" />
@@ -86,13 +94,30 @@ export function DirectoryFilters({
       
       <div className="flex justify-between items-center mt-4">
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-8">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-8 border-[#E5DEFF] hover:bg-[#F1F0FB] transition-all"
+          >
             <Filter className="h-3.5 w-3.5 mr-1" />
             More Filters
           </Button>
-          <Button variant="outline" size="sm" className="h-8">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-8 border-[#E5DEFF] hover:bg-[#F1F0FB] transition-all"
+          >
             <SlidersHorizontal className="h-3.5 w-3.5 mr-1" />
             Sort
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-8 text-[#8B5CF6] border-[#E5DEFF] hover:bg-[#F1F0FB] transition-all"
+            onClick={onShowAIInsights}
+          >
+            <Sparkles className="h-3.5 w-3.5 mr-1" />
+            AI Insights
           </Button>
         </div>
         
@@ -115,6 +140,6 @@ export function DirectoryFilters({
           </Button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
