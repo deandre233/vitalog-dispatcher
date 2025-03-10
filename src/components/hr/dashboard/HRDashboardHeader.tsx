@@ -3,13 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Activity, Clock, MessageSquare } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface HRDashboardHeaderProps {
   unreadMessages: number;
 }
 
 export function HRDashboardHeader({ unreadMessages }: HRDashboardHeaderProps) {
+  const navigate = useNavigate();
+  
   const handleMessageClick = () => {
+    // Navigate to the employee profile with the notifications tab active
+    navigate(`/employees/profile/current?tab=notifications`);
+    
     toast({
       title: "Messages",
       description: "Opening your message center...",

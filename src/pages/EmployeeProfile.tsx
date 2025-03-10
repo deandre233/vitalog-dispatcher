@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+
+import { useState, useEffect } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import { HRLayout } from "@/components/layout/HRLayout";
 import { EmployeeProfileTabs } from "@/components/hr/EmployeeProfileTabs";
 import { EmployeeHeader } from "@/components/hr/EmployeeHeader";
@@ -23,7 +24,17 @@ import { useEmployeePayroll } from "@/hooks/useEmployeePayroll";
 
 const EmployeeProfile = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
-  const [activeTab, setActiveTab] = useState("identity");
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  
+  const [activeTab, setActiveTab] = useState(tabParam || "identity");
+  
+  // Set the active tab based on the URL parameter if present
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
   
   const { roles, isLoading: loadingRoles, updateRole } = useEmployeeRoles(employeeId);
   const { privileges, isLoading: loadingPrivileges, updatePrivileges, getAIRecommendations } = useEmployeePrivileges(employeeId);
