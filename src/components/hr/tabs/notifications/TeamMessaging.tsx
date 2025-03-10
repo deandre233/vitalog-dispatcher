@@ -7,6 +7,8 @@ import { ChannelSelector } from "./components/ChannelSelector";
 import { MessageList } from "./components/MessageList";
 import { MessageInput } from "./components/MessageInput";
 import { fetchTeamMessages, setupRealtimeSubscription } from "./utils/teamMessagingUtils";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 interface TeamMessagingProps {
   employeeId: string;
@@ -18,6 +20,7 @@ export function TeamMessaging({ employeeId, teamMembers = [] }: TeamMessagingPro
   const [isLoading, setIsLoading] = useState(false);
   const [channel, setChannel] = useState("general");
   const [messageCount, setMessageCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     loadMessages();
@@ -31,6 +34,10 @@ export function TeamMessaging({ employeeId, teamMembers = [] }: TeamMessagingPro
         return [...prev, newMessage];
       });
       setMessageCount(prev => prev + 1);
+      // Increment unread count if message isn't from current user
+      if (newMessage.senderId !== employeeId) {
+        setUnreadCount(prev => prev + 1);
+      }
     });
       
     return () => {
@@ -44,6 +51,8 @@ export function TeamMessaging({ employeeId, teamMembers = [] }: TeamMessagingPro
       const fetchedMessages = await fetchTeamMessages(channel, teamMembers);
       setMessages(fetchedMessages);
       setMessageCount(fetchedMessages.length);
+      // Reset unread count when messages are loaded
+      setUnreadCount(0);
     } catch (error) {
       console.error("Error loading messages:", error);
     } finally {
@@ -57,7 +66,15 @@ export function TeamMessaging({ employeeId, teamMembers = [] }: TeamMessagingPro
 
   return (
     <div className="flex flex-col h-full">
-      <ChannelSelector channel={channel} onChange={handleChannelChange} />
+      <div className="flex justify-between items-center mb-4">
+        <ChannelSelector channel={channel} onChange={handleChannelChange} />
+        
+        {unreadCount > 0 && (
+          <Badge variant="destructive" className="animate-pulse">
+            {unreadCount} new {unreadCount === 1 ? 'message' : 'messages'}
+          </Badge>
+        )}
+      </div>
       
       <Card className="flex-1 p-4 mb-4 bg-gray-50 overflow-hidden">
         <MessageList 

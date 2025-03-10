@@ -9,6 +9,7 @@ import { AINotificationCenter } from "./notifications/AINotificationCenter";
 import { TeamMessaging } from "./notifications/TeamMessaging";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
+import { MessageSquare, Bell } from "lucide-react";
 
 interface NotificationsTabProps {
   employeeId: string;
@@ -16,7 +17,7 @@ interface NotificationsTabProps {
 
 export function NotificationsTab({ employeeId }: NotificationsTabProps) {
   const [isOnClock, setIsOnClock] = useState(false);
-  const [activeTab, setActiveTab] = useState("notifications");
+  const [activeTab, setActiveTab] = useState("team-chat"); // Set team-chat as default
   const [teamMembers, setTeamMembers] = useState<{ id: string; name: string; avatar?: string }[]>([]);
   
   useEffect(() => {
@@ -136,20 +137,26 @@ export function NotificationsTab({ employeeId }: NotificationsTabProps) {
       
       <Separator />
       
-      <Card>
-        <CardHeader className="pb-2">
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="team-chat">Team Chat</TabsTrigger>
+              <TabsTrigger value="team-chat" className="gap-2">
+                <MessageSquare className="h-4 w-4" />
+                Team Chat
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="gap-2">
+                <Bell className="h-4 w-4" />
+                Notifications
+              </TabsTrigger>
             </TabsList>
           </Tabs>
         </CardHeader>
-        <CardContent>
-          {activeTab === "notifications" ? (
-            <AINotificationCenter employeeId={employeeId} />
-          ) : (
+        <CardContent className="p-4 pt-6">
+          {activeTab === "team-chat" ? (
             <TeamMessaging employeeId={employeeId} teamMembers={teamMembers} />
+          ) : (
+            <AINotificationCenter employeeId={employeeId} />
           )}
         </CardContent>
       </Card>
