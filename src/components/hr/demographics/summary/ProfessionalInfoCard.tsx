@@ -22,8 +22,8 @@ export function ProfessionalInfoCard({ data, formatDate }: ProfessionalInfoCardP
           value={formatDate(data.certification_expiry)} 
         />
         <InfoRow 
-          label="Years Experience" 
-          value={data.years_experience || "Not provided"} 
+          label="Role" 
+          value={data.employee_type || "Not specified"} 
         />
       </InfoGrid>
     </SummaryCard>

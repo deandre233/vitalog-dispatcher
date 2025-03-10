@@ -20,6 +20,7 @@ export function useEmployeeDirectory() {
   const [viewMode, setViewMode] = useState<"grid" | "list" | "table">("table"); // Default to table view for better visibility
   const [certFilter, setCertFilter] = useState<string>("all");
   const [stationFilter, setStationFilter] = useState<string>("all");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
 
   const stations = useMemo(() => {
     const stationSet = new Set(employees.map(emp => emp.station || 'Unassigned'));
@@ -29,6 +30,11 @@ export function useEmployeeDirectory() {
   const certificationLevels = useMemo(() => {
     const certSet = new Set(employees.map(emp => emp.certification_level || 'Uncertified'));
     return Array.from(certSet);
+  }, [employees]);
+
+  const employeeRoles = useMemo(() => {
+    const roleSet = new Set(employees.map(emp => emp.employee_type || 'Unspecified'));
+    return Array.from(roleSet);
   }, [employees]);
 
   useEffect(() => {
@@ -98,13 +104,20 @@ export function useEmployeeDirectory() {
       );
     }
     
+    if (roleFilter !== "all") {
+      result = result.filter(
+        employee => employee.employee_type === roleFilter
+      );
+    }
+    
     setFilteredEmployees(result);
-  }, [searchQuery, certFilter, stationFilter, employees]);
+  }, [searchQuery, certFilter, stationFilter, roleFilter, employees]);
 
   const resetFilters = () => {
     setSearchQuery("");
     setCertFilter("all");
     setStationFilter("all");
+    setRoleFilter("all");
   };
 
   const getStatusBadgeColor = (role?: string) => {
@@ -138,8 +151,11 @@ export function useEmployeeDirectory() {
     setCertFilter,
     stationFilter,
     setStationFilter,
+    roleFilter,
+    setRoleFilter,
     stations,
     certificationLevels,
+    employeeRoles,
     resetFilters,
     getStatusBadgeColor
   };

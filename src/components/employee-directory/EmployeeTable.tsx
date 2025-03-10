@@ -3,7 +3,7 @@ import { Employee } from "@/types/employee";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Phone, Clock, Check, Calendar, Mail, Building } from "lucide-react";
+import { MapPin, Phone, Briefcase, Check, Calendar, Mail, Building } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -46,7 +46,7 @@ export function EmployeeTable({ employees, getStatusBadgeColor }: EmployeeTableP
             <TableHead className="font-semibold">Certification</TableHead>
             <TableHead className="font-semibold">Station</TableHead>
             <TableHead className="font-semibold">Phone</TableHead>
-            <TableHead className="font-semibold">Experience</TableHead>
+            <TableHead className="font-semibold">Role</TableHead>
           </TableRow>
         </TableHeader>
         <motion.tbody
@@ -101,14 +101,10 @@ export function EmployeeTable({ employees, getStatusBadgeColor }: EmployeeTableP
                 )}
               </TableCell>
               <TableCell>
-                {employee.years_experience !== undefined ? (
-                  <div className="flex items-center text-gray-600">
-                    <Clock className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
-                    {employee.years_experience} years
-                  </div>
-                ) : (
-                  <span className="text-gray-400 text-sm italic">No data</span>
-                )}
+                <div className="flex items-center text-gray-600">
+                  <Briefcase className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                  {employee.employee_type || 'Unspecified Role'}
+                </div>
               </TableCell>
             </motion.tr>
           ))}
