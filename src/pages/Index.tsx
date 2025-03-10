@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
@@ -13,7 +14,8 @@ import {
   BarChart,
   TrendingUp,
   Truck,
-  UserCheck
+  UserCheck,
+  Briefcase
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -48,9 +50,9 @@ const menuItems = [
   },
   {
     title: "HR",
-    icon: Users,
-    description: "Manage staff and crew assignments",
-    path: "/crew",
+    icon: Briefcase,
+    description: "Manage employees, payroll, and HR operations",
+    path: "/hr",
     color: "text-amber-500",
     gradient: "from-amber-400 to-orange-500"
   },
