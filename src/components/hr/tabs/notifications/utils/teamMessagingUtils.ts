@@ -11,6 +11,20 @@ export const channelOptions = [
   { id: "field-crew", name: "Field Crew" },
 ];
 
+// Define interface for raw database team message response
+interface RawTeamMessage {
+  id: string;
+  sender_id: string;
+  channel_id: string;
+  message: string;
+  is_important: boolean;
+  is_announcement?: boolean;
+  created_at: string;
+  updated_at: string;
+  sender_name?: string;
+  reactions?: string[];
+}
+
 export const fetchTeamMessages = async (channel: string, teamMembers: TeamMember[] = []) => {
   try {
     // Get recent messages for this channel
@@ -25,7 +39,7 @@ export const fetchTeamMessages = async (channel: string, teamMembers: TeamMember
     
     if (data) {
       // Enhance messages with sender info where available
-      const enhancedMessages: TeamMessage[] = data.map(msg => {
+      const enhancedMessages: TeamMessage[] = data.map((msg: RawTeamMessage) => {
         const sender = teamMembers.find(m => m.id === msg.sender_id);
         return {
           id: msg.id,
@@ -110,7 +124,7 @@ export const addReactionToMessage = async (messageId: string, reaction: string) 
     if (fetchError) throw fetchError;
     
     // Update the reactions array
-    const currentReactions = currentMessage?.reactions || [];
+    const currentReactions = (currentMessage as RawTeamMessage)?.reactions || [];
     const newReactions = [...currentReactions, reaction];
     
     // Update the message with new reactions
@@ -141,7 +155,7 @@ export const setupRealtimeSubscription = (
       table: 'team_messages',
       filter: `channel_id=eq.${channel}`
     }, (payload) => {
-      const newMessageData = payload.new as any;
+      const newMessageData = payload.new as RawTeamMessage;
       
       // Convert to our TeamMessage type
       const newMessage: TeamMessage = {

@@ -1,5 +1,6 @@
+
 import { useRef, useEffect, useState } from "react";
-import { AlertTriangle, Bell, ThumbsUp, SmilePlus, Star, Reply, Bot } from "lucide-react";
+import { AlertTriangle, Bell, ThumbsUp, SmilePlus, Star, Reply, Bot, Send } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
