@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -40,23 +41,23 @@ export function HRSidebar() {
 
   return (
     <div className={cn(
-      "relative border-r bg-[#2B4B8C] text-white",
+      "relative border-r bg-gradient-to-b from-[#221F26] to-[#2D2A33] text-[#C8C8C9]",
       "transition-all duration-300 ease-in-out h-[calc(100vh-4rem)]",
       isCollapsed ? "w-16" : "w-64",
       isMobile && !isCollapsed && "absolute left-0 top-0 z-50 h-screen shadow-lg"
     )}>
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-4 border-b border-[#3A363F]">
           {!isCollapsed && (
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
+              <Building2 className="h-5 w-5 text-purple-300" />
               HR Portal
             </h2>
           )}
           <Button
             variant="ghost"
             size="icon"
-            className="text-white hover:bg-white/10"
+            className="text-[#C8C8C9] hover:bg-[#3A363F] hover:text-white"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? 
@@ -76,23 +77,24 @@ export function HRSidebar() {
                     variant="ghost"
                     className={cn(
                       "w-full justify-start relative overflow-hidden group",
-                      "hover:bg-white/10",
+                      "hover:bg-[#3A363F] hover:text-white",
                       "transition-all duration-200 ease-in-out",
-                      pathname === item.href && "bg-white/20",
+                      pathname === item.href && "bg-[#3A363F] border-l-4 border-purple-400",
                       isCollapsed ? "px-2" : "px-4"
                     )}
                     asChild
                   >
                     <Link to={item.href} className="flex items-center">
                       <IconComponent className={cn(
-                        "h-4 w-4 text-white",
+                        "h-4 w-4",
+                        pathname === item.href ? "text-purple-300" : "text-[#9E9AA3]",
                         !isCollapsed && "mr-2"
                       )} />
                       {!isCollapsed && (
-                        <span className="font-medium text-white">{item.label}</span>
+                        <span className="font-medium">{item.label}</span>
                       )}
                       {!isCollapsed && item.badge && (
-                        <span className="ml-auto bg-white/20 text-xs rounded px-2 py-1">
+                        <span className="ml-auto bg-[#3A363F] text-purple-300 text-xs rounded-full px-2.5 py-0.5 font-semibold">
                           {item.badge.text}
                         </span>
                       )}
@@ -103,6 +105,15 @@ export function HRSidebar() {
             })}
           </div>
         </nav>
+        
+        {!isCollapsed && (
+          <div className="p-4 border-t border-[#3A363F] mt-auto">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[#9E9AA3]">Version 2.4.0</span>
+              <span className="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-300">Pro</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
