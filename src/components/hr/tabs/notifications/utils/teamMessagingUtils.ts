@@ -128,9 +128,12 @@ export const addReactionToMessage = async (messageId: string, reaction: string) 
     const newReactions = [...currentReactions, reaction];
     
     // Update the message with new reactions
+    // We need to use type assertion here to tell TypeScript this property exists
     const { error: updateError } = await supabase
       .from('team_messages')
-      .update({ reactions: newReactions })
+      .update({ 
+        reactions: newReactions 
+      } as Partial<RawTeamMessage>)
       .eq('id', messageId);
       
     if (updateError) throw updateError;
